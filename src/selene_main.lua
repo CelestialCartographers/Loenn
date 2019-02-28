@@ -2,9 +2,7 @@
 
 local logo = love.graphics.newImage("logo.png")
 
-function love.draw()    
-    love.graphics.setScreen("top")
+function love.draw()
     love.graphics.print($("Hello", "World!"):concat(" "), 20, 20)   
-    love.graphics.setScreen("bottom")  
-    love.graphics.draw(logo, 25, -30)
+    love.graphics.draw(logo, 80, 80)
 end
