@@ -199,7 +199,7 @@ local varPattern = "^[%a_][%w_]*$"
 --local lambdaParPattern = "("..varPattern..")((%s*,%s*)("..varPattern.."))*"
 
 local function isVar(t)
-  for str in t:gmatch("([^.]*)") do
+  for str in t:gmatch("([^.]+)") do
     if not str:find(varPattern) then
       return false
     end
@@ -290,8 +290,8 @@ local function findLambda(tokens, i, part, line, stripcomments)
     funcode = tryAddReturn(funcode, stripcomments)
   end
   for _, s in ipairs(params) do
-    if not s:find(varPattern) then
-      perror("invalid lambda at index " .. i .. " (line " .. line .. "): invalid parameters: " .. table.concat(params, ","))
+    if not (s:find(varPattern) or s == "...") then
+      perror("invalid lambda at index " .. i .. " (line " .. line .. "): invalid parameters: " .. table.concat(params, ",") .. " - parameter " .. s)
     end
   end
   local func = string.format("(_selene._newFunc(function(%s) %s end, %d, %s))", table.concat(params, ","), funcode, #params, cond)
@@ -304,7 +304,11 @@ end
 
 local function findDollars(tokens, i, part, line)
   local curr = tokens[i + 1][1]
-  if curr:find("^[({\"']") or curr:find("^%[=*%[") then
+  if tokens[i - 1][1] and tokens[i - 1][1]:find("[:%.]$") then
+    tokens[i - 1][1] = tokens[i - 1][1]:sub(1, #(tokens[i - 1][1]) - 1)
+    tokens[i][1] = "()"
+    return i - 1, i
+  elseif curr:find("^[({\"']") or curr:find("^%[=*%[") then
     tokens[i][1] = "_selene._new"
   elseif curr:find("^l") then
     tokens[i][1] = "_selene._newList"
@@ -318,10 +322,9 @@ local function findDollars(tokens, i, part, line)
   elseif curr:find("^o") then
     tokens[i][1] = "_selene._newOptional"
     table.remove(tokens, i + 1)
-  elseif tokens[i - 1]:find("[:%.]$") then
-    tokens[i - 1][1] = tokens[i - 1][1]:sub(1, #(tokens[i - 1][1]) - 1)
-    tokens[i][1] = "()"
-    return i - 1, i
+  elseif curr:find("^i") then
+    tokens[i][1] = "_selene._newIterable"
+    table.remove(tokens, i + 1)
   else
     perror("invalid $ at index " .. i .. " (line " .. line .. ")")
   end
@@ -385,13 +388,12 @@ local function findForeach(tokens, i, part, line)
       step = step + 1
     end
   end
-  vars = split(table.concat(vars), ",")
   for _, p in ipairs(params) do
     if not p:find(varPattern) then
       return false
     end
   end
-  local func = string.format("%s in lpairs(%s)", table.concat(params, ","), table.concat(vars, ","))
+  local func = string.format("%s in lpairs(%s)", table.concat(params, ","), table.concat(vars, " "))
   for i = start, stop do
     table.remove(tokens, start)
   end
@@ -400,7 +402,7 @@ local function findForeach(tokens, i, part, line)
 end
 
 local function findAssignmentOperator(tokens, i)
-  if isVar(tokens[i - 1][1]) then
+  if tokens[i - 1][1] and isVar(tokens[i - 1][1]) then
     tokens[i][1] = " = " .. tokens[i - 1][1] .. " " .. tokens[i][1]:sub(1, #tokens[i][1] - 1)
     return i, i
   end
@@ -408,7 +410,7 @@ local function findAssignmentOperator(tokens, i)
 end
 
 local function findDollarAssignment(tokens, i, part, line)
-  if isVar(tokens[i - 1][1]) then
+  if tokens[i - 1][1] and isVar(tokens[i - 1][1]) then
     tokens[i][1] = " = _selene._new(" .. tokens[i - 1][1] .. ")"
     return i, i
   else

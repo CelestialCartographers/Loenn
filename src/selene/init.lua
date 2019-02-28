@@ -132,36 +132,36 @@ local function lpairs(obj)
 end
 
 local allMaps = { "map", "list", "stringlist" }
+local allIterables = { "map", "list", "stringlist", "iterable" }
+local allIndexables = {"list", "stringlist", "iterable"}
 
 -- Errors if the value is not a valid type (list or map)
 local function checkType(n, have, ...)
   have = tblType(have)
   local things = { ... }
-  if #things == 0 then things = allMaps end
-  local function check(want, ...)
-    if not want then
-      return false
-    else
-      return have == want or check(...)
+  if #things == 0 then
+    things = allIterables
+  elseif #things == 1 and type(things[1]) == "table" then
+    things = things[1]
+  end
+  for _, want in ipairs(things) do
+    if have == want then
+      return
     end
   end
-
-  if not check(table.unpack(things)) then
-    local msg = string.format("[Selene] bad argument #%d (%s expected, got %s)",
-      n, table.concat({ ... }, " or "), have)
-    error(msg, 3)
-  end
+  local msg = string.format("[Selene] bad argument #%d (%s expected, got %s)",
+    n, table.concat(things, " or "), have)
+  error(msg, 3)
 end
 
 -- Errors if the value is not a function or does not have the required parameter count
 local function checkFunc(n, have, ...)
-  checkType(n, have, "function")
+  checkType(n, have, "function", "table")
   if type(have) == "function" then return end
   local haveParCount = parCount(have, nil)
   have = type(have)
   if not haveParCount then
-    local msg = string.format("[Selene] bad argument #%d (function expected, got %s)", n, have)
-    error(msg, 2)
+    return
   end
 
   if #{ ... } == 0 then return end
@@ -189,8 +189,7 @@ local function switch(o, ...)
   for i, f in ipairs({ ... }) do
     checkFunc(i + 1, f, 1, 0)
     if type(f) == "table" then
-      local fm = getmetatable(f)
-      if fm and fm.applies and fm.applies(o) then
+      if f.applies and f.applies(o) then
         return f._fnc(o)
       end
     else
@@ -243,8 +242,7 @@ local function truef() return true end
 
 local fmt = {
   __call = function(fnc, ...)
-    local fm = getmetatable(fnc)
-    if fm.applies and not fm.applies(...) then return end
+    if fnc.applies and not fnc.applies(...) then return end
     return fnc._fnc(...)
   end,
   __len = function(fnc)
@@ -270,8 +268,19 @@ local fmt = {
   ltype = "function"
 }
 
+local cfmt = shallowcopy(fmt)
+cfmt.__call = function(fnc, ...)
+  local fm = getmetatable(fnc)
+  for i, f in ipairs(fm._cfnc) do
+    if f[1](...) then
+      return f[2](...)
+    end
+  end
+end
+
 local _Table = {}
 local _String = {}
+local _Iterable = {}
 
 local smt = shallowcopy(mt)
 smt.ltype = "stringlist"
@@ -279,6 +288,42 @@ smt.__call = function(str)
   return table.concat(str._tbl)
 end
 smt.__tostring = smt.__call
+
+local function inext(spl, i)
+  local v = spl(i)
+  if v == nil then
+    return v
+  else
+    return i+1, v
+  end
+end
+
+local imt = {
+  __call = function(itr)
+    local v = itr._spl(itr._i)
+    itr._i = itr._i + 1
+    return v
+  end,
+  __len = function(itr)
+    error("[Selene] attempt to get length of " .. tblType(itr), 2)
+  end,
+  __pairs = function(itr)
+    return inext, itr._spl, 1
+  end,
+  __ipairs = function(itr)
+    return inext, itr._spl, 1
+  end,
+  __tostring = function(itr)
+    return tostring(itr._spl)
+  end,
+  __index = function(itr, key)
+    error("[Selene] attempt to index " .. tblType(itr), 2)
+  end,
+  __newindex = function(itr, key, val)
+    error("[Selene] attempt to insert value into " .. tblType(itr), 2)
+  end,
+  ltype = "iterable"
+}
 
 --------
 -- Initialization functions
@@ -360,17 +405,31 @@ local function newFunc(f, parCnt, applies)
   local newF = {}
   local fm = shallowcopy(fmt)
   newF._fnc = f
-  fm.applies = applies
+  newF.applies = applies
   fm.parCount = parCnt
   setmetatable(newF, fm)
   return newF
 end
 
-local function newWrappedTable(...)
+local function newIterable(spl)
+  checkType(1, spl, "function")
+  local newI = {}
+  newI._spl = spl
+  newI._i = 1
+  for i, j in pairs(_Iterable) do
+    newI[i] = j
+  end
+  setmetatable(newI, imt)
+  return newI
+end
+
+local function newGeneric(...)
   local t = ...
   if #{ ... } > 1 then t = { ... } end
   if type(t) == "string" then
     return newString(t)
+  elseif tblType(t) == "function" then
+    return newIterable(t)
   else
     return newListOrMap(t)
   end
@@ -433,6 +492,59 @@ lmt.__add = function(first, second)
     error(string.format("[Selene] attempt to add %s and %s (cannot insert %s into %s)",
       fType, sType, sType, fType), 2)
   end
+end
+
+fmt.__add = function(first, second)
+  if type(first) == "table" and type(second) == "table" then
+    local fm = getmetatable(first)
+    local sm = getmetatable(second)
+    if(fm and fm.ltype == "function" and sm and sm.ltype == "function") then
+      local funcs = {}
+      local pc
+      local function insert(p, t)
+        if not pc or pc == p then
+          table.insert(funcs, t)
+          pc = pc or p
+        else
+          error(string.format("[Selene] attempt to create composite function out of functions with different parameter counts %s and %s",
+            pc, p), 3)
+        end
+      end
+      if fm._cfnc then
+        for i, f in ipairs(fm._cfnc) do
+          insert(fm.parCount, f)
+        end
+      else
+        insert(fm.parCount, {first.applies, first._fnc})
+      end
+      if sm._cfnc then
+        for i, f in ipairs(sm._cfnc) do
+          insert(sm.parCount, f)
+        end
+      else
+        insert(sm.parCount, {second.applies, second._fnc})
+      end
+      local newC = {}
+      local cm = shallowcopy(cfmt)
+      cm._cfnc = funcs
+      newC.applies = function(...)
+        for i, f in ipairs(cm._cfnc) do
+          if f[1](...) then
+            return true
+          end
+        end
+        return false
+      end
+      newC._fnc = function(...)
+        return newC(...)
+      end
+      cm.parCount = pc
+      setmetatable(newC, cm)
+      return newC
+    end
+  end
+  error(string.format("[Selene] attempt to create composite function out of %s and %s",
+    tblType(first), tblType(second)), 2)
 end
 
 --------
@@ -626,6 +738,22 @@ local function tbl_slice(self, start, stop, step)
   return wrap_rawslice(self, start, stop, step, wrap_returnselfentry, newListOrMap)
 end
 
+local function tbl_splice(self, index, ...)
+  checkType(1, self, "list", "stringlist")
+  checkArg(2, index, "number")
+  local repl = {...}
+  local spliced = shallowcopy(self._tbl)
+  if #repl == 0 then
+    table.remove(spliced, index)
+  else
+    spliced[index] = repl[1]
+    for i = 2, #repl do
+      table.insert(spliced, index + i - 1, repl[i])
+    end
+  end
+  return newList(spliced)
+end
+
 --inverts the list
 local function wrap_reverse(self, newl)
   checkType(1, self, "list", "stringlist")
@@ -670,14 +798,17 @@ local function tbl_foldright(self, start, f)
 end
 
 local function tbl_reduceleft(self, f)
-  checkType(1, self, "list", "stringlist")
+  checkType(1, self, "list", "stringlist", "iterable")
   checkFunc(2, f)
-  if #self <= 0 then
-    error("[Selene] bad argument #1 (got empty list)", 2)
-  end
-  local m = self[1]
-  for i = 2, #self do
-    m = f(m, self._tbl[i])
+  local d = false
+  local m
+  for i, j in mpairs(self) do
+    if d then
+      m = f(m, j)
+    else
+      d = true
+      m = j
+    end
   end
   return m
 end
@@ -694,6 +825,17 @@ local function tbl_find(self, f)
   for i, j in mpairs(self) do
     if f(parCnt(i, j)) then
       return j
+    end
+  end
+end
+
+local function tbl_index(self, f)
+  checkType(1, self, allIndexables)
+  checkFunc(2, f)
+  local parCnt = checkParCnt(parCount(f, 2))
+  for i, j in mpairs(self) do
+    if f(parCnt(i, j)) then
+      return i
     end
   end
 end
@@ -716,7 +858,7 @@ local function rawflatten(self)
 end
 
 local function tbl_flatten(self)
-  checkType(1, self, "list")
+  checkType(1, self, "list", "iterable")
   return newListOrMap(rawflatten(self._tbl))
 end
 
@@ -775,7 +917,7 @@ local function tbl_contains(self, val)
 end
 
 local function tbl_containskey(self, key)
-  checkType(1, self)
+  checkType(1, self, allMaps)
   return self._tbl[key] ~= nil
 end
 
@@ -833,7 +975,7 @@ local function rawvalues(self)
 end
 
 local function tbl_clear(self)
-  checkType(1, self)
+  checkType(1, self, allMaps)
   for _, j in ipairs(rawkeys(self)) do
     self._tbl[j] = nil
   end
@@ -848,6 +990,40 @@ end
 local function tbl_values(self)
   checkType(1, self)
   return newList(rawvalues(self))
+end
+
+-- for iterable objects
+
+local function itr_collect(self)
+  local collected = {}
+  for i, j in mpairs(self) do
+    insert(collected, false, i, j)
+  end
+  return newListOrMap(collected)
+end
+
+local function itr_drop(self, amt)
+  amt = math.max(amt, 0)
+  for i = 1, amt do
+    if self() == nil then
+      break
+    end
+  end
+  return self
+end
+
+local function itr_take(self, amt)
+  local taken = {}
+  amt = math.max(amt, 0)
+  for i = 1, amt do
+    local next = self()
+    if next == nil then
+      break
+    else
+      insert(taken, false, next)
+    end
+  end
+  return newListOrMap(taken)
 end
 
 -- for the actual table library
@@ -878,12 +1054,12 @@ local function tbl_zipped(one, two)
 end
 
 local function tbl_call(self, f, ...)
-  checkType(1, self)
+  checkType(1, self, allMaps)
   checkFunc(2, f)
   local res = f(self._tbl, ...)
   local tRes = tblType(res)
   if tRes == "table" or tRes == "string" then
-    return newWrappedTable(res)
+    return newGeneric(res)
   else
     return res
   end
@@ -965,7 +1141,7 @@ local function str_foreach(self, f)
   checkFunc(2, f)
   local parCnt = checkParCnt(parCount(f))
   for i = 1, #self do
-    f(parCnt(i, j))
+    f(parCnt(i, self:sub(i,i)))
   end
 end
 
@@ -1223,7 +1399,7 @@ end
 -- Adding to global variables
 --------
 
-local VERSION = "Selene 0.1.0.5"
+local VERSION = "Selene 0.1.0.7"
 
 local function patchNativeLibs(env)
   env.string.foreach = str_foreach
@@ -1290,6 +1466,7 @@ local function loadSeleneConstructs()
   _Table.takeright = tbl_takeright
   _Table.takewhile = tbl_takewhile
   _Table.slice = tbl_slice
+  _Table.splice = tbl_splice
   _Table.reverse = tbl_reverse
   _Table.flip = tbl_flip
   _Table.fold = tbl_foldleft
@@ -1299,6 +1476,7 @@ local function loadSeleneConstructs()
   _Table.reduceleft = tbl_reduceleft
   _Table.reduceright = tbl_reduceright
   _Table.find = tbl_find
+  _Table.index = tbl_index
   _Table.flatten = tbl_flatten
   _Table.zip = tbl_zip
   _Table.contains = tbl_contains
@@ -1312,14 +1490,19 @@ local function loadSeleneConstructs()
   _Table.values = tbl_values
 
   _Table.shallowcopy = function(self)
-    checkType(1, self)
+    checkType(1, self, allMaps)
     return newListOrMap(shallowcopy(self._tbl))
   end
 
   _Table.switch = function(self, ...)
-    checkType(1, self)
+    checkType(1, self, allMaps)
     return switch(self, ...)
   end
+
+  _Iterable = shallowcopy(_Table)
+  _Iterable.collect = itr_collect
+  _Iterable.drop = itr_drop
+  _Iterable.take = itr_take
 
   _String.foreach = tbl_foreach
   _String.map = tbl_map
@@ -1368,7 +1551,7 @@ local function loadSelene(env, lvMode)
     env._selene.liveMode = true
   end
 
-  env._selene._new = newWrappedTable
+  env._selene._new = newGeneric
   if not env.checkArg then
     env.checkArg = checkArg
     env._selene._checkArg = true
@@ -1376,6 +1559,7 @@ local function loadSelene(env, lvMode)
   env._selene._newString = newString
   env._selene._newList = newList
   env._selene._newFunc = newFunc
+  env._selene._newIterable = newIterable
   env._selene._newOptional = newOptional
   env._selene._VERSION = VERSION
   env._selene._parse = parse

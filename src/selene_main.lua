@@ -2,11 +2,15 @@
 
 local utils = require("utils")
 
+local mapcoder = require("mapcoder")
+
 love.window.setTitle("Lönn Demo")
 
 -- Only works on Windows before graphics dumping is added
 local gameplayAtlas = utils.loadImageAbsPath(os.getenv("LOCALAPPDATA") .. "/Ahorn/Sprites/Gameplay.png")
 local spinnerQuad = love.graphics.newQuad(237, 1138, 19, 19, gameplayAtlas:getDimensions())
+
+mapcoder.decodeFile("E:/Games/Celeste/Content/Maps/0-Intro.bin")
 
 function love.draw()
     love.graphics.print("FPS " .. tostring(love.timer.getFPS()), 20, 40)
