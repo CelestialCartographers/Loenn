@@ -10,7 +10,7 @@ local function trim(value) -- from http://lua-users.org/wiki/StringTrim
 end
 
 local escapable = { "'", '"' }
-local specialchars = { "(", ")", ":", "?", ",", "+", "-", "*", "%", "^", "&", "~", "|" }
+local specialchars = { "(", ")", "[", "]", "{", "}", ":", "?", ",", "+", "-", "*", "%", "^", "&", "~", "|" }
 local doublechars = { "/", "<", ">", "$" }
 local lambdachars = { "-", "=" }
 local assignchars = { "+", "-", "*", "/", "%", "^", "&", "|", ">", "<", ":", "~", "//", "<<", ">>", ".." }
@@ -35,7 +35,7 @@ local function tokenize(value, stripcomments, utime)
   if stripcomments == nil then stripcomments = true end
   local tokens, token, lines = {[0]={}}, "", 1
   local escaped, quoted, start = false, false, -1
-  local waiting
+  local waiting = {}
   for i = 1, #value do
     if timeout and utime then
       if timeout.time() >= utime + timeout.wait() then
@@ -50,8 +50,8 @@ local function tokenize(value, stripcomments, utime)
     end
 
     -- process last entry without touching the current char
-    if not quoted and token == "." and tokens[#tokens][1] == ".." and waiting == false and not string.find(char, "^%d$") then
-      waiting = nil
+    if not quoted and token == "." and tokens[#tokens][1] == ".." and waiting["."] == false and not string.find(char, "^%d$") then
+      waiting["."] = nil
       tokens[#tokens][1] = tokens[#tokens][1] .. token
       token = ""
     end
@@ -117,11 +117,12 @@ local function tokenize(value, stripcomments, utime)
       quoted = token
       start = i - 1
       tokens[#tokens] = nil
-    elseif char == "[" and not quoted and string.find(token, "%[=*$") then -- derpy quote
-      local s = string.match(token, "%[=*$")
+    elseif char == "[" and not quoted and tokens[#tokens][1] == "[" and string.find(token, "^=*$") then -- derpy quote
+      local s = "[" .. token
       quoted = s .. char
       start = i - #s
-      token = token .. char
+      token = s .. char
+      table.remove(tokens, #tokens)
     elseif not quoted and string.find(char, "%s") then -- delimiter
       if token ~= "" then
         table.insert(tokens, {token, lines})
@@ -131,7 +132,7 @@ local function tokenize(value, stripcomments, utime)
         lines = lines + 1
       end
     elseif char == "." and not quoted and token == "" and tokens[#tokens][1] == ".." then
-      waiting = true
+      waiting["."] = true
       token = "."
     elseif char == "=" and not quoted and token == "" and assignchars[tokens[#tokens][1]] then
       tokens[#tokens][1] = tokens[#tokens][1] .. char
@@ -141,29 +142,29 @@ local function tokenize(value, stripcomments, utime)
       table.insert(tokens, {token .. char, lines})
       token = ""
     elseif not quoted and char == "." then
-      if waiting == false and string.sub(token, #token) == "." then
+      if waiting["."] == false and string.sub(token, #token) == "." then
         token = string.sub(token, 1, #token - 1)
         if token and token ~= "" then
           table.insert(tokens, {token, lines})
           token = ""
         end
         table.insert(tokens, {"..", lines})
-        waiting = nil
+        waiting["."] = nil
       else
         token = token .. char
-        waiting = true
+        waiting["."] = true
       end
     elseif not quoted and doublechars[char] then
-      if waiting == false and token == "" and tokens[#tokens][1] == char then
+      if waiting[char] == false and token == "" and tokens[#tokens][1] == char then
         tokens[#tokens][1] = tokens[#tokens][1] .. char
-        waiting = nil
+        waiting[char] = nil
       else
         if token ~= "" then
           table.insert(tokens, {token, lines})
           token = ""
         end
         table.insert(tokens, {char, lines})
-        waiting = true
+        waiting[char] = true
       end
     elseif not quoted and specialchars[char] then
       if token ~= "" then
@@ -174,10 +175,12 @@ local function tokenize(value, stripcomments, utime)
     else -- normal char
       token = token .. char
     end
-    if waiting then
-      waiting = false
-    else
-      waiting = nil
+    for wi, w in pairs(waiting) do
+      if w then
+        waiting[wi] = false
+      else
+        waiting[wi] = nil
+      end
     end
   end
   if quoted then
@@ -213,7 +216,7 @@ local function perror(msg, lvl)
   error("[Selene] error while parsing: " .. msg, lvl)
 end
 
-local function bracket(tokens, plus, minus, step, result, incr, start)
+local function bracket(tokens, plus, minus, step, result, incr, start, returntokens)
   local curr = tokens[step][1]
   local brackets = start or 1
   local res = { result }
@@ -237,7 +240,11 @@ local function bracket(tokens, plus, minus, step, result, incr, start)
       curr = tokens[step][1]
     end
   end
-  return table.concat(res, " "), step
+  if returntokens then
+    return res, step
+  else
+    return table.concat(res, " "), step
+  end
 end
 
 local function split(self, sep)
@@ -312,6 +319,9 @@ local function findDollars(tokens, i, part, line)
     tokens[i][1] = "_selene._new"
   elseif curr:find("^l") then
     tokens[i][1] = "_selene._newList"
+    table.remove(tokens, i + 1)
+  elseif curr:find("^a") then
+    tokens[i][1] = "_selene._newArray"
     table.remove(tokens, i + 1)
   elseif curr:find("^f") then
     tokens[i][1] = "_selene._newFunc"
@@ -401,6 +411,46 @@ local function findForeach(tokens, i, part, line)
   return start, start
 end
 
+local function evenBrackets(ind, start, stop)
+  local c = 0
+  for ni = start, stop do
+    if string.find(ind[ni], "^[%[%(%{]$") then
+      c = c + 1
+    elseif string.find(ind[ni], "^[%]%)%}]$") then
+      c = c - 1
+    end
+  end
+  return c
+end
+
+local function findArrayIndex(tokens, i, part, line)
+  local ind, stop = bracket(tokens, "[", "]", i + 1, nil, 1, 1, true)
+  if #ind < 2 then
+    return false
+  end
+  local params = {}
+  local last = 1
+  for ti = 2, #ind do
+    if ind[ti] == "," then
+      if evenBrackets(ind, last, ti - 1) == 0 then
+        table.insert(params, table.concat(ind, " ", last, ti - 1))
+        last = ti + 1
+      end
+    end
+  end
+  if last > 1 and evenBrackets(ind, last, #ind) == 0 then
+    table.insert(params, table.concat(ind, " ", last, #ind))
+  end
+  if #params <= 1 then
+    return false
+  end
+  for _ = i, stop do
+    table.remove(tokens, i)
+  end
+  table.insert(tokens, i, {"[{" .. table.concat(ind, " ") .. "}]", line, false})
+  return i, i
+end
+
 local function findAssignmentOperator(tokens, i)
   if tokens[i - 1][1] and isVar(tokens[i - 1][1]) then
     tokens[i][1] = " = " .. tokens[i - 1][1] .. " " .. tokens[i][1]:sub(1, #tokens[i][1] - 1)
@@ -448,6 +498,7 @@ local keywords = {
   ["<-"   ] = findForeach,
   ["?"    ] = findTernary,
   [":"    ] = findSelfCall,
+  ["["    ] = findArrayIndex,
   --["match"] = findMatch,
   ["$"    ] = findDollars,
   ["$$"   ] = findDollarAssignment,
