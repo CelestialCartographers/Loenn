@@ -1,6 +1,17 @@
--- TODO - Use spritebatch for supah ~~mario brothers two~~ fast rendering
-local function drawSprites()
+-- Assumes everything uses the same base image
+local function createSpriteBatch(sprites)
+    local image = sprites[1].meta.image
+    local batch = love.graphics.newSpriteBatch(image)
 
+    for i, sprite in lpairs(sprites) do
+        if sprite.meta.image ~= image then
+            print("Sprite " .. tostring(i) .. " is using a different image from the sprite batch.")
+        end
+
+        batch:add(sprite.meta.quad, sprite.x, sprite.y, sprite.r, sprite.sx, sprite.sy, sprite.ox, sprite.oy, sprite.kx, sprite.ky)
+    end
+
+    return batch
 end
 
 local function drawSprite(spriteMeta, x, y, r, sx, sy, ox, oy)
@@ -8,6 +19,6 @@ local function drawSprite(spriteMeta, x, y, r, sx, sy, ox, oy)
 end
 
 return {
-    drawSprites = drawSprites,
+    createSpriteBatch = createSpriteBatch,
     drawSprite = drawSprite
 }

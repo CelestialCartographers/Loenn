@@ -9,24 +9,33 @@ local drawing = require("drawing")
 
 love.window.setTitle("Lönn Demo")
 
+-- Edit manually for now
 local gameplayMeta = "/home/gt/.config/Ahorn/Sprites/Gameplay.meta"
 local gameplayPng = "/home/gt/.config/Ahorn/Sprites/Gameplay.png"
+local mapFile = "/home/gt/Celeste/Celeste/Content/Maps/0-Intro.bin"
 
--- Only works on Windows before graphics dumping is added
---local gameplayAtlas = utils.loadImageAbsPath(os.getenv("LOCALAPPDATA") .. "/Ahorn/Sprites/Gameplay.png")
-
---mapcoder.decodeFile("E:/Games/Celeste/Content/Maps/0-Intro.bin")
-mapcoder.decodeFile("/home/gt/Celeste/Celeste/Content/Maps/0-Intro.bin")
+mapcoder.decodeFile(mapFile)
 gameplayAtlas = spriteMeta.loadSprites(gameplayMeta, gameplayPng)
 
 spinner = gameplayAtlas["danger/crystal/fg_red00"]
+    
+sprites = $()
+
+for i = 0, 24 do
+    for j = 0, 24 do
+        sprites += {
+            x = 16 * i,
+            y = 16 * j,
+
+            meta = spinner
+        }
+    end
+end
+
+batch = drawing.createSpriteBatch(sprites)
 
 function love.draw()
     love.graphics.print("FPS " .. tostring(love.timer.getFPS()), 20, 40)
 
-    for i = 1, 10 do
-        for j = 1, 10 do
-            drawing.drawSprite(spinner, 50 + 16 * i, 50 + 16 * j)
-        end
-    end
+    love.graphics.draw(batch, 50, 50)
 end
