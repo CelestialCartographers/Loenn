@@ -58,7 +58,7 @@ end
 local function decodeFile(path, header)
     local header = header or "CELESTE MAP"
     local fh = io.open(path, "rb")
-    local res = {__children = $()}
+    local res = {}
 
     if binfile.readString(fh) ~= header then
         print("Invalid Celeste map file")

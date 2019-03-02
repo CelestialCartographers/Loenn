@@ -15,7 +15,16 @@ local function twosCompliment(n, power)
     end
 end
 
+local function stripByteOrderMark(s)
+    if s:byte(1) == 0xEF and s:byte(2) == 0xBB and s:byte(3) == 0xBF then
+        return s:sub(4, #s)
+    end
+
+    return s
+end
+
 return {
     loadImageAbsPath = loadImageAbsPath,
-    twosCompliment = twosCompliment
+    twosCompliment = twosCompliment,
+    stripByteOrderMark = stripByteOrderMark
 }

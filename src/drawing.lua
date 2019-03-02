@@ -3,7 +3,7 @@ local function createSpriteBatch(sprites)
     local image = sprites[1].meta.image
     local batch = love.graphics.newSpriteBatch(image)
 
-    for i, sprite in lpairs(sprites) do
+    for i, sprite <- sprites do
         if sprite.meta.image ~= image then
             print("Sprite " .. tostring(i) .. " is using a different image from the sprite batch.")
         end

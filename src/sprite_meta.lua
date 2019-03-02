@@ -2,16 +2,16 @@ local utils = require("utils")
 local binfile = require("binfile")
 
 local function loadSprites(metaFn, spritesFn)
-    fh = io.open(metaFn)
+    fh = io.open(metaFn, "rb")
     res = {}
 
     spritesImage = utils.loadImageAbsPath(spritesFn)
     spritesWidth, spritesHeight = spritesImage:getDimensions()
 
     -- Get rid of headers
-    binfile.readLong(fh)
+    binfile.readSignedLong(fh)
     binfile.readString(fh)
-    binfile.readLong(fh)
+    binfile.readSignedLong(fh)
 
     count = binfile.readShort(fh)
 
@@ -21,7 +21,7 @@ local function loadSprites(metaFn, spritesFn)
 
         for j = 1, sprites do
             pathRaw = binfile.readString(fh)
-            path = ($(pathRaw)):split("\\"):concat("/")
+            path = pathRaw:gsub("\\", "/")
 
             sprite = {
                 x = binfile.readSignedShort(fh),
