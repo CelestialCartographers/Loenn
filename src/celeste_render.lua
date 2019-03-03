@@ -205,19 +205,25 @@ end
 local function drawMap(map)
     local viewport = viewportHandler.getViewport()
 
-    for i, data <- map.__children[1].__children do
-        if data.__name == "levels" then
-            for j, room <- data.__children or {} do
-                if viewportHandler.roomVisible(room, viewport) then
-                    drawRoom(room, viewport)
+    if viewport.visible then
+        for i, data <- map.__children[1].__children do
+            if data.__name == "levels" then
+                for j, room <- data.__children or {} do
+                    if viewportHandler.roomVisible(room, viewport) then
+                        drawRoom(room, viewport)
+                    end
+                end
+
+            elseif data.__name == "Filler" then
+                for j, filler <- data.__children or {} do
+                    drawFiller(filler, viewport)
                 end
             end
-
-        elseif data.__name == "Filler" then
-            for j, filler <- data.__children or {} do
-                drawFiller(filler, viewport)
-            end
         end
+
+    else
+        print("Not visible... Waiting 200ms...")
+        love.timer.sleep(0.2)
     end
 end
 

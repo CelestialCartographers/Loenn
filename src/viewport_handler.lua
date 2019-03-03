@@ -6,9 +6,13 @@ local movementButton = 2
 local viewport = {
     x = 0,
     y = 0,
+
     scale = 1,
+
     width = love.graphics.getWidth(),
-    height = love.graphics.getHeight()
+    height = love.graphics.getHeight(),
+
+    visible = true
 }
 
 local function roomVisible(room, viewport)
@@ -95,6 +99,10 @@ function addDevice()
             elseif dy < 0 then
                 zoomOut()
             end
+        end,
+
+        visible = function(visible)
+            viewport.visible = visible
         end
     }
 end

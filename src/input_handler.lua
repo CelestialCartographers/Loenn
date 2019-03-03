@@ -62,3 +62,7 @@ end
 function love.wheelmoved(dx, dy)
     inputDevice.sendEvent("wheelmoved", dx, dy)
 end
+
+function love.visible(visible)
+    inputDevice.sendEvent("visible", visible)
+end
