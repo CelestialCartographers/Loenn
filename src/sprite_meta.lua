@@ -2,7 +2,7 @@ local utils = require("utils")
 local binfile = require("binfile")
 
 local function loadSprites(metaFn, spritesFn)
-    fh = io.open(metaFn, "rb")
+    fh = utils.getFileHandle(metaFn, "rb")
 
     spritesImage = utils.loadImageAbsPath(spritesFn)
     spritesWidth, spritesHeight = spritesImage:getDimensions

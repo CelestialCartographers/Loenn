@@ -96,7 +96,7 @@ local function convertTileString(s)
 end
 
 local function loadTilesetXML(fn)
-    local fh = io.open(fn, "rb")
+    local fh = utils.getFileHandle(fn, "rb")
 
     local handler = require("xml2lua.xmlhandler.tree")
     local parser = xml2lua.parser(handler)

@@ -56,10 +56,22 @@ local function split(s, sSeparator, nMax, bRegexp)
     return aRecord
 end
 
+local function getFileHandle(path, mode, external)
+    local external = external or true
+    
+    if external then
+        return io.open(path, mode)
+
+    else
+        return love.filesystem.newFile(path, mode)
+    end
+end
+
 return {
     loadImageAbsPath = loadImageAbsPath,
     twosCompliment = twosCompliment,
     stripByteOrderMark = stripByteOrderMark,
     split = split,
-    aabbCheck = aabbCheck
+    aabbCheck = aabbCheck,
+    getFileHandle = getFileHandle
 }

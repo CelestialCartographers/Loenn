@@ -1,5 +1,4 @@
-local serialization = require("serialization")
-
+local utils = require("utils")
 local binfile = require("binfile")
 
 local function look(fh, lookup)
@@ -60,7 +59,7 @@ end
 
 local function decodeFile(path, header)
     local header = header or "CELESTE MAP"
-    local fh = io.open(path, "rb")
+    local fh = utils.getFileHandle(path, "rb")
     local res = {}
 
     if binfile.readString(fh) ~= header then

@@ -8,10 +8,11 @@ local mapcoder = require("mapcoder")
 local celesteRender = require("celeste_render")
 local inputHandler = require("input_handler")
 local viewportHandler = require("viewport_handler")
+local fileLocations = require("file_locations")
 
 viewportHandler.addDevice()
 
-local mapFile = "E:/Games/Celeste/Content/Maps/0-Intro.bin"
+local mapFile = fileLocations.getResourceDir() .. "/Maps/0-Intro.bin"
 local map = mapcoder.decodeFile(mapFile)
 
 function love.draw()

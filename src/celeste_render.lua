@@ -3,15 +3,16 @@ local spriteMeta = require("sprite_meta")
 local drawing = require("drawing")
 local tilesUtils = require("tiles")
 local viewportHandler = require("viewport_handler")
+local fileLocations = require("file_locations")
 
-local tilesetFileFg = "C:/Users/GT/AppData/Local/Ahorn/XML/ForegroundTiles.xml"
-local tilesetFileBg = "C:/Users/GT/AppData/Local/Ahorn/XML/BackgroundTiles.xml"
+local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
+local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
 
 local tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
 local tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
 
-local gameplayMeta = "C:/Users/GT/AppData/Local/Ahorn/Sprites/Gameplay.meta"
-local gameplayPng = "C:/Users/GT/AppData/Local/Ahorn/Sprites/Gameplay.png"
+local gameplayMeta = fileLocations.getResourceDir() .. "/Sprites/Gameplay.meta"
+local gameplayPng = fileLocations.getResourceDir() .. "/Sprites/Gameplay.png"
 
 local gameplayAtlas = spriteMeta.loadSprites(gameplayMeta, gameplayPng)
 
@@ -89,8 +90,6 @@ local function getDecalsBatch(decals)
         local meta = gameplayAtlas[texture]
 
         if meta then
-            print(texture, x, y, scaleX, scaleY, meta.x, meta.y, meta.offsetX, meta.offsetY, meta.width, meta.height, meta.quad:getViewport)
-
             spriteBatch:add(
                 meta.quad,
                 x - meta.offsetX * scaleX - math.floor(meta.realWidth / 2) * scaleX,
