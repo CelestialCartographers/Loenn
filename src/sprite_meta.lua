@@ -6,7 +6,7 @@ local function loadSprites(metaFn, spritesFn)
     res = {}
 
     spritesImage = utils.loadImageAbsPath(spritesFn)
-    spritesWidth, spritesHeight = spritesImage:getDimensions()
+    spritesWidth, spritesHeight = spritesImage:getDimensions
 
     -- Get rid of headers
     binfile.readSignedLong(fh)

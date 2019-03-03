@@ -18,7 +18,13 @@ local function drawSprite(spriteMeta, x, y, r, sx, sy, ox, oy)
     love.graphics.draw(spriteMeta.image, spriteMeta.quad, x, y, r, sx, sy, ox, oy)
 end
 
+-- Replace \ with /, remove .png and prefix with `decals/`
+local function getDecalTexture(texture)
+    return "decals/" .. texture:gsub("\\", "/"):sub(1, #texture - 4)
+end
+
 return {
     createSpriteBatch = createSpriteBatch,
-    drawSprite = drawSprite
+    drawSprite = drawSprite,
+    getDecalTexture = getDecalTexture
 }

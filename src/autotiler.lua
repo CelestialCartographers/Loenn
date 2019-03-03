@@ -4,17 +4,80 @@ local serialization = require("serialization")
 
 local function convertMaskString(s)
     local res = table.filled(0, {3, 3})
-    local rows = $(s):split("-")
+    local raw = s:gsub("x", "2")
+    local rows = $(raw):split("-")
 
     for y, row <- rows do
         local rowValues = $(row):map(v -> tonumber(v))
 
-        for x = 1, 3 do
-            res[x, y] = rowValues[x]
+        for x, value <- rowValues do
+            res[y, x] = value
         end
     end
 
     return res
+end
+
+local function checkMask(adjacent, mask)
+    for i = 1, 9 do
+        if mask[i] ~= 2 then
+            if adjacent[i] ~= (mask[i] == 1) then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
+local function getTile(tiles, x, y)
+    return tiles[x, y] or " "
+end
+
+local function checkPadding(tiles, x, y)
+    return getTile(tiles, x - 2, y) == "0" or getTile(tiles, x + 2, y) == "0" or getTile(tiles, x, y - 2) == "0" or getTile(tiles, x, y + 2) == "0"
+end
+
+local function checkTile(value, target, ignore)
+    return not (target ~= "0" or $(ignore):contains(target) or ($(ignore):contains("*") and value ~= target))
+end
+
+local function sortByScore(masks)
+    local res = masks
+
+    -- TODO - TBI
+
+    return res
+end
+
+local function getQuads(x, y, tiles, meta)
+    local tile = tiles[x, y]
+
+    local masks = meta.masks[tile] or {}
+    local ignore = meta.ignores[tile] or {}
+
+    local adjacent = tiles[{x - 1, x + 1}, {y - 1, y + 1}]
+    adjacent = adjacent:map(target -> checkTile(tile, target, ignore))
+
+    for i, maskData <- masks do
+        if checkMask(adjacent, maskData.mask) then
+            print("From mask")
+            return maskData.quads, maskData.sprites
+        end
+    end
+
+    if checkPadding(tiles, x, y) then
+        local padding = meta.padding[tile]
+
+        return #padding > 0 and padding or {{0, 0}}, ""
+
+    else
+        local center = meta.center[tile]
+        
+        return #center > 0 and center or {{0, 0}}, ""
+    end
+
+    return {{5, 12}}, ""
 end
 
 local function convertTileString(s)
@@ -56,19 +119,15 @@ local function loadTilesetXML(fn)
         local copy = tileset._attr.copy
         local ignore = tileset._attr.ignores
 
-        print(id, path, copy, ignore)
-
         paths[id] = "tilesets/" .. path
 
         if ignore then
             ignores[id] = ignore
         end
 
-        if copy then
-            padding[id] = table.shallowcopy(padding[copy])
-            center[id] = table.shallowcopy(center[copy])
-            masks[id] = table.shallowcopy(masks[copy])
-        end
+        padding[id] = copy and table.shallowcopy(padding[copy]()) or {}
+        center[id] = copy and table.shallowcopy(center[copy]()) or {}
+        masks[id] = copy and table.shallowcopy(masks[copy]()) or {}
 
         currentMasks = $()
 
@@ -94,10 +153,8 @@ local function loadTilesetXML(fn)
             end
         end
 
-        if #currentMasks > 0 then
-            masks[id] = currentMasks
-
-            -- TODO - Sort masks by "score"
+        if currentMasks:len > 0 then
+            masks[id] = sortByScore(currentMasks)
         end
     end
 
@@ -113,5 +170,6 @@ local function loadTilesetXML(fn)
 end
 
 return {
-    loadTilesetXML = loadTilesetXML
+    loadTilesetXML = loadTilesetXML,
+    getQuads = getQuads
 }

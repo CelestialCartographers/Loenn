@@ -29,30 +29,33 @@ local function decodeValue(fh, lookup, typ)
     end
 end
 
-local function decodeElement(fh, lookup, parent)
-    name = look(fh, lookup)
-    element = {__children, __name=name}
-    attributeCount = binfile.readByte(fh)
+local function decodeElement(fh, lookup)
+    local name = look(fh, lookup)
+    local element = {__name=name}
+    local attributeCount = binfile.readByte(fh)
 
     for i = 1, attributeCount do
-        key = look(fh, lookup)
-        typ = binfile.readByte(fh)
+        local key = look(fh, lookup)
+        local typ = binfile.readByte(fh)
 
-        value = decodeValue(fh, lookup, typ)
+        local value = decodeValue(fh, lookup, typ)
 
         if key then
             element[key] = value
         end
     end
 
-    parent.__children = parent.__children or $()
-    parent.__children += element
+    local elementCount = binfile.readShort(fh)
 
-    elementCount = binfile.readShort(fh)
+    if elementCount > 0 then
+        element.__children = $()
 
-    for i = 1, elementCount do
-        decodeElement(fh, lookup, element)
+        for i = 1, elementCount do
+            element.__children += decodeElement(fh, lookup)
+        end
     end
+
+    return element
 end
 
 local function decodeFile(path, header)
@@ -76,11 +79,11 @@ local function decodeFile(path, header)
     end
 
     res._package = package
-    decodeElement(fh, lookup, res)
+    res.__children = {decodeElement(fh, lookup)}
 
     fh:close()
 
-    return true
+    return res
 end
 
 local function encodeFile(path, data)
