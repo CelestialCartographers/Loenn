@@ -3,10 +3,15 @@ local binfile = require("binfile")
 
 local function loadSprites(metaFn, spritesFn)
     fh = io.open(metaFn, "rb")
-    res = {}
 
     spritesImage = utils.loadImageAbsPath(spritesFn)
     spritesWidth, spritesHeight = spritesImage:getDimensions
+
+    res = {
+        _image = spritesImage,
+        _width = spritesWidth,
+        _height = spritesHeight
+    }
 
     -- Get rid of headers
     binfile.readSignedLong(fh)
@@ -39,7 +44,7 @@ local function loadSprites(metaFn, spritesFn)
                 filename = spritesFn
             }
 
-            sprite.quad = love.graphics.newQuad(sprite.x - sprite.offsetX, sprite.y - sprite.offsetY, sprite.width, sprite.height, spritesWidth, spritesHeight)
+            sprite.quad = love.graphics.newQuad(sprite.x, sprite.y, sprite.width, sprite.height, spritesWidth, spritesHeight)
             res[path] = sprite
         end
     end
