@@ -5,6 +5,7 @@ local tilesUtils = require("tiles")
 local viewportHandler = require("viewport_handler")
 local fileLocations = require("file_locations")
 local colors = require("colors")
+local tasks = require("task")
 
 local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
 local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
@@ -74,28 +75,34 @@ local function getTilesBatch(tiles, meta)
                     spriteBatch:add(quad, x * 8 - 8, y * 8 - 8)
                 end
             end
+
+            coroutine.yield(spriteBatch)
         end
     end
 
-    return spriteBatch
+    coroutine.yield(spritebatch)
 end
 
 local function drawTilesFg(room, tiles)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].fgTiles = roomCache[room.name].fgTiles or getTilesBatch(tiles, tilesMetaFg)
+    roomCache[room.name].fgTiles = roomCache[room.name].fgTiles or tasks.newTask(function() getTilesBatch(tiles, tilesMetaFg) end)
 
-    local batch = roomCache[room.name].fgTiles
+    local batch = roomCache[room.name].fgTiles.result
 
-    love.graphics.draw(batch, 0, 0)
+    if batch then
+        love.graphics.draw(batch, 0, 0)
+    end
 end
 
 local function drawTilesBg(room, tiles)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].bgTiles = roomCache[room.name].bgTiles or getTilesBatch(tiles, tilesMetaBg)
+    roomCache[room.name].bgTiles = roomCache[room.name].bgTiles or tasks.newTask(function() getTilesBatch(tiles, tilesMetaBg) end)
 
-    local batch = roomCache[room.name].bgTiles
+    local batch = roomCache[room.name].bgTiles.result
 
-    love.graphics.draw(batch, 0, 0)
+    if batch then
+        love.graphics.draw(batch, 0, 0)
+    end
 end
 
 local function getDecalsBatch(decals)
@@ -123,27 +130,33 @@ local function getDecalsBatch(decals)
                 scaleY
             )
         end
+
+        coroutine.yield(spriteBatch)
     end
 
-    return spriteBatch
+    coroutine.yield(spriteBatch)
 end
 
 local function drawDecalsFg(room, decals)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].fgDecals = roomCache[room.name].fgDecals or getDecalsBatch(decals)
+    roomCache[room.name].fgDecals = roomCache[room.name].fgDecals or tasks.newTask(function() getDecalsBatch(decals) end)
 
-    local batch = roomCache[room.name].fgDecals
+    local batch = roomCache[room.name].fgDecals.result
 
-    love.graphics.draw(batch, 0, 0)
+    if batch then
+        love.graphics.draw(batch, 0, 0)
+    end
 end
 
 local function drawDecalsBg(room, decals)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].bgDecals = roomCache[room.name].bgDecals or getDecalsBatch(decals)
+    roomCache[room.name].bgDecals = roomCache[room.name].bgDecals or tasks.newTask(function() getDecalsBatch(decals) end)
 
-    local batch = roomCache[room.name].bgDecals
+    local batch = roomCache[room.name].bgDecals.result
 
-    love.graphics.draw(batch, 0, 0)
+    if batch then
+        love.graphics.draw(batch, 0, 0)
+    end
 end
 
 local function drawEntities(room, entities)
@@ -258,27 +271,33 @@ local function drawFiller(filler, viewport)
 end
 
 local function drawMap(map)
-    local viewport = viewportHandler.getViewport()
+    if map.result then
+        local map = map.result
+        local viewport = viewportHandler.getViewport()
 
-    if viewport.visible then
-        for i, data <- map.__children[1].__children do
-            if data.__name == "levels" then
-                for j, room <- data.__children or {} do
-                    if viewportHandler.roomVisible(room, viewport) then
-                        drawRoom(room, viewport)
+        if viewport.visible then
+            for i, data <- map.__children[1].__children do
+                if data.__name == "levels" then
+                    for j, room <- data.__children or {} do
+                        if viewportHandler.roomVisible(room, viewport) then
+                            drawRoom(room, viewport)
+                        end
+                    end
+
+                elseif data.__name == "Filler" then
+                    for j, filler <- data.__children or {} do
+                        -- TODO - Don't draw out of view fillers
+                        -- ... Even though checking if they are out of view is probably more expensive than drawing it
+                        drawFiller(filler, viewport)
                     end
                 end
-
-            elseif data.__name == "Filler" then
-                for j, filler <- data.__children or {} do
-                    drawFiller(filler, viewport)
-                end
             end
-        end
 
-    else
-        print("Not visible... Waiting 200ms...")
-        love.timer.sleep(0.2)
+        else
+            -- TODO - Test and commit if it works
+            print("Not visible... Waiting 200ms...")
+            love.timer.sleep(0.2)
+        end
     end
 end
 

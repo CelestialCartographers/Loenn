@@ -54,6 +54,8 @@ local function decodeElement(fh, lookup)
         end
     end
 
+    coroutine.yield()
+
     return element
 end
 
@@ -82,7 +84,7 @@ local function decodeFile(path, header)
 
     fh:close()
 
-    return res
+    coroutine.yield(res)
 end
 
 local function encodeFile(path, data)
