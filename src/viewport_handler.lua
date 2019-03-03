@@ -87,6 +87,13 @@ function addDevice()
             end
         end,
 
+        mousemoved = function(x, y, dx, dy, istouch)
+            if istouch then
+                viewport.x -= dx
+                viewport.y -= dy
+            end
+        end,
+
         resize = function(width, height)
             viewport.width = width
             viewport.height = height

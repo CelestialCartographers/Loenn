@@ -1512,8 +1512,29 @@ local function posToIndex(pos, size)
   return i + 1
 end
 
-local function op_addToRes(tbl, c, r)
-  table.insert(r, tbl[posToIndex(c, tbl._size)])
+local function mod1(x, y)
+  local m = x % y
+  return m == 0 and y or m
+end
+
+local function fld(x, y)
+  return math.floor(x / y)
+end
+
+local function fld1(x, y)
+  return fld(x + y - mod1(x, y), y)
+end
+
+local function indexToPos(index, size)
+  local pos = {}
+  for dim = 1, #size do
+    pos[dim] = mod1(fld1(index, dim), size[dim])
+  end
+  return pos
+end
+
+local function op_addToRes(tbl, c, r, i)
+  r[i] = tbl[posToIndex(c, tbl._size)]
 end
 
 local function op_setIndex(tbl, c, val)
@@ -1536,25 +1557,34 @@ local function sliceIndexOp(tbl, key, val, op)
       ends[i] = key[i]
     end
   end
-  op(tbl, c, val)
-  repeat
+  local endreached = true
+  op(tbl, c, val, 1)
+  for i = 1, #c do
+    if c[i] ~= ends[i] then
+      endreached = false
+      break
+    end
+  end
+  local newI = 2
+  while not endreached do
     for i = 1, #c do
       if c[i] < ends[i] then
         c[i] = c[i] + 1
-        op(tbl, c, val)
+        op(tbl, c, val, newI)
+        newI = newI + 1
         break
       else
         c[i] = starts[i]
       end
     end
-    local endreached = true
+    endreached = true
     for i = 1, #c do
       if c[i] ~= ends[i] then
         endreached = false
         break
       end
     end
-  until endreached
+  end
 end
 
 local function sliceIndex(tbl, key)
@@ -1575,6 +1605,14 @@ end
 
 local function sliceSetIndex(tbl, key, val)
   sliceIndexOp(tbl, key, val, op_setIndex)
+end
+
+mdmt.__len = function(tbl)
+  local r = 1
+  for _, s in ipairs(tbl._size) do
+    r = r * s
+  end
+  return r
 end
 
 mdmt.__index = function(tbl, key)
@@ -1749,6 +1787,68 @@ local function arr_dims(self)
   return #self._size
 end
 
+local function arr_get(self, def, ...)
+  local dims = {...}
+  if #dims ~= #self._size then
+    error(string.format("[Selene] attempt to get %d-dimensional slice of %d-dimensional array.", #dims, #self._size), 2)
+  end
+  local newsize = {}
+  local c, starts, ends = {}, {}, {}
+  local co = {}
+  local pure = true
+  for i, s in ipairs(self._size) do
+    local start = type(dims[i]) == "table" and dims[i][1] or dims[i]
+    local stop = type(dims[i]) == "table" and dims[i][2] or dims[i]
+    if stop < start then
+      error(string.format("[Selene] attempt to get slice where upper limit %d is smaller than lower limit %d.", stop, start), 2)
+    end
+    if start < 1 or stop > s then
+      pure = false
+    end
+    local realstart, realstop = math.max(1, start), math.min(s, stop)
+    newsize[i] = stop - start + 1
+    c[i] = realstart
+    co[i] = realstart - start + 1
+    starts[i] = realstart
+    ends[i] = realstop
+    dims[i] = {start, stop}
+  end
+  if pure then
+    return self[dims]
+  end
+  local res = fillArray(def, newsize)
+  res[posToIndex(co, res._size)] = self[posToIndex(c, self._size)]
+  local endreached = true
+  for i = 1, #c do
+    if c[i] ~= ends[i] then
+      endreached = false
+      break
+    end
+  end
+  while not endreached do
+    for i = 1, #c do
+      if c[i] < ends[i] then
+        c[i] = c[i] + 1
+        co[i] = c[i] - dims[i][1] + 1
+        res[posToIndex(co, res._size)] = self[posToIndex(c, self._size)]
+        break
+      else
+        c[i] = starts[i]
+        co[i] = c[i] - dims[i][1] + 1
+      end
+    end
+
+    endreached = true
+    for i = 1, #c do
+      if c[i] ~= ends[i] then
+        endreached = false
+        break
+      end
+    end
+  end
+  return res
+end
+
 --------
 -- Adding to global variables
 --------
@@ -1862,6 +1962,7 @@ local function loadSeleneConstructs()
 
   _Array.dims = arr_dims
   _Array.size = arr_size
+  _Array.get = arr_get
 
   _Iterable = shallowcopy(_Table)
   _Iterable.collect = itr_collect

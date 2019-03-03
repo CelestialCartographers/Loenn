@@ -54,8 +54,8 @@ local function getTilesBatch(tiles, meta)
     local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._image)
 
     -- Slicing currently doesnt allow default values, just ignore the literal edgecases
-    for x = 2, width - 1 do
-        for y = 2, height - 1 do
+    for x = 1, width do
+        for y = 1, height do
             local tile = tiles[x, y]
 
             if tile ~= "0" then

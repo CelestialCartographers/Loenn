@@ -56,7 +56,7 @@ local function getQuads(x, y, tiles, meta)
     local masks = meta.masks[tile] or {}
     local ignore = meta.ignores[tile] or {}
 
-    local adjacent = tiles[{x - 1, x + 1}, {y - 1, y + 1}]
+    local adjacent = tiles:get(tile, {x - 1, x + 1}, {y - 1, y + 1})
     adjacent = adjacent:map(target -> checkTile(tile, target, ignore))
 
     for i, maskData <- masks do
