@@ -1,10 +1,4 @@
-local function loadImageAbsPath(path)
-    local file = io.open(path, "rb")
-    local data = love.filesystem.newFileData(file:read("*a"), "image.png")
-    file:close()
-
-    return love.graphics.newImage(data)
-end
+local fileLocations = require("file_locations")
 
 local function twosCompliment(n, power)
     if n >= 2^(power - 1) then
@@ -56,15 +50,31 @@ local function split(s, sSeparator, nMax, bRegexp)
     return aRecord
 end
 
-local function getFileHandle(path, mode, external)
-    local external = external or true
+local function getFileHandle(path, mode, internal)
+    local internal = internal or fileLocations.useInternal
     
-    if external then
-        return io.open(path, mode)
-
+    if internal then
+        return love.filesystem.newFile(path, mode:gsub("b", ""))
+        
     else
-        return love.filesystem.newFile(path, mode)
+        return io.open(path, mode)
     end
+end
+
+local function readAll(path, mode, internal)
+    local internal = internal or fileLocations.useInternal
+    local file = getFileHandle(path, mode, internal)
+    local res = internal and file:read() or file:read("*a")
+
+    file:close()
+
+    return res
+end
+
+local function loadImageAbsPath(path)
+    local data = love.filesystem.newFileData(readAll(path, "rb"), "image.png")
+
+    return love.graphics.newImage(data)
 end
 
 return {
@@ -73,5 +83,6 @@ return {
     stripByteOrderMark = stripByteOrderMark,
     split = split,
     aabbCheck = aabbCheck,
-    getFileHandle = getFileHandle
+    getFileHandle = getFileHandle,
+    readAll = readAll
 }

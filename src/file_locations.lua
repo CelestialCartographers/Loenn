@@ -1,16 +1,24 @@
+local useInternal = true
+
 -- Temporary for now
 local function getResourceDir()
-    local appdata = os.getenv("LocalAppData")
-    local home = os.getenv("HOME")
-
-    if appdata then
-        return appdata .. "/Loenn"
+    if useInternal then
+        return "celesteResources"
 
     else
-        return home .. "/.loenn"
+        local appdata = os.getenv("LocalAppData")
+        local home = os.getenv("HOME")
+
+        if appdata then
+            return appdata .. "/Loenn"
+
+        else
+            return home .. "/.loenn"
+        end
     end
 end
 
 return {
-    getResourceDir = getResourceDir
+    getResourceDir = getResourceDir,
+    useInternal = useInternal
 }

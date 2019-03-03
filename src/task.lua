@@ -27,6 +27,7 @@ local function processTasks(calcTime)
         end
 
         if coroutine.status(task.coroutine) == "dead" then
+            task.callback()
             table.remove(tasks, 1)
         end
     end
@@ -34,9 +35,10 @@ local function processTasks(calcTime)
     return true
 end
 
-local function newTask(func)
+local function newTask(func, callback)
     local task = {
-        coroutine = coroutine.create(func)
+        coroutine = coroutine.create(func),
+        callback = callback or function() end
     }
     
     table.insert(tasks, task)

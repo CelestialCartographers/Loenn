@@ -98,11 +98,9 @@ local function convertTileString(s)
 end
 
 local function loadTilesetXML(fn)
-    local fh = utils.getFileHandle(fn, "rb")
-
     local handler = require("xml2lua.xmlhandler.tree")
     local parser = xml2lua.parser(handler)
-    local xml = utils.stripByteOrderMark(fh:read("*a"))
+    local xml = utils.stripByteOrderMark(utils.readAll(fn, "rb"))
 
     parser:parse(xml)
 
@@ -158,8 +156,6 @@ local function loadTilesetXML(fn)
             masks[id] = sortByScore(currentMasks)
         end
     end
-
-    fh:close()
 
     return {
         paths = paths,

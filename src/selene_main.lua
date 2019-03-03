@@ -14,21 +14,34 @@ local tasks = require("task")
 
 love.graphics.setFont(fonts.font)
 
-viewportHandler.addDevice()
+local loadingMap = true
 
-local mapFile = fileLocations.getResourceDir() .. "/Maps/6-Reflection.bin"
-local map = tasks.newTask(function() mapcoder.decodeFile(mapFile) end)
+local mapFile = fileLocations.getResourceDir() .. "/Maps/7-Summit.bin"
+local map = tasks.newTask(
+    function()
+        mapcoder.decodeFile(mapFile)
+    end,
+    function()
+        loadingMap = false
+        viewportHandler.addDevice()
+    end
+)
 
 function love.draw()
     local viewport = viewportHandler.getViewport()
 
-    celesteRender.drawMap(map)
+    if loadingMap then
+        love.graphics.printf("Loading...", viewport.width / 2, viewport.height / 2, viewport.width, "left", love.timer.getTime(), fonts.fontScale * 2, fonts.fontScale * 2)
 
-    love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, 1080, "left", 0, fonts.fontScale, fonts.fontScale)
-    love.graphics.printf("Viewport: " .. tostring(viewport.x) .. " " .. tostring(viewport.y) .. " " .. tostring(viewport.scale), 20, 80, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
+    else
+        celesteRender.drawMap(map)
+
+        love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
+        love.graphics.printf("Viewport: " .. tostring(viewport.x) .. " " .. tostring(viewport.y) .. " " .. tostring(viewport.scale), 20, 80, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
+    end
 end
 
 function love.update()
     -- TODO - Put in saner default
-    tasks.processTasks(1 / 200)
+    tasks.processTasks(1 / 120)
 end
