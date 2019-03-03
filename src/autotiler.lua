@@ -11,7 +11,7 @@ local function convertMaskString(s)
         local rowValues = $(row):map(v -> tonumber(v))
 
         for x, value <- rowValues do
-            res[y, x] = value
+            res[x, y] = value
         end
     end
 
@@ -39,7 +39,7 @@ local function checkPadding(tiles, x, y)
 end
 
 local function checkTile(value, target, ignore)
-    return not (target ~= "0" or $(ignore):contains(target) or ($(ignore):contains("*") and value ~= target))
+    return not (target == "0" or $(ignore):contains(target) or ($(ignore):contains("*") and value ~= target))
 end
 
 local function sortByScore(masks)
@@ -61,7 +61,6 @@ local function getQuads(x, y, tiles, meta)
 
     for i, maskData <- masks do
         if checkMask(adjacent, maskData.mask) then
-            print("From mask")
             return maskData.quads, maskData.sprites
         end
     end
@@ -147,7 +146,7 @@ local function loadTilesetXML(fn)
             else
                 currentMasks += {
                     mask = convertMaskString(mask),
-                    tiles = convertTileString(tiles),
+                    quads = convertTileString(tiles),
                     sprites = sprites
                 }
             end

@@ -27,15 +27,15 @@ local function drawTiles(tiles, meta)
 
             if tile ~= "0" then
                 local quads, sprites = autotiler.getQuads(x, y, tiles, meta)
+                local quadCount = quads.len and quads:len or #quads
                 local texture = meta.paths[tile] or ""
                 local spriteMeta = gameplayAtlas[texture]
 
-                -- Use first quad for testing reasons
-
-                if spriteMeta and #quads > 0 then
+                if spriteMeta and quadCount > 0 then
                     -- Cache quad creation
-                    local randQuad = quads[math.random(1, #quads)]
+                    local randQuad = quads[math.random(1, quadCount)]
                     local quadX, quadY = randQuad[1], randQuad[2]
+
                     local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
                     local quad = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
@@ -72,7 +72,7 @@ local function drawDecals(decals)
             love.graphics.translate(x, y)
             love.graphics.scale(scaleX, scaleY)
             love.graphics.translate(-meta.offsetX, -meta.offsetY)
-            love.graphics.translate(-meta.realWidth / 2, meta.realHeight / 2)
+            love.graphics.translate(math.floor(-meta.realWidth / 2), math.floor(meta.realHeight / 2))
 
             drawing.drawSprite(meta, 0, 0)
 
