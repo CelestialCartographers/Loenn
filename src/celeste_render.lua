@@ -16,6 +16,8 @@ local gameplayPng = fileLocations.getResourceDir() .. "/Sprites/Gameplay.png"
 
 local gameplayAtlas = spriteMeta.loadSprites(gameplayMeta, gameplayPng)
 
+local triggerFontSize = 1
+
 -- Temptf 
 local roomCache = {}
 
@@ -73,7 +75,6 @@ local function drawTilesBg(room, tiles)
     love.graphics.draw(batch, 0, 0)
 end
 
--- Seems to be wrong now, woops.
 local function getDecalsBatch(decals)
     local decals = decals or {}
     local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._image)
@@ -123,19 +124,50 @@ local function drawDecalsBg(room, decals)
 end
 
 local function drawEntities(room, entities)
+    -- Heh its Hex for "Cru"
+    love.graphics.setColor(47, 114, 117, 0.3)
 
+    for i, entity <- entities.__children or {} do
+        local name = entity.__name
+
+        local x = entity.x or 0
+        local y = entity.y or 0
+        
+        love.graphics.rectangle("fill", x - 1, y - 1, 3, 3)
+    end
+
+    love.graphics.setColor(255, 255, 255, 1.0)
 end
 
 local function drawTriggers(room, triggers)
+    for i, trigger <- triggers.__children or {} do
+        local name = trigger.__name
 
+        local x = trigger.x or 0
+        local y = trigger.y or 0
+
+        local width = trigger.width or 16
+        local height = trigger.height or 16
+
+        love.graphics.setColor(47, 114, 117, 0.3)
+        
+        love.graphics.rectangle("line", x, y, width, height)
+        love.graphics.rectangle("fill", x, y, width, height)
+
+        love.graphics.setColor(255, 255, 255, 1.0)
+
+        -- TODO - Center properly, split on PascalCase -> Pascal Case etc
+        love.graphics.printf(name, x, y + height / 2, width, "center", 0, triggerFontSize, triggerFontSize)
+    end
 end
 
 local roomDrawingFunctions = {
-    {"BGTiles", "bg", drawTilesBg},
-    {"BGDecals", "bgdecals", drawDecalsBg},
+    {"Background Tiles", "bg", drawTilesBg},
+    {"Background Decals", "bgdecals", drawDecalsBg},
     {"Entities", "entities", drawEntities},
-    {"FGTiles", "solids", drawTilesFg},
-    {"FGDecals", "fgdecals", drawDecalsFg}
+    {"Foreground Tiles", "solids", drawTilesFg},
+    {"Foreground Decals", "fgdecals", drawDecalsFg},
+    {"Triggers", "triggers", drawTriggers}
 }
 
 local function drawRoom(room, viewport)
