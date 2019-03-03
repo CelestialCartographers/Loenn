@@ -16,7 +16,7 @@ local function twosCompliment(n, power)
 end
 
 local function stripByteOrderMark(s)
-    if s:byte(1) == 0xEF and s:byte(2) == 0xBB and s:byte(3) == 0xBF then
+    if s:byte(1) == 0xef and s:byte(2) == 0xbb and s:byte(3) == 0xbf then
         return s:sub(4, #s)
     end
 

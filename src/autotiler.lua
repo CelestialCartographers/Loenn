@@ -67,13 +67,15 @@ local function getQuads(x, y, tiles, meta)
 
     if checkPadding(tiles, x, y) then
         local padding = meta.padding[tile]
+        local paddingLength = padding.len and padding:len or #padding
 
-        return #padding > 0 and padding or {{0, 0}}, ""
+        return paddingLength > 0 and padding or {{0, 0}}, ""
 
     else
         local center = meta.center[tile]
+        local centerLength = center.len and center:len or #center
         
-        return #center > 0 and center or {{0, 0}}, ""
+        return centerLength > 0 and center or {{0, 0}}, ""
     end
 
     return {{5, 12}}, ""

@@ -4,6 +4,7 @@ local drawing = require("drawing")
 local tilesUtils = require("tiles")
 local viewportHandler = require("viewport_handler")
 local fileLocations = require("file_locations")
+local colors = require("colors")
 
 local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
 local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
@@ -18,8 +19,30 @@ local gameplayAtlas = spriteMeta.loadSprites(gameplayMeta, gameplayPng)
 
 local triggerFontSize = 1
 
--- Temptf 
+-- Temp
 local roomCache = {}
+
+local function getRoomBackgroundColor(room)
+    local color = room.c or 0
+
+    if color >= 0 and color < #colors.roomBackgroundColors then
+        return colors.roomBackgroundColors[color + 1]
+
+    else
+        return colors.roomBackgroundDefault
+    end
+end
+
+local function getRoomBorderColor(room)
+    local color = room.c or 0
+
+    if color >= 0 and color < #colors.roomBorderColors then
+        return colors.roomBorderColors[color + 1]
+
+    else
+        return colors.roomBorderDefault
+    end
+end
 
 local function getTilesBatch(tiles, meta)
     local tilesRaw = tiles.innerText or ""
@@ -41,7 +64,7 @@ local function getTilesBatch(tiles, meta)
                 local spriteMeta = gameplayAtlas[texture]
 
                 if spriteMeta and quadCount > 0 then
-                    -- Cache quad creation
+                    -- TODO - Cache quad creation
                     local randQuad = quads[math.random(1, quadCount)]
                     local quadX, quadY = randQuad[1], randQuad[2]
 
@@ -124,8 +147,7 @@ local function drawDecalsBg(room, decals)
 end
 
 local function drawEntities(room, entities)
-    -- Heh its Hex for "Cru"
-    love.graphics.setColor(47, 114, 117, 0.3)
+    love.graphics.setColor(colors.entityMissingColor)
 
     for i, entity <- entities.__children or {} do
         local name = entity.__name
@@ -136,7 +158,7 @@ local function drawEntities(room, entities)
         love.graphics.rectangle("fill", x - 1, y - 1, 3, 3)
     end
 
-    love.graphics.setColor(255, 255, 255, 1.0)
+    love.graphics.setColor(colors.default)
 end
 
 local function drawTriggers(room, triggers)
@@ -149,16 +171,18 @@ local function drawTriggers(room, triggers)
         local width = trigger.width or 16
         local height = trigger.height or 16
 
-        love.graphics.setColor(47, 114, 117, 0.3)
+        love.graphics.setColor(colors.triggerColor)
         
         love.graphics.rectangle("line", x, y, width, height)
         love.graphics.rectangle("fill", x, y, width, height)
 
-        love.graphics.setColor(255, 255, 255, 1.0)
+        love.graphics.setColor(colors.triggerTextColor)
 
         -- TODO - Center properly, split on PascalCase -> Pascal Case etc
         love.graphics.printf(name, x, y + height / 2, width, "center", 0, triggerFontSize, triggerFontSize)
     end
+
+    love.graphics.setColor(colors.default)
 end
 
 local roomDrawingFunctions = {
@@ -174,11 +198,25 @@ local function drawRoom(room, viewport)
     local roomX = room.x or 0
     local roomY = room.y or 0
 
+    local width = room.width or 40 * 8
+    local height = room.height or 23 * 8
+
+    local backgroundColor = getRoomBackgroundColor(room)
+    local borderColor = getRoomBorderColor(room)
+
     love.graphics.push()
 
     love.graphics.translate(math.floor(-viewport.x), math.floor(-viewport.y))
     love.graphics.scale(viewport.scale, viewport.scale)
     love.graphics.translate(roomX, roomY)
+
+    love.graphics.setColor(backgroundColor)
+    love.graphics.rectangle("fill", 0, 0, width, height)
+
+    love.graphics.setColor(borderColor)
+    love.graphics.rectangle("line", 0, 0, width, height)
+
+    love.graphics.setColor(colors.default)
 
     local roomData = {}
 
@@ -198,8 +236,25 @@ local function drawRoom(room, viewport)
     love.graphics.pop()
 end
 
-local function drawFiller(filler)
+local function drawFiller(filler, viewport)
+    love.graphics.push()
 
+    local fillerX = filler.x * 8
+    local fillerY = filler.y * 8
+
+    local width = filler.w * 8
+    local height = filler.h * 8
+
+    love.graphics.translate(math.floor(-viewport.x), math.floor(-viewport.y))
+    love.graphics.scale(viewport.scale, viewport.scale)
+    love.graphics.translate(fillerX, fillerY)
+
+    love.graphics.setColor(colors.fillerColor)
+    love.graphics.rectangle("fill", 0, 0, width, height)
+
+    love.graphics.setColor(colors.default)
+
+    love.graphics.pop()
 end
 
 local function drawMap(map)

@@ -15,7 +15,7 @@ love.graphics.setFont(fonts.font)
 
 viewportHandler.addDevice()
 
-local mapFile = fileLocations.getResourceDir() .. "/Maps/1-ForsakenCity.bin"
+local mapFile = fileLocations.getResourceDir() .. "/Maps/7-Summit.bin"
 local map = mapcoder.decodeFile(mapFile)
 
 function love.draw()
