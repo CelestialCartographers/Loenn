@@ -20,6 +20,10 @@ local gameplayAtlas = spriteMeta.loadSprites(gameplayMeta, gameplayPng)
 
 local triggerFontSize = 1
 
+local spriteBatchMode = "static"
+
+local tilesQuadCache = {}
+
 -- Temp
 local roomCache = {}
 
@@ -50,8 +54,7 @@ local function getTilesBatch(tiles, meta)
     local tiles = tilesUtils.convertTileString(tilesRaw)
 
     local width, height = tiles:size
-
-    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._image)
+    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._image, 1024, spriteBatchMode)
 
     -- Slicing currently doesnt allow default values, just ignore the literal edgecases
     for x = 1, width do
@@ -63,24 +66,29 @@ local function getTilesBatch(tiles, meta)
                 local quadCount = quads.len and quads:len or #quads
                 local texture = meta.paths[tile] or ""
                 local spriteMeta = gameplayAtlas[texture]
+                local spritesWidth, spritesHeight = gameplayAtlas._width, gameplayAtlas._height
 
                 if spriteMeta and quadCount > 0 then
                     -- TODO - Cache quad creation
                     local randQuad = quads[math.random(1, quadCount)]
                     local quadX, quadY = randQuad[1], randQuad[2]
 
-                    local spritesWidth, spritesHeight = gameplayAtlas._width, gameplayAtlas._height
-                    local quad = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
+                    tilesQuadCache[tile] = tilesQuadCache[tile] or table.filled(false, {6, 15})
+                    local quadCache = tilesQuadCache[tile]
+                    
+                    if not tilesQuadCache[quadX + 1, quadY + 1] then
+                        quadCache[quadX + 1, quadY + 1] = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
+                    end
 
-                    spriteBatch:add(quad, x * 8 - 8, y * 8 - 8)
+                    spriteBatch:add(quadCache[quadX + 1, quadY + 1], x * 8 - 8, y * 8 - 8)
                 end
             end
 
-            coroutine.yield(spriteBatch)
+            coroutine.yield()
         end
     end
 
-    coroutine.yield(spritebatch)
+    coroutine.yield(spriteBatch)
 end
 
 local function drawTilesFg(room, tiles)
@@ -106,10 +114,11 @@ local function drawTilesBg(room, tiles)
 end
 
 local function getDecalsBatch(decals)
-    local decals = decals or {}
-    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._image)
+    local decals = (decals or {}).__children or {}
+    local decalCount = decals.len and decals:len or #decals
+    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._image, math.max(decalCount, 1), spriteBatchMode)
 
-    for i, decal <- decals.__children or {} do
+    for i, decal <- decals do
         local texture = drawing.getDecalTexture(decal.texture or "")
 
         local x = decal.x or 0
@@ -131,7 +140,7 @@ local function getDecalsBatch(decals)
             )
         end
 
-        coroutine.yield(spriteBatch)
+        coroutine.yield()
     end
 
     coroutine.yield(spriteBatch)

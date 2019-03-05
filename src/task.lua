@@ -1,14 +1,19 @@
-local tasks = {}
+local globalTasks = {}
 
-local function processTasks(calcTime)
-    local calcTime = calcTime or math.inf
+-- Processes tasks from table for at around calcTime (default until done) and atmost maxTasks (default all)
+-- Returns processingStatus, timeSpent
+local function processTasks(calcTime, maxTasks, customTasks)
+    local timeSpent = 0
+    local calcTime = calcTime or math.huge
+    local tasksAllowed = maxTasks or math.huge
+    local tasks = customTasks or globalTasks
 
-    while #tasks > 0 do
+    while #tasks > 0 and tasksAllowed > 0 do
         local task = tasks[1]
 
         while coroutine.status(task.coroutine) ~= "dead" do
-            if calcTime < 0 then
-                return false
+            if timeSpent >= calcTime then
+                return false, timeSpent
             end
 
             local start = love.timer.getTime()
@@ -20,22 +25,19 @@ local function processTasks(calcTime)
 
             local stop = love.timer.getTime()
             local deltaTime = stop - start
-            calcTime -= deltaTime
-
-            --print("Worked on task for " .. tostring(deltaTime * 1000) .. "ms")
-            --print("Timeleft " .. tostring(calcTime * 1000) .. "ms")
+            timeSpent += deltaTime
         end
 
-        if coroutine.status(task.coroutine) == "dead" then
-            task.callback()
-            table.remove(tasks, 1)
-        end
+        task.callback()
+        table.remove(tasks, 1)
+        tasksAllowed -= 1
     end
 
-    return true
+    return #tasks == 0, timeSpent
 end
 
-local function newTask(func, callback)
+local function newTask(func, callback, tasks)
+    local tasks = tasks or globalTasks
     local task = {
         coroutine = coroutine.create(func),
         callback = callback or function() end

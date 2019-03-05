@@ -42,6 +42,5 @@ function love.draw()
 end
 
 function love.update()
-    -- TODO - Put in saner default
-    tasks.processTasks(1 / 120)
+    tasks.processTasks(math.huge, 1)
 end

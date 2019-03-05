@@ -59,6 +59,7 @@ local function getQuads(x, y, tiles, meta)
     local adjacent = tiles:get(tile, {x - 1, x + 1}, {y - 1, y + 1})
     adjacent = adjacent:map(target -> checkTile(tile, target, ignore))
 
+    -- TODO - Look into doing some insanely arcane caching here?
     for i, maskData <- masks do
         if checkMask(adjacent, maskData.mask) then
             return maskData.quads, maskData.sprites
