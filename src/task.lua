@@ -26,6 +26,7 @@ local function processTasks(calcTime, maxTasks, customTasks)
             local stop = love.timer.getTime()
             local deltaTime = stop - start
             timeSpent += deltaTime
+            task.timeTotal += deltaTime
         end
 
         task.callback()
@@ -40,7 +41,8 @@ local function newTask(func, callback, tasks)
     local tasks = tasks or globalTasks
     local task = {
         coroutine = coroutine.create(func),
-        callback = callback or function() end
+        callback = callback or function() end,
+        timeTotal = 0
     }
     
     table.insert(tasks, task)
