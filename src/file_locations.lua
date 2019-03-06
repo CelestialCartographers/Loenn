@@ -1,4 +1,4 @@
-local useInternal = true
+local useInternal = false
 
 -- Temporary for now
 local function getResourceDir()

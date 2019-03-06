@@ -1,5 +1,5 @@
 local autotiler = require("autotiler")
-local spriteMeta = require("sprite_meta")
+local spriteLoader = require("sprite_loader")
 local drawing = require("drawing")
 local tilesUtils = require("tiles")
 local viewportHandler = require("viewport_handler")
@@ -13,10 +13,10 @@ local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xm
 local tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
 local tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
 
-local gameplayMeta = fileLocations.getResourceDir() .. "/Sprites/Gameplay.meta"
-local gameplayPng = fileLocations.getResourceDir() .. "/Sprites/Gameplay.png"
+local gameplayMeta = fileLocations.getResourceDir() .. "/Atlases/Gameplay.meta"
+local celesteAtlasFolder = fileLocations.getResourceDir() .. "/Atlases/"
 
-local gameplayAtlas = spriteMeta.loadSprites(gameplayMeta, gameplayPng)
+local gameplayAtlas = spriteLoader.loadSpriteAtlas(gameplayMeta, celesteAtlasFolder)
 
 local triggerFontSize = 1
 
@@ -54,7 +54,7 @@ local function getTilesBatch(tiles, meta)
     local tiles = tilesUtils.convertTileString(tilesRaw)
 
     local width, height = tiles:size
-    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._image, 1024, spriteBatchMode)
+    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._imageMeta[1].image, 1024, spriteBatchMode)
 
     -- Slicing currently doesnt allow default values, just ignore the literal edgecases
     for x = 1, width do
@@ -66,7 +66,7 @@ local function getTilesBatch(tiles, meta)
                 local quadCount = quads.len and quads:len or #quads
                 local texture = meta.paths[tile] or ""
                 local spriteMeta = gameplayAtlas[texture]
-                local spritesWidth, spritesHeight = gameplayAtlas._width, gameplayAtlas._height
+                local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
 
                 if spriteMeta and quadCount > 0 then
                     -- TODO - Cache quad creation
@@ -116,7 +116,7 @@ end
 local function getDecalsBatch(decals)
     local decals = (decals or {}).__children or {}
     local decalCount = decals.len and decals:len or #decals
-    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._image, math.max(decalCount, 1), spriteBatchMode)
+    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._imageMeta[1].image, math.max(decalCount, 1), spriteBatchMode)
 
     for i, decal <- decals do
         local texture = drawing.getDecalTexture(decal.texture or "")
