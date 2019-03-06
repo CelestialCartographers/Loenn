@@ -6,6 +6,7 @@ local viewportHandler = require("viewport_handler")
 local fileLocations = require("file_locations")
 local colors = require("colors")
 local tasks = require("task")
+local utils = require("utils")
 
 local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
 local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
@@ -184,8 +185,11 @@ local function drawEntities(room, entities)
 end
 
 local function drawTriggers(room, triggers)
+    local font = love.graphics.getFont()
+
     for i, trigger <- triggers.__children or {} do
         local name = trigger.__name
+        local displayName = utils.humanizeVariableName(name)
 
         local x = trigger.x or 0
         local y = trigger.y or 0
@@ -200,8 +204,13 @@ local function drawTriggers(room, triggers)
 
         love.graphics.setColor(colors.triggerTextColor)
 
-        -- TODO - Center properly, split on PascalCase -> Pascal Case etc
-        love.graphics.printf(name, x, y + height / 2, width, "center", 0, triggerFontSize, triggerFontSize)
+        local longest, lines = font:getWrap(displayName, width)
+        local textHeight = #lines * (font:getHeight() * font:getLineHeight())
+
+        local offsetX = 0
+        local offsetY = (textHeight - height) / 2
+
+        love.graphics.printf(displayName, x, y, width, "center", 0, triggerFontSize, triggerFontSize, offsetX, offsetY)
     end
 
     love.graphics.setColor(colors.default)

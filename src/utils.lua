@@ -77,6 +77,23 @@ local function loadImageAbsPath(path)
     return love.graphics.newImage(data)
 end
 
+
+-- TODO - Get Vex to look at the lambda versions
+local function humanizeVariableName(name)
+    local res = name
+
+    res := gsub("_", " ")
+    res := gsub("/", " ")
+
+    res := gsub("(%l)(%u)", function (a, b) return a .. " " .. b end)
+    res := gsub("(%a)(%a*)", function(a, b) return string.upper(a) .. b end)
+
+    res := gsub("%s+", " ")
+    res := match("^%s*(.*)%s*$")
+
+    return res
+end
+
 return {
     loadImageAbsPath = loadImageAbsPath,
     twosCompliment = twosCompliment,
@@ -84,5 +101,6 @@ return {
     split = split,
     aabbCheck = aabbCheck,
     getFileHandle = getFileHandle,
-    readAll = readAll
+    readAll = readAll,
+    humanizeVariableName = humanizeVariableName
 }
