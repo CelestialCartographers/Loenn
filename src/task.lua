@@ -19,7 +19,11 @@ local function processTasks(calcTime, maxTasks, customTasks)
             local start = love.timer.getTime()
             local success, res = coroutine.resume(task.coroutine)
 
-            if res then
+            if not success then
+                print("! Task Failed:", res)
+            end
+
+            if success and res then
                 task.result = res
             end
 

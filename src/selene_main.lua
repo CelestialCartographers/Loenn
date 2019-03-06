@@ -11,12 +11,23 @@ local viewportHandler = require("viewport_handler")
 local fileLocations = require("file_locations")
 local fonts = require("fonts")
 local tasks = require("task")
+local entities = require("entities")
 
 love.graphics.setFont(fonts.font)
+love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
+
+-- TODO - Make task "group" for loading things
+
+tasks.newTask(
+    function()
+        entities.loadInternalEntities()
+    end
+)
+
 
 local loadingMap = true
 
-local mapFile = fileLocations.getResourceDir() .. "/Maps/7-Summit.bin"
+local mapFile = fileLocations.getResourceDir() .. "/Maps/1-ForsakenCity.bin"
 local map = tasks.newTask(
     function()
         mapcoder.decodeFile(mapFile)
@@ -42,5 +53,10 @@ function love.draw()
 end
 
 function love.update()
-    tasks.processTasks(math.huge, 1)
+    if loadingMap then
+        tasks.processTasks(1 / 144)
+
+    else
+        tasks.processTasks(math.huge, 1)
+    end
 end

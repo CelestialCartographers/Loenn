@@ -17,7 +17,7 @@ local function sendEvent(event, ...)
     end
 end
 
-local function newInputDevice(t, unhandled)
+local function newInputDevice(t)
     local newDevice = setmetatable(t, inputDeviceMt)
     inputDevices += newDevice
 

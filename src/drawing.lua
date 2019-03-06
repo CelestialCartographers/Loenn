@@ -23,8 +23,34 @@ local function getDecalTexture(texture)
     return "decals/" .. texture:gsub("\\", "/"):sub(1, #texture - 4)
 end
 
+function getCurvePoint(start, stop, control, percent)
+    local startMul = (1 - percent)^2
+    local controlMul = 2 * (1 - percent) * percent
+    local stopMul = percent^2
+
+    return {
+        start[1] * startMul + control[1] * controlMul + stop[1] * stopMul,
+        start[2] * startMul + control[2] * controlMul + stop[2] * stopMul,
+    }
+end
+
+local function getSimpleCurve(start, stop, control, resolution)
+    local control = control or {(start[1] + stop[1]) / 2, (start[2] + stop[2]) / 2}
+    local resolution = resolution or 16
+    local res = $()
+
+    for i = 0, resolution do
+        res += getCurvePoint(start, stop, control, i / resolution)
+    end
+
+    return res()
+end
+
 return {
     createSpriteBatch = createSpriteBatch,
     drawSprite = drawSprite,
-    getDecalTexture = getDecalTexture
+    getDecalTexture = getDecalTexture,
+
+    getCurvePoint = getCurvePoint,
+    getSimpleCurve = getSimpleCurve
 }

@@ -94,6 +94,19 @@ local function humanizeVariableName(name)
     return res
 end
 
+local function parseHexColor(color)
+    local color := match("^#?([0-9a-fA-F]+)$")
+
+    if color and #color == 6 then
+        local number = tonumber(color, 16)
+        local r, g, b = number / 256^2 % 256, number / 256 % 256, number % 256
+
+        return true, r / 255, g / 255, b / 255
+    end
+
+    return false, 0, 0, 0
+end
+
 return {
     loadImageAbsPath = loadImageAbsPath,
     twosCompliment = twosCompliment,
@@ -102,5 +115,6 @@ return {
     aabbCheck = aabbCheck,
     getFileHandle = getFileHandle,
     readAll = readAll,
-    humanizeVariableName = humanizeVariableName
+    humanizeVariableName = humanizeVariableName,
+    parseHexColor = parseHexColor
 }

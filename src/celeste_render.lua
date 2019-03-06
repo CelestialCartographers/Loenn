@@ -7,17 +7,14 @@ local fileLocations = require("file_locations")
 local colors = require("colors")
 local tasks = require("task")
 local utils = require("utils")
+local atlases = require("atlases")
+local entityHandler = require("entities")
 
 local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
 local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
 
 local tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
 local tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
-
-local gameplayMeta = fileLocations.getResourceDir() .. "/Atlases/Gameplay.meta"
-local celesteAtlasFolder = fileLocations.getResourceDir() .. "/Atlases/"
-
-local gameplayAtlas = spriteLoader.loadSpriteAtlas(gameplayMeta, celesteAtlasFolder)
 
 local triggerFontSize = 1
 
@@ -55,7 +52,7 @@ local function getTilesBatch(tiles, meta)
     local tiles = tilesUtils.convertTileString(tilesRaw)
 
     local width, height = tiles:size
-    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._imageMeta[1].image, 1024, spriteBatchMode)
+    local spriteBatch = love.graphics.newSpriteBatch(atlases.gameplay._imageMeta[1].image, 1024, spriteBatchMode)
 
     -- Slicing currently doesnt allow default values, just ignore the literal edgecases
     for x = 1, width do
@@ -66,7 +63,7 @@ local function getTilesBatch(tiles, meta)
                 local quads, sprites = autotiler.getQuads(x, y, tiles, meta)
                 local quadCount = quads.len and quads:len or #quads
                 local texture = meta.paths[tile] or ""
-                local spriteMeta = gameplayAtlas[texture]
+                local spriteMeta = atlases.gameplay[texture]
                 local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
 
                 if spriteMeta and quadCount > 0 then
@@ -117,7 +114,7 @@ end
 local function getDecalsBatch(decals)
     local decals = (decals or {}).__children or {}
     local decalCount = decals.len and decals:len or #decals
-    local spriteBatch = love.graphics.newSpriteBatch(gameplayAtlas._imageMeta[1].image, math.max(decalCount, 1), spriteBatchMode)
+    local spriteBatch = love.graphics.newSpriteBatch(atlases.gameplay._imageMeta[1].image, math.max(decalCount, 1), spriteBatchMode)
 
     for i, decal <- decals do
         local texture = drawing.getDecalTexture(decal.texture or "")
@@ -128,7 +125,7 @@ local function getDecalsBatch(decals)
         local scaleX = decal.scaleX or 1
         local scaleY = decal.scaleY or 1
 
-        local meta = gameplayAtlas[texture]
+        local meta = atlases.gameplay[texture]
 
         if meta then
             spriteBatch:add(
@@ -169,16 +166,33 @@ local function drawDecalsBg(room, decals)
     end
 end
 
-local function drawEntities(room, entities)
-    love.graphics.setColor(colors.entityMissingColor)
+-- TODO - Add more advanced rendering support
+local function drawEntities(room, entities, registeredEntities)
+    local registeredEntities = registeredEntities or entityHandler.registeredEntities
 
     for i, entity <- entities.__children or {} do
         local name = entity.__name
+        local entityHandler = registeredEntities[name]
 
-        local x = entity.x or 0
-        local y = entity.y or 0
-        
-        love.graphics.rectangle("fill", x - 1, y - 1, 3, 3)
+        if entityHandler then
+            if entityHandler.sprite then
+                local sprite = entityHandler.sprite(room, entity)
+
+                love.graphics.draw(sprite.meta.image, sprite.meta.quad, sprite.x, sprite.y, sprite.r, sprite.sx, sprite.sy, sprite.jx * sprite.meta.width, sprite.jy * sprite.meta.height)
+            end
+
+            if entityHandler.draw then
+                local res = entityHandler.draw(room, entity)
+            end
+
+        else
+            local x = entity.x or 0
+            local y = entity.y or 0
+            
+            love.graphics.setColor(colors.entityMissingColor)
+            love.graphics.rectangle("fill", x - 1, y - 1, 3, 3)
+            love.graphics.setColor(colors.default)
+        end
     end
 
     love.graphics.setColor(colors.default)
