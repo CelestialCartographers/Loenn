@@ -11,7 +11,7 @@ local function loadDataImage(fn)
     local image = love.image.newImageData(width, height)
 
     local repeatsLeft = 0
-    local pixel
+    local r, g, b, a
 
     for y = 0, height - 1 do
         for x = 0, width - 1 do
@@ -23,22 +23,22 @@ local function loadDataImage(fn)
                     local alpha = binfile.readByte(fh)
 
                     if alpha > 0 then
-                        local b, g, r = binfile.readByte(fh) / 255, binfile.readByte(fh) / 255, binfile.readByte(fh) / 255
-                        pixel = {r, g, b, alpha / 255}
+                        b, g, r = binfile.readByte(fh) / 255, binfile.readByte(fh) / 255, binfile.readByte(fh) / 255
+                        a = alpha / 255
 
                     else
-                        pixel = {0, 0, 0, 0}
+                        r, g, b, a = 0, 0, 0, 0
                     end
 
                 else
-                    local b, g, r = binfile.readByte(fh) / 255, binfile.readByte(fh) / 255, binfile.readByte(fh) / 255
-                    pixel = {r, g, b, alpha / 255}
+                    b, g, r = binfile.readByte(fh) / 255, binfile.readByte(fh) / 255, binfile.readByte(fh) / 255
+                    a = 1
                 end
 
-                image:setPixel(x, y, unpack(pixel))
+                image:setPixel(x, y, r, g, b, a)
 
             else
-                image:setPixel(x, y, unpack(pixel))
+                image:setPixel(x, y, r, g, b, a)
                 repeatsLeft -= 1
             end
         end
