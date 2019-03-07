@@ -2,6 +2,8 @@ local xml2lua = require("xml2lua.xml2lua")
 local utils = require("utils")
 local serialization = require("serialization")
 
+local autotiler = {}
+
 local function convertMaskString(s)
     local res = table.filled(0, {3, 3})
     local raw = s:gsub("x", "2")
@@ -50,7 +52,7 @@ local function sortByScore(masks)
     return res
 end
 
-local function getQuads(x, y, tiles, meta)
+function autotiler.getQuads(x, y, tiles, meta)
     local tile = tiles[x, y]
 
     local masks = meta.masks[tile] or {}
@@ -98,7 +100,7 @@ local function convertTileString(s)
     return res
 end
 
-local function loadTilesetXML(fn)
+function autotiler.loadTilesetXML(fn)
     local handler = require("xml2lua.xmlhandler.tree")
     local parser = xml2lua.parser(handler)
     local xml = utils.stripByteOrderMark(utils.readAll(fn, "rb"))
@@ -167,7 +169,4 @@ local function loadTilesetXML(fn)
     }
 end
 
-return {
-    loadTilesetXML = loadTilesetXML,
-    getQuads = getQuads
-}
+return autotiler

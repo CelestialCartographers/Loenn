@@ -1,6 +1,8 @@
 local fileLocations = require("file_locations")
 
-local function twosCompliment(n, power)
+local utils = {}
+
+function utils.twosCompliment(n, power)
     if n >= 2^(power - 1) then
         return n - 2^power
 
@@ -9,7 +11,7 @@ local function twosCompliment(n, power)
     end
 end
 
-local function stripByteOrderMark(s)
+function utils.stripByteOrderMark(s)
     if s:byte(1) == 0xef and s:byte(2) == 0xbb and s:byte(3) == 0xbf then
         return s:sub(4, #s)
     end
@@ -17,13 +19,13 @@ local function stripByteOrderMark(s)
     return s
 end
 
-local function aabbCheck(r1, r2)
+function utils.aabbCheck(r1, r2)
     return not (r2.x >= r1.x + r1.width or r2.x + r2.width <= r1.x or r2.y >= r1.y + r1.height or r2.y + r2.height <= r1.y)
 end
 
 -- Temp, from https://bitbucket.org/Oddstr13/ac-get-repo/src/8a08af2a87b246e200e83a0e2e7f35a3537d0378/tk-lib-str/lib/str.lua#lines-6 
 -- Keeps empty split entries
-local function split(s, sSeparator, nMax, bRegexp)
+function utils.split(s, sSeparator, nMax, bRegexp)
 -- http://lua-users.org/wiki/SplitJoin
 -- "Function: true Python semantics for split"
     assert(sSeparator ~= '')
@@ -50,7 +52,7 @@ local function split(s, sSeparator, nMax, bRegexp)
     return aRecord
 end
 
-local function getFileHandle(path, mode, internal)
+function utils.getFileHandle(path, mode, internal)
     local internal = internal or fileLocations.useInternal
     
     if internal then
@@ -61,9 +63,9 @@ local function getFileHandle(path, mode, internal)
     end
 end
 
-local function readAll(path, mode, internal)
+function utils.readAll(path, mode, internal)
     local internal = internal or fileLocations.useInternal
-    local file = getFileHandle(path, mode, internal)
+    local file = utils.getFileHandle(path, mode, internal)
     local res = internal and file:read() or file:read("*a")
 
     file:close()
@@ -71,7 +73,7 @@ local function readAll(path, mode, internal)
     return res
 end
 
-local function loadImageAbsPath(path)
+function utils.loadImageAbsPath(path)
     local data = love.filesystem.newFileData(readAll(path, "rb"), "image.png")
 
     return love.graphics.newImage(data)
@@ -79,7 +81,7 @@ end
 
 
 -- TODO - Get Vex to look at the lambda versions
-local function humanizeVariableName(name)
+function utils.humanizeVariableName(name)
     local res = name
 
     res := gsub("_", " ")
@@ -94,7 +96,7 @@ local function humanizeVariableName(name)
     return res
 end
 
-local function parseHexColor(color)
+function utils.parseHexColor(color)
     local color := match("^#?([0-9a-fA-F]+)$")
 
     if color and #color == 6 then
@@ -107,14 +109,4 @@ local function parseHexColor(color)
     return false, 0, 0, 0
 end
 
-return {
-    loadImageAbsPath = loadImageAbsPath,
-    twosCompliment = twosCompliment,
-    stripByteOrderMark = stripByteOrderMark,
-    split = split,
-    aabbCheck = aabbCheck,
-    getFileHandle = getFileHandle,
-    readAll = readAll,
-    humanizeVariableName = humanizeVariableName,
-    parseHexColor = parseHexColor
-}
+return utils

@@ -1,4 +1,6 @@
-local inputDevices = $()
+local inputHandler = {}
+
+inputHandler.inputDevices = $()
 
 local function unhandledEvent()
     -- Do nothing
@@ -8,23 +10,20 @@ local inputDeviceMt = {
     __index = function() return unhandledEvent end
 }
 
-local function sendEvent(event, ...)
+function inputHandler.sendEvent(event, ...)
     if event then
-        for i, device <- inputDevices do
+        for i, device <- inputHandler.inputDevices do
             local args = {...} or {}
             device[event](unpack(args))
         end
     end
 end
 
-local function newInputDevice(t)
+function inputHandler.newInputDevice(t)
     local newDevice = setmetatable(t, inputDeviceMt)
-    inputDevices += newDevice
+    inputHandler.inputDevices += newDevice
 
     return newDevice
 end
 
-return {
-    newInputDevice = newInputDevice,
-    sendEvent = sendEvent
-}
+return inputHandler

@@ -22,6 +22,8 @@ local spriteBatchMode = "static"
 
 local tilesQuadCache = {}
 
+local celesteRender = {}
+
 -- Temp
 local roomCache = {}
 
@@ -47,7 +49,7 @@ local function getRoomBorderColor(room)
     end
 end
 
-local function getTilesBatch(tiles, meta)
+function celesteRender.getTilesBatch(tiles, meta)
     local tilesRaw = tiles.innerText or ""
     local tiles = tilesUtils.convertTileString(tilesRaw)
 
@@ -89,9 +91,9 @@ local function getTilesBatch(tiles, meta)
     coroutine.yield(spriteBatch)
 end
 
-local function drawTilesFg(room, tiles)
+function celesteRender.drawTilesFg(room, tiles)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].fgTiles = roomCache[room.name].fgTiles or tasks.newTask(function() getTilesBatch(tiles, tilesMetaFg) end)
+    roomCache[room.name].fgTiles = roomCache[room.name].fgTiles or tasks.newTask(function() celesteRender.getTilesBatch(tiles, tilesMetaFg) end)
 
     local batch = roomCache[room.name].fgTiles.result
 
@@ -100,9 +102,9 @@ local function drawTilesFg(room, tiles)
     end
 end
 
-local function drawTilesBg(room, tiles)
+function celesteRender.drawTilesBg(room, tiles)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].bgTiles = roomCache[room.name].bgTiles or tasks.newTask(function() getTilesBatch(tiles, tilesMetaBg) end)
+    roomCache[room.name].bgTiles = roomCache[room.name].bgTiles or tasks.newTask(function() celesteRender.getTilesBatch(tiles, tilesMetaBg) end)
 
     local batch = roomCache[room.name].bgTiles.result
 
@@ -111,7 +113,7 @@ local function drawTilesBg(room, tiles)
     end
 end
 
-local function getDecalsBatch(decals)
+function celesteRender.getDecalsBatch(decals)
     local decals = (decals or {}).__children or {}
     local decalCount = decals.len and decals:len or #decals
     local spriteBatch = love.graphics.newSpriteBatch(atlases.gameplay._imageMeta[1].image, math.max(decalCount, 1), spriteBatchMode)
@@ -144,9 +146,9 @@ local function getDecalsBatch(decals)
     coroutine.yield(spriteBatch)
 end
 
-local function drawDecalsFg(room, decals)
+function celesteRender.drawDecalsFg(room, decals)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].fgDecals = roomCache[room.name].fgDecals or tasks.newTask(function() getDecalsBatch(decals) end)
+    roomCache[room.name].fgDecals = roomCache[room.name].fgDecals or tasks.newTask(function() celesteRender.getDecalsBatch(decals) end)
 
     local batch = roomCache[room.name].fgDecals.result
 
@@ -155,9 +157,9 @@ local function drawDecalsFg(room, decals)
     end
 end
 
-local function drawDecalsBg(room, decals)
+function celesteRender.drawDecalsBg(room, decals)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].bgDecals = roomCache[room.name].bgDecals or tasks.newTask(function() getDecalsBatch(decals) end)
+    roomCache[room.name].bgDecals = roomCache[room.name].bgDecals or tasks.newTask(function() celesteRender.getDecalsBatch(decals) end)
 
     local batch = roomCache[room.name].bgDecals.result
 
@@ -167,7 +169,7 @@ local function drawDecalsBg(room, decals)
 end
 
 -- TODO - Add more advanced rendering support
-local function drawEntities(room, entities, registeredEntities)
+function celesteRender.drawEntities(room, entities, registeredEntities)
     local registeredEntities = registeredEntities or entityHandler.registeredEntities
 
     for i, entity <- entities.__children or {} do
@@ -198,7 +200,7 @@ local function drawEntities(room, entities, registeredEntities)
     love.graphics.setColor(colors.default)
 end
 
-local function drawTriggers(room, triggers)
+function celesteRender.drawTriggers(room, triggers)
     local font = love.graphics.getFont()
 
     for i, trigger <- triggers.__children or {} do
@@ -231,15 +233,15 @@ local function drawTriggers(room, triggers)
 end
 
 local roomDrawingFunctions = {
-    {"Background Tiles", "bg", drawTilesBg},
-    {"Background Decals", "bgdecals", drawDecalsBg},
-    {"Entities", "entities", drawEntities},
-    {"Foreground Tiles", "solids", drawTilesFg},
-    {"Foreground Decals", "fgdecals", drawDecalsFg},
-    {"Triggers", "triggers", drawTriggers}
+    {"Background Tiles", "bg", celesteRender.drawTilesBg},
+    {"Background Decals", "bgdecals", celesteRender.drawDecalsBg},
+    {"Entities", "entities", celesteRender.drawEntities},
+    {"Foreground Tiles", "solids", celesteRender.drawTilesFg},
+    {"Foreground Decals", "fgdecals", celesteRender.drawDecalsFg},
+    {"Triggers", "triggers", celesteRender.drawTriggers}
 }
 
-local function drawRoom(room, viewport)
+function celesteRender.drawRoom(room, viewport)
     local roomX = room.x or 0
     local roomY = room.y or 0
 
@@ -281,7 +283,7 @@ local function drawRoom(room, viewport)
     love.graphics.pop()
 end
 
-local function drawFiller(filler, viewport)
+function celesteRender.drawFiller(filler, viewport)
     love.graphics.push()
 
     local fillerX = filler.x * 8
@@ -302,17 +304,17 @@ local function drawFiller(filler, viewport)
     love.graphics.pop()
 end
 
-local function drawMap(map)
+function celesteRender.drawMap(map)
     if map.result then
         local map = map.result
-        local viewport = viewportHandler.getViewport()
+        local viewport = viewportHandler.viewport
 
         if viewport.visible then
             for i, data <- map.__children[1].__children do
                 if data.__name == "levels" then
                     for j, room <- data.__children or {} do
                         if viewportHandler.roomVisible(room, viewport) then
-                            drawRoom(room, viewport)
+                            celesteRender.drawRoom(room, viewport)
                         end
                     end
 
@@ -320,7 +322,7 @@ local function drawMap(map)
                     for j, filler <- data.__children or {} do
                         -- TODO - Don't draw out of view fillers
                         -- ... Even though checking if they are out of view is probably more expensive than drawing it
-                        drawFiller(filler, viewport)
+                        celesteRender.drawFiller(filler, viewport)
                     end
                 end
             end
@@ -333,11 +335,4 @@ local function drawMap(map)
     end
 end
 
-return {
-    drawMap = drawMap,
-    drawRoom = drawRoom,
-    drawTilesFg = drawTilesFg,
-    drawTilesBg = drawTilesBg,
-    drawDecalsFg = drawDecalsFg,
-    drawDecalsBg = drawDecalsBg
-}
+return celesteRender

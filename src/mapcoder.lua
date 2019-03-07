@@ -1,7 +1,9 @@
 local utils = require("utils")
 local binfile = require("binfile")
 
-local function look(fh, lookup)
+local mapcoder = {}
+
+function mapcoder.look(fh, lookup)
     return lookup[binfile.readShort(fh) + 1]
 end
 
@@ -18,7 +20,7 @@ local function decodeValue(fh, lookup, typ)
         return decodeFunctions[typ + 1](fh)
 
     elseif typ == 5 then
-        return look(fh, lookup)
+        return mapcoder.look(fh, lookup)
 
     elseif typ == 6 then
         return binfile.readString(fh)
@@ -29,12 +31,12 @@ local function decodeValue(fh, lookup, typ)
 end
 
 local function decodeElement(fh, lookup)
-    local name = look(fh, lookup)
+    local name = mapcoder.look(fh, lookup)
     local element = {__name=name}
     local attributeCount = binfile.readByte(fh)
 
     for i = 1, attributeCount do
-        local key = look(fh, lookup)
+        local key = mapcoder.look(fh, lookup)
         local typ = binfile.readByte(fh)
 
         local value = decodeValue(fh, lookup, typ)
@@ -59,12 +61,12 @@ local function decodeElement(fh, lookup)
     return element
 end
 
-local function decodeFile(path, header)
+function mapcoder.decodeFile(path, header)
     local header = header or "CELESTE MAP"
     local fh = utils.getFileHandle(path, "rb")
     local res = {}
 
-    if binfile.readString(fh) ~= header then
+    if #header > 0 and binfile.readString(fh) ~= header then
         print("Invalid Celeste map file")
 
         return false
@@ -87,11 +89,8 @@ local function decodeFile(path, header)
     coroutine.yield(res)
 end
 
-local function encodeFile(path, data)
+function mapcoder.encodeFile(path, data)
 
 end
 
-return {
-    decodeFile = decodeFile,
-    encodeFile = encodeFile
-}
+return mapcoder

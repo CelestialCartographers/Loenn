@@ -1,7 +1,9 @@
 local utils = require("utils")
 
+local tiles = {}
+
 -- Has issues since spliting doesn't keep empty entries
-local function convertTileString(tiles)
+function tiles.convertTileString(tiles)
     local tiles = tiles:gsub("\r\n", "\n")
     local lines = $(utils.split(tiles, "\n"))
 
@@ -25,6 +27,4 @@ local function convertTileString(tiles)
     return res
 end
 
-return {
-    convertTileString = convertTileString
-}
+return tiles

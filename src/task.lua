@@ -1,8 +1,10 @@
 local globalTasks = {}
 
+local tasks = {}
+
 -- Processes tasks from table for at around calcTime (default until done) and atmost maxTasks (default all)
 -- Returns processingStatus, timeSpent
-local function processTasks(calcTime, maxTasks, customTasks)
+function tasks.processTasks(calcTime, maxTasks, customTasks)
     local timeSpent = 0
     local calcTime = calcTime or math.huge
     local tasksAllowed = maxTasks or math.huge
@@ -41,7 +43,7 @@ local function processTasks(calcTime, maxTasks, customTasks)
     return #tasks == 0, timeSpent
 end
 
-local function newTask(func, callback, tasks)
+function tasks.newTask(func, callback, tasks)
     local tasks = tasks or globalTasks
     local task = {
         coroutine = coroutine.create(func),
@@ -54,7 +56,4 @@ local function newTask(func, callback, tasks)
     return task
 end
 
-return {
-    processTasks = processTasks,
-    newTask = newTask
-}
+return tasks

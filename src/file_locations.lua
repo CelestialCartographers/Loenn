@@ -1,7 +1,9 @@
-local useInternal = false
+local fileLocations = {}
+
+fileLocations.useInternal = false
 
 -- Temporary for now
-local function getResourceDir()
+function fileLocations.getResourceDir()
     if useInternal then
         return "celesteResources"
 
@@ -18,7 +20,4 @@ local function getResourceDir()
     end
 end
 
-return {
-    getResourceDir = getResourceDir,
-    useInternal = useInternal
-}
+return fileLocations

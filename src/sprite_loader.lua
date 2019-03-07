@@ -1,7 +1,9 @@
 local utils = require("utils")
 local binfile = require("binfile")
 
-local function loadDataImage(fn)
+local spriteLoader = {}
+
+function spriteLoader.loadDataImage(fn)
     local fh = utils.getFileHandle(fn, "rb")
 
     local width = binfile.readLong(fh)
@@ -47,7 +49,7 @@ local function loadDataImage(fn)
     return love.graphics.newImage(image)
 end
 
-local function loadSpriteAtlas(metaFn, atlasDir)
+function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
     local fh = utils.getFileHandle(metaFn, "rb")
 
     -- Get rid of headers
@@ -68,7 +70,7 @@ local function loadSpriteAtlas(metaFn, atlasDir)
 
         local dataFilePath = atlasDir .. dataFile .. ".data"
 
-        local spritesImage = loadDataImage(dataFilePath)
+        local spritesImage = spriteLoader.loadDataImage(dataFilePath)
         local spritesWidth, spritesHeight = spritesImage:getDimensions
 
         res._imageMeta += {
@@ -108,7 +110,4 @@ local function loadSpriteAtlas(metaFn, atlasDir)
     return res
 end
 
-return {
-    loadSpriteAtlas = loadSpriteAtlas,
-    loadDataImage = loadDataImage
-}
+return spriteLoader

@@ -1,42 +1,44 @@
 local utils = require("utils")
 
-local function readByte(fh)
+local binfile = {}
+
+function binfile.readByte(fh)
     return string.byte(fh:read(1))
 end
 
-local function readShort(fh)
-    return readByte(fh) + readByte(fh) * 256
+function binfile.readShort(fh)
+    return binfile.readByte(fh) + binfile.readByte(fh) * 256
 end
 
-local function readLong(fh)
-    return readByte(fh) + readByte(fh) * 256 + readByte(fh) * 65526 + readByte(fh) * 15777216 
+function binfile.readLong(fh)
+    return binfile.readByte(fh) + binfile.readByte(fh) * 256 + binfile.readByte(fh) * 65526 + binfile.readByte(fh) * 15777216 
 end
 
-local function readBool(fh)
-    return readByte(fh) ~= 0
+function binfile.readBool(fh)
+    return binfile.readByte(fh) ~= 0
 end
 
-local function readSignedShort(fh)
-    return utils.twosCompliment(readShort(fh), 16)
+function binfile.readSignedShort(fh)
+    return utils.twosCompliment(binfile.readShort(fh), 16)
 end
 
-local function readSignedLong(fh)
-    return utils.twosCompliment(readLong(fh), 32)
+function binfile.readSignedLong(fh)
+    return utils.twosCompliment(binfile.readLong(fh), 32)
 end
 
 -- TBI
-local function readFloat(fh)
-    readLong(fh)
+function binfile.readFloat(fh)
+    binfile.readLong(fh)
 
     return 0.0
 end
 
-local function readVariableLength(fh)
+function binfile.readVariableLength(fh)
     local res = 0
     local count = 0
 
     while true do
-        local byte = readByte(fh)
+        local byte = binfile.readByte(fh)
 
         res += byte % 128 * 2^(count * 7)
         count += 1
@@ -47,7 +49,7 @@ local function readVariableLength(fh)
     end
 end
 
-local function writeVariableLength(fh, value)
+function binfile.writeVariableLength(fh, value)
     local res = $()
 
     while value > 127 do
@@ -60,24 +62,24 @@ local function writeVariableLength(fh, value)
     return res
 end
 
-local function readString(fh)
-    local length = readVariableLength(fh)
+function binfile.readString(fh)
+    local length = binfile.readVariableLength(fh)
     local res = fh:read(length)
 
     return res
 end
 
-local function writeString(fh, value)
-    writeVariableLength(#value)
+function binfile.writeString(fh, value)
+    binfile.writeVariableLength(#value)
     fh:write(value)
 end
 
-local function readRunLengthEncoded(fh)
-    local bytes = readShort(fh)
+function binfile.readRunLengthEncoded(fh)
+    local bytes = binfile.readShort(fh)
     local res = ""
 
     for i = 1, bytes, 2 do
-        times = readByte(fh)
+        times = binfile.readByte(fh)
         char = fh:read(1)
 
         res ..= char:rep(times)
@@ -86,7 +88,7 @@ local function readRunLengthEncoded(fh)
     return res
 end
 
-local function writeRunLengthEncoded(fh, value)
+function binfile.writeRunLengthEncoded(fh, value)
     local res = $()
     local value = $(value)
 
@@ -110,20 +112,4 @@ local function writeRunLengthEncoded(fh, value)
     res += current
 end
 
-return {
-    readBool = readBool,
-    readByte = readByte,
-    readShort = readShort,
-    readSignedShort = readSignedShort,
-    readLong = readLong,
-    readSignedLong = readSignedLong,
-    readFloat = readFloat,
-
-    readVariableLength = readVariableLength,
-    readRunLengthEncoded = readRunLengthEncoded,
-    readString = readString,
-
-    writeVariableLength = writeVariableLength,
-    writeRunLengthEncoded = writeRunLengthEncoded,
-    writeString = writeString   
-}
+return binfile

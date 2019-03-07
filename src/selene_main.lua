@@ -24,7 +24,6 @@ tasks.newTask(
     end
 )
 
-
 local loadingMap = true
 
 local mapFile = fileLocations.getResourceDir() .. "/Maps/1-ForsakenCity.bin"
@@ -39,7 +38,7 @@ local map = tasks.newTask(
 )
 
 function love.draw()
-    local viewport = viewportHandler.getViewport()
+    local viewport = viewportHandler.viewport
 
     if loadingMap then
         love.graphics.printf("Loading...", viewport.width / 2, viewport.height / 2, viewport.width, "left", love.timer.getTime(), fonts.fontScale * 2, fonts.fontScale * 2)

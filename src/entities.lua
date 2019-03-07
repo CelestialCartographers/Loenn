@@ -1,13 +1,11 @@
 local atlases = require("atlases")
 local utils = require("utils")
 
-local registeredEntities = {}
+local entities = {}
 
-local function getRegisteredEntities()
-    return registerEntity
-end
+entities.registeredEntities = {}
 
-local function spriteFromTexture(texture, data)
+function entities.spriteFromTexture(texture, data)
     local atlas = data.atlas or "gameplay"
     local spriteMeta = atlases[atlas][texture]
 
@@ -30,7 +28,7 @@ local function spriteFromTexture(texture, data)
 end
 
 -- TODO - Default to filename without ext
-local function registerEntity(fn, registerAt, internal)
+function entities.registerEntity(fn, registerAt, internal)
     local registerAt = registerAt or registeredEntities
     local handlerFunction = assert(loadstring(utils.readAll(fn, "rb", true)))
 
@@ -43,12 +41,12 @@ local function registerEntity(fn, registerAt, internal)
 end
 
 -- TODO - Santize user paths
-local function loadInternalEntities(registerAt, path)
-    local registerAt = registerAt or registeredEntities
+function entities.loadInternalEntities(registerAt, path)
+    local registerAt = registerAt or entities.registeredEntities
     local path = path or "entities"
 
     for i, file <- love.filesystem.getDirectoryItems(path) do
-        registerEntity(path .. "/" .. file, registerAt)
+        entities.registerEntity(path .. "/" .. file, registerAt)
 
         coroutine.yield()
     end
@@ -56,7 +54,7 @@ local function loadInternalEntities(registerAt, path)
     coroutine.yield(registerAt)
 end
 
-local function getNodes(entity)
+function entities.getNodes(entity)
     local res = $()
 
     for i, node <- entity.__children or {} do
@@ -71,10 +69,4 @@ local function getNodes(entity)
     return res
 end
 
-return {
-    spriteFromTexture = spriteFromTexture,
-    registerEntity = registerEntity,
-    loadInternalEntities = loadInternalEntities,
-    registeredEntities = registeredEntities,
-    getNodes = getNodes
-}
+return entities

@@ -1,6 +1,8 @@
 local inputDevice = require("input_device")
 local utils = require("utils")
 
+local viewportHandler = {}
+
 local movementButton = 2
 
 local viewport = {
@@ -15,7 +17,9 @@ local viewport = {
     visible = true
 }
 
-local function roomVisible(room, viewport)
+viewportHandler.viewport = viewport
+
+function viewportHandler.roomVisible(room, viewport)
     local actuallX = viewport.x / viewport.scale
     local actuallY = viewport.y / viewport.scale
 
@@ -28,11 +32,7 @@ local function roomVisible(room, viewport)
     return utils.aabbCheck(cameraRect, roomRect)
 end
 
-local function getViewport()
-    return viewport
-end
-
-local function getMousePosition()
+function viewportHandler.getMousePosition()
     if love.mouse.isCursorSupported() then
         return love.mouse.getX(), love.mouse.getY()
 
@@ -41,7 +41,7 @@ local function getMousePosition()
     end
 end
 
-local function zoomIn()
+function viewportHandler.zoomIn()
     local mouseX, mouseY = getMousePosition()
 
     viewport.scale *= 2
@@ -49,7 +49,7 @@ local function zoomIn()
     viewport.y = viewport.y * 2 + mouseY
 end
 
-local function zoomOut()
+function viewportHandler.zoomOut()
     local mouseX, mouseY = getMousePosition()
 
     viewport.scale /= 2
@@ -57,7 +57,7 @@ local function zoomOut()
     viewport.y = (viewport.y - mouseY) / 2
 end
 
-function addDevice()
+function viewportHandler.addDevice()
     inputDevice.newInputDevice{
         keypressed = function(key, scancode, isrepeat)
             if key == "+" and not isrepeat then
@@ -114,11 +114,4 @@ function addDevice()
     }
 end
 
-return {
-    addDevice = addDevice,
-    getViewport = getViewport,
-    getMousePosition = getMousePosition,
-    zoomIn = zoomIn,
-    zoomOut = zoomOut,
-    roomVisible = roomVisible
-}
+return viewportHandler

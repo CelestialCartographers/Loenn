@@ -1,5 +1,7 @@
+local drawing = {}
+
 -- Assumes everything uses the same base image
-local function createSpriteBatch(sprites)
+function drawing.createSpriteBatch(sprites)
     local image = sprites[1].meta.image
     local batch = love.graphics.newSpriteBatch(image)
 
@@ -14,16 +16,16 @@ local function createSpriteBatch(sprites)
     return batch
 end
 
-local function drawSprite(spriteMeta, x, y, r, sx, sy, ox, oy)
+function drawing.drawSprite(spriteMeta, x, y, r, sx, sy, ox, oy)
     love.graphics.draw(spriteMeta.image, spriteMeta.quad, x, y, r, sx, sy, ox, oy)
 end
 
 -- Replace \ with /, remove .png and prefix with `decals/`
-local function getDecalTexture(texture)
+function drawing.getDecalTexture(texture)
     return "decals/" .. texture:gsub("\\", "/"):sub(1, #texture - 4)
 end
 
-function getCurvePoint(start, stop, control, percent)
+function drawing.getCurvePoint(start, stop, control, percent)
     local startMul = (1 - percent)^2
     local controlMul = 2 * (1 - percent) * percent
     local stopMul = percent^2
@@ -34,23 +36,16 @@ function getCurvePoint(start, stop, control, percent)
     }
 end
 
-local function getSimpleCurve(start, stop, control, resolution)
+function drawing.getSimpleCurve(start, stop, control, resolution)
     local control = control or {(start[1] + stop[1]) / 2, (start[2] + stop[2]) / 2}
     local resolution = resolution or 16
     local res = $()
 
     for i = 0, resolution do
-        res += getCurvePoint(start, stop, control, i / resolution)
+        res += drawing.getCurvePoint(start, stop, control, i / resolution)
     end
 
     return res()
 end
 
-return {
-    createSpriteBatch = createSpriteBatch,
-    drawSprite = drawSprite,
-    getDecalTexture = getDecalTexture,
-
-    getCurvePoint = getCurvePoint,
-    getSimpleCurve = getSimpleCurve
-}
+return drawing
