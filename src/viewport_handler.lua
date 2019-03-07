@@ -42,7 +42,7 @@ function viewportHandler.getMousePosition()
 end
 
 function viewportHandler.zoomIn()
-    local mouseX, mouseY = getMousePosition()
+    local mouseX, mouseY = viewportHandler.getMousePosition()
 
     viewport.scale *= 2
     viewport.x = viewport.x * 2 + mouseX
@@ -50,7 +50,7 @@ function viewportHandler.zoomIn()
 end
 
 function viewportHandler.zoomOut()
-    local mouseX, mouseY = getMousePosition()
+    local mouseX, mouseY = viewportHandler.getMousePosition()
 
     viewport.scale /= 2
     viewport.x = (viewport.x - mouseX) / 2
@@ -61,10 +61,10 @@ function viewportHandler.addDevice()
     inputDevice.newInputDevice{
         keypressed = function(key, scancode, isrepeat)
             if key == "+" and not isrepeat then
-                zoomIn()
+                viewportHandler.zoomIn()
 
             elseif key == "-" and not isrepeat then
-                zoomOut()
+                viewportHandler.zoomOut()
 
             elseif key == "w" or key == "up" then
                 viewport.y -= 8
@@ -101,10 +101,10 @@ function viewportHandler.addDevice()
 
         wheelmoved = function(dx, dy)
             if dy > 0 then
-                zoomIn()
+                viewportHandler.zoomIn()
 
             elseif dy < 0 then
-                zoomOut()
+                viewportHandler.zoomOut()
             end
         end,
 

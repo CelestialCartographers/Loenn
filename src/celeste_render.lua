@@ -93,7 +93,10 @@ end
 
 function celesteRender.drawTilesFg(room, tiles)
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].fgTiles = roomCache[room.name].fgTiles or tasks.newTask(function() celesteRender.getTilesBatch(tiles, tilesMetaFg) end)
+    roomCache[room.name].fgTiles = roomCache[room.name].fgTiles or tasks.newTask(
+        (-> celesteRender.getTilesBatch(tiles, tilesMetaFg)),
+        (task -> print("FG Tiles", room.name, task.timeTotal))
+    )
 
     local batch = roomCache[room.name].fgTiles.result
 

@@ -35,7 +35,7 @@ function tasks.processTasks(calcTime, maxTasks, customTasks)
             task.timeTotal += deltaTime
         end
 
-        task.callback()
+        task:callback()
         table.remove(tasks, 1)
         tasksAllowed -= 1
     end
@@ -43,10 +43,11 @@ function tasks.processTasks(calcTime, maxTasks, customTasks)
     return #tasks == 0, timeSpent
 end
 
+-- TODO - Unwrap lambda properly
 function tasks.newTask(func, callback, tasks)
     local tasks = tasks or globalTasks
     local task = {
-        coroutine = coroutine.create(func),
+        coroutine = coroutine.create(function() func() end),
         callback = callback or function() end,
         timeTotal = 0
     }
