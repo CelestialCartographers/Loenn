@@ -1,8 +1,14 @@
 -- love.load() is not called again, put stuff here.
 
+local windowIcon = love.image.newImageData("assets/lönn-icon-shadur-256-4.png")
+
 love.window.setTitle("Lönn Demo")
+love.window.setIcon(windowIcon)
+
 love.keyboard.setKeyRepeat(true)
+
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
+love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
 local mapcoder = require("mapcoder")
 local celesteRender = require("celeste_render")
@@ -14,7 +20,6 @@ local tasks = require("task")
 local entities = require("entities")
 
 love.graphics.setFont(fonts.font)
-love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
 -- TODO - Make task "group" for loading things
 
