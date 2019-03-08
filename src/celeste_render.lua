@@ -188,35 +188,78 @@ function celesteRender.drawDecalsBg(room, decals)
     end
 end
 
--- TODO - Add more advanced rendering support
-function celesteRender.drawEntities(room, entities, registeredEntities)
+local function getEntityDrawCalls(room, entities, registeredEntities)
     local registeredEntities = registeredEntities or entityHandler.registeredEntities
+
+    local res = $()
 
     for i, entity <- entities.__children or {} do
         local name = entity.__name
-        local entityHandler = registeredEntities[name]
+        local handler = registeredEntities[name]
 
-        if entityHandler then
-            if entityHandler.sprite then
-                local sprites = entityHandler.sprite(room, entity)
+        if handler then
+            local defaultDepth = type(handler.depth) == "function" and handler.depth(entity) or handler.depth or 0
 
-                if #sprites == 0 and sprites.meta then
-                    love.graphics.draw(sprites.meta.image, sprites.meta.quad, sprites.x, sprites.y, sprites.r, sprites.sx, sprites.sy, sprites.jx * sprites.meta.width, sprites.jy * sprites.meta.height)
+            if handler.sprite then
+                local sprites = handler.sprite(room, entity)
 
-                else
-                    for i, sprite <- sprites do
-                        love.graphics.draw(sprite.meta.image, sprite.meta.quad, sprite.x, sprite.y, sprite.r, sprite.sx, sprite.sy, sprite.jx * sprite.meta.width, sprite.jy * sprite.meta.height)
+                if sprites then
+                    local spriteCount = sprites.len and sprites:len or #sprites
+                    if spriteCount == 0 and sprites.meta then
+                        sprites.depth = sprites.depth or defaultDepth
+                        res += sprites
+
+                    else
+                        for i, sprite <- sprites do
+                            sprite.depth = sprite.depth or defaultDepth
+                            res += sprite
+                        end
                     end
                 end
             end
 
-            if entityHandler.draw then
-                local res = entityHandler.draw(room, entity)
+            if handler.draw then
+                res += {
+                    func = handler.draw,
+                    depth = defaultDepth,
+                    room = room,
+                    entity = entity
+                }
             end
         end
     end
 
-    love.graphics.setColor(colors.default)
+    return res
+end
+
+-- TODO - Add more advanced rendering support
+function celesteRender.drawEntities(room, entities, registeredEntities)
+    local registeredEntities = registeredEntities or entityHandler.registeredEntities
+
+    local drawables = getEntityDrawCalls(room, entities, registeredEntities)
+    drawables := sortby(d -> d.depth or 0)
+    drawables := reverse
+
+    for i, drawable <- drawables do
+        if drawable.func then
+            drawable.func(drawable.room, drawable.entity)
+
+        else
+            local color = drawable.color
+            local offsetX = drawable.jx * drawable.meta.realWidth + drawable.meta.offsetX
+            local offsetY = drawable.jy * drawable.meta.realHeight + drawable.meta.offsetY
+
+            if color then
+                love.graphics.setColor(color)
+            end
+
+            love.graphics.draw(drawable.meta.image, drawable.meta.quad, drawable.x, drawable.y, drawable.r, drawable.sx, drawable.sy, offsetX, offsetY)
+
+            if color then
+                love.graphics.setColor(colors.default)
+            end
+        end
+    end
 end
 
 function celesteRender.drawTriggers(room, triggers)

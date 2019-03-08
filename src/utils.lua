@@ -83,4 +83,16 @@ function utils.parseHexColor(color)
     return false, 0, 0, 0
 end
 
+function utils.filename(path)
+    return path:match("[^/]+$")
+end
+
+function utils.fileExtension(path)
+    return path:match("[^.]+$")
+end
+
+function utils.stripExtension(path)
+    return path:sub(1, #path - #utils.fileExtension(path) - 1)
+end
+
 return utils

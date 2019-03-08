@@ -4,7 +4,9 @@ local utils = require("utils")
 
 local wire = {}
 
-wire.name = "wire"
+function wire.depth(entity)
+    return entity.above and -8500 or 2000
+end
 
 function wire.draw(room, entity)
     local pr, pg, pb, pa = love.graphics.getColor()

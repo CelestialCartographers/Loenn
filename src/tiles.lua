@@ -2,7 +2,6 @@ local utils = require("utils")
 
 local tiles = {}
 
--- Has issues since spliting doesn't keep empty entries
 function tiles.convertTileString(tiles)
     local tiles = tiles:gsub("\r\n", "\n")
     local lines = tiles:split("\n")

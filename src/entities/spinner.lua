@@ -2,7 +2,9 @@ local entities = require("entities")
 
 local spinner = {}
 
-spinner.name = "spinner"
+function spinner.depth(entity)
+    return entity.dusty and -50 or -8500
+end
 
 function spinner.sprite(room, entity)
     local color = entity.color or "blue"

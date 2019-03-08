@@ -27,6 +27,9 @@ function entities.spriteFromTexture(texture, data)
 
         r = data.r or 0,
         
+        depth = data.depth,
+        color = data.color,
+        
         meta = spriteMeta
     }
 
@@ -36,10 +39,14 @@ end
 -- TODO - Default to filename without ext
 function entities.registerEntity(fn, registerAt, internal)
     local registerAt = registerAt or entities.registeredEntities
-    local handlerFunction = assert(loadstring(utils.readAll(fn, "rb", true)))
 
-    local handler = handlerFunction()
-    local name = handler.name
+    local pathNoExt = utils.stripExtension(fn)
+    local filenameNoExt = utils.filename(pathNoExt)
+
+    local handler = require(pathNoExt)
+    local name = handler.name or filenameNoExt
+
+    print(handler, name)
 
     print("! Registered entity '" .. name .. "'")
 

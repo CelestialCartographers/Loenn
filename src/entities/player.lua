@@ -2,7 +2,7 @@ local entities = require("entities")
 
 local player = {}
 
-player.name = "player"
+player.depth = 0
 
 function player.sprite(room, entity)
     local data = {
