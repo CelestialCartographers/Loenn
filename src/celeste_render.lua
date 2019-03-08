@@ -198,22 +198,21 @@ function celesteRender.drawEntities(room, entities, registeredEntities)
 
         if entityHandler then
             if entityHandler.sprite then
-                local sprite = entityHandler.sprite(room, entity)
+                local sprites = entityHandler.sprite(room, entity)
 
-                love.graphics.draw(sprite.meta.image, sprite.meta.quad, sprite.x, sprite.y, sprite.r, sprite.sx, sprite.sy, sprite.jx * sprite.meta.width, sprite.jy * sprite.meta.height)
+                if #sprites == 0 and sprites.meta then
+                    love.graphics.draw(sprites.meta.image, sprites.meta.quad, sprites.x, sprites.y, sprites.r, sprites.sx, sprites.sy, sprites.jx * sprites.meta.width, sprites.jy * sprites.meta.height)
+
+                else
+                    for i, sprite <- sprites do
+                        love.graphics.draw(sprite.meta.image, sprite.meta.quad, sprite.x, sprite.y, sprite.r, sprite.sx, sprite.sy, sprite.jx * sprite.meta.width, sprite.jy * sprite.meta.height)
+                    end
+                end
             end
 
             if entityHandler.draw then
                 local res = entityHandler.draw(room, entity)
             end
-
-        else
-            local x = entity.x or 0
-            local y = entity.y or 0
-            
-            love.graphics.setColor(colors.entityMissingColor)
-            love.graphics.rectangle("fill", x - 1, y - 1, 3, 3)
-            love.graphics.setColor(colors.default)
         end
     end
 

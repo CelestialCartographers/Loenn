@@ -1,6 +1,6 @@
 local colors = {}
 
-colors.entityMissingColor = {47 / 255, 114 / 255, 100 / 255, 0.3}
+colors.entityMissingColor = {47 / 255, 114 / 255, 100 / 255, 0.75}
 colors.triggerColor = {47 / 255, 114 / 255, 100 / 255, 0.3}
 colors.triggerTextColor = {255 / 255, 255 / 255, 255 / 255}
 

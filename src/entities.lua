@@ -3,7 +3,13 @@ local utils = require("utils")
 
 local entities = {}
 
-entities.registeredEntities = {}
+local missingEntity = require("missing_entity")
+
+local entityRegisteryMT = {
+    __index = function() return missingEntity end
+}
+
+entities.registeredEntities = setmetatable({}, entityRegisteryMT)
 
 function entities.spriteFromTexture(texture, data)
     local atlas = data.atlas or "gameplay"
@@ -29,7 +35,7 @@ end
 
 -- TODO - Default to filename without ext
 function entities.registerEntity(fn, registerAt, internal)
-    local registerAt = registerAt or registeredEntities
+    local registerAt = registerAt or entities.registeredEntities
     local handlerFunction = assert(loadstring(utils.readAll(fn, "rb", true)))
 
     local handler = handlerFunction()
