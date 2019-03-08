@@ -5,7 +5,7 @@ local tiles = {}
 -- Has issues since spliting doesn't keep empty entries
 function tiles.convertTileString(tiles)
     local tiles = tiles:gsub("\r\n", "\n")
-    local lines = $(utils.split(tiles, "\n"))
+    local lines = tiles:split("\n")
 
     local cols = 0
     local rows = lines:len
