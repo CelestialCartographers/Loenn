@@ -1,6 +1,6 @@
 -- love.load() is not called again, put stuff here.
 
-local windowIcon = love.image.newImageData("assets/lönn-icon-shadur-256-4.png")
+local windowIcon = love.image.newImageData("assets/logo-256.png")
 
 love.window.setTitle("Lönn Demo")
 love.window.setIcon(windowIcon)
