@@ -31,7 +31,7 @@ tasks.newTask(
 
 local loadingMap = true
 
-local mapFile = fileLocations.getResourceDir() .. "/Maps/1-ForsakenCity.bin"
+local mapFile = fileLocations.getResourceDir() .. "/Maps/7-Summit.bin"
 local map = tasks.newTask(
     function()
         mapcoder.decodeFile(mapFile)

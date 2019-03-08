@@ -1,6 +1,5 @@
 local xml2lua = require("xml2lua.xml2lua")
 local utils = require("utils")
-local serialization = require("serialization")
 
 local autotiler = {}
 
@@ -41,47 +40,78 @@ local function checkPadding(tiles, x, y)
 end
 
 local function checkTile(value, target, ignore)
-    return not (target == "0" or $(ignore):contains(target) or ($(ignore):contains("*") and value ~= target))
+    if ignore then
+        return not (target == "0" or ignore[target] or (ignore["*"] and value ~= target))
+    end
+
+    return target ~= "0"
 end
 
 local function sortByScore(masks)
     local res = masks
 
     -- TODO - TBI
+    -- Is this needed?
 
     return res
 end
 
-function autotiler.getQuads(x, y, tiles, meta)
-    local tile = tiles[x, y]
-
-    local masks = meta.masks[tile] or {}
-    local ignore = meta.ignores[tile] or {}
-
-    local adjacent = tiles:get(tile, {x - 1, x + 1}, {y - 1, y + 1})
-    adjacent = adjacent:map(target -> checkTile(tile, target, ignore))
-
-    -- TODO - Look into doing some insanely arcane caching here?
-    for i, maskData <- masks do
-        if checkMask(adjacent, maskData.mask) then
-            return maskData.quads, maskData.sprites
-        end
-    end
-
+local function getPaddingOrCenterQuad(x, y, tile, tiles, meta)
     if checkPadding(tiles, x, y) then
-        local padding = meta.padding[tile]
+        local padding = meta.padding[tile] or {}
         local paddingLength = padding.len and padding:len or #padding
 
         return paddingLength > 0 and padding or {{0, 0}}, ""
 
     else
-        local center = meta.center[tile]
+        local center = meta.center[tile] or {}
         local centerLength = center.len and center:len or #center
         
         return centerLength > 0 and center or {{0, 0}}, ""
     end
+end
 
-    return {{5, 12}}, ""
+local function getMaskQuads(masks, adjacent)
+    if masks then
+        for i, maskData <- masks do
+            if checkMask(adjacent, maskData.mask) then
+                return true, maskData.quads, maskData.sprites
+            end
+        end
+    end
+
+    return false, nil, nil
+end
+
+function autotiler.getQuads(x, y, tiles, meta, adjacent)
+    local adjacent = adjacent
+
+    local tile = tiles[x, y]
+
+    local masks = meta.masks[tile]
+    local ignore = meta.ignores[tile]
+
+    if not adjacent then
+        adjacent = tiles:get(tile, {x - 1, x + 1}, {y - 1, y + 1})
+        adjacent = adjacent:map(target -> checkTile(tile, target, ignore))
+    end
+
+    local matches, quads, sprites = getMaskQuads(masks, adjacent)
+
+    if matches then
+        return quads, sprites
+
+    else
+        return getPaddingOrCenterQuad(x, y, tile, tiles, meta)
+    end
+end
+
+-- TODO - TBI, see if its actually worth it
+function autotiler.getAllQuads(tiles, meta)
+    local width, height = tiles:size
+    local res = table.filled(false, {width, height})
+
+    return res
 end
 
 local function convertTileString(s)
@@ -114,6 +144,7 @@ function autotiler.loadTilesetXML(fn)
     local ignores = {}
 
     -- TODO - sort tilesets that copy others to the end?
+    -- Is this needed?
 
     for i, tileset <- handler.root.Data.Tileset do
         local id = tileset._attr.id
@@ -124,7 +155,8 @@ function autotiler.loadTilesetXML(fn)
         paths[id] = "tilesets/" .. path
 
         if ignore then
-            ignores[id] = ignore
+            -- TODO - Check assumption, none of the XML files have mutliple ignores without wildcard
+            ignores[id] = table.flip($(ignore):split(";"))
         end
 
         padding[id] = copy and table.shallowcopy(padding[copy]()) or {}

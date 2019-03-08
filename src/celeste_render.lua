@@ -49,14 +49,28 @@ local function getRoomBorderColor(room)
     end
 end
 
-function celesteRender.getTilesBatch(tiles, meta)
+local function getOrCacheTileQuad(tile, spriteMeta, quad, fg)
+    tilesQuadCache[tile] = tilesQuadCache[tile] or {}
+    tilesQuadCache[tile][fg] = tilesQuadCache[tile][fg] or table.filled(false, {6, 15})
+    local tilesQuadCache = tilesQuadCache[tile][fg]
+    local quadX, quadY = quad[1], quad[2]
+    
+    if not tilesQuadCache[quadX + 1, quadY + 1] then
+        local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
+
+        tilesQuadCache[quadX + 1, quadY + 1] = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
+    end
+
+    return tilesQuadCache[quadX + 1, quadY + 1]
+end
+
+function celesteRender.getTilesBatch(tiles, meta, fg)
     local tilesRaw = tiles.innerText or ""
     local tiles = tilesUtils.convertTileString(tilesRaw)
 
     local width, height = tiles:size
     local spriteBatch = love.graphics.newSpriteBatch(atlases.gameplay._imageMeta[1].image, 1024, spriteBatchMode)
 
-    -- Slicing currently doesnt allow default values, just ignore the literal edgecases
     for x = 1, width do
         for y = 1, height do
             local tile = tiles[x, y]
@@ -66,39 +80,37 @@ function celesteRender.getTilesBatch(tiles, meta)
                 local quadCount = quads.len and quads:len or #quads
                 local texture = meta.paths[tile] or ""
                 local spriteMeta = atlases.gameplay[texture]
-                local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
 
                 if spriteMeta and quadCount > 0 then
-                    -- TODO - Cache quad creation
                     local randQuad = quads[math.random(1, quadCount)]
-                    local quadX, quadY = randQuad[1], randQuad[2]
+                    local drawQuad = getOrCacheTileQuad(tile, spriteMeta, randQuad, fg)
 
-                    tilesQuadCache[tile] = tilesQuadCache[tile] or table.filled(false, {6, 15})
-                    local quadCache = tilesQuadCache[tile]
-                    
-                    if not tilesQuadCache[quadX + 1, quadY + 1] then
-                        quadCache[quadX + 1, quadY + 1] = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
-                    end
-
-                    spriteBatch:add(quadCache[quadX + 1, quadY + 1], x * 8 - 8, y * 8 - 8)
+                    spriteBatch:add(drawQuad, x * 8 - 8, y * 8 - 8)
                 end
             end
-
-            coroutine.yield()
         end
+
+        coroutine.yield()
     end
 
     coroutine.yield(spriteBatch)
 end
 
-function celesteRender.drawTilesFg(room, tiles)
+local function getRoomTileBatch(room, tiles, fg)
+    local key = fg and "fgTiles" or "bgTiles"
+    local meta = fg and tilesMetaFg or tilesMetaBg
+
     roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].fgTiles = roomCache[room.name].fgTiles or tasks.newTask(
-        (-> celesteRender.getTilesBatch(tiles, tilesMetaFg)),
-        (task -> print("FG Tiles", room.name, task.timeTotal))
+    roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
+        (-> celesteRender.getTilesBatch(tiles, meta, fg)),
+        (task -> print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000)))
     )
 
-    local batch = roomCache[room.name].fgTiles.result
+    return roomCache[room.name][key].result
+end
+
+function celesteRender.drawTilesFg(room, tiles)
+    local batch = getRoomTileBatch(room, tiles, true)
 
     if batch then
         love.graphics.draw(batch, 0, 0)
@@ -106,10 +118,7 @@ function celesteRender.drawTilesFg(room, tiles)
 end
 
 function celesteRender.drawTilesBg(room, tiles)
-    roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].bgTiles = roomCache[room.name].bgTiles or tasks.newTask(function() celesteRender.getTilesBatch(tiles, tilesMetaBg) end)
-
-    local batch = roomCache[room.name].bgTiles.result
+    local batch = getRoomTileBatch(room, tiles, false)
 
     if batch then
         love.graphics.draw(batch, 0, 0)
@@ -143,17 +152,28 @@ function celesteRender.getDecalsBatch(decals)
             )
         end
 
-        coroutine.yield()
+        if i % 10 == 0 then
+            coroutine.yield()
+        end
     end
 
     coroutine.yield(spriteBatch)
 end
 
-function celesteRender.drawDecalsFg(room, decals)
-    roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].fgDecals = roomCache[room.name].fgDecals or tasks.newTask(function() celesteRender.getDecalsBatch(decals) end)
+local function getRoomDecalsBatch(room, decals, fg)
+    local key = fg and "fgDecals" or "bgDecals"
 
-    local batch = roomCache[room.name].fgDecals.result
+    roomCache[room.name] = roomCache[room.name] or {}
+    roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
+        (-> celesteRender.getDecalsBatch(decals)),
+        (task -> print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000)))
+    )
+
+    return roomCache[room.name][key].result
+end
+
+function celesteRender.drawDecalsFg(room, decals)
+    local batch = getRoomDecalsBatch(room, decals, true)
 
     if batch then
         love.graphics.draw(batch, 0, 0)
@@ -161,10 +181,7 @@ function celesteRender.drawDecalsFg(room, decals)
 end
 
 function celesteRender.drawDecalsBg(room, decals)
-    roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name].bgDecals = roomCache[room.name].bgDecals or tasks.newTask(function() celesteRender.getDecalsBatch(decals) end)
-
-    local batch = roomCache[room.name].bgDecals.result
+    local batch = getRoomDecalsBatch(room, decals, false)
 
     if batch then
         love.graphics.draw(batch, 0, 0)
@@ -277,7 +294,7 @@ function celesteRender.drawRoom(room, viewport)
     for i, data <- roomDrawingFunctions do
         local description, key, func = unpack(data)
         local value = roomData[key]
-        
+
         if value then
             func(room, value)
         end
