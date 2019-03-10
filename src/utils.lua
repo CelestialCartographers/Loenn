@@ -106,4 +106,17 @@ function utils.typeof(v)
     end
 end
 
+function utils.group(t, by)
+    local res = {}
+
+    for k, v <- t do
+        local key = by(k, v)
+        res[key] = res[key] or $()
+        
+        res[key] += v
+    end
+
+    return res
+end
+
 return utils

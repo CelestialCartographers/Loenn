@@ -32,7 +32,7 @@ tasks.newTask(
 
 local loadingMap = true
 
-local mapFile = fileLocations.getResourceDir() .. "/Maps/0-Intro.bin"
+local mapFile = fileLocations.getResourceDir() .. "/Maps/5-MirrorTemple.bin"
 local map = tasks.newTask(
     function()
         mapcoder.decodeFile(mapFile)

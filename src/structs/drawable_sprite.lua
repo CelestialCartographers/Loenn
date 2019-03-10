@@ -1,6 +1,6 @@
 local atlases = require("atlases")
 
-local drawableSpriteHandler = {}
+local drawableSpriteStruct = {}
 
 local drawableSpriteMt = {}
 drawableSpriteMt.__index = {}
@@ -26,14 +26,22 @@ function drawableSpriteMt.__index.addPosition(self, x, y)
     return self
 end
 
-function drawableSpriteMt.__index.setScale(self, sx, sy)
-    self.sx = sx
-    self.sy = sy
+function drawableSpriteMt.__index.setScale(self, scaleX, scaleY)
+    self.scaleX = scaleX
+    self.scaleY = scaleY
 
     return self
 end
 
-function drawableSpriteHandler.spriteFromTexture(texture, data)
+function drawableSpriteMt.__index.setOffset(self, offsetX, offsetY)
+    self.offsetX = offsetX
+    self.offsetY = offsetY
+
+    return self
+end
+
+function drawableSpriteStruct.spriteFromTexture(texture, data)
+    local data = data or {}
     local atlas = data.atlas or "gameplay"
     local spriteMeta = atlases[atlas][texture]
 
@@ -47,10 +55,10 @@ function drawableSpriteHandler.spriteFromTexture(texture, data)
     drawableSprite.jx = data.jx or 0.5
     drawableSprite.jy = data.jy or 0.5
 
-    drawableSprite.sx = data.sx or 1
-    drawableSprite.sy = data.sy or 1
+    drawableSprite.scaleX = data.sx or 1
+    drawableSprite.scaleY = data.sy or 1
 
-    drawableSprite.r = data.r or 0
+    drawableSprite.rotation = data.r or 0
 
     drawableSprite.depth = data.depth
     drawableSprite.color = data.color
@@ -60,4 +68,4 @@ function drawableSpriteHandler.spriteFromTexture(texture, data)
     return setmetatable(drawableSprite, drawableSpriteMt)
 end
 
-return drawableSpriteHandler
+return drawableSpriteStruct
