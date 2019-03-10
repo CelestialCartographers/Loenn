@@ -4,7 +4,7 @@ local utils = require("utils")
 
 local wire = {}
 
-function wire.depth(entity)
+function wire.depth(room, entity)
     return entity.above and -8500 or 2000
 end
 

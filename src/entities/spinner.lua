@@ -2,7 +2,7 @@ local entities = require("entities")
 
 local spinner = {}
 
-function spinner.depth(entity)
+function spinner.depth(room, entity)
     return entity.dusty and -50 or -8500
 end
 

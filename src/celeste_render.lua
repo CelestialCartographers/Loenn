@@ -184,7 +184,7 @@ function celesteRender.drawDecalsBg(room, decals)
     end
 end
 
-local function getEntityDrawCalls(room, entities, registeredEntities)
+local function getEntityDrawCalls(room, entities, viewport, registeredEntities)
     local registeredEntities = registeredEntities or entityHandler.registeredEntities
 
     local res = $()
@@ -194,10 +194,10 @@ local function getEntityDrawCalls(room, entities, registeredEntities)
         local handler = registeredEntities[name]
 
         if handler then
-            local defaultDepth = type(handler.depth) == "function" and handler.depth(entity) or handler.depth or 0
+            local defaultDepth = type(handler.depth) == "function" and handler.depth(room, entity, viewport) or handler.depth or 0
 
             if handler.sprite then
-                local sprites = handler.sprite(room, entity)
+                local sprites = handler.sprite(room, entity, viewport)
 
                 if sprites then
                     local spriteCount = sprites.len and sprites:len or #sprites
@@ -207,8 +207,10 @@ local function getEntityDrawCalls(room, entities, registeredEntities)
 
                     else
                         for i, sprite <- sprites do
-                            sprite.depth = sprite.depth or defaultDepth
-                            res += sprite
+                            if sprite.meta then
+                                sprite.depth = sprite.depth or defaultDepth
+                                res += sprite
+                            end
                         end
                     end
                 end
@@ -229,10 +231,10 @@ local function getEntityDrawCalls(room, entities, registeredEntities)
 end
 
 -- TODO - Add more advanced rendering support
-function celesteRender.drawEntities(room, entities, registeredEntities)
+function celesteRender.drawEntities(room, entities, viewport, registeredEntities)
     local registeredEntities = registeredEntities or entityHandler.registeredEntities
 
-    local drawables = getEntityDrawCalls(room, entities, registeredEntities)
+    local drawables = getEntityDrawCalls(room, entities, viewport, registeredEntities)
     drawables := sortby(d -> d.depth or 0)
     drawables := reverse
 
@@ -328,7 +330,7 @@ function celesteRender.drawRoom(room, viewport)
         local value = room[key]
 
         if value then
-            func(room, value)
+            func(room, value, viewport)
         end
     end
 

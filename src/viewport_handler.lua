@@ -41,6 +41,18 @@ function viewportHandler.getMousePosition()
     end
 end
 
+function viewportHandler.getMapCoordinates()
+    local mouseX, mouseY = viewportHandler.getMousePosition()
+
+    return math.floor((mouseX + viewport.x) / viewport.scale), math.floor((mouseY + viewport.y) / viewport.scale)
+end
+
+function viewportHandler.getRoomCoorindates(room)
+    local mapX, mapY = viewportHandler.getMapCoordinates()
+
+    return mapX - room.x, mapY - room.y
+end
+
 function viewportHandler.zoomIn()
     local mouseX, mouseY = viewportHandler.getMousePosition()
 
