@@ -32,7 +32,7 @@ local decalsBgDepth = 9000
 
 local triggersDepth = -math.huge
 
-local PRINT_BATCHING_DURATION = false
+local PRINT_BATCHING_DURATION = true
 
 -- Temp
 local roomCache = {}

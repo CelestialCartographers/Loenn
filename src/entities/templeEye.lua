@@ -9,8 +9,8 @@ local function isBackground(room, entity)
 
     local tx = math.floor(x / 8) + 1
     local ty = math.floor(y / 8) + 1
-
-    return room.tilesFg.matrix:get("0", tx, ty)[1] == "0"
+    
+    return room.tilesFg.matrix:get("0", tx, ty) == "0"
 end
 
 function templeEye.depth(room, entity, viewport)

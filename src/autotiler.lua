@@ -32,7 +32,7 @@ local function checkMask(adjacent, mask)
 end
 
 local function getTile(tiles, x, y)
-    return tiles[x, y] or " "
+    return tiles:get(" ", x, y)
 end
 
 local function checkPadding(tiles, x, y)
