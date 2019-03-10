@@ -55,7 +55,6 @@ function love.draw()
         celesteRender.drawMap(map)
 
         love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
-        love.graphics.printf("Viewport: " .. tostring(viewport.x) .. " " .. tostring(viewport.y) .. " " .. tostring(viewport.scale), 20, 80, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
     end
 end
 
