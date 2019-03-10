@@ -97,7 +97,20 @@ function autotiler.getQuads(x, y, tiles, meta, adjacent)
     local ignore = meta.ignores[tile]
 
     if not adjacent then
-        adjacent = tiles:get(tile, {x - 1, x + 1}, {y - 1, y + 1})
+        --adjacent = tiles:get(tile, {x - 1, x + 1}, {y - 1, y + 1})
+
+        adjacent = ${
+            tiles:get(tile, x - 1, y - 1),
+            tiles:get(tile, x, y - 1),
+            tiles:get(tile, x + 1, y - 1),
+            tiles:get(tile, x - 1, y),
+            tiles:get(tile, x, y),
+            tiles:get(tile, x + 1, y),
+            tiles:get(tile, x - 1, y + 1),
+            tiles:get(tile, x, y + 1),
+            tiles:get(tile, x + 1, y + 1),
+        }
+
         adjacent = adjacent:map(target -> checkTile(tile, target, ignore))
     end
 

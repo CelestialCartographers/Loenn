@@ -20,7 +20,7 @@ local tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
 
 local triggerFontSize = 1
 
-local tilesQuadCache = {}
+local tilesSpriteMetaCache = {}
 
 local celesteRender = {}
 
@@ -59,23 +59,38 @@ local function getRoomBorderColor(room)
     end
 end
 
-local function getOrCacheTileQuad(tile, spriteMeta, quad, fg)
-    tilesQuadCache[tile] = tilesQuadCache[tile] or {}
-    tilesQuadCache[tile][fg] = tilesQuadCache[tile][fg] or table.filled(false, {6, 15})
-    local tilesQuadCache = tilesQuadCache[tile][fg]
+local function getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
+    cache[tile] = cache[tile] or {}
+    cache[tile][fg] = cache[tile][fg] or table.filled(false, {6, 15})
+
+    local quadCache = cache[tile][fg]
     local quadX, quadY = quad[1], quad[2]
     
-    if not tilesQuadCache[quadX + 1, quadY + 1] then
+    if not quadCache[quadX + 1, quadY + 1] then
+        local spriteMeta = atlases.gameplay[texture]
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
+        local quad = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
-        tilesQuadCache[quadX + 1, quadY + 1] = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
+        local newSpritesMeta = table.shallowcopy(spriteMeta)
+        newSpritesMeta.quad = quad
+
+        quadCache[quadX + 1, quadY + 1] = newSpritesMeta
     end
 
-    return tilesQuadCache[quadX + 1, quadY + 1]
+    return quadCache[quadX + 1, quadY + 1]
 end
 
 function celesteRender.getTilesBatch(tiles, meta, fg)
     local tiles = tiles.matrix
+
+    -- Getting upvalues
+    local gameplayAtlas = atlases.gameplay
+    local cache = tilesSpriteMetaCache
+    local autotiler = autotiler
+    local meta = meta
+
+    local airTile = "0"
+    local empty = ""
 
     local width, height = tiles:size
     local batch = smartDrawingBatch.createBatch()
@@ -83,24 +98,29 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
     for x = 1, width do
         for y = 1, height do
             local tile = tiles[x, y]
+            cache[tile] = cache[tile] or {}
 
-            if tile ~= "0" then
+            if tile ~= airTile then
                 local quads, sprites = autotiler.getQuads(x, y, tiles, meta)
                 local quadCount = quads.len and quads:len or #quads
-                local texture = meta.paths[tile] or ""
-                local spriteMeta = atlases.gameplay[texture]
 
-                if spriteMeta and quadCount > 0 then
-                    local drawable = drawableSprite.spriteFromTexture(texture)
-                    local metaCopy = table.shallowcopy(drawable.meta)
-            
+                if quadCount > 0 then
                     local randQuad = quads[math.random(1, quadCount)]
-                    local drawQuad = getOrCacheTileQuad(tile, spriteMeta, randQuad, fg)
+                    local texture = meta.paths[tile] or empty
 
-                    drawable:setPosition(x * 8 - 8, y * 8 - 8)
-                    drawable:setOffset(0, 0) -- No automagicall calculations
-                    metaCopy.quad = drawQuad
-                    drawable.meta = metaCopy
+                    local spriteMeta = getOrCacheTileSpriteMeta(cache, tile, texture, randQuad, fg)
+
+                    local drawable = {
+                        _type = "drawableSprite",
+
+                        meta = spriteMeta,
+
+                        x = x * 8 - 8,
+                        y = y * 8 - 8,
+
+                        offsetX = 0,
+                        offsetY = 0
+                    }
 
                     batch:add(drawable)
                 end
