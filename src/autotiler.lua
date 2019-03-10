@@ -36,7 +36,9 @@ local function getTile(tiles, x, y)
 end
 
 local function checkPadding(tiles, x, y)
-    return getTile(tiles, x - 2, y) == "0" or getTile(tiles, x + 2, y) == "0" or getTile(tiles, x, y - 2) == "0" or getTile(tiles, x, y + 2) == "0"
+    local airTile = "0"
+
+    return getTile(tiles, x - 2, y) == airTile or getTile(tiles, x + 2, y) == airTile or getTile(tiles, x, y - 2) == airTile or getTile(tiles, x, y + 2) == airTile
 end
 
 local function checkTile(value, target, ignore)
@@ -57,17 +59,20 @@ local function sortByScore(masks)
 end
 
 local function getPaddingOrCenterQuad(x, y, tile, tiles, meta)
+    local defaultQuad = {{0, 0}}
+    local defaultSprite = ""
+
     if checkPadding(tiles, x, y) then
-        local padding = meta.padding[tile] or {}
+        local padding = meta.padding[tile]
         local paddingLength = padding.len and padding:len or #padding
 
-        return paddingLength > 0 and padding or {{0, 0}}, ""
+        return paddingLength > 0 and padding or defaultQuad, defaultSprite
 
     else
-        local center = meta.center[tile] or {}
+        local center = meta.center[tile]
         local centerLength = center.len and center:len or #center
         
-        return centerLength > 0 and center or {{0, 0}}, ""
+        return centerLength > 0 and center or defaultQuad, defaultSprite
     end
 end
 
