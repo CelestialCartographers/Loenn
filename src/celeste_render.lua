@@ -20,8 +20,6 @@ local tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
 
 local triggerFontSize = 1
 
-local spriteBatchMode = "static"
-
 local tilesQuadCache = {}
 
 local celesteRender = {}
@@ -40,7 +38,7 @@ local PRINT_BATCHING_DURATION = false
 local roomCache = {}
 
 local function getRoomBackgroundColor(room)
-    local color = room.c or 0
+    local color = room.color or 0
 
     if color >= 0 and color < #colors.roomBackgroundColors then
         return colors.roomBackgroundColors[color + 1]
@@ -51,7 +49,7 @@ local function getRoomBackgroundColor(room)
 end
 
 local function getRoomBorderColor(room)
-    local color = room.c or 0
+    local color = room.color or 0
 
     if color >= 0 and color < #colors.roomBorderColors then
         return colors.roomBorderColors[color + 1]

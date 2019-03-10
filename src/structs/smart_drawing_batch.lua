@@ -5,6 +5,8 @@ local smartDrawingBatch = {}
 local smartDrawingBatchMt = {}
 smartDrawingBatchMt.__index = {}
 
+local spriteBatchMode = "static"
+
 function smartDrawingBatchMt.__index.add(self, drawable)
     local typ = utils.typeof(drawable)
 
@@ -34,7 +36,7 @@ function smartDrawingBatchMt.__index.add(self, drawable)
 
         else
             if image ~= self._prevImage or self._prevTyp ~= "drawableSprite" then
-                self._drawables += love.graphics.newSpriteBatch(image)
+                self._drawables += love.graphics.newSpriteBatch(image, 1000, spriteBatchMode)
             end
 
             self._drawables[self._drawables:len]:add(drawable.meta.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
