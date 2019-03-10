@@ -1,6 +1,6 @@
-local entity_struct = {}
+local entityStruct = {}
 
-local ignored_attrs = {
+local ignoredAttrs = {
     __children = true,
     __name = true,
     id = true,
@@ -8,7 +8,7 @@ local ignored_attrs = {
     originY = true
 }
 
-function entity_struct.get_nodes(entity)
+function entityStruct.getNodes(entity)
     local res = $()
 
     for i, node <- entity.__children or {} do
@@ -23,7 +23,7 @@ function entity_struct.get_nodes(entity)
     return res
 end
 
-function entity_struct.decode(data)
+function entityStruct.decode(data)
     local entity = {
         _type = "entity",
         _raw = data
@@ -33,20 +33,20 @@ function entity_struct.decode(data)
     entity._id = data.id
 
     for k, v <- data do
-        if not ignored_attrs[k] then
+        if not ignoredAttrs[k] then
             entity[k] = v
         end
     end
 
     if data.__children and data.__children:len > 0 then
-        entity.nodes = entity_struct.get_nodes(data)
+        entity.nodes = entityStruct.getNodes(data)
     end
 
     return entity
 end
 
-function entity_struct.encode(entity)
+function entityStruct.encode(entity)
 
 end
 
-return entity_struct
+return entityStruct

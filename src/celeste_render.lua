@@ -293,11 +293,11 @@ function celesteRender.drawTriggers(room, triggers)
 end
 
 local roomDrawingFunctions = {
-    {"Background Tiles", "tiles_bg", celesteRender.drawTilesBg},
-    {"Background Decals", "decals_bg", celesteRender.drawDecalsBg},
+    {"Background Tiles", "tilesBg", celesteRender.drawTilesBg},
+    {"Background Decals", "decalsBg", celesteRender.drawDecalsBg},
     {"Entities", "entities", celesteRender.drawEntities},
-    {"Foreground Tiles", "tiles_fg", celesteRender.drawTilesFg},
-    {"Foreground Decals", "decals_fg", celesteRender.drawDecalsFg},
+    {"Foreground Tiles", "tilesFg", celesteRender.drawTilesFg},
+    {"Foreground Decals", "decalsFg", celesteRender.drawDecalsFg},
     {"Triggers", "triggers", celesteRender.drawTriggers}
 }
 

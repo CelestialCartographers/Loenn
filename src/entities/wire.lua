@@ -1,4 +1,3 @@
-local entities = require("entities")
 local drawing = require("drawing")
 local utils = require("utils")
 

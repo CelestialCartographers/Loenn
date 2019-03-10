@@ -1,6 +1,6 @@
-local trigger_struct = {}
+local triggerStruct = {}
 
-local ignored_attrs = {
+local ignoredAttrs = {
     __children = true,
     __name = true,
     id = true,
@@ -8,7 +8,7 @@ local ignored_attrs = {
     originY = true
 }
 
-function trigger_struct.get_nodes(trigger)
+function triggerStruct.getNodes(trigger)
     local res = $()
 
     for i, node <- trigger.__children or {} do
@@ -23,7 +23,7 @@ function trigger_struct.get_nodes(trigger)
     return res
 end
 
-function trigger_struct.decode(data)
+function triggerStruct.decode(data)
     local trigger = {
         _type = "trigger",
         _raw = data
@@ -33,20 +33,20 @@ function trigger_struct.decode(data)
     trigger._id = data.id
 
     for k, v <- data do
-        if not ignored_attrs[k] then
+        if not ignoredAttrs[k] then
             trigger[k] = v
         end
     end
 
     if data.__children and #data.__children > 0 then
-        trigger.nodes = trigger_struct.get_nodes(data)
+        trigger.nodes = triggerStruct.getNodes(data)
     end
 
     return trigger
 end
 
-function trigger_struct.encode(trigger)
+function triggerStruct.encode(trigger)
 
 end
 
-return trigger_struct
+return triggerStruct

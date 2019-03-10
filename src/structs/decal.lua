@@ -1,17 +1,17 @@
-local decal_struct = {}
+local decalStruct = {}
 
 -- Replace \ with /, remove .png and prefix with `decals/`
-function decal_struct.get_decal_texture(texture)
+function decalStruct.getDecalTexture(texture)
     return "decals/" .. texture:gsub("\\", "/"):sub(1, #texture - 4)
 end
 
-function decal_struct.decode(data)
+function decalStruct.decode(data)
     local decal = {
         _type = "decal",
         _raw = data
     }
 
-    decal.texture = decal_struct.get_decal_texture(data.texture or "")
+    decal.texture = decalStruct.getDecalTexture(data.texture or "")
 
     decal.x = data.x or 0
     decal.y = data.y or 0
@@ -22,8 +22,8 @@ function decal_struct.decode(data)
     return decal
 end
 
-function decal_struct.encode(decal)
+function decalStruct.encode(decal)
 
 end
 
-return decal_struct
+return decalStruct

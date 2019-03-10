@@ -1,6 +1,6 @@
-local filler_struct = {}
+local fillerStruct = {}
 
-function filler_struct.decode(data)
+function fillerStruct.decode(data)
     local filler = {
         _type = "filler",
         _raw = data
@@ -15,8 +15,8 @@ function filler_struct.decode(data)
     return filler
 end
 
-function filler_struct.encode(data)
+function fillerStruct.encode(data)
 
 end
 
-return filler_struct
+return fillerStruct

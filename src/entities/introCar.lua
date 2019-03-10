@@ -1,4 +1,4 @@
-local entities = require("entities")
+local drawableSpriteStruct = require("structs/drawable_sprite")
 local colors = require("xna_colors")
 
 local introCar = {}
@@ -12,53 +12,31 @@ function introCar.sprite(room, entity)
     local sprites = $()
     local hasRoadAndBarriers = entity.hasRoadAndBarriers
 
-    local carBodyData = {
-        x = entity.x,
-        y = entity.y,
+    local bodySprite = drawableSpriteStruct.spriteFromTexture(bodyTexture, entity)
+    bodySprite:setJustification(0.5, 1.0)
+    bodySprite.depth = 1
 
-        jx = 0.5,
-        jy = 1.0,
-
-        depth = 1
-    }
-
-    local carWheelsData = {
-        x = entity.x,
-        y = entity.y,
-
-        jx = 0.5,
-        jy = 1.0,
-
-        depth = 3
-    }
+    local wheelSprite = drawableSpriteStruct.spriteFromTexture(wheelsTexture, entity)
+    wheelSprite:setJustification(0.5, 1.0)
+    wheelSprite.depth = 3
     
-    sprites += entities.spriteFromTexture(bodyTexture, carBodyData)
-    sprites += entities.spriteFromTexture(wheelsTexture, carWheelsData)
+    sprites += bodySprite
+    sprites += wheelSprite
 
     if hasRoadAndBarriers then
-        local barrierOneData = {
-            x = entity.x + 32,
-            y = entity.y,
+        local barrier1Sprite = drawableSpriteStruct.spriteFromTexture(barrierTexture, entity)
+        barrier1Sprite:addPosition(32, 0)
+        barrier1Sprite:setJustification(0.0, 1.0)
+        barrier1Sprite.depth = -10
 
-            jx = 0.0,
-            jy = 1.0,
+        local barrier2Sprite = drawableSpriteStruct.spriteFromTexture(barrierTexture, entity)
+        barrier2Sprite:addPosition(41, 0)
+        barrier2Sprite:setJustification(0.0, 1.0)
+        barrier2Sprite.depth = 5
+        barrier2Sprite.color = colors.DarkGray
 
-            depth = -10
-        }
-
-        local barrierTwoData = {
-            x = entity.x + 41,
-            y = entity.y,
-
-            jx = 0.0,
-            jy = 1.0,
-
-            depth = 5,
-            color = colors.DarkGray
-        }
-
-        sprites += entities.spriteFromTexture(barrierTexture, barrierOneData)
-        sprites += entities.spriteFromTexture(barrierTexture, barrierTwoData)
+        sprites += barrier1Sprite
+        sprites += barrier2Sprite
 
         -- TODO - Add pavement
     end

@@ -1,4 +1,3 @@
-local atlases = require("atlases")
 local utils = require("utils")
 
 local entities = {}
@@ -11,31 +10,6 @@ local entityRegisteryMT = {
 
 entities.registeredEntities = setmetatable({}, entityRegisteryMT)
 
-function entities.spriteFromTexture(texture, data)
-    local atlas = data.atlas or "gameplay"
-    local spriteMeta = atlases[atlas][texture]
-
-    local res = {
-        x = data.x or 0,
-        y = data.y or 0,
-
-        jx = data.jx or 0.5,
-        jy = data.jy or 0.5,
-
-        sx = data.sx or 1,
-        sy = data.sy or 1,
-
-        r = data.r or 0,
-        
-        depth = data.depth,
-        color = data.color,
-        
-        meta = spriteMeta
-    }
-
-    return res
-end
-
 -- TODO - Default to filename without ext
 function entities.registerEntity(fn, registerAt, internal)
     local registerAt = registerAt or entities.registeredEntities
@@ -45,8 +19,6 @@ function entities.registerEntity(fn, registerAt, internal)
 
     local handler = require(pathNoExt)
     local name = handler.name or filenameNoExt
-
-    print(handler, name)
 
     print("! Registered entity '" .. name .. "'")
 

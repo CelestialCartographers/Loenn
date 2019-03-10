@@ -1,4 +1,4 @@
-local entities = require("entities")
+local drawableSpriteStruct = require("structs/drawable_sprite")
 
 local spinner = {}
 
@@ -15,14 +15,14 @@ function spinner.sprite(room, entity)
         local textureCenter = "danger/dustcreature/center00"
 
         return {
-            entities.spriteFromTexture(textureBase, entity),
-            entities.spriteFromTexture(textureCenter, entity),
+            drawableSpriteStruct.spriteFromTexture(textureBase, entity),
+            drawableSpriteStruct.spriteFromTexture(textureCenter, entity),
         }
 
     else
         local texture = "danger/crystal/fg_" .. string.lower(color) .. "00"
 
-        return entities.spriteFromTexture(texture, entity)
+        return drawableSpriteStruct.spriteFromTexture(texture, entity)
     end
 end
 

@@ -1,6 +1,6 @@
-local tiles_struct = {}
+local tilesStruct = {}
 
-function tiles_struct.convert_tile_string(tiles)
+function tilesStruct.convertTileString(tiles)
     local tiles = tiles:gsub("\r\n", "\n")
     local lines = tiles:split("\n")
 
@@ -24,19 +24,19 @@ function tiles_struct.convert_tile_string(tiles)
     return res
 end
 
-function tiles_struct.decode(data)
+function tilesStruct.decode(data)
     local tiles = {
         _type = "tiles",
         _raw = data
     }
 
-    tiles.matrix = tiles_struct.convert_tile_string(data.innerText or "")
+    tiles.matrix = tilesStruct.convertTileString(data.innerText or "")
 
     return tiles
 end
 
-function tiles_struct.encode(tiles)
+function tilesStruct.encode(tiles)
 
 end
 
-return tiles_struct
+return tilesStruct

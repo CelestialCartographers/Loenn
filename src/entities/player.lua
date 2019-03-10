@@ -1,21 +1,16 @@
-local entities = require("entities")
+local drawableSpriteStruct = require("structs/drawable_sprite")
 
 local player = {}
 
 player.depth = 0
 
+local texture = "characters/player/sitDown00"
+
 function player.sprite(room, entity)
-    local data = {
-        x = entity.x,
-        y = entity.y,
+    local playerSprite = drawableSpriteStruct.spriteFromTexture(texture, entity)
+    playerSprite:setJustification(0.5, 1.0)
 
-        jx = 0.5,
-        jy = 1.0
-    }
-    
-    local texture = "characters/player/sitDown00"
-
-    return entities.spriteFromTexture(texture, data)
+    return playerSprite
 end
 
 return player

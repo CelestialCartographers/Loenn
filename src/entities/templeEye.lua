@@ -1,5 +1,5 @@
 local viewportHandler = require("viewport_handler")
-local entities = require("entities")
+local drawableSpriteStruct = require("structs/drawable_sprite")
 
 local templeEye = {}
 
@@ -29,9 +29,9 @@ function templeEye.sprite(room, entity, viewport)
     local layer = isBackground(room, entity) and "bg" or "fg"
 
     return {
-        entities.spriteFromTexture("scenery/temple/eye/" .. layer .. "_eye", entity),
-        entities.spriteFromTexture("scenery/temple/eye/" .. layer .. "_lid00", entity),
-        entities.spriteFromTexture("scenery/temple/eye/" .. layer .. "_pupil", pupilData)
+        drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_eye", entity),
+        drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_lid00", entity),
+        drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_pupil", pupilData)
     }
 end
 

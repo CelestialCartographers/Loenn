@@ -1,4 +1,4 @@
-local entities = require("entities")
+local drawableSpriteStruct = require("structs/drawable_sprite")
 
 local function getTexture(entity)
     return entity.twoDash and "objects/refillTwo/idle00" or "objects/refill/idle00"
@@ -10,8 +10,8 @@ refill.depth = -100
 
 function refill.sprite(room, entity)
     local texture = getTexture(entity)
-
-    return entities.spriteFromTexture(texture, entity)
+    
+    return drawableSpriteStruct.spriteFromTexture(texture, entity)
 end
 
 return refill
