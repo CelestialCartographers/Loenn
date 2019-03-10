@@ -227,9 +227,7 @@ local function getOrCreateSmartBatch(batches, key)
     return batches[key]
 end
 
-function celesteRender.getEntityBatch(room, entities, viewport, registeredEntities)
-    local registeredEntities = registeredEntities or entityHandler.registeredEntities
-
+local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)
     local batches = {}
 
     for i, entity <- entities do
@@ -264,24 +262,34 @@ function celesteRender.getEntityBatch(room, entities, viewport, registeredEntiti
                 local batch = getOrCreateSmartBatch(batches, defaultDepth)
                 batch:add(drawableFunction.fromFunction(handler.draw, room, entity, viewport))
             end
+
+            if i % 10 == 0 then
+                coroutine.yield()
+            end
         end
     end
 
-    return batches
+    coroutine.yield(batches)
 end
 
--- TODO - Add more advanced rendering support
-function celesteRender.drawEntities(room, entities, viewport, registeredEntities)
+function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw)
     local registeredEntities = registeredEntities or entityHandler.registeredEntities
+    
+    roomCache[room.name] = roomCache[room.name] or {}
 
-    local batches = getEntityBatch(room, entities, viewport, registeredEntities)
-
-    for depth, batch <- batches do
-        batch:draw()
+    if forceRedraw and roomCache[room.name].entities.result ~= nil then
+        roomCache[room.name].entities = nil
     end
+
+    roomCache[room.name].entities = roomCache[room.name].entities or tasks.newTask(
+        (-> getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)),
+        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000)))
+    )
+
+    return roomCache[room.name].entities.result
 end
 
-function celesteRender.getTriggerBatch(room, triggers, viewport)
+local function getTriggerBatchTaskFunc(room, triggers, viewport)
     local font = love.graphics.getFont()
     local batch = smartDrawingBatch.createBatch()
 
@@ -313,11 +321,30 @@ function celesteRender.getTriggerBatch(room, triggers, viewport)
             
             love.graphics.setColor(colors.default)
         end
-        
+
         batch:add(drawableFunction.fromFunction(func))
+
+        if i % 10 == 0 then
+            coroutine.yield()
+        end
     end
 
-    return batch
+    coroutine.yield(batch)
+end
+
+function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
+    roomCache[room.name] = roomCache[room.name] or {}
+
+    if forceRedraw and roomCache[room.name].triggers.result ~= nil then
+        roomCache[room.name].triggers = nil
+    end
+
+    roomCache[room.name].triggers = roomCache[room.name].triggers or tasks.newTask(
+        (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
+        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", room.name, task.timeTotal * 1000)))
+    )
+
+    return roomCache[room.name].triggers.result
 end
 
 function celesteRender.drawTriggers(room, triggers, viewport)
@@ -334,6 +361,54 @@ local depthBatchingFunctions = {
     {"Foreground Decals", "decalsFg", celesteRender.getDecalsFgBatch, decalsFgDepth},
     {"Triggers", "triggers", celesteRender.getTriggerBatch, triggersDepth}
 }
+
+function celesteRender.getRoomBatches(room, viewport)
+    roomCache[room.name] = roomCache[room.name] or {}
+
+    if not roomCache[room.name].complete then
+        local depthBatches = {}
+        local done = true
+
+        for i, data <- depthBatchingFunctions do
+            local description, key, func, depth = unpack(data)
+            local batches = func(room, room[key], viewport)
+
+            if batches then
+                if depth then
+                    depthBatches[depth] = batches
+
+                else
+                    for depth, batch <- batches do
+                        depthBatches[depth] = batch
+                    end
+                end
+
+            else
+                done = false
+            end
+        end
+
+        -- Not done, but all the tasks have been started
+        -- Attempt to render other rooms while we wait
+        if not done then
+            return
+        end
+
+        local orderedBatches = $()
+
+        for depth, batches <- depthBatches do
+            orderedBatches += {depth, batches}
+        end
+
+        orderedBatches := sortby(v -> v[1])
+        orderedBatches := reverse
+        orderedBatches := map(v -> v[2])
+
+        roomCache[room.name].complete = orderedBatches
+    end
+
+    return roomCache[room.name].complete
+end
 
 function celesteRender.drawRoom(room, viewport)
     local roomX = room.x or 0
@@ -359,36 +434,12 @@ function celesteRender.drawRoom(room, viewport)
 
     love.graphics.setColor(colors.default)
 
-    local depthBatches = {}
+    local orderedBatches = celesteRender.getRoomBatches(room, viewport)
 
-    for i, data <- depthBatchingFunctions do
-        local description, key, func, depth = unpack(data)
-        local batches = func(room, room[key], viewport)
-
-        if batches then
-            if depth then
-                depthBatches[depth] = batches
-
-            else
-                for depth, batch <- batches do
-                    depthBatches[depth] = batch
-                end
-            end
+    if orderedBatches then
+        for depth, batch <- orderedBatches do
+            batch:draw()
         end
-    end
-
-    local orderedBatches = $()
-
-    for depth, batches <- depthBatches do
-        orderedBatches += {depth, batches}
-    end
-
-    orderedBatches := sortby(v -> v[1])
-    orderedBatches := reverse
-    orderedBatches := map(v -> v[2])
-
-    for depth, batch <- orderedBatches do
-        batch:draw()
     end
 
     love.graphics.pop()
