@@ -67,19 +67,4 @@ function entities.loadInternalEntities(registerAt, path)
     coroutine.yield(registerAt)
 end
 
-function entities.getNodes(entity)
-    local res = $()
-
-    for i, node <- entity.__children or {} do
-        if node.__name == "node" then
-            res += {
-                node.x,
-                node.y
-            }
-        end
-    end
-
-    return res
-end
-
 return entities

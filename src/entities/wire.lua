@@ -19,9 +19,9 @@ function wire.draw(room, entity)
             tr, tg, tb = r, g, b
         end
     end
-
+    
     local start = {entity.x, entity.y}
-    local stop = entities.getNodes(entity)[1]
+    local stop = entity.nodes[1]
     local control = {
         (start[1] + stop[1]) / 2,
         (start[2] + stop[2]) / 2 + 24

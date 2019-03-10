@@ -95,4 +95,15 @@ function utils.stripExtension(path)
     return path:sub(1, #path - #utils.fileExtension(path) - 1)
 end
 
+function utils.typeof(v)
+    local typ = type(v)
+
+    if typ == "table" and v._type then
+        return v._type
+
+    else
+        return typ
+    end
+end
+
 return utils

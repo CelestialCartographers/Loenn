@@ -1,7 +1,6 @@
 local autotiler = require("autotiler")
 local spriteLoader = require("sprite_loader")
 local drawing = require("drawing")
-local tilesUtils = require("tiles")
 local viewportHandler = require("viewport_handler")
 local fileLocations = require("file_locations")
 local colors = require("colors")
@@ -65,8 +64,7 @@ local function getOrCacheTileQuad(tile, spriteMeta, quad, fg)
 end
 
 function celesteRender.getTilesBatch(tiles, meta, fg)
-    local tilesRaw = tiles.innerText or ""
-    local tiles = tilesUtils.convertTileString(tilesRaw)
+    local tiles = tiles.matrix
 
     local width, height = tiles:size
     local spriteBatch = love.graphics.newSpriteBatch(atlases.gameplay._imageMeta[1].image, 1024, spriteBatchMode)
@@ -126,12 +124,10 @@ function celesteRender.drawTilesBg(room, tiles)
 end
 
 function celesteRender.getDecalsBatch(decals)
-    local decals = (decals or {}).__children or {}
-    local decalCount = decals.len and decals:len or #decals
-    local spriteBatch = love.graphics.newSpriteBatch(atlases.gameplay._imageMeta[1].image, math.max(decalCount, 1), spriteBatchMode)
+    local spriteBatch = love.graphics.newSpriteBatch(atlases.gameplay._imageMeta[1].image, math.max(decals:len, 1), spriteBatchMode)
 
     for i, decal <- decals do
-        local texture = drawing.getDecalTexture(decal.texture or "")
+        local texture = decal.texture
 
         local x = decal.x or 0
         local y = decal.y or 0
@@ -193,8 +189,8 @@ local function getEntityDrawCalls(room, entities, registeredEntities)
 
     local res = $()
 
-    for i, entity <- entities.__children or {} do
-        local name = entity.__name
+    for i, entity <- entities do
+        local name = entity._name
         local handler = registeredEntities[name]
 
         if handler then
@@ -265,8 +261,8 @@ end
 function celesteRender.drawTriggers(room, triggers)
     local font = love.graphics.getFont()
 
-    for i, trigger <- triggers.__children or {} do
-        local name = trigger.__name
+    for i, trigger <- triggers do
+        local name = trigger._name or ""
         local displayName = utils.humanizeVariableName(name)
 
         local x = trigger.x or 0
@@ -295,11 +291,11 @@ function celesteRender.drawTriggers(room, triggers)
 end
 
 local roomDrawingFunctions = {
-    {"Background Tiles", "bg", celesteRender.drawTilesBg},
-    {"Background Decals", "bgdecals", celesteRender.drawDecalsBg},
+    {"Background Tiles", "tiles_bg", celesteRender.drawTilesBg},
+    {"Background Decals", "decals_bg", celesteRender.drawDecalsBg},
     {"Entities", "entities", celesteRender.drawEntities},
-    {"Foreground Tiles", "solids", celesteRender.drawTilesFg},
-    {"Foreground Decals", "fgdecals", celesteRender.drawDecalsFg},
+    {"Foreground Tiles", "tiles_fg", celesteRender.drawTilesFg},
+    {"Foreground Decals", "decals_fg", celesteRender.drawDecalsFg},
     {"Triggers", "triggers", celesteRender.drawTriggers}
 }
 
@@ -327,15 +323,9 @@ function celesteRender.drawRoom(room, viewport)
 
     love.graphics.setColor(colors.default)
 
-    local roomData = {}
-
-    for key, value <- room.__children do
-        roomData[value.__name] = value
-    end
-
     for i, data <- roomDrawingFunctions do
         local description, key, func = unpack(data)
-        local value = roomData[key]
+        local value = room[key]
 
         if value then
             func(room, value)
@@ -346,17 +336,17 @@ function celesteRender.drawRoom(room, viewport)
 end
 
 function celesteRender.drawFiller(filler, viewport)
+    local x = filler.x * 8
+    local y = filler.y * 8
+
+    local width = filler.width * 8
+    local height = filler.height * 8
+
     love.graphics.push()
-
-    local fillerX = filler.x * 8
-    local fillerY = filler.y * 8
-
-    local width = filler.w * 8
-    local height = filler.h * 8
 
     love.graphics.translate(math.floor(-viewport.x), math.floor(-viewport.y))
     love.graphics.scale(viewport.scale, viewport.scale)
-    love.graphics.translate(fillerX, fillerY)
+    love.graphics.translate(x, y)
 
     love.graphics.setColor(colors.fillerColor)
     love.graphics.rectangle("fill", 0, 0, width, height)
@@ -372,27 +362,17 @@ function celesteRender.drawMap(map)
         local viewport = viewportHandler.viewport
 
         if viewport.visible then
-            for i, data <- map.__children[1].__children do
-                if data.__name == "levels" then
-                    for j, room <- data.__children or {} do
-                        if viewportHandler.roomVisible(room, viewport) then
-                            celesteRender.drawRoom(room, viewport)
-                        end
-                    end
-
-                elseif data.__name == "Filler" then
-                    for j, filler <- data.__children or {} do
-                        -- TODO - Don't draw out of view fillers
-                        -- ... Even though checking if they are out of view is probably more expensive than drawing it
-                        celesteRender.drawFiller(filler, viewport)
-                    end
+            for i, room <- map.rooms do
+                if viewportHandler.roomVisible(room, viewport) then
+                    celesteRender.drawRoom(room, viewport)
                 end
             end
 
-        else
-            -- TODO - Test and commit if it works
-            print("Not visible... Waiting 200ms...")
-            love.timer.sleep(0.2)
+            for i, filler <- map.fillers do
+                -- TODO - Don't draw out of view fillers
+                -- ... Even though checking if they are out of view is probably more expensive than drawing it
+                celesteRender.drawFiller(filler, viewport)
+            end
         end
     end
 end

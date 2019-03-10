@@ -20,11 +20,6 @@ function drawing.drawSprite(spriteMeta, x, y, r, sx, sy, ox, oy)
     love.graphics.draw(spriteMeta.image, spriteMeta.quad, x, y, r, sx, sy, ox, oy)
 end
 
--- Replace \ with /, remove .png and prefix with `decals/`
-function drawing.getDecalTexture(texture)
-    return "decals/" .. texture:gsub("\\", "/"):sub(1, #texture - 4)
-end
-
 function drawing.getCurvePoint(start, stop, control, percent)
     local startMul = (1 - percent)^2
     local controlMul = 2 * (1 - percent) * percent

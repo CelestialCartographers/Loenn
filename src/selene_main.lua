@@ -11,6 +11,7 @@ love.graphics.setDefaultFilter("nearest", "nearest", 1)
 love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
 local mapcoder = require("mapcoder")
+local map_struct = require("structs/map")
 local celesteRender = require("celeste_render")
 local inputHandler = require("input_handler")
 local viewportHandler = require("viewport_handler")
@@ -31,13 +32,15 @@ tasks.newTask(
 
 local loadingMap = true
 
-local mapFile = fileLocations.getResourceDir() .. "/Maps/7-Summit.bin"
+local mapFile = fileLocations.getResourceDir() .. "/Maps/0-Intro.bin"
 local map = tasks.newTask(
     function()
         mapcoder.decodeFile(mapFile)
     end,
-    function()
+    function(task)
         loadingMap = false
+        task.result = map_struct.decode(task.result)
+        
         viewportHandler.addDevice()
     end
 )
