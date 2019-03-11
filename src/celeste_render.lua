@@ -93,6 +93,11 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
     local empty = ""
     local wildcard = "*"
 
+    local defaultQuad = ${{0, 0}}
+    local defaultSprite = ""
+
+    local drawableSpriteType = "drawableSprite"
+
     local width, height = tiles:size
     local batch = smartDrawingBatch.createBatch()
 
@@ -102,17 +107,17 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
             cache[tile] = cache[tile] or {}
 
             if tile ~= airTile then
-                local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, wildcard)
-                local quadCount = quads.len and quads:len or #quads
+                local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, wildcard, defaultQuad, defaultSprite)
+                local quadCount = quads:len
 
                 if quadCount > 0 then
-                    local randQuad = quads[math.random(1, quadCount)]
+                    local randQuad = quadCount == 1 and quads[1] or quads[math.random(1, quadCount)]
                     local texture = meta.paths[tile] or empty
 
                     local spriteMeta = getOrCacheTileSpriteMeta(cache, tile, texture, randQuad, fg)
 
                     local drawable = {
-                        _type = "drawableSprite",
+                        _type = drawableSpriteType,
 
                         meta = spriteMeta,
 

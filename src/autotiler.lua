@@ -73,21 +73,16 @@ local function sortByScore(masks)
     return res
 end
 
-local function getPaddingOrCenterQuad(x, y, tile, tiles, meta)
-    local defaultQuad = {{0, 0}}
-    local defaultSprite = ""
-
+local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, defaultQuad, defaultSprite)
     if checkPadding(tiles, x, y) then
         local padding = meta.padding[tile]
-        local paddingLength = padding.len and padding:len or #padding
 
-        return paddingLength > 0 and padding or defaultQuad, defaultSprite
+        return padding:len > 0 and padding or defaultQuad, defaultSprite
 
     else
         local center = meta.center[tile]
-        local centerLength = center.len and center:len or #center
         
-        return centerLength > 0 and center or defaultQuad, defaultSprite
+        return center:len > 0 and center or defaultQuad, defaultSprite
     end
 end
 
@@ -121,19 +116,19 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
     return false, nil, nil
 end
 
-function autotiler.getQuads(x, y, tiles, meta, air, wildcard)
+function autotiler.getQuads(x, y, tiles, meta, airTile, wildcard, defaultQuad, defaultSprite)
     local tile = tiles[x, y]
 
     local masks = meta.masks[tile]
     local ignore = meta.ignores[tile]
 
-    local matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wildcard)
+    local matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, airTile, wildcard)
 
     if matches then
         return quads, sprites
 
     else
-        return getPaddingOrCenterQuad(x, y, tile, tiles, meta)
+        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, defaultQuad, defaultSprite)
     end
 end
 
@@ -190,9 +185,9 @@ function autotiler.loadTilesetXML(fn)
             ignores[id] = table.flip($(ignore):split(";"))
         end
 
-        padding[id] = copy and table.shallowcopy(padding[copy]()) or {}
-        center[id] = copy and table.shallowcopy(center[copy]()) or {}
-        masks[id] = copy and table.shallowcopy(masks[copy]()) or {}
+        padding[id] = copy and $(table.shallowcopy(padding[copy]())) or $()
+        center[id] = copy and $(table.shallowcopy(center[copy]())) or $()
+        masks[id] = copy and $(table.shallowcopy(masks[copy]())) or $()
 
         currentMasks = $()
 
