@@ -31,12 +31,12 @@ local function checkMask(adjacent, mask)
     return true
 end
 
-local function checkTile(value, target, ignore)
+local function checkTile(value, target, ignore, air, wildcard)
     if ignore then
-        return not (target == "0" or ignore[target] or (ignore["*"] and value ~= target))
+        return not (target == air or ignore[target] or (ignore[wildcard] and value ~= target))
     end
 
-    return target ~= "0"
+    return target ~= air
 end
 
 -- Unrolled
@@ -103,13 +103,13 @@ local function getMaskQuads(masks, adjacent)
     return false, nil, nil
 end
 
-local function getMaskQuadsFromTiles(x, y, masks, tiles, ignore)
+local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wildcard)
     if masks then
         local checkTile = checkTile
 
-        local a, b, c = checkTile(tile, tiles:get(tile, x - 1, y - 1), ignore), checkTile(tile, tiles:get(tile, x + 0, y - 1), ignore), checkTile(tile, tiles:get(tile, x + 1, y - 1), ignore)
-        local d, e, f = checkTile(tile, tiles:get(tile, x - 1, y + 0), ignore), checkTile(tile, tile, ignore), checkTile(tile, tiles:get(tile, x + 1, y + 0), ignore)
-        local g, h, i = checkTile(tile, tiles:get(tile, x - 1, y + 1), ignore), checkTile(tile, tiles:get(tile, x + 0, y + 1), ignore), checkTile(tile, tiles:get(tile, x + 1, y + 1), ignore)
+        local a, b, c = checkTile(tile, tiles:get(tile, x - 1, y - 1), ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 0, y - 1), ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 1, y - 1), ignore, air, wildcard)
+        local d, e, f = checkTile(tile, tiles:get(tile, x - 1, y + 0), ignore, air, wildcard), checkTile(tile, tile, ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 1, y + 0), ignore, air, wildcard)
+        local g, h, i = checkTile(tile, tiles:get(tile, x - 1, y + 1), ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 0, y + 1), ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 1, y + 1), ignore, air, wildcard)
 
         for i, maskData <- masks do
             if checkMaskFromTiles(maskData.mask, a, b, c, d, e, f, g, h, i) then
@@ -121,15 +121,13 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, ignore)
     return false, nil, nil
 end
 
-function autotiler.getQuads(x, y, tiles, meta, adjacent)
-    local adjacent = adjacent
-
+function autotiler.getQuads(x, y, tiles, meta, air, wildcard)
     local tile = tiles[x, y]
 
     local masks = meta.masks[tile]
     local ignore = meta.ignores[tile]
 
-    local matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore)
+    local matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wildcard)
 
     if matches then
         return quads, sprites

@@ -91,6 +91,7 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
 
     local airTile = "0"
     local empty = ""
+    local wildcard = "*"
 
     local width, height = tiles:size
     local batch = smartDrawingBatch.createBatch()
@@ -101,7 +102,7 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
             cache[tile] = cache[tile] or {}
 
             if tile ~= airTile then
-                local quads, sprites = autotiler.getQuads(x, y, tiles, meta)
+                local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, wildcard)
                 local quadCount = quads.len and quads:len or #quads
 
                 if quadCount > 0 then
