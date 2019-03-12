@@ -10,7 +10,6 @@ local entityRegisteryMT = {
 
 entities.registeredEntities = setmetatable({}, entityRegisteryMT)
 
--- TODO - Default to filename without ext
 function entities.registerEntity(fn, registerAt, internal)
     local registerAt = registerAt or entities.registeredEntities
 

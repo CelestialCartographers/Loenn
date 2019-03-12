@@ -7,6 +7,8 @@ smartDrawingBatchMt.__index = {}
 
 local spriteBatchMode = "static"
 
+-- TODO - Make a unordered version that attempts to reduce draw calls as much as possible
+-- TODO - Make tinting smarter? Batch based on color?
 function smartDrawingBatchMt.__index.add(self, drawable)
     local typ = utils.typeof(drawable)
 

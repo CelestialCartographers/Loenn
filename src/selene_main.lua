@@ -17,6 +17,12 @@ local entities = require("entities")
 local viewerState = require("loaded_state")
 local viewportHandler = require("viewport_handler")
 
+local inputDevice = require("input_device")
+local mapLoaderDevice = require("input_devices/map_loader")
+
+inputDevice.newInputDevice(viewportHandler.device)
+inputDevice.newInputDevice(mapLoaderDevice)
+
 love.graphics.setFont(fonts.font)
 
 -- TODO - Make task "group" for loading things

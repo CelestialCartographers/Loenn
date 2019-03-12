@@ -17,7 +17,10 @@ local viewport = {
     visible = true
 }
 
+local viewportDevice = {}
+
 viewportHandler.viewport = viewport
+viewportHandler.device = viewportDevice
 
 function viewportHandler.roomVisible(room, viewport)
     local actuallX = viewport.x / viewport.scale
@@ -69,7 +72,15 @@ function viewportHandler.zoomOut()
     viewport.y = (viewport.y - mouseY) / 2
 end
 
-local viewportDevice = {}
+function viewportHandler.enable()
+    viewportHandler.device._enabled = true
+end
+
+function viewportHandler.disable()
+    viewportHandler.device._enabled = false
+end
+
+
 
 function viewportDevice.keypressed(key, scancode, isrepeat)
     if key == "+" and not isrepeat then
@@ -123,16 +134,5 @@ end
 function viewportDevice.visible(visible)
     viewport.visible = visible
 end
-
-function viewportHandler.enable()
-    viewportDevice._enabled = true
-end
-
-function viewportHandler.disable()
-    viewportDevice._enabled = false
-end
-
-
-inputDevice.newInputDevice(viewportDevice)
 
 return viewportHandler
