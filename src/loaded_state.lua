@@ -6,6 +6,7 @@ local mapStruct = require("structs/map")
 
 local state = {}
 
+-- TODO - Invalidate map rendering tasks and cache
 function state.loadMap(filename)
     tasks.newTask(
         function()

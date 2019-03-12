@@ -46,7 +46,29 @@ function love.draw()
         love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
 
     else
-        love.graphics.printf("Loading...", viewport.width / 2, viewport.height / 2, viewport.width, "left", love.timer.getTime(), fonts.fontScale * 2, fonts.fontScale * 2)
+        local time = love.timer.getTime()
+        local offsetX = math.sin(time) * 32
+        local offsetY = math.cos(time) * 64
+
+        local x = viewport.width / 2 + offsetX
+        local y = viewport.height / 2 +  offsetY
+
+        local baseText = "Loading"
+        local reps = math.floor(time * 2) % 3 + 1
+        local dots = string.rep(".", reps)
+
+        love.graphics.push()
+
+        love.graphics.setColor(math.abs(math.sin(time)), math.abs(math.cos(time)), math.abs(math.tan(time)))
+
+        love.graphics.translate(x, y)
+        love.graphics.rotate(time * 0.3)
+        love.graphics.translate(offsetX, offsetY)
+        love.graphics.printf(baseText .. dots, 0, 0, viewport.width, "left", time, fonts.fontScale * 2, fonts.fontScale * 2)
+
+        love.graphics.setColor(1.0, 1.0, 1.0)
+
+        love.graphics.pop()
     end
 end
 
