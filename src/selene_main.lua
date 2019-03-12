@@ -7,15 +7,15 @@ love.keyboard.setKeyRepeat(true)
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
 love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
-local mapcoder = require("mapcoder")
-local map_struct = require("structs/map")
+require("input_handler")
+
 local celesteRender = require("celeste_render")
-local inputHandler = require("input_handler")
-local viewportHandler = require("viewport_handler")
 local fileLocations = require("file_locations")
 local fonts = require("fonts")
 local tasks = require("task")
 local entities = require("entities")
+local viewerState = require("loaded_state")
+local viewportHandler = require("viewport_handler")
 
 love.graphics.setFont(fonts.font)
 
@@ -27,39 +27,28 @@ tasks.newTask(
     end
 )
 
-local loadingMap = true
-
 local mapFile = fileLocations.getResourceDir() .. "/Maps/7-Summit.bin"
-local map = tasks.newTask(
-    function()
-        mapcoder.decodeFile(mapFile)
-    end,
-    function(task)
-        loadingMap = false
-        task.result = map_struct.decode(task.result)
-        
-        viewportHandler.addDevice()
-    end
-)
+
+viewerState.loadMap(mapFile)
 
 function love.draw()
-    local viewport = viewportHandler.viewport
+    local viewport = viewerState.viewport
 
-    if loadingMap then
-        love.graphics.printf("Loading...", viewport.width / 2, viewport.height / 2, viewport.width, "left", love.timer.getTime(), fonts.fontScale * 2, fonts.fontScale * 2)
-
-    else
-        celesteRender.drawMap(map)
+    if viewerState.map then
+        celesteRender.drawMap(viewerState)
 
         love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
+
+    else
+        love.graphics.printf("Loading...", viewport.width / 2, viewport.height / 2, viewport.width, "left", love.timer.getTime(), fonts.fontScale * 2, fonts.fontScale * 2)
     end
 end
 
 function love.update()
-    if loadingMap then
-        tasks.processTasks(1 / 144)
+    if viewerState.map then
+        tasks.processTasks(math.huge, 1)
 
     else
-        tasks.processTasks(math.huge, 1)
+        tasks.processTasks(1 / 144)
     end
 end

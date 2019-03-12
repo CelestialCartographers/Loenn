@@ -1,7 +1,6 @@
 local autotiler = require("autotiler")
 local spriteLoader = require("sprite_loader")
 local drawing = require("drawing")
-local viewportHandler = require("viewport_handler")
 local fileLocations = require("file_locations")
 local colors = require("colors")
 local tasks = require("task")
@@ -11,6 +10,7 @@ local entityHandler = require("entities")
 local smartDrawingBatch = require("structs/smart_drawing_batch")
 local drawableSprite = require("structs/drawable_sprite")
 local drawableFunction = require("structs/drawable_function")
+local viewportHandler = require("viewport_handler")
 
 local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
 local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
@@ -490,10 +490,10 @@ function celesteRender.drawFiller(filler, viewport)
     love.graphics.pop()
 end
 
-function celesteRender.drawMap(map)
-    if map.result then
-        local map = map.result
-        local viewport = viewportHandler.viewport
+function celesteRender.drawMap(state)
+    if state.map then
+        local map = state.map
+        local viewport = state.viewport
 
         if viewport.visible then
             for i, room <- map.rooms do

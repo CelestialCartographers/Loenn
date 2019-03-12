@@ -69,61 +69,70 @@ function viewportHandler.zoomOut()
     viewport.y = (viewport.y - mouseY) / 2
 end
 
-function viewportHandler.addDevice()
-    inputDevice.newInputDevice{
-        keypressed = function(key, scancode, isrepeat)
-            if key == "+" and not isrepeat then
-                viewportHandler.zoomIn()
+local viewportDevice = {}
 
-            elseif key == "-" and not isrepeat then
-                viewportHandler.zoomOut()
+function viewportDevice.keypressed(key, scancode, isrepeat)
+    if key == "+" and not isrepeat then
+        viewportHandler.zoomIn()
 
-            elseif key == "w" or key == "up" then
-                viewport.y -= 8
+    elseif key == "-" and not isrepeat then
+        viewportHandler.zoomOut()
 
-            elseif key == "a" or key == "left" then
-                viewport.x -= 8
+    elseif key == "w" or key == "up" then
+        viewport.y -= 8
 
-            elseif key == "s" or key == "down" then
-                viewport.y += 8
+    elseif key == "a" or key == "left" then
+        viewport.x -= 8
 
-            elseif key == "d" or key == "right" then
-                viewport.x += 8
-            end
-        end,
+    elseif key == "s" or key == "down" then
+        viewport.y += 8
 
-        mousedragmoved = function(dx, dy, button, istouch)
-            if button == movementButton then
-                viewport.x -= dx
-                viewport.y -= dy
-            end
-        end,
-
-        mousemoved = function(x, y, dx, dy, istouch)
-            if istouch then
-                viewport.x -= dx
-                viewport.y -= dy
-            end
-        end,
-
-        resize = function(width, height)
-            viewport.width = width
-            viewport.height = height
-        end,
-
-        wheelmoved = function(dx, dy)
-            if dy > 0 then
-                viewportHandler.zoomIn()
-
-            elseif dy < 0 then
-                viewportHandler.zoomOut()
-            end
-        end,
-
-        visible = function(visible)
-            viewport.visible = visible
-        end
-    }
+    elseif key == "d" or key == "right" then
+        viewport.x += 8
+    end
 end
+
+function viewportDevice.mousedragmoved(dx, dy, button, istouch)
+    if button == movementButton then
+        viewport.x -= dx
+        viewport.y -= dy
+    end
+end
+
+function viewportDevice.mousemoved(x, y, dx, dy, istouch)
+    if istouch then
+        viewport.x -= dx
+        viewport.y -= dy
+    end
+end
+
+function viewportDevice.resize(width, height)
+    viewport.width = width
+    viewport.height = height
+end
+
+function viewportDevice.wheelmoved(dx, dy)
+    if dy > 0 then
+        viewportHandler.zoomIn()
+
+    elseif dy < 0 then
+        viewportHandler.zoomOut()
+    end
+end
+
+function viewportDevice.visible(visible)
+    viewport.visible = visible
+end
+
+function viewportHandler.enable()
+    viewportDevice._enabled = true
+end
+
+function viewportHandler.disable()
+    viewportDevice._enabled = false
+end
+
+
+inputDevice.newInputDevice(viewportDevice)
 
 return viewportHandler

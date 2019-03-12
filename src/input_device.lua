@@ -13,8 +13,10 @@ local inputDeviceMt = {
 function inputHandler.sendEvent(event, ...)
     if event then
         for i, device <- inputHandler.inputDevices do
-            local args = {...} or {}
-            device[event](unpack(args))
+            if device._enabled then
+                local args = {...} or {}
+                device[event](unpack(args))
+            end
         end
     end
 end

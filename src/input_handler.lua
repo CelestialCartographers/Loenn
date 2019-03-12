@@ -66,3 +66,11 @@ end
 function love.visible(visible)
     inputDevice.sendEvent("visible", visible)
 end
+
+function love.filedropped(file)
+    inputDevice.sendEvent("filedropped", file)
+end
+
+function love.directorydropped(path)
+    inputDevice.sendEvent("directorydropped", path)
+end
