@@ -60,8 +60,12 @@ local function getRoomBorderColor(room)
 end
 
 local function getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
-    cache[tile] = cache[tile] or {}
-    cache[tile][fg] = cache[tile][fg] or table.filled(false, {6, 15})
+    if not cache[tile] then
+        cache[tile] = {
+            [false] = table.filled(false, {6, 15}),
+            [true] = table.filled(false, {6, 15})
+        }
+    end
 
     local quadCache = cache[tile][fg]
     local quadX, quadY = quad[1], quad[2]
@@ -75,6 +79,8 @@ local function getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
         newSpritesMeta.quad = quad
 
         quadCache[quadX + 1, quadY + 1] = newSpritesMeta
+
+        return newSpritesMeta
     end
 
     return quadCache[quadX + 1, quadY + 1]
@@ -90,7 +96,7 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
     local meta = meta
 
     local airTile = "0"
-    local empty = ""
+    local emptyTile = " "
     local wildcard = "*"
 
     local defaultQuad = ${{0, 0}}
@@ -104,10 +110,9 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
     for x = 1, width do
         for y = 1, height do
             local tile = tiles[x, y]
-            cache[tile] = cache[tile] or {}
 
             if tile ~= airTile then
-                local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, wildcard, defaultQuad, defaultSprite)
+                local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
                 local quadCount = quads:len
 
                 if quadCount > 0 then

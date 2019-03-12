@@ -54,14 +54,12 @@ local function checkMaskFromTiles(mask, a, b, c, d, e, f, g, h, i)
     )
 end
 
-local function getTile(tiles, x, y)
-    return tiles:get(" ", x, y)
+local function getTile(tiles, x, y, emptyTile)
+    return tiles:get(emptyTile, x, y)
 end
 
-local function checkPadding(tiles, x, y)
-    local airTile = "0"
-
-    return getTile(tiles, x - 2, y) == airTile or getTile(tiles, x + 2, y) == airTile or getTile(tiles, x, y - 2) == airTile or getTile(tiles, x, y + 2) == airTile
+local function checkPadding(tiles, x, y, airTile, emptyTile)
+    return getTile(tiles, x - 2, y, emptyTile) == airTile or getTile(tiles, x + 2, y, emptyTile) == airTile or getTile(tiles, x, y - 2, emptyTile) == airTile or getTile(tiles, x, y + 2, emptyTile) == airTile
 end
 
 local function sortByScore(masks)
@@ -73,8 +71,8 @@ local function sortByScore(masks)
     return res
 end
 
-local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, defaultQuad, defaultSprite)
-    if checkPadding(tiles, x, y) then
+local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
+    if checkPadding(tiles, x, y, airTile, emptyTile) then
         local padding = meta.padding[tile]
 
         return padding:len > 0 and padding or defaultQuad, defaultSprite
@@ -116,7 +114,7 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
     return false, nil, nil
 end
 
-function autotiler.getQuads(x, y, tiles, meta, airTile, wildcard, defaultQuad, defaultSprite)
+function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
     local tile = tiles[x, y]
 
     local masks = meta.masks[tile]
@@ -128,7 +126,7 @@ function autotiler.getQuads(x, y, tiles, meta, airTile, wildcard, defaultQuad, d
         return quads, sprites
 
     else
-        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, defaultQuad, defaultSprite)
+        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
     end
 end
 
