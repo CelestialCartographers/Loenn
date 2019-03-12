@@ -2,7 +2,7 @@ local utils = require("utils")
 
 local entities = {}
 
-local missingEntity = require("missing_entity")
+local missingEntity = require("defaults/entity")
 
 local entityRegisteryMT = {
     __index = function() return missingEntity end
