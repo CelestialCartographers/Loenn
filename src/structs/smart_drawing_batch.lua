@@ -15,14 +15,14 @@ function smartDrawingBatchMt.__index.add(self, drawable)
     if typ == "drawableSprite" then
         local image = drawable.meta.image
 
-        local offsetX = drawable.offsetX or (drawable.jx * drawable.meta.realWidth + drawable.meta.offsetX)
-        local offsetY = drawable.offsetY or (drawable.jy * drawable.meta.realHeight + drawable.meta.offsetY)
+        local offsetX = drawable.offsetX or ((drawable.jx or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX)
+        local offsetY = drawable.offsetY or ((drawable.jy or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY)
 
         if drawable.color then
             -- Special case
             local newDrawable = {_type = "drawableFunction"}
 
-            function drawable.func(drawable)
+            function newDrawable.func(drawable)
                 local prevColor = {love.graphics.getColor()}
 
                 love.graphics.setColor(drawable.color)
@@ -38,18 +38,18 @@ function smartDrawingBatchMt.__index.add(self, drawable)
 
         else
             if image ~= self._prevImage or self._prevTyp ~= "drawableSprite" then
-                self._drawables += love.graphics.newSpriteBatch(image, 1000, spriteBatchMode)
+                self._lastBatch = love.graphics.newSpriteBatch(image, 1000, spriteBatchMode)
+                table.insert(self._drawables, self._lastBatch)
             end
 
-            self._drawables[self._drawables:len]:add(drawable.meta.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
-
             self._prevImage = image
+            self._lastBatch:add(drawable.meta.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
         end
     end
 
 
     if typ == "drawableFunction" then
-        self._drawables += drawable
+        table.insert(self._drawables, drawable)
     end
 
     self._prevTyp = typ
@@ -73,7 +73,9 @@ function smartDrawingBatch.createBatch()
         _type = "smartDrawingBatch",
     }
 
-    res._drawables = $()
+    res._drawables = {}
+    res._lastBatch = nil
+    res._lastImage = nil
 
     return setmetatable(res, smartDrawingBatchMt)
 end

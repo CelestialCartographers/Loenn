@@ -158,9 +158,6 @@ local function getTilesBatch(tiles, meta, fg)
 
                         x = x * 8 - 8,
                         y = y * 8 - 8,
-
-                        offsetX = 0,
-                        offsetY = 0
                     }
 
                     batch:add(drawable)
