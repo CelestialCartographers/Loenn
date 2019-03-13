@@ -1,9 +1,10 @@
 local fileLocations = require("file_locations")
-local serialization = require("serialization")
+local serialize = require("serialize")
 
 local utils = {}
 
-utils.serialize = serialization.serialize
+utils.serialize = serialize.serialize
+utils.unserialize = serialize.unserialize
 
 function utils.twosCompliment(n, power)
     if n >= 2^(power - 1) then
