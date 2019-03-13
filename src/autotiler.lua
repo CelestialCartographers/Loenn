@@ -1,18 +1,18 @@
 local xml2lua = require("xml2lua.xml2lua")
 local utils = require("utils")
+local matrix = require("matrix")
 
 local autotiler = {}
 
 local function convertMaskString(s)
-    local res = table.filled(0, {3, 3})
+    local res = matrix.filled(0, 3, 3)
+
     local raw = s:gsub("x", "2")
-    local rows = $(raw):split("-")
+    local rows = raw:split("-")
 
     for y, row <- rows do
-        local rowValues = $(row):map(v -> tonumber(v))
-
-        for x, value <- rowValues do
-            res[x, y] = value
+        for x, v <- row:split(1) do
+            res:setInbounds(x, y, tonumber(v))
         end
     end
 
@@ -55,7 +55,7 @@ local function checkMaskFromTiles(mask, a, b, c, d, e, f, g, h, i)
 end
 
 local function getTile(tiles, x, y, emptyTile)
-    return tiles:get(emptyTile, x, y)
+    return tiles:get(x, y, emptyTile)
 end
 
 local function checkPadding(tiles, x, y, airTile, emptyTile)
@@ -100,9 +100,9 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
     if masks then
         local checkTile = checkTile
 
-        local a, b, c = checkTile(tile, tiles:get(tile, x - 1, y - 1), ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 0, y - 1), ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 1, y - 1), ignore, air, wildcard)
-        local d, e, f = checkTile(tile, tiles:get(tile, x - 1, y + 0), ignore, air, wildcard), checkTile(tile, tile, ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 1, y + 0), ignore, air, wildcard)
-        local g, h, i = checkTile(tile, tiles:get(tile, x - 1, y + 1), ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 0, y + 1), ignore, air, wildcard), checkTile(tile, tiles:get(tile, x + 1, y + 1), ignore, air, wildcard)
+        local a, b, c = checkTile(tile, tiles:get(x - 1, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y - 1, tile), ignore, air, wildcard)
+        local d, e, f = checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard), checkTile(tile, tile, ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard)
+        local g, h, i = checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard)
 
         for i, maskData <- masks do
             if checkMaskFromTiles(maskData.mask, a, b, c, d, e, f, g, h, i) then
@@ -115,7 +115,7 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
 end
 
 function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
-    local tile = tiles[x, y]
+    local tile = tiles:get(x, y)
 
     local masks = meta.masks[tile]
     local ignore = meta.ignores[tile]

@@ -26,8 +26,6 @@ inputDevice.newInputDevice(mapLoaderDevice)
 
 love.graphics.setFont(fonts.font)
 
--- TODO - Make task "group" for loading things
-
 tasks.newTask(
     function()
         entities.loadInternalEntities()
@@ -55,7 +53,8 @@ function love.update(dt)
     tasks.processTasks(1 / 144)
     
     if viewerState.map then
-        celesteRender.processTasks(math.huge, 1)
+        -- TODO - Find some sane values for this
+        celesteRender.processTasks(1 / 20, 20)
 
     else
         loading:update(dt)

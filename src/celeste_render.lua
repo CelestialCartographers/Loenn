@@ -11,6 +11,7 @@ local smartDrawingBatch = require("structs/smart_drawing_batch")
 local drawableSprite = require("structs/drawable_sprite")
 local drawableFunction = require("structs/drawable_function")
 local viewportHandler = require("viewport_handler")
+local matrix = require("matrix")
 
 local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
 local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
@@ -91,15 +92,15 @@ end
 function celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
     if not cache[tile] then
         cache[tile] = {
-            [false] = table.filled(false, {6, 15}),
-            [true] = table.filled(false, {6, 15})
+            [false] = matrix.filled(false, 6, 15),
+            [true] = matrix.filled(false, 6, 15)
         }
     end
 
     local quadCache = cache[tile][fg]
     local quadX, quadY = quad[1], quad[2]
     
-    if not quadCache[quadX + 1, quadY + 1] then
+    if not quadCache:get0(quadX, quadY) then
         local spriteMeta = atlases.gameplay[texture]
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
         local quad = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
@@ -107,12 +108,12 @@ function celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
         local newSpritesMeta = table.shallowcopy(spriteMeta)
         newSpritesMeta.quad = quad
 
-        quadCache[quadX + 1, quadY + 1] = newSpritesMeta
+        quadCache:set0(quadX, quadY, newSpritesMeta)
 
         return newSpritesMeta
     end
 
-    return quadCache[quadX + 1, quadY + 1]
+    return quadCache:get0(quadX, quadY)
 end
 
 local function getTilesBatch(tiles, meta, fg)
@@ -138,7 +139,7 @@ local function getTilesBatch(tiles, meta, fg)
 
     for x = 1, width do
         for y = 1, height do
-            local tile = tiles[x, y]
+            local tile = tiles:getInbounds(x, y)
 
             if tile ~= airTile then
                 local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)

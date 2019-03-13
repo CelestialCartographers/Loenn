@@ -1,3 +1,5 @@
+local matrix = require("matrix")
+
 local tilesStruct = {}
 
 function tilesStruct.convertTileString(tiles)
@@ -11,13 +13,13 @@ function tilesStruct.convertTileString(tiles)
         cols = math.max(cols, #line)
     end
 
-    local res = table.filled("0", {cols, rows})
+    local res = matrix.filled("0", cols, rows)
 
     for y, line <- lines do
-        local chars = $(line):split(1)()
+        local chars = line:split(1)
 
         for x, char <- chars do
-            res[x, y] = char
+            res:setInbounds(x, y, char)
         end
     end
 
