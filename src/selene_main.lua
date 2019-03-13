@@ -52,11 +52,12 @@ function love.draw()
 end
 
 function love.update(dt)
+    tasks.processTasks(1 / 144)
+    
     if viewerState.map then
-        tasks.processTasks(math.huge, 1)
+        celesteRender.processTasks(math.huge, 1)
 
     else
-        tasks.processTasks(1 / 144)
         loading:update(dt)
     end
 end

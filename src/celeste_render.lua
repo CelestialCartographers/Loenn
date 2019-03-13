@@ -34,10 +34,39 @@ local triggersDepth = -math.huge
 
 local PRINT_BATCHING_DURATION = true
 
--- Temp
+-- Room cache
 local roomCache = {}
 
-local function getRoomBackgroundColor(room)
+local batchingTasks = {}
+
+function celesteRender.sortBatchingTasks(map, tasks)
+    -- TODO
+    -- Return visible tasks in first array, non visible in other
+
+    return tasks, {}
+end
+
+function celesteRender.processTasks(calcTime, maxTasks)
+    local visible, notVisible = celesteRender.sortBatchingTasks(nil, batchingTasks) -- TODO
+
+    local success, timeSpent, tasksDone = tasks.processTasks(calcTime, maxTasks, visible)
+    tasks.processTasks(calcTime - timeSpent, maxTasks - tasksDone, notVisible)
+end
+
+function celesteRender.clearBatchingTasks()
+    batchingTasks = {}
+end
+
+function celesteRender.invalidateRoomCache(room)
+    if room then
+        roomCache[room] = {}
+
+    else
+        roomCache = {}
+    end
+end
+
+function celesteRender.getRoomBackgroundColor(room)
     local color = room.color or 0
 
     if color >= 0 and color < #colors.roomBackgroundColors then
@@ -48,7 +77,7 @@ local function getRoomBackgroundColor(room)
     end
 end
 
-local function getRoomBorderColor(room)
+function celesteRender.getRoomBorderColor(room)
     local color = room.color or 0
 
     if color >= 0 and color < #colors.roomBorderColors then
@@ -59,7 +88,7 @@ local function getRoomBorderColor(room)
     end
 end
 
-local function getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
+function celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
     if not cache[tile] then
         cache[tile] = {
             [false] = table.filled(false, {6, 15}),
@@ -86,7 +115,7 @@ local function getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
     return quadCache[quadX + 1, quadY + 1]
 end
 
-function celesteRender.getTilesBatch(tiles, meta, fg)
+local function getTilesBatch(tiles, meta, fg)
     local tiles = tiles.matrix
 
     -- Getting upvalues
@@ -119,7 +148,7 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
                     local randQuad = quadCount == 1 and quads[1] or quads[math.random(1, quadCount)]
                     local texture = meta.paths[tile] or empty
 
-                    local spriteMeta = getOrCacheTileSpriteMeta(cache, tile, texture, randQuad, fg)
+                    local spriteMeta = celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, randQuad, fg)
 
                     local drawable = {
                         _type = drawableSpriteType,
@@ -150,8 +179,9 @@ local function getRoomTileBatch(room, tiles, fg)
 
     roomCache[room.name] = roomCache[room.name] or {}
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
-        (-> celesteRender.getTilesBatch(tiles, meta, fg)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000)))
+        (-> getTilesBatch(tiles, meta, fg)),
+        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
+        batchingTasks
     )
 
     return roomCache[room.name][key].result
@@ -220,7 +250,8 @@ local function getRoomDecalsBatch(room, decals, fg)
     roomCache[room.name] = roomCache[room.name] or {}
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
         (-> getDecalsBatch(decals)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000)))
+        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
+        batchingTasks
     )
 
     return roomCache[room.name][key].result
@@ -312,7 +343,8 @@ function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw)
 
     roomCache[room.name].entities = roomCache[room.name].entities or tasks.newTask(
         (-> getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000)))
+        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
+        batchingTasks
     )
 
     return roomCache[room.name].entities.result
@@ -370,7 +402,8 @@ function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
 
     roomCache[room.name].triggers = roomCache[room.name].triggers or tasks.newTask(
         (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", room.name, task.timeTotal * 1000)))
+        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
+        batchingTasks
     )
 
     return roomCache[room.name].triggers.result
@@ -446,8 +479,8 @@ function celesteRender.drawRoom(room, viewport)
     local width = room.width or 40 * 8
     local height = room.height or 23 * 8
 
-    local backgroundColor = getRoomBackgroundColor(room)
-    local borderColor = getRoomBorderColor(room)
+    local backgroundColor = celesteRender.getRoomBackgroundColor(room)
+    local borderColor = celesteRender.getRoomBorderColor(room)
 
     love.graphics.push()
 
@@ -463,6 +496,7 @@ function celesteRender.drawRoom(room, viewport)
 
     love.graphics.setColor(colors.default)
 
+    -- TODO - Cache the render in inactive rooms
     local orderedBatches = celesteRender.getRoomBatches(room, viewport)
 
     if orderedBatches then

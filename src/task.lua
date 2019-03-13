@@ -5,17 +5,20 @@ local tasks = {}
 -- Processes tasks from table for at around calcTime (default until done) and atmost maxTasks (default all)
 -- Returns processingStatus, timeSpent
 function tasks.processTasks(calcTime, maxTasks, customTasks)
-    local timeSpent = 0
-    local calcTime = calcTime or math.huge
-    local tasksAllowed = maxTasks or math.huge
     local tasks = customTasks or globalTasks
 
-    while #tasks > 0 and tasksAllowed > 0 do
+    local timeSpent = 0
+    local tasksDone = 0
+
+    local calcTime = calcTime or math.huge
+    local tasksAllowed = maxTasks or math.huge
+
+    while #tasks > 0 and tasksDone < tasksAllowed do
         local task = tasks[1]
 
         while coroutine.status(task.coroutine) ~= "dead" do
             if timeSpent >= calcTime then
-                return false, timeSpent
+                return false, timeSpent, tasksDone
             end
 
             local start = love.timer.getTime()
@@ -37,10 +40,10 @@ function tasks.processTasks(calcTime, maxTasks, customTasks)
 
         task:callback()
         table.remove(tasks, 1)
-        tasksAllowed -= 1
+        tasksDone += 1
     end
 
-    return #tasks == 0, timeSpent
+    return #tasks == 0, timeSpent, tasksDone
 end
 
 -- TODO - Unwrap lambda properly
