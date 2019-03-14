@@ -135,7 +135,7 @@ local function getTilesBatch(tiles, meta, fg)
     local drawableSpriteType = "drawableSprite"
 
     local width, height = tiles:size
-    local batch = smartDrawingBatch.createBatch()
+    local batch = smartDrawingBatch.createUnorderedBatch()
 
     for x = 1, width do
         for y = 1, height do
@@ -151,16 +151,7 @@ local function getTilesBatch(tiles, meta, fg)
 
                     local spriteMeta = celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, randQuad, fg)
 
-                    local drawable = {
-                        _type = drawableSpriteType,
-
-                        meta = spriteMeta,
-
-                        x = x * 8 - 8,
-                        y = y * 8 - 8,
-                    }
-
-                    batch:add(drawable)
+                    batch:add(spriteMeta, x * 8 - 8, y * 8 - 8)
                 end
             end
         end
@@ -210,7 +201,7 @@ function celesteRender.drawTilesBg(room, tiles)
 end
 
 local function getDecalsBatch(decals)
-    local batch = smartDrawingBatch.createBatch()
+    local batch = smartDrawingBatch.createOrderedBatch()
 
     for i, decal <- decals do
         local texture = decal.texture
@@ -231,10 +222,10 @@ local function getDecalsBatch(decals)
         )
 
         if meta then
-            batch:add(drawable)
+            batch:addFromDrawable(drawable)
         end
 
-        if i % 10 == 0 then
+        if i % 25 == 0 then
             coroutine.yield()
         end
     end
@@ -280,7 +271,7 @@ function celesteRender.drawDecalsBg(room, decals)
 end
 
 local function getOrCreateSmartBatch(batches, key)
-    batches[key] = batches[key] or smartDrawingBatch.createBatch()
+    batches[key] = batches[key] or smartDrawingBatch.createOrderedBatch()
 
     return batches[key]
 end
@@ -303,13 +294,13 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
 
                     if spriteCount == 0 and utils.typeof(sprites) == "drawableSprite" then
                         local batch = getOrCreateSmartBatch(batches, sprites.depth or defaultDepth)
-                        batch:add(sprites)
+                        batch:addFromDrawable(sprites)
 
                     else
                         for i, sprite <- sprites do
                             if utils.typeof(sprite) == "drawableSprite" then
                                 local batch = getOrCreateSmartBatch(batches, sprite.depth or defaultDepth)
-                                batch:add(sprite)
+                                batch:addFromDrawable(sprite)
                             end
                         end
                     end
@@ -318,7 +309,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
 
             if handler.draw then
                 local batch = getOrCreateSmartBatch(batches, defaultDepth)
-                batch:add(drawableFunction.fromFunction(handler.draw, room, entity, viewport))
+                batch:addFromDrawable(drawableFunction.fromFunction(handler.draw, room, entity, viewport))
             end
 
             if i % 10 == 0 then
@@ -350,7 +341,7 @@ end
 
 local function getTriggerBatchTaskFunc(room, triggers, viewport)
     local font = love.graphics.getFont()
-    local batch = smartDrawingBatch.createBatch()
+    local batch = smartDrawingBatch.createOrderedBatch()
 
     for i, trigger <- triggers do
         local func = function()
@@ -381,9 +372,9 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
             love.graphics.setColor(colors.default)
         end
 
-        batch:add(drawableFunction.fromFunction(func))
+        batch:addFromDrawable(drawableFunction.fromFunction(func))
 
-        if i % 10 == 0 then
+        if i % 25 == 0 then
             coroutine.yield()
         end
     end

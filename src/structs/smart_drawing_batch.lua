@@ -2,14 +2,13 @@ local utils = require("utils")
 
 local smartDrawingBatch = {}
 
-local smartDrawingBatchMt = {}
-smartDrawingBatchMt.__index = {}
+local orderedDrawingBatchMt = {}
+orderedDrawingBatchMt.__index = {}
 
 local spriteBatchMode = "static"
 
--- TODO - Make a unordered version that attempts to reduce draw calls as much as possible
 -- TODO - Make tinting smarter? Batch based on color?
-function smartDrawingBatchMt.__index.add(self, drawable)
+function orderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
     local typ = utils.typeof(drawable)
 
     if typ == "drawableSprite" then
@@ -55,7 +54,7 @@ function smartDrawingBatchMt.__index.add(self, drawable)
     self._prevTyp = typ
 end
 
-function smartDrawingBatchMt.__index.draw(self)
+function orderedDrawingBatchMt.__index.draw(self)
     for i, drawable <- self._drawables do
         local typ = utils.typeof(drawable)
 
@@ -68,16 +67,53 @@ function smartDrawingBatchMt.__index.draw(self)
     end
 end
 
-function smartDrawingBatch.createBatch()
+function smartDrawingBatch.createOrderedBatch()
     local res = {
-        _type = "smartDrawingBatch",
+        _type = "orderedDrawingBatch",
     }
 
     res._drawables = {}
     res._lastBatch = nil
     res._lastImage = nil
 
-    return setmetatable(res, smartDrawingBatchMt)
+    return setmetatable(res, orderedDrawingBatchMt)
+end
+
+
+local unorderedDrawingBatchMt = {}
+unorderedDrawingBatchMt.__index = {}
+
+function unorderedDrawingBatchMt.__index.add(self, meta, x, y, r, sx, sy, jx, jy, ox, oy)
+    local image = meta.image
+    
+    local offsetX = offsetX or ((jx or 0.0) * meta.realWidth + meta.offsetX)
+    local offsetY = offsetY or ((jy or 0.0) * meta.realHeight + meta.offsetY)
+
+    self._lookup[image] = self._lookup[image] or love.graphics.newSpriteBatch(image, 1000, spriteBatchMode)
+    self._lookup[image]:add(meta.quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
+end
+
+function unorderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
+    if utils.typeof(drawable) == "drawableSprite" then
+        self:add(drawable.meta, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.jx, drawable.jy, drawable.offsetX, drawable.offsetY)
+    end
+end
+
+function unorderedDrawingBatchMt.__index.draw(self)
+    for image, batch <- self._lookup do
+        love.graphics.draw(batch, 0, 0)
+    end
+end
+
+-- Only works with textures
+function smartDrawingBatch.createUnorderedBatch()
+    local res = {
+        _type = "unorderedDrawingBatch",
+    }
+
+    res._lookup = {}
+
+    return setmetatable(res, unorderedDrawingBatchMt)
 end
 
 
