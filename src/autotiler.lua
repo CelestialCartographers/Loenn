@@ -4,6 +4,7 @@ local matrix = require("matrix")
 
 local autotiler = {}
 
+-- True for same tile, false for air, nil for any tile
 local function convertMaskString(s)
     local res = matrix.filled(0, 3, 3)
 
@@ -12,7 +13,8 @@ local function convertMaskString(s)
 
     for y, row <- rows do
         for x, v <- row:split(1) do
-            res:setInbounds(x, y, tonumber(v))
+            local n = tonumber(v)
+            res:setInbounds(x, y, (n == 2 ? nil : n == 1))
         end
     end
 
@@ -43,14 +45,14 @@ end
 -- Never need to check index 5, it will always be fine
 local function checkMaskFromTiles(mask, a, b, c, d, e, f, g, h, i)
     return not (
-        mask[1] ~= 2 and a ~= (mask[1] == 1) or
-        mask[2] ~= 2 and b ~= (mask[2] == 1) or
-        mask[3] ~= 2 and c ~= (mask[3] == 1) or
-        mask[4] ~= 2 and d ~= (mask[4] == 1) or
-        mask[6] ~= 2 and f ~= (mask[6] == 1) or
-        mask[7] ~= 2 and g ~= (mask[7] == 1) or
-        mask[8] ~= 2 and h ~= (mask[8] == 1) or
-        mask[9] ~= 2 and i ~= (mask[9] == 1)
+        a ~= mask[1] and mask[1] ~= nil or
+        b ~= mask[2] and mask[2] ~= nil or
+        c ~= mask[3] and mask[3] ~= nil or
+        d ~= mask[4] and mask[4] ~= nil or
+        f ~= mask[6] and mask[6] ~= nil or
+        g ~= mask[7] and mask[7] ~= nil or
+        h ~= mask[8] and mask[8] ~= nil or
+        i ~= mask[9] and mask[9] ~= nil
     )
 end
 
