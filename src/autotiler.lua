@@ -40,13 +40,13 @@ local function checkTile(value, target, ignore, air, wildcard)
 end
 
 -- Unrolled
+-- Never need to check index 5, it will always be fine
 local function checkMaskFromTiles(mask, a, b, c, d, e, f, g, h, i)
     return not (
         mask[1] ~= 2 and a ~= (mask[1] == 1) or
         mask[2] ~= 2 and b ~= (mask[2] == 1) or
         mask[3] ~= 2 and c ~= (mask[3] == 1) or
         mask[4] ~= 2 and d ~= (mask[4] == 1) or
-        mask[5] ~= 2 and e ~= (mask[5] == 1) or
         mask[6] ~= 2 and f ~= (mask[6] == 1) or
         mask[7] ~= 2 and g ~= (mask[7] == 1) or
         mask[8] ~= 2 and h ~= (mask[8] == 1) or
@@ -101,7 +101,7 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
         local checkTile = checkTile
 
         local a, b, c = checkTile(tile, tiles:get(x - 1, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y - 1, tile), ignore, air, wildcard)
-        local d, e, f = checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard), checkTile(tile, tile, ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard)
+        local d, f = checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard)
         local g, h, i = checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard)
 
         for i, maskData <- masks do
