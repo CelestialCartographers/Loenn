@@ -67,26 +67,32 @@ function celesteRender.invalidateRoomCache(room)
     end
 end
 
-function celesteRender.getRoomBackgroundColor(room)
-    local color = room.color or 0
+function celesteRender.getRoomBackgroundColor(room, selected)
+    local roomColor = room.color or 0
+    local color = colors.roomBackgroundDefault
 
-    if color >= 0 and color < #colors.roomBackgroundColors then
-        return colors.roomBackgroundColors[color + 1]
-
-    else
-        return colors.roomBackgroundDefault
+    if roomColor >= 0 and roomColor < #colors.roomBackgroundColors then
+        color = colors.roomBackgroundColors[roomColor + 1]
     end
+
+    local r, g, b = unpack(color)
+    local a = selected and 1.0 or 0.3
+
+    return {r, g, b, a}
 end
 
-function celesteRender.getRoomBorderColor(room)
-    local color = room.color or 0
+function celesteRender.getRoomBorderColor(room, selected)
+    local roomColor = room.color or 0
+    local color = colors.roomBorderDefault
 
-    if color >= 0 and color < #colors.roomBorderColors then
-        return colors.roomBorderColors[color + 1]
-
-    else
-        return colors.roomBorderDefault
+    if roomColor >= 0 and roomColor < #colors.roomBorderColors then
+        color = colors.roomBorderColors[roomColor + 1]
     end
+
+    local r, g, b = unpack(color)
+    local a = selected and 1.0 or 0.3
+
+    return {r, g, b, a}
 end
 
 function celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
@@ -461,15 +467,15 @@ function celesteRender.getRoomBatches(room, viewport)
     return roomCache[room.name].complete
 end
 
-function celesteRender.drawRoom(room, viewport)
+function celesteRender.drawRoom(room, viewport, selected)
     local roomX = room.x or 0
     local roomY = room.y or 0
 
     local width = room.width or 40 * 8
     local height = room.height or 23 * 8
 
-    local backgroundColor = celesteRender.getRoomBackgroundColor(room)
-    local borderColor = celesteRender.getRoomBorderColor(room)
+    local backgroundColor = celesteRender.getRoomBackgroundColor(room, selected)
+    local borderColor = celesteRender.getRoomBorderColor(room, selected)
 
     love.graphics.push()
 
@@ -532,7 +538,7 @@ function celesteRender.drawMap(state)
 
             for i, room <- map.rooms do
                 if viewportHandler.roomVisible(room, viewport) then
-                    celesteRender.drawRoom(room, viewport)
+                    celesteRender.drawRoom(room, viewport, room == state.selectedRoom)
                 end
             end
         end

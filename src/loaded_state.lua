@@ -27,8 +27,8 @@ function state.selectRoom(room)
     state.selectedRoom = room
 end
 
-function state.getSelectedRoomName()
-    return state.selectedRoom.name
+function state.getSelectedRoom()
+    return state.selectedRoom
 end
 
 -- The currently loaded map
