@@ -7,7 +7,7 @@ function spinner.depth(room, entity)
 end
 
 function spinner.sprite(room, entity)
-    local color = entity.color or "blue"
+    local color = entity.color or "Blue"
     local dusty = entity.dusty
 
     if dusty then

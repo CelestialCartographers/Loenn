@@ -34,6 +34,7 @@ local decalsBgDepth = 9000
 local triggersDepth = -math.huge
 
 local PRINT_BATCHING_DURATION = true
+local ALWAYS_REDRAW_UNSELECTED_ROOMS = false
 
 -- Room cache
 local roomCache = {}
@@ -58,9 +59,14 @@ function celesteRender.clearBatchingTasks()
     batchingTasks = {}
 end
 
-function celesteRender.invalidateRoomCache(room)
+function celesteRender.invalidateRoomCache(room, key)
     if room then
-        roomCache[room] = {}
+        if key and roomCache[room] then
+            roomCache[room][key] = nil
+
+        else
+            roomCache[room] = {}
+        end
 
     else
         roomCache = {}
@@ -89,10 +95,7 @@ function celesteRender.getRoomBorderColor(room, selected)
         color = colors.roomBorderColors[roomColor + 1]
     end
 
-    local r, g, b = unpack(color)
-    local a = selected and 1.0 or 0.3
-
-    return {r, g, b, a}
+    return color
 end
 
 function celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
@@ -219,15 +222,16 @@ local function getDecalsBatch(decals)
         local scaleX = decal.scaleX or 1
         local scaleY = decal.scaleY or 1
 
-        local drawable = drawableSprite.spriteFromTexture(texture)
-        drawable:setScale(scaleX, scaleY)
-        drawable:setOffset(0, 0) -- No automagicall calculations
-        drawable:setPosition(
-            x - meta.offsetX * scaleX - math.floor(meta.realWidth / 2) * scaleX,
-            y - meta.offsetY * scaleY - math.floor(meta.realHeight / 2) * scaleY
-        )
-
         if meta then
+            local drawable = drawableSprite.spriteFromTexture(texture)
+
+            drawable:setScale(scaleX, scaleY)
+            drawable:setOffset(0, 0) -- No automagicall calculations
+            drawable:setPosition(
+                x - meta.offsetX * scaleX - math.floor(meta.realWidth / 2) * scaleX,
+                y - meta.offsetY * scaleY - math.floor(meta.realHeight / 2) * scaleY
+            )
+
             batch:addFromDrawable(drawable)
         end
 
@@ -467,6 +471,38 @@ function celesteRender.getRoomBatches(room, viewport)
     return roomCache[room.name].complete
 end
 
+function drawRoomFromBatches(room, viewport, selected)
+    local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+
+    if orderedBatches then
+        for depth, batch <- orderedBatches do
+            batch:draw()
+        end
+    end
+end
+
+function getRoomCanvas(room, viewport, selected)
+    roomCache[room.name] = roomCache[room.name] or {}
+
+    if not roomCache[room.name].canvas then
+        local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+
+        if orderedBatches then
+            local canvas = love.graphics.newCanvas(room.width or 0, room.height or 0)
+        
+            canvas:renderTo(function()
+                for depth, batch <- orderedBatches do
+                    batch:draw()
+                end
+            end)
+
+            roomCache[room.name].canvas = canvas
+        end
+    end
+
+    return roomCache[room.name].canvas
+end
+
 function celesteRender.drawRoom(room, viewport, selected)
     local roomX = room.x or 0
     local roomY = room.y or 0
@@ -476,6 +512,9 @@ function celesteRender.drawRoom(room, viewport, selected)
 
     local backgroundColor = celesteRender.getRoomBackgroundColor(room, selected)
     local borderColor = celesteRender.getRoomBorderColor(room, selected)
+
+    local redrawRoom = selected or ALWAYS_REDRAW_UNSELECTED_ROOMS
+    local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
     love.graphics.push()
 
@@ -491,12 +530,16 @@ function celesteRender.drawRoom(room, viewport, selected)
 
     love.graphics.setColor(colors.default)
 
-    -- TODO - Cache the render in inactive rooms
-    local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+    if redrawRoom then
+        -- Invalidate the canvas, so it is updated properly when the selected room changes
+        -- TODO - Move into code responsible for changing selected room?
 
-    if orderedBatches then
-        for depth, batch <- orderedBatches do
-            batch:draw()
+        celesteRender.invalidateRoomCache(room, "canvas")
+        drawRoomFromBatches(room, viewport, selected)
+
+    else
+        if canvas then
+            love.graphics.draw(canvas)
         end
     end
 

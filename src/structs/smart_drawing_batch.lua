@@ -17,7 +17,7 @@ function orderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
         local offsetX = drawable.offsetX or ((drawable.jx or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX)
         local offsetY = drawable.offsetY or ((drawable.jy or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY)
 
-        if drawable.color then
+        if drawable.color and type(drawable.color) == "table" then
             -- Special case
             local newDrawable = {_type = "drawableFunction"}
 
