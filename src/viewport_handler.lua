@@ -35,6 +35,21 @@ function viewportHandler.roomVisible(room, viewport)
     return utils.aabbCheck(cameraRect, roomRect)
 end
 
+function viewportHandler.fillerVisible(filler, viewport)
+    local actuallX = viewport.x / viewport.scale
+    local actuallY = viewport.y / viewport.scale
+
+    local actuallWidth = viewport.width / viewport.scale
+    local actuallHeight = viewport.height / viewport.scale
+
+    local cameraRect = {x = actuallX, y = actuallY, width = actuallWidth, height = actuallHeight}
+    local fillerRect = {x = filler.x * 8, y = filler.y * 8, width = filler.width * 8, height = filler.height * 8}
+
+    --print(utils.serialize(filler))
+
+    return utils.aabbCheck(cameraRect, fillerRect)
+end
+
 function viewportHandler.getMousePosition()
     if love.mouse.isCursorSupported() then
         return love.mouse.getX(), love.mouse.getY()

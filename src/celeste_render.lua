@@ -524,16 +524,16 @@ function celesteRender.drawMap(state)
         local viewport = state.viewport
 
         if viewport.visible then
+            for i, filler <- map.fillers do
+                if viewportHandler.fillerVisible(filler, viewport) then
+                    celesteRender.drawFiller(filler, viewport)
+                end
+            end
+
             for i, room <- map.rooms do
                 if viewportHandler.roomVisible(room, viewport) then
                     celesteRender.drawRoom(room, viewport)
                 end
-            end
-
-            for i, filler <- map.fillers do
-                -- TODO - Don't draw out of view fillers
-                -- ... Even though checking if they are out of view is probably more expensive than drawing it
-                celesteRender.drawFiller(filler, viewport)
             end
         end
     end
