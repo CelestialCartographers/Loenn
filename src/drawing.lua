@@ -31,7 +31,7 @@ function drawing.getRelativeQuad(spriteMeta, x, y, width, height)
     local image = spriteMeta.image
     local qx, qy, qw, qh = image.quad:getViewport
 
-    return love.graphics.newQuad(qx + x, qy + y, width, height, image.quad.image:getDimensions)
+    return love.graphics.newQuad(qx + x, qy + y, width, height, image:getDimensions)
 end
 
 return drawing

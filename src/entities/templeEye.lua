@@ -17,7 +17,7 @@ function templeEye.depth(room, entity, viewport)
     return isBackground(room, entity) and 8990 or -10001
 end
 
-function templeEye.sprite(room, entity, viewport)
+function templeEye.draw(room, entity, viewport)
     local roomX, roomY = viewportHandler.getRoomCoordindates(room)
     local angle = math.atan2(roomY - entity.y, roomX - entity.x)
 
@@ -28,11 +28,13 @@ function templeEye.sprite(room, entity, viewport)
 
     local layer = isBackground(room, entity) and "bg" or "fg"
 
-    return {
-        drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_eye", entity),
-        drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_lid00", entity),
-        drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_pupil", pupilData)
-    }
+    local sprite1 = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_eye", entity)
+    local sprite2 = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_lid00", entity)
+    local sprite3 = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_pupil", pupilData)
+
+    sprite1:draw()
+    sprite2:draw()
+    sprite3:draw()
 end
 
 return templeEye

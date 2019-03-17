@@ -22,11 +22,7 @@ function orderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
             local newDrawable = {_type = "drawableFunction"}
 
             function newDrawable.func(drawable)
-                local prevColor = {love.graphics.getColor()}
-
-                love.graphics.setColor(drawable.color)
-                love.graphics.draw(drawable.meta.image, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
-                love.graphics.setColor(prevColor)
+                drawable:draw()
             end
 
             newDrawable.depth = drawable.depth

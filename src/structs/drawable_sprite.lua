@@ -40,6 +40,22 @@ function drawableSpriteMt.__index.setOffset(self, offsetX, offsetY)
     return self
 end
 
+function drawableSpriteMt.__index.draw(self)
+    local offsetX = self.offsetX or ((self.jx or 0.0) * self.meta.realWidth + self.meta.offsetX)
+    local offsetY = self.offsetY or ((self.jy or 0.0) * self.meta.realHeight + self.meta.offsetY)
+
+    if self.color and type(self.color) == "table" then
+        local prevColor = {love.graphics.getColor()}
+
+        love.graphics.setColor(self.color)
+        love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+        love.graphics.setColor(prevColor)
+
+    else
+        love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+    end
+end
+
 function drawableSpriteStruct.spriteFromTexture(texture, data)
     local data = data or {}
     local atlas = data.atlas or "gameplay"
