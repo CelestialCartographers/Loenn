@@ -4,7 +4,7 @@ local function getTexture(entity)
     return entity.twoDash and "objects/refillTwo/idle00" or "objects/refill/idle00"
 end
 
-refill = {}
+local refill = {}
 
 refill.depth = -100
 
