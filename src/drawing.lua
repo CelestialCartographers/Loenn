@@ -29,7 +29,7 @@ end
 
 function drawing.getRelativeQuad(spriteMeta, x, y, width, height)
     local image = spriteMeta.image
-    local qx, qy, qw, qh = image.quad:getViewport
+    local qx, qy, qw, qh = spriteMeta.quad:getViewport
 
     return love.graphics.newQuad(qx + x, qy + y, width, height, image:getDimensions)
 end

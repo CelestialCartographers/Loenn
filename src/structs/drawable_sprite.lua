@@ -80,7 +80,7 @@ function drawableSpriteStruct.spriteFromTexture(texture, data)
     drawableSprite.color = data.color
 
     drawableSprite.meta = spriteMeta
-    drawableSprite.quad = spriteMeta.quad
+    drawableSprite.quad = spriteMeta and spriteMeta.quad or nil
 
     return setmetatable(drawableSprite, drawableSpriteMt)
 end
