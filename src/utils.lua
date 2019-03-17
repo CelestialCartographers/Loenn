@@ -120,4 +120,32 @@ function utils.group(t, by)
     return res
 end
 
+-- Return the 1 index based tile indices for the coordinates
+function utils.pixelsToTiles(x, y)
+    return math.floor(x / 8) + 1, math.floor(y / 8) + 1
+end
+
+function utils.getRoomAtCoords(x, y, map)
+    for i, room <- map.rooms do
+        if x >= room.x and x <= room.x + room.width and y >= room.y and y <= room.y + room.height then
+            return room
+        end
+    end
+
+    return false
+end
+
+-- Clear the cache of a required library
+function utils.unrequire(lib)
+    package.loaded[lib] = nil
+end
+
+-- Clear the cache and return a new uncached version of the library
+-- Highly unrecommended to use this for anything
+function utils.rerequire(lib)
+    utils.unrequre(lib)
+
+    return require(lib)
+end
+
 return utils

@@ -20,9 +20,12 @@ local viewportHandler = require("viewport_handler")
 
 local inputDevice = require("input_device")
 local mapLoaderDevice = require("input_devices/map_loader")
+local toolHandlerDevice = require("input_devices/tool_handler")
 
 inputDevice.newInputDevice(viewportHandler.device)
+
 inputDevice.newInputDevice(mapLoaderDevice)
+inputDevice.newInputDevice(toolHandlerDevice)
 
 love.graphics.setFont(fonts.font)
 
@@ -43,6 +46,7 @@ function love.draw()
         celesteRender.drawMap(viewerState)
 
         love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
+        love.graphics.printf("Room: " .. viewerState.selectedRoom.name, 20, 80, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
 
     else
         loading:drawLoadScreen(viewport)

@@ -3,6 +3,7 @@ local utils = require("utils")
 
 local viewportHandler = {}
 
+-- TODO - Put in config/constants files
 local movementButton = 2
 
 local viewport = {
@@ -45,8 +46,6 @@ function viewportHandler.fillerVisible(filler, viewport)
     local cameraRect = {x = actuallX, y = actuallY, width = actuallWidth, height = actuallHeight}
     local fillerRect = {x = filler.x * 8, y = filler.y * 8, width = filler.width * 8, height = filler.height * 8}
 
-    --print(utils.serialize(filler))
-
     return utils.aabbCheck(cameraRect, fillerRect)
 end
 
@@ -59,14 +58,15 @@ function viewportHandler.getMousePosition()
     end
 end
 
-function viewportHandler.getMapCoordinates()
+function viewportHandler.getMapCoordinates(x, y)
     local mouseX, mouseY = viewportHandler.getMousePosition()
+    local x, y = x or mouseX, y or mouseY
 
-    return math.floor((mouseX + viewport.x) / viewport.scale), math.floor((mouseY + viewport.y) / viewport.scale)
+    return math.floor((x + viewport.x) / viewport.scale), math.floor((y + viewport.y) / viewport.scale)
 end
 
-function viewportHandler.getRoomCoorindates(room)
-    local mapX, mapY = viewportHandler.getMapCoordinates()
+function viewportHandler.getRoomCoordindates(room, x, y)
+    local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
 
     return mapX - room.x, mapY - room.y
 end
@@ -116,12 +116,16 @@ function viewportDevice.keypressed(key, scancode, isrepeat)
     elseif key == "d" or key == "right" then
         viewport.x += 8
     end
+    
+    return true
 end
 
 function viewportDevice.mousedragmoved(dx, dy, button, istouch)
     if button == movementButton then
         viewport.x -= dx
         viewport.y -= dy
+
+        return true
     end
 end
 
@@ -129,6 +133,8 @@ function viewportDevice.mousemoved(x, y, dx, dy, istouch)
     if istouch then
         viewport.x -= dx
         viewport.y -= dy
+
+        return true
     end
 end
 
@@ -141,8 +147,12 @@ function viewportDevice.wheelmoved(dx, dy)
     if dy > 0 then
         viewportHandler.zoomIn()
 
+        return true
+
     elseif dy < 0 then
         viewportHandler.zoomOut()
+        
+        return true
     end
 end
 

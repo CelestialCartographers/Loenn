@@ -18,7 +18,7 @@ function templeEye.depth(room, entity, viewport)
 end
 
 function templeEye.sprite(room, entity, viewport)
-    local roomX, roomY = viewportHandler.getRoomCoorindates(room)
+    local roomX, roomY = viewportHandler.getRoomCoordindates(room)
     local angle = math.atan2(roomY - entity.y, roomX - entity.x)
 
     local pupilData = {

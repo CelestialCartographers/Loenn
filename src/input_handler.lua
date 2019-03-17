@@ -42,15 +42,22 @@ function love.mousemoved(x, y, dx, dy, istouch)
     inputDevice.sendEvent("mousemoved", x, y, dx, dy, istouch)
 end
 
+-- Don't send the event here, make sure it is not a drag first
 function love.mousepressed(x, y, button, istouch, presses)
-    inputDevice.sendEvent("mousepressed", x, y, button, istouch, presses)
-
     mouseButtonsPressed[button] = {x, y, x, y}
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     inputDevice.sendEvent("mousereleased", x, y, button, istouch, presses)
-    inputDevice.sendEvent("mousedrag", getMouseDrag(x, y, button))
+
+    local startX, startY, button, dx, dy, consideredDrag = getMouseDrag(x, y, button)
+
+    if consideredDrag then
+        inputDevice.sendEvent("mousedrag", startX, startY, button, dx, dy)
+
+    else
+        inputDevice.sendEvent("mousepressed", startX, startY, button, istouch, presses)
+    end
 
     mouseButtonsPressed[button] = nil
 end
