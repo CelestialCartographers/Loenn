@@ -42,7 +42,7 @@ function jumpthru.sprite(room, entity)
 
     local sprites = {}
 
-    for i = 0, stopX - startX do
+    for i = 0, len do
         local connected = 1
         local qx = 2
 

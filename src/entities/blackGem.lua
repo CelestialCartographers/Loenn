@@ -2,10 +2,9 @@ local drawableSpriteStruct = require("structs/drawable_sprite")
 
 local heart = {}
 
--- TODO find depth
-heart.depth = -100
+heart.depth = -2000000
 
-local texture = "collectables/heartGem/0/00.png"
+local texture = "collectables/heartGem/0/00"
 
 function heart.sprite(room, entity)
     return drawableSpriteStruct.spriteFromTexture(texture, entity)
