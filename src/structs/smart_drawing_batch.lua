@@ -25,7 +25,7 @@ function orderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
                 local prevColor = {love.graphics.getColor()}
 
                 love.graphics.setColor(drawable.color)
-                love.graphics.draw(drawable.meta.image, drawable.meta.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
+                love.graphics.draw(drawable.meta.image, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
                 love.graphics.setColor(prevColor)
             end
 
@@ -42,7 +42,7 @@ function orderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
             end
 
             self._prevImage = image
-            self._lastBatch:add(drawable.meta.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
+            self._lastBatch:add(drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
         end
     end
 
@@ -83,19 +83,19 @@ end
 local unorderedDrawingBatchMt = {}
 unorderedDrawingBatchMt.__index = {}
 
-function unorderedDrawingBatchMt.__index.add(self, meta, x, y, r, sx, sy, jx, jy, ox, oy)
+function unorderedDrawingBatchMt.__index.add(self, meta, quad, x, y, r, sx, sy, jx, jy, ox, oy)
     local image = meta.image
     
     local offsetX = offsetX or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = offsetY or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
     self._lookup[image] = self._lookup[image] or love.graphics.newSpriteBatch(image, 1000, spriteBatchMode)
-    self._lookup[image]:add(meta.quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
+    self._lookup[image]:add(quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
 end
 
 function unorderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
     if utils.typeof(drawable) == "drawableSprite" then
-        self:add(drawable.meta, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.jx, drawable.jy, drawable.offsetX, drawable.offsetY)
+        self:add(drawable.meta, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.jx, drawable.jy, drawable.offsetX, drawable.offsetY)
     end
 end
 

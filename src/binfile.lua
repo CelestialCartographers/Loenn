@@ -14,7 +14,7 @@ function binfile.readShort(fh)
     return binfile.readByte(fh) + binfile.readByte(fh) * 256
 end
 
-function binfile.readShort(fh, n)
+function binfile.writeShort(fh, n)
     binfile.writeByte(fh, n % 256)
     binfile.writeByte(fh, math.floor(n / 256) % 256)
 end

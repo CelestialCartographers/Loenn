@@ -98,7 +98,7 @@ function celesteRender.getRoomBorderColor(room, selected)
     return color
 end
 
-function celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
+function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     if not cache[tile] then
         cache[tile] = {
             [false] = matrix.filled(false, 6, 15),
@@ -114,12 +114,9 @@ function celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, quad, fg)
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
         local quad = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
-        local newSpritesMeta = table.shallowcopy(spriteMeta)
-        newSpritesMeta.quad = quad
+        quadCache:set0(quadX, quadY, quad)
 
-        quadCache:set0(quadX, quadY, newSpritesMeta)
-
-        return newSpritesMeta
+        return quad
     end
 
     return quadCache:get0(quadX, quadY)
@@ -158,9 +155,10 @@ local function getTilesBatch(tiles, meta, fg)
                     local randQuad = quadCount == 1 and quads[1] or quads[math.random(1, quadCount)]
                     local texture = meta.paths[tile] or empty
 
-                    local spriteMeta = celesteRender.getOrCacheTileSpriteMeta(cache, tile, texture, randQuad, fg)
+                    local spriteMeta = atlases.gameplay[texture]
+                    local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
 
-                    batch:add(spriteMeta, x * 8 - 8, y * 8 - 8)
+                    batch:add(spriteMeta, quad, x * 8 - 8, y * 8 - 8)
                 end
             end
         end
