@@ -11,7 +11,7 @@ local keywords = {
 
 local variablePattern = "^[%a_][%w_]*$"
 
-function countKeys(t)
+function serialize.countKeys(t)
     local numerical = 0
     local total = 0
 
@@ -26,7 +26,7 @@ function countKeys(t)
     return total, numerical
 end
 
-function numericalLength(t)
+function serialize.numericalLength(t)
     local index = 0
 
     while t[index + 1] do
@@ -44,8 +44,8 @@ function serialize.serialize(t, pretty, seen, depth, success)
     local pretty = not not pretty
     local success = success == nil or success
 
-    local keyCount, numIndices = countKeys(t)
-    local length = numericalLength(t)
+    local keyCount, numIndices = serialize.countKeys(t)
+    local length = serialize.numericalLength(t)
 
     local count = 0
 
@@ -103,7 +103,7 @@ function serialize.serialize(t, pretty, seen, depth, success)
             end
 
         elseif vtyp == "string" then
-            value = string.format("%q", value)
+            value = string.format("%q", value):gsub("\\\n","\\n")
 
         else
             value = tostring(value)

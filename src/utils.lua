@@ -120,6 +120,8 @@ function utils.group(t, by)
     return res
 end
 
+utils.countKeys = serialize.countKeys
+
 -- Return the 1 index based tile indices for the coordinates
 function utils.pixelsToTiles(x, y)
     return math.floor(x / 8) + 1, math.floor(y / 8) + 1

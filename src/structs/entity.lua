@@ -38,7 +38,7 @@ function entityStruct.decode(data)
         end
     end
 
-    if data.__children and data.__children:len > 0 then
+    if data.__children and #data.__children > 0 then
         entity.nodes = entityStruct.getNodes(data)
     end
 

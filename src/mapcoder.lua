@@ -49,10 +49,10 @@ local function decodeElement(fh, lookup)
     local elementCount = binfile.readShort(fh)
 
     if elementCount > 0 then
-        element.__children = $()
+        element.__children = {}
 
         for i = 1, elementCount do
-            element.__children += decodeElement(fh, lookup)
+            table.insert(element.__children, decodeElement(fh, lookup))
         end
     end
 
@@ -81,16 +81,170 @@ function mapcoder.decodeFile(path, header)
         lookup += binfile.readString(fh)
     end
 
+    res = decodeElement(fh, lookup)
     res._package = package
-    res.__children = {decodeElement(fh, lookup)}
 
     fh:close()
 
     coroutine.yield(res)
 end
 
-function mapcoder.encodeFile(path, data)
+function countStrings(data, seen)
+    local seen = seen or {}
+    local name = data.__name or ""
+    local children = data.__children or {}
 
+    seen[name] = (seen[name] or 0) + 1
+
+    for k, v <- data do
+        if type(k) == "string" and not k:match("^_") then
+            seen[k] = (seen[k] or 0) + 1
+        end
+
+        if type(v) == "string" and k ~= "innerText" then
+            seen[v] = (seen[v] or 0) + 1
+        end
+    end
+
+    for i, child <- children do
+        countStrings(child, seen)
+    end
+
+    return seen
+end
+
+local integerBits = {
+    {1, 0, 255, binfile.writeByte},
+    {2, -32768, 32767, binfile.writeSignedShort},
+    {3, -2147483648, 2147483647, binfile.writeSignedLong},
+}
+
+function encodeNumber(fh, n, lookup)
+    local float = n ~= math.floor(n)
+
+    if float then
+        binfile.writeByte(fh, 4)
+        binfile.writeFloat(fh, n)
+
+    else
+        for i, d <- integerBits do
+            local header, min, max, func = d[1], d[2], d[3], d[4]
+
+            if n >= min and n <= max then
+                binfile.writeByte(fh, header)
+                func(fh, n)
+
+                return
+            end
+        end
+    end
+end
+
+function encodeBoolean(fh, b, lookup)
+    binfile.writeByte(fh, 0)
+    binfile.writeBool(fh, b)
+end
+
+function findInLookup(lookup, s)
+    return lookup:index(look -> look == s)
+end
+
+function encodeString(fh, s, lookup)
+    local index = findInLookup(lookup, s)
+
+    if index then
+        binfile.writeByte(fh, 5)
+        binfile.writeSignedShort(fh, index - 1)
+
+    else
+        local encodedString = binfile.encodeRunLengthEncoded(s)
+        local encodedLength = #encodedString
+
+        if encodedLength < #s and encodedLength < 2^15 then
+            binfile.writeByte(fh, 7)
+            binfile.writeSignedShort(fh, encodedLength)
+            binfile.writeByteArray(fh, encodedString)
+
+        else
+            binfile.writeByte(fh, 6)
+            binfile.writeString(fh, s)
+        end
+    end
+end
+
+function encodeTable(fh, data, lookup)
+    local index = findInLookup(lookup, data.__name)
+
+    local attributes = {}
+    local attributeCount = 0
+
+    local children = data.__children or {}
+
+    for attr, value <- data do
+        if not attr:match("^_") then
+            attributes[attr] = value
+            attributeCount += 1
+        end
+    end
+
+    binfile.writeShort(fh, index - 1)
+    binfile.writeByte(fh, attributeCount)
+
+    for attr, value <- attributes do
+        local attrIndex = findInLookup(lookup, attr)
+
+        binfile.writeShort(fh, attrIndex - 1)
+        encodeValue(fh, value, lookup)
+    end
+
+    binfile.writeShort(fh, #children)
+
+    for i, child <- children do
+        encodeValue(fh, child, lookup)
+    end
+end
+
+local encodingFunctions = {
+    number = encodeNumber,
+    boolean = encodeBoolean,
+    string = encodeString,
+    table = encodeTable
+}
+
+function encodeValue(fh, value, lookup)
+    coroutine.yield()
+
+    encodingFunctions[type(value)](fh, value, lookup)
+end
+
+function mapcoder.encodeFile(path, data, header)
+    local header = header or "CELESTE MAP"
+    local fh = utils.getFileHandle(path, "wb")
+
+    local stringsSeen = countStrings(data)
+    local lookupStrings = $()
+
+    for s, c <- stringsSeen do
+        lookupStrings += {s, c}
+    end
+
+    lookupStrings := sortby(v -> v[2])
+    lookupStrings := reverse
+    lookupStrings := map(v -> v[1])
+
+    binfile.writeString(fh, header)
+    binfile.writeString(fh, data._package or "")
+    binfile.writeSignedShort(fh, lookupStrings:len)
+
+    for i, lookup <- lookupStrings do
+        binfile.writeString(fh, lookup)
+    end
+
+    encodeValue(fh, data, lookupStrings)
+
+    fh:close()
+
+    coroutine.yield()
 end
 
 return mapcoder

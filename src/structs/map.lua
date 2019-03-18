@@ -15,7 +15,7 @@ function mapStruct.decode(data)
     map.rooms = $()
     map.fillers = $()
 
-    for i, d <- data.__children[1].__children do
+    for i, d <- data.__children do
         if d.__name == "levels" then
             for j, room <- d.__children or {} do
                 map.rooms += roomStruct.decode(room)
