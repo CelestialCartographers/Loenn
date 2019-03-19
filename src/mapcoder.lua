@@ -15,6 +15,17 @@ decodeFunctions = {
     binfile.readFloat
 }
 
+local typeHeaders = {
+    bool = 0,
+    byte = 1,
+    signedShort = 2,
+    signedLong = 3,
+    float32 = 4,
+    stringLookup = 5,
+    string = 6,
+    runLengthEncoded = 7
+}
+
 local function decodeValue(fh, lookup, typ)
     if typ >= 0 and typ <= 4 then
         return decodeFunctions[typ + 1](fh)
@@ -97,7 +108,7 @@ function countStrings(data, seen)
     seen[name] = (seen[name] or 0) + 1
 
     for k, v <- data do
-        if type(k) == "string" and not k:match("^_") then
+        if type(k) == "string" and k ~= "__name" and k ~= "__children" then
             seen[k] = (seen[k] or 0) + 1
         end
 
@@ -114,16 +125,16 @@ function countStrings(data, seen)
 end
 
 local integerBits = {
-    {1, 0, 255, binfile.writeByte},
-    {2, -32768, 32767, binfile.writeSignedShort},
-    {3, -2147483648, 2147483647, binfile.writeSignedLong},
+    {typeHeaders.byte, 0, 255, binfile.writeByte},
+    {typeHeaders.signedShort, -32768, 32767, binfile.writeSignedShort},
+    {typeHeaders.signedLong, -2147483648, 2147483647, binfile.writeSignedLong},
 }
 
 function encodeNumber(fh, n, lookup)
     local float = n ~= math.floor(n)
 
     if float then
-        binfile.writeByte(fh, 4)
+        binfile.writeByte(fh, typeHeaders.float32)
         binfile.writeFloat(fh, n)
 
     else
@@ -141,7 +152,7 @@ function encodeNumber(fh, n, lookup)
 end
 
 function encodeBoolean(fh, b, lookup)
-    binfile.writeByte(fh, 0)
+    binfile.writeByte(fh, typeHeaders.bool)
     binfile.writeBool(fh, b)
 end
 
@@ -150,26 +161,8 @@ function findInLookup(lookup, s)
 end
 
 function encodeString(fh, s, lookup)
-    local index = findInLookup(lookup, s)
-
-    if index then
-        binfile.writeByte(fh, 5)
-        binfile.writeSignedShort(fh, index - 1)
-
-    else
-        local encodedString = binfile.encodeRunLengthEncoded(s)
-        local encodedLength = #encodedString
-
-        if encodedLength < #s and encodedLength < 2^15 then
-            binfile.writeByte(fh, 7)
-            binfile.writeSignedShort(fh, encodedLength)
-            binfile.writeByteArray(fh, encodedString)
-
-        else
-            binfile.writeByte(fh, 6)
-            binfile.writeString(fh, s)
-        end
-    end
+    binfile.writeByte(fh, typeHeaders.string)
+    binfile.writeString(fh, s)
 end
 
 function encodeTable(fh, data, lookup)
@@ -181,7 +174,7 @@ function encodeTable(fh, data, lookup)
     local children = data.__children or {}
 
     for attr, value <- data do
-        if not attr:match("^_") then
+        if attr ~= "__children" and attr ~= "__name" then
             attributes[attr] = value
             attributeCount += 1
         end
@@ -200,7 +193,7 @@ function encodeTable(fh, data, lookup)
     binfile.writeShort(fh, #children)
 
     for i, child <- children do
-        encodeValue(fh, child, lookup)
+        encodeTable(fh, child, lookup)
     end
 end
 
@@ -234,13 +227,13 @@ function mapcoder.encodeFile(path, data, header)
 
     binfile.writeString(fh, header)
     binfile.writeString(fh, data._package or "")
-    binfile.writeSignedShort(fh, lookupStrings:len)
+    binfile.writeShort(fh, lookupStrings:len)
 
     for i, lookup <- lookupStrings do
         binfile.writeString(fh, lookup)
     end
 
-    encodeValue(fh, data, lookupStrings)
+    encodeTable(fh, data, lookupStrings)
 
     fh:close()
 

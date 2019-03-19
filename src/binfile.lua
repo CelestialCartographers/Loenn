@@ -141,8 +141,6 @@ function binfile.readString(fh)
 end
 
 function binfile.writeString(fh, value)
-    print(value, #value)
-
     binfile.writeVariableLength(fh, #value)
     fh:write(value)
 end
@@ -161,7 +159,7 @@ function binfile.readRunLengthEncoded(fh)
     return res
 end
 
-function binfile.encodeRunLengthEncoded(value)
+function binfile.encodeRunLength(value)
     local res = $()
     local value = $(value)
 
@@ -169,15 +167,17 @@ function binfile.encodeRunLengthEncoded(value)
     local current = value[1]
 
     for index, char <- value do
-        if char ~= current or count == 255 then
-            res += count
-            res += string.byte(current)
+        if index > 1 then
+            if char ~= current or count == 255 then
+                res += count
+                res += string.byte(current)
 
-            count = 1
-            current = char
+                count = 1
+                current = char
 
-        else
-            count += 1
+            else
+                count += 1
+            end
         end
     end
 
@@ -188,7 +188,7 @@ function binfile.encodeRunLengthEncoded(value)
 end
 
 function binfile.writeRunLengthEncoded(fh, value)
-    local payload = binfile.encodeRunLengthEncoded(value)
+    local payload = binfile.encodeRunLength(value)
 end
 
 function binfile.writeByteArray(fh, t)
