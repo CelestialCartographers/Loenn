@@ -98,6 +98,8 @@ function mapcoder.decodeFile(path, header)
     fh:close()
 
     coroutine.yield(res)
+
+    return res
 end
 
 function countStrings(data, seen)
@@ -161,8 +163,26 @@ function findInLookup(lookup, s)
 end
 
 function encodeString(fh, s, lookup)
-    binfile.writeByte(fh, typeHeaders.string)
-    binfile.writeString(fh, s)
+    local index = findInLookup(lookup, s)
+
+    if index then
+        binfile.writeByte(fh, 5)
+        binfile.writeSignedShort(fh, index - 1)
+
+    else
+        local encodedString = binfile.encodeRunLength(s)
+        local encodedLength = #encodedString
+
+        if encodedLength < #s and encodedLength < 2^15 then
+            binfile.writeByte(fh, 7)
+            binfile.writeSignedShort(fh, encodedLength)
+            binfile.writeByteArray(fh, encodedString)
+
+        else
+            binfile.writeByte(fh, 6)
+            binfile.writeString(fh, s)
+        end
+    end
 end
 
 function encodeTable(fh, data, lookup)
@@ -213,7 +233,7 @@ end
 function mapcoder.encodeFile(path, data, header)
     local header = header or "CELESTE MAP"
     local fh = utils.getFileHandle(path, "wb")
-
+    
     local stringsSeen = countStrings(data)
     local lookupStrings = $()
 

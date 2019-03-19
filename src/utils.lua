@@ -6,15 +6,6 @@ local utils = {}
 utils.serialize = serialize.serialize
 utils.unserialize = serialize.unserialize
 
-function utils.twosCompliment(n, power)
-    if n >= 2^(power - 1) then
-        return n - 2^power
-
-    else
-        return n
-    end
-end
-
 function utils.stripByteOrderMark(s)
     if s:byte(1) == 0xef and s:byte(2) == 0xbb and s:byte(3) == 0xbf then
         return s:sub(4, #s)

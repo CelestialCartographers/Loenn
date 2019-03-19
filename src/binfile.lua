@@ -1,6 +1,13 @@
-local utils = require("utils")
-
 local binfile = {}
+
+function binfile.twosCompliment(n, power)
+    if n >= 2^(power - 1) then
+        return n - 2^power
+
+    else
+        return n
+    end
+end
 
 function binfile.readByte(fh)
     return string.byte(fh:read(1))
@@ -20,7 +27,7 @@ function binfile.writeShort(fh, n)
 end
 
 function binfile.readLong(fh)
-    return binfile.readByte(fh) + binfile.readByte(fh) * 256 + binfile.readByte(fh) * 65526 + binfile.readByte(fh) * 15777216 
+    return binfile.readByte(fh) + binfile.readByte(fh) * 256 + binfile.readByte(fh) * 256^2 + binfile.readByte(fh) * 256^3
 end
 
 function binfile.writeLong(fh, n)
@@ -39,19 +46,19 @@ function binfile.writeBool(fh, b)
 end
 
 function binfile.readSignedShort(fh)
-    return utils.twosCompliment(binfile.readShort(fh), 16)
+    return binfile.twosCompliment(binfile.readShort(fh), 16)
 end
 
 function binfile.writeSignedShort(fh, n)
-    binfile.writeShort(fh, utils.twosCompliment(n, 16))
+    binfile.writeShort(fh, binfile.twosCompliment(n, 16))
 end
 
 function binfile.readSignedLong(fh)
-    return utils.twosCompliment(binfile.readLong(fh), 32)
+    return binfile.twosCompliment(binfile.readLong(fh), 32)
 end
 
 function binfile.writeSignedLong(fh, n)
-    binfile.writeLong(fh, utils.twosCompliment(n, 32))
+    binfile.writeLong(fh, binfile.twosCompliment(n, 32))
 end
 
 function binfile.readFloat(fh)
@@ -189,6 +196,9 @@ end
 
 function binfile.writeRunLengthEncoded(fh, value)
     local payload = binfile.encodeRunLength(value)
+
+    binfile.writeShort(fh, #payload)
+    binfile.writeByteArray(fh, payload)
 end
 
 function binfile.writeByteArray(fh, t)
