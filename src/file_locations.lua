@@ -2,6 +2,9 @@ local fileLocations = {}
 
 fileLocations.useInternal = false
 
+local loennUpper = "L" .. string.char(148) .. "nn"
+local loennLower = "l" .. string.char(148) .. "nn"
+
 -- Temporary for now
 function fileLocations.getResourceDir()
     if useInternal then
@@ -20,16 +23,18 @@ function fileLocations.getResourceDir()
     end
 end
 
+-- TODO - Figure out how to create this folder automatically
+-- Problems with love2d filesystem
+-- Assume user has the folder at the moment
 function fileLocations.getStorageDir()
     local userOS = love.system.getOS()
 
     if userOS == "Windows" then
-        return os.getenv("LocalAppData") .. "/Lönn"
+        return os.getenv("LocalAppData"):gsub("\\", "/") .. "/" .. loennUpper
 
     elseif userOS == "Linux" then
         -- TODO - Is this good enough? Better alternative?
-        -- Doesn't work on Linux when creating folders for some reason?
-        return os.getenv("HOME") .. "/.lönn"
+        return os.getenv("HOME") .. "/." .. loennLower
 
     elseif userOS == "OS X" then
         -- TODO

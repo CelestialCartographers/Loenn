@@ -22,6 +22,7 @@ function config.readConfig(filename)
     return res
 end
 
+-- TODO - Currently assuming directory exists
 function config.writeConfig(filename, data, pretty)
     local pretty = pretty == nil or pretty
     local success, content = false, nil
