@@ -2,7 +2,29 @@ local matrix = require("matrix")
 
 local tilesStruct = {}
 
-function tilesStruct.convertTileString(tiles)
+-- TODO - Add minimized version
+function tilesStruct.matrixToTileString(matrix, seperator, empty)
+    local seperator = seperator or ""
+    local empty = empty or "0"
+
+    local width, height = matrix:size
+
+    local lines = {}
+
+    for y = 1, height do
+        local rowData = {}
+
+        for x = 1, width do
+            table.insert(rowData, matrix:getInbounds(x, y))
+        end
+
+        table.insert(lines, table.concat(rowData, seperator))
+    end
+
+    return table.concat(lines, "\n")
+end
+
+function tilesStruct.tileStringToMatrix(tiles)
     local tiles = tiles:gsub("\r\n", "\n")
     local lines = tiles:split("\n")
 
@@ -32,13 +54,17 @@ function tilesStruct.decode(data)
         _raw = data
     }
 
-    tiles.matrix = tilesStruct.convertTileString(data.innerText or "")
+    tiles.matrix = tilesStruct.tileStringToMatrix(data.innerText or "")
 
     return tiles
 end
 
 function tilesStruct.encode(tiles)
+    local res = {}
 
+    res.innerText = tilesStruct.matrixToTileString(tiles.matrix)
+
+    return res
 end
 
 return tilesStruct

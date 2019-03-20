@@ -5,16 +5,16 @@ local decalStruct = require("structs/decal")
 
 local roomStruct = {}
 
-local decodingSingleNames = {
-    solids = {"tilesFg", tilesStruct.decode},
-    bg = {"tilesBg", tilesStruct.decode}
+local structSingleNames = {
+    solids = {"tilesFg", tilesStruct},
+    bg = {"tilesBg", tilesStruct}
 }
 
-local decodingMutlipleNames = {
-    fgdecals = {"decalsFg", decalStruct.decode},
-    bgdecals = {"decalsBg", decalStruct.decode},
-    entities = {"entities", entityStruct.decode},
-    triggers = {"triggers", triggerStruct.decode}
+local structMutlipleNames = {
+    fgdecals = {"decalsFg", decalStruct},
+    bgdecals = {"decalsBg", decalStruct},
+    entities = {"entities", entityStruct},
+    triggers = {"triggers", triggerStruct}
 }
 
 function roomStruct.decode(data)
@@ -64,17 +64,17 @@ function roomStruct.decode(data)
     for key, value <- data.__children or {} do
         local name = value.__name
 
-        if decodingSingleNames[name] then
-            local target, func = unpack(decodingSingleNames[name])
+        if structSingleNames[name] then
+            local target, struct = unpack(structSingleNames[name])
 
-            room[target] = func(value)
+            room[target] = struct.decode(value)
         end
 
-        if decodingMutlipleNames[name] then
+        if structMutlipleNames[name] then
             for i, d <- value.__children or {} do
-                local target, func = unpack(decodingMutlipleNames[name])
+                local target, struct = unpack(structMutlipleNames[name])
 
-                room[target] += func(d)
+                room[target] += struct.decode(d)
             end
         end
     end
@@ -83,7 +83,64 @@ function roomStruct.decode(data)
 end
 
 function roomStruct.encode(room)
+    local res = {}
 
+    res.__name = "level"
+    res.__children = {}
+
+    res.name = room.name
+
+    res.x = room.x
+    res.y = room.y
+
+    res.width = room.width
+    res.height = room.height
+
+    res.musicLayer1 = room.musicLayer1
+    res.musicLayer2 = room.musicLayer2
+    res.musicLayer3 = room.musicLayer3
+    res.musicLayer4 = room.musicLayer4
+
+    res.dark = room.dark
+    res.space = room.space
+    res.underwater = room.underwater
+    res.whisper = room.whisper
+    res.disableDownTransition = room.disableDownTransition
+
+    res.music = room.music
+    res.alt_music = room.musicAlternative
+
+    res.windPattern = room.windPattern
+
+    res.c = room.color
+
+    for raw, meta <- structSingleNames do
+        local key, struct = unpack(meta)
+        local encoded = struct.encode(room[key])
+
+        encoded.__name = raw
+
+        table.insert(res.__children, encoded)
+    end
+
+    for raw, meta <- structMutlipleNames do
+        local key, struct = unpack(meta)
+
+        if room[key]:len > 0 or #room[key] > 0 then
+            local children = {}
+
+            for j, target <- room[key] do
+                table.insert(children, struct.encode(target))
+            end
+
+            table.insert(res.__children, {
+                __name = raw,
+                __children = children
+            })
+        end
+    end
+
+    return res
 end
 
 return roomStruct

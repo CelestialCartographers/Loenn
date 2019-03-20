@@ -1,27 +1,21 @@
+local nodeStruct = require("structs/node")
+
 local entityStruct = {}
 
+-- Special cases
 local ignoredAttrs = {
     __children = true,
     __name = true,
     id = true,
     originX = true,
-    originY = true
+    originY = true,
+
+    _name = true,
+    _id = true,
+    nodes = true,
+    _raw = true,
+    _type = true
 }
-
-function entityStruct.getNodes(entity)
-    local res = $()
-
-    for i, node <- entity.__children or {} do
-        if node.__name == "node" then
-            res += {
-                node.x,
-                node.y
-            }
-        end
-    end
-
-    return res
-end
 
 function entityStruct.decode(data)
     local entity = {
@@ -39,14 +33,33 @@ function entityStruct.decode(data)
     end
 
     if data.__children and #data.__children > 0 then
-        entity.nodes = entityStruct.getNodes(data)
+        entity.nodes = nodeStruct.decodeNodes(data.__children)
     end
 
     return entity
 end
 
 function entityStruct.encode(entity)
+    local res = {}
 
+    res.__name = entity._name
+    res.id = entity._id
+
+    for k, v <- entity do
+        if not ignoredAttrs[k] then
+            res[k] = v
+        end
+    end
+
+    if entity.nodes then
+        res.__children = {}
+
+        for i, node <- entity.nodes do
+            table.insert(res.__children, nodeStruct.encode(node))
+        end
+    end
+
+    return res
 end
 
 return entityStruct

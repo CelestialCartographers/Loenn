@@ -32,7 +32,40 @@ function mapStruct.decode(data)
 end
 
 function mapStruct.encode(map)
+    local res = {}
 
+    res.__name = "Map"
+    res._package = map.package
+
+    res.__children = {}
+
+    if map.fillers:len > 0 then
+        local children = {}
+
+        for i, filler <- map.fillers do
+            table.insert(children, fillerStruct.encode(filler))
+        end
+
+        table.insert(res.__children, {
+            __name = "Filler",
+            __children = children
+        })
+    end
+    
+    if map.rooms:len > 0 then
+        local children = {}
+
+        for i, room <- map.rooms do
+            table.insert(children, roomStruct.encode(room))
+        end
+
+        table.insert(res.__children, {
+            __name = "levels",
+            __children = children
+        })
+    end
+
+    return res
 end
 
 return mapStruct

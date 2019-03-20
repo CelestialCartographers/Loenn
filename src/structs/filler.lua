@@ -15,8 +15,18 @@ function fillerStruct.decode(data)
     return filler
 end
 
-function fillerStruct.encode(data)
+function fillerStruct.encode(rect)
+    local res = {}
 
+    res.__name = "rect"
+
+    res.x = rect.x
+    res.y = rect.y
+
+    res.w = rect.width
+    res.h = rect.height
+
+    return res
 end
 
 return fillerStruct

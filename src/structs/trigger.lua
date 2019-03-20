@@ -1,27 +1,21 @@
+local nodeStruct = require("structs/node")
+
 local triggerStruct = {}
 
+-- Special cases
 local ignoredAttrs = {
     __children = true,
     __name = true,
     id = true,
     originX = true,
-    originY = true
+    originY = true,
+
+    _name = true,
+    _id = true,
+    nodes = true,
+    _raw = true,
+    _type = true
 }
-
-function triggerStruct.getNodes(trigger)
-    local res = $()
-
-    for i, node <- trigger.__children or {} do
-        if node.__name == "node" then
-            res += {
-                node.x,
-                node.y
-            }
-        end
-    end
-
-    return res
-end
 
 function triggerStruct.decode(data)
     local trigger = {
@@ -39,14 +33,33 @@ function triggerStruct.decode(data)
     end
 
     if data.__children and #data.__children > 0 then
-        trigger.nodes = triggerStruct.getNodes(data)
+        trigger.nodes = nodeStruct.decodeNodes(data.__children)
     end
 
     return trigger
 end
 
 function triggerStruct.encode(trigger)
+    local res = {}
 
+    res.__name = trigger._name
+    res.id = trigger._id
+
+    for k, v <- trigger do
+        if not ignoredAttrs[k] then
+            res[k] = v
+        end
+    end
+
+    if trigger.nodes then
+        res.__children = {}
+
+        for i, node <- trigger.nodes do
+            table.insert(res.__children, nodeStruct.encode(node))
+        end
+    end
+
+    return res
 end
 
 return triggerStruct
