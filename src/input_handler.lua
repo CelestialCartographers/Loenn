@@ -1,12 +1,14 @@
 local inputDevice = require("input_device")
 
+local inputHandler = {}
+
 local mouseButtonsPressed = {}
 
 local dragTreshold = 2
 
 local echoDevice = true
 
-local function getMouseDrag(x, y, button)
+function inputHandler.getMouseDrag(x, y, button)
     local from = mouseButtonsPressed[button]
     local startX, startY = from[1], from[2]
     local dx, dy = x - startX, y - startY
@@ -15,7 +17,7 @@ local function getMouseDrag(x, y, button)
     return startX, startY, button, dx, dy, consideredDrag
 end
 
-local function getMouseDragDelta(x, y, button, istouch)
+function inputHandler.getMouseDragDelta(x, y, button, istouch)
     local from = mouseButtonsPressed[button]
     local prevX, prevY = from[3], from[4]
     local dx, dy = x - prevX, y - prevY
@@ -36,7 +38,7 @@ end
 
 function love.mousemoved(x, y, dx, dy, istouch)
     for button, data <- mouseButtonsPressed do
-        inputDevice.sendEvent("mousedragmoved", getMouseDragDelta(x, y, button, istouch))
+        inputDevice.sendEvent("mousedragmoved", inputHandler.getMouseDragDelta(x, y, button, istouch))
     end
 
     inputDevice.sendEvent("mousemoved", x, y, dx, dy, istouch)
@@ -50,7 +52,7 @@ end
 function love.mousereleased(x, y, button, istouch, presses)
     inputDevice.sendEvent("mousereleased", x, y, button, istouch, presses)
 
-    local startX, startY, button, dx, dy, consideredDrag = getMouseDrag(x, y, button)
+    local startX, startY, button, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
 
     if consideredDrag then
         inputDevice.sendEvent("mousedrag", startX, startY, button, dx, dy)
@@ -81,3 +83,13 @@ end
 function love.directorydropped(path)
     inputDevice.sendEvent("directorydropped", path)
 end
+
+function inputHandler.update(dt)
+    inputDevice.sendEvent("update", dt)
+end
+
+function inputHandler.draw()
+    inputDevice.sendEvent("draw")
+end
+
+return inputHandler

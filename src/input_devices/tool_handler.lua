@@ -1,4 +1,4 @@
-local currentTool = {}
+local currentTool = require("tools/brush")
 
 local state = require("loaded_state")
 local viewport = require("viewport_handler")
@@ -8,8 +8,20 @@ local utils = require("utils")
 -- Button that is considered a "click" for tools, such as painting a tile or placing entity
 local actionButton = 1
 
-local device = {_enabled = true}
+local toolProxyMt = {
+    __index = function(self, event)
+        if currentTool and currentTool[event] then
+            return currentTool[event]
+        end
 
+        return function() end
+    end
+}
+
+local device = setmetatable({_enabled = true}, toolProxyMt)
+
+
+-- Don't send clicks that would "swap" the target room
 function device.mousepressed(x, y, button, istouch, presses)
     if button == actionButton then
         local mapX, mapY = viewport.getMapCoordinates(x, y)
@@ -23,7 +35,9 @@ function device.mousepressed(x, y, button, istouch, presses)
         end
     end
 
-    -- Send event to current tool
+    if currentTool and currentTool.mousepressed then
+        currentTool.mousepressed(x, y, button, istouch, presses)
+    end
 end
 
 return device

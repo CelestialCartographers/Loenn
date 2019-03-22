@@ -28,9 +28,15 @@ function inputHandler.sendEvent(event, ...)
     end
 end
 
+-- Use inputDeviceMt if no other metatable is already set for the device
 function inputHandler.newInputDevice(device, devices)
     local devices = devices or inputHandler.inputDevices
-    local newDevice = setmetatable(device, inputDeviceMt)
+
+    local newDevice = device
+
+    if not getmetatable(device) then
+        newDevice = setmetatable(newDevice, inputDeviceMt)
+    end
 
     table.insert(devices, newDevice)
 

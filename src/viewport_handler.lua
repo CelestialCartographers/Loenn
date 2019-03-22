@@ -71,6 +71,10 @@ function viewportHandler.getRoomCoordindates(room, x, y)
     return mapX - room.x, mapY - room.y
 end
 
+function viewportHandler.pixelToTileCoordinates(x, y)
+    return math.floor(x / 8), math.floor(y / 8)
+end
+
 function viewportHandler.zoomIn()
     local mouseX, mouseY = viewportHandler.getMousePosition()
 

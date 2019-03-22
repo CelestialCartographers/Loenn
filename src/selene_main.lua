@@ -7,7 +7,7 @@ love.keyboard.setKeyRepeat(true)
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
 love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
-require("input_handler")
+local inputHandler = require("input_handler")
 require("filesystem_mount_workaround")
 
 local celesteRender = require("celeste_render")
@@ -52,10 +52,13 @@ function love.draw()
     else
         loading:drawLoadScreen(viewport)
     end
+
+    inputHandler.draw()
 end
 
 function love.update(dt)
     tasks.processTasks(1 / 144)
+    inputHandler.update(dt)
     
     if viewerState.map then
         -- TODO - Find some sane values for this
