@@ -99,6 +99,17 @@ function viewportHandler.disable()
     viewportHandler.device._enabled = false
 end
 
+function viewportHandler.drawRelativeTo(x, y, func)
+    love.graphics.push()
+
+    love.graphics.translate(math.floor(-viewport.x), math.floor(-viewport.y))
+    love.graphics.scale(viewport.scale, viewport.scale)
+    love.graphics.translate(x, y)
+
+    func()
+
+    love.graphics.pop()
+end
 
 
 function viewportDevice.keypressed(key, scancode, isrepeat)

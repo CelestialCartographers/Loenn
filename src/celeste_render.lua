@@ -13,17 +13,17 @@ local drawableFunction = require("structs/drawable_function")
 local viewportHandler = require("viewport_handler")
 local matrix = require("matrix")
 
+local celesteRender = {}
+
 local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
 local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
 
-local tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
-local tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
+celesteRender.tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
+celesteRender.tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
 
 local triggerFontSize = 1
 
 local tilesSpriteMetaCache = {}
-
-local celesteRender = {}
 
 local tilesFgDepth = -10000
 local tilesBgDepth = 10000
@@ -59,13 +59,13 @@ function celesteRender.clearBatchingTasks()
     batchingTasks = {}
 end
 
-function celesteRender.invalidateRoomCache(room, key)
-    if room then
-        if key and roomCache[room] then
-            roomCache[room][key] = nil
+function celesteRender.invalidateRoomCache(roomName, key)
+    if roomName then
+        if key and roomCache[roomName] then
+            roomCache[roomName][key] = nil
 
         else
-            roomCache[room] = {}
+            roomCache[roomName] = {}
         end
 
     else
@@ -122,7 +122,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     return quadCache:get0(quadX, quadY)
 end
 
-local function getTilesBatch(tiles, meta, fg)
+function celesteRender.getTilesBatch(tiles, meta, fg)
     local tiles = tiles.matrix
 
     -- Getting upvalues
@@ -167,15 +167,17 @@ local function getTilesBatch(tiles, meta, fg)
     end
 
     coroutine.yield(batch)
+
+    return batch
 end
 
 local function getRoomTileBatch(room, tiles, fg)
-    local key = fg and "fgTiles" or "bgTiles"
-    local meta = fg and tilesMetaFg or tilesMetaBg
+    local key = fg and "tilesFg" or "tilesBg"
+    local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
 
     roomCache[room.name] = roomCache[room.name] or {}
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
-        (-> getTilesBatch(tiles, meta, fg)),
+        (-> celesteRender.getTilesBatch(tiles, meta, fg)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
         batchingTasks
     )
@@ -239,6 +241,8 @@ local function getDecalsBatch(decals)
     end
 
     coroutine.yield(batch)
+
+    return batch
 end
 
 local function getRoomDecalsBatch(room, decals, fg)
@@ -327,6 +331,8 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
     end
 
     coroutine.yield(batches)
+
+    return batches
 end
 
 function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw)
@@ -388,6 +394,8 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
     end
 
     coroutine.yield(batch)
+
+    return batch
 end
 
 function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
@@ -514,34 +522,30 @@ function celesteRender.drawRoom(room, viewport, selected)
     local redrawRoom = selected or ALWAYS_REDRAW_UNSELECTED_ROOMS
     local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
-    love.graphics.push()
+    viewportHandler.drawRelativeTo(roomX, roomY, (->
+        love.graphics.setColor(backgroundColor)
+        love.graphics.rectangle("fill", 0, 0, width, height)
 
-    love.graphics.translate(math.floor(-viewport.x), math.floor(-viewport.y))
-    love.graphics.scale(viewport.scale, viewport.scale)
-    love.graphics.translate(roomX, roomY)
+        love.graphics.setColor(borderColor)
+        love.graphics.rectangle("line", 0, 0, width, height)
 
-    love.graphics.setColor(backgroundColor)
-    love.graphics.rectangle("fill", 0, 0, width, height)
+        love.graphics.setColor(colors.default)
 
-    love.graphics.setColor(borderColor)
-    love.graphics.rectangle("line", 0, 0, width, height)
+        if redrawRoom then
+            -- Invalidate the canvas, so it is updated properly when the selected room changes
+            -- TODO - Move into code responsible for changing selected room?
 
-    love.graphics.setColor(colors.default)
+            celesteRender.invalidateRoomCache(room, "canvas")
+            drawRoomFromBatches(room, viewport, selected)
 
-    if redrawRoom then
-        -- Invalidate the canvas, so it is updated properly when the selected room changes
-        -- TODO - Move into code responsible for changing selected room?
-
-        celesteRender.invalidateRoomCache(room, "canvas")
-        drawRoomFromBatches(room, viewport, selected)
-
-    else
-        if canvas then
-            love.graphics.draw(canvas)
+        else
+            if canvas then
+                love.graphics.draw(canvas)
+            end
         end
-    end
 
-    love.graphics.pop()
+        return -- TODO - Vex please fix
+    ))
 end
 
 function celesteRender.drawFiller(filler, viewport)
@@ -551,18 +555,14 @@ function celesteRender.drawFiller(filler, viewport)
     local width = filler.width * 8
     local height = filler.height * 8
 
-    love.graphics.push()
+    viewportHandler.drawRelativeTo(x, y, (->
+        love.graphics.setColor(colors.fillerColor)
+        love.graphics.rectangle("fill", 0, 0, width, height)
 
-    love.graphics.translate(math.floor(-viewport.x), math.floor(-viewport.y))
-    love.graphics.scale(viewport.scale, viewport.scale)
-    love.graphics.translate(x, y)
+        love.graphics.setColor(colors.default)
 
-    love.graphics.setColor(colors.fillerColor)
-    love.graphics.rectangle("fill", 0, 0, width, height)
-
-    love.graphics.setColor(colors.default)
-
-    love.graphics.pop()
+        return -- TODO - Vex please fix
+    ))
 end
 
 function celesteRender.drawMap(state)
