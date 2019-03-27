@@ -10,7 +10,7 @@ local inputDeviceMt = {
     __index = function() return unhandledEvent end
 }
 
--- TODO - Add devices arg
+-- TODO - Add a way to specify what device group we are sending to?
 function inputHandler.sendEvent(event, ...)
     local devices = inputHandler.inputDevices
 

@@ -18,12 +18,14 @@ local tasks = require("task")
 local entities = require("entities")
 local viewerState = require("loaded_state")
 local viewportHandler = require("viewport_handler")
+local hotkeyHandler = require("hotkey_handler")
 
 local inputDevice = require("input_device")
 local mapLoaderDevice = require("input_devices/map_loader")
 local toolHandlerDevice = require("input_devices/tool_handler")
 
 inputDevice.newInputDevice(viewportHandler.device)
+inputDevice.newInputDevice(hotkeyHandler.createHotkeyDevice()) -- Default hotkey group
 
 inputDevice.newInputDevice(mapLoaderDevice)
 inputDevice.newInputDevice(toolHandlerDevice)

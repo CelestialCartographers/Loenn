@@ -18,7 +18,7 @@ local toolProxyMt = {
     end
 }
 
-local device = setmetatable({_enabled = true}, toolProxyMt)
+local device = setmetatable({_enabled = true, _type = "device"}, toolProxyMt)
 
 
 -- Don't send clicks that would "swap" the target room

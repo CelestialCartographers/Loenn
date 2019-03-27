@@ -49,8 +49,20 @@ end
 
 function hotkeyStruct.callbackIfActive(hotkey)
     if hotkeyStruct.hotkeyActive(hotkey) then
-        hotkey.callback()
+        hotkey:callback()
     end
+end
+
+function hotkeyStruct.callbackFirstActive(hotkeys)
+    for i, hotkey <- hotkeys do
+        if hotkey:active() then
+            hotkey:callback()
+
+            return true, i
+        end
+    end
+
+    return false, false
 end
 
 local hotkeyMt = {}
