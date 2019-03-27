@@ -21,11 +21,13 @@ local viewportHandler = require("viewport_handler")
 local hotkeyHandler = require("hotkey_handler")
 local standardHotkeys = require("standard_hotkeys")
 local configs = require("configs")
+local uiHandler = require("ui_handler")
 
 local inputDevice = require("input_device")
 local mapLoaderDevice = require("input_devices/map_loader")
 local toolHandlerDevice = require("input_devices/tool_handler")
 
+inputDevice.newInputDevice(uiHandler)
 inputDevice.newInputDevice(viewportHandler.device)
 inputDevice.newInputDevice(hotkeyHandler.createHotkeyDevice(standardHotkeys))
 

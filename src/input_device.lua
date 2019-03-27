@@ -17,8 +17,7 @@ function inputHandler.sendEvent(event, ...)
     if event then
         for i, device <- devices do
             if device._enabled then
-                local args = {...} or {}
-                local consumed = device[event](unpack(args))
+                local consumed = device[event](...)
 
                 if consumed then
                     return

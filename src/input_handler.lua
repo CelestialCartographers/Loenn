@@ -47,11 +47,12 @@ end
 -- Don't send the event here, make sure it is not a drag first
 function love.mousepressed(x, y, button, istouch, presses)
     mouseButtonsPressed[button] = {x, y, x, y}
+
+    -- A raw mouse pressed event, doesn't care if we are draging or not
+    inputDevice.sendEvent("mousepressedraw", x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
-    inputDevice.sendEvent("mousereleased", x, y, button, istouch, presses)
-
     local startX, startY, button, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
 
     if consideredDrag then
@@ -60,6 +61,8 @@ function love.mousereleased(x, y, button, istouch, presses)
     else
         inputDevice.sendEvent("mousepressed", startX, startY, button, istouch, presses)
     end
+
+    inputDevice.sendEvent("mousereleased", x, y, button, istouch, presses)
 
     mouseButtonsPressed[button] = nil
 end
