@@ -49,14 +49,14 @@ end
 
 function hotkeyStruct.callbackIfActive(hotkey)
     if hotkeyStruct.hotkeyActive(hotkey) then
-        hotkey:callback()
+        hotkey()
     end
 end
 
 function hotkeyStruct.callbackFirstActive(hotkeys)
     for i, hotkey <- hotkeys do
         if hotkey:active() then
-            hotkey:callback()
+            hotkey()
 
             return true, i
         end
@@ -66,10 +66,14 @@ function hotkeyStruct.callbackFirstActive(hotkeys)
 end
 
 local hotkeyMt = {}
-hotkeyMt.__index = {}
 
+hotkeyMt.__index = {}
 hotkeyMt.__index.active = hotkeyStruct.hotkeyActive
 hotkeyMt.__index.callbackIfActive = hotkeyStruct.callbackIfActive
+
+function hotkeyMt.__call(self) 
+    self:callback()
+end
 
 function hotkeyStruct.createHotkey(activator, callback)
     local hotkey = {
