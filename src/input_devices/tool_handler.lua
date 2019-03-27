@@ -10,8 +10,10 @@ local actionButton = 1
 
 local toolProxyMt = {
     __index = function(self, event)
-        if currentTool and currentTool[event] then
-            return currentTool[event]
+        if state.map ~= nil then
+            if currentTool and currentTool[event] then
+                return currentTool[event]
+            end
         end
 
         return function() end
@@ -23,20 +25,22 @@ local device = setmetatable({_enabled = true, _type = "device"}, toolProxyMt)
 
 -- Don't send clicks that would "swap" the target room
 function device.mousepressed(x, y, button, istouch, presses)
-    if button == actionButton then
-        local mapX, mapY = viewport.getMapCoordinates(x, y)
+    if state.map ~= nil then
+        if button == actionButton then
+            local mapX, mapY = viewport.getMapCoordinates(x, y)
 
-        local roomClicked = utils.getRoomAtCoords(mapX, mapY, state.map)
+            local roomClicked = utils.getRoomAtCoords(mapX, mapY, state.map)
 
-        if roomClicked and roomClicked ~= state.selectedRoom then
-            state.selectedRoom = roomClicked
+            if roomClicked and roomClicked ~= state.selectedRoom then
+                state.selectedRoom = roomClicked
 
-            return true
+                return true
+            end
         end
-    end
 
-    if currentTool and currentTool.mousepressed then
-        currentTool.mousepressed(x, y, button, istouch, presses)
+        if currentTool and currentTool.mousepressed then
+            currentTool.mousepressed(x, y, button, istouch, presses)
+        end
     end
 end
 
