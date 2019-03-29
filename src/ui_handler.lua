@@ -45,7 +45,7 @@ end
 
 -- Needs to always be called, otherwise keys can repeat when they shouldnt
 function uiHandler.keyreleased(key, scancode)
-    return uiHandler.rawCall("keyreleased", key, scancode)
+    uiHandler.rawCall("keyreleased", key, scancode)
 end
 
 -- Use raw event, Nuklear handles drag itself
@@ -55,12 +55,12 @@ end
 
 -- Needs to always be called, otherwise we can't "undrag" in a window
 function uiHandler.mousereleased(x, y, button, istouch, presses)
-	return uiHandler.rawCall("mousereleased", x, y, button, istouch, presses)
+	uiHandler.rawCall("mousereleased", x, y, button, istouch, presses)
 end
 
 -- Needs to always be called, otherwise we can't check if any windows are hovered
 function uiHandler.mousemoved(x, y, dx, dy, istouch)
-	return uiHandler.rawCall("mousemoved", x, y, dx, dy, istouch)
+	uiHandler.rawCall("mousemoved", x, y, dx, dy, istouch)
 end
 
 function uiHandler.textinput(text)

@@ -3,6 +3,7 @@ local inputDevice = require("input_device")
 local inputHandler = {}
 
 local mouseButtonsPressed = {}
+local mousePressedRawHandled = {}
 
 local dragTreshold = 2
 
@@ -49,7 +50,8 @@ function love.mousepressed(x, y, button, istouch, presses)
     mouseButtonsPressed[button] = {x, y, x, y}
 
     -- A raw mouse pressed event, doesn't care if we are draging or not
-    inputDevice.sendEvent("mousepressedraw", x, y, button, istouch, presses)
+    local handled = inputDevice.sendEvent("mousepressedraw", x, y, button, istouch, presses)
+    mousePressedRawHandled[button] = handled
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
@@ -59,7 +61,10 @@ function love.mousereleased(x, y, button, istouch, presses)
         inputDevice.sendEvent("mousedrag", startX, startY, button, dx, dy)
 
     else
-        inputDevice.sendEvent("mousepressed", startX, startY, button, istouch, presses)
+        if not mousePressedRawHandled[button] then
+            inputDevice.sendEvent("mousepressed", startX, startY, button, istouch, presses)
+            mousePressedRawHandled[button] = false
+        end
     end
 
     inputDevice.sendEvent("mousereleased", x, y, button, istouch, presses)

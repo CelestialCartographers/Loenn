@@ -20,11 +20,13 @@ function inputHandler.sendEvent(event, ...)
                 local consumed = device[event](...)
 
                 if consumed then
-                    return
+                    return true
                 end
             end
         end
     end
+
+    return false
 end
 
 -- Use inputDeviceMt if no other metatable is already set for the device
