@@ -28,11 +28,11 @@ function config.writeConfig(filename, data, pretty)
     local success, content = false, nil
 
     if data then
-        fh = io.open(filename, "wb")
-
         success, content = utils.serialize(data, pretty)
 
         if success then
+            fh = io.open(filename, "wb")
+            
             if fh then
                 fh:write(content)
                 fh:close()

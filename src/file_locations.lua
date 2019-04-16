@@ -1,3 +1,5 @@
+local physfs = require("physfs")
+
 local fileLocations = {}
 
 fileLocations.useInternal = false
@@ -13,12 +15,13 @@ function fileLocations.getResourceDir()
     else
         local appdata = os.getenv("LocalAppData")
         local home = os.getenv("HOME")
+        local sep = physfs.getDirSeparator()
 
         if appdata then
-            return appdata .. "/Loenn"
+            return appdata .. sep .. "Loenn"
 
         else
-            return home .. "/.loenn"
+            return home .. sep .. ".loenn"
         end
     end
 end
@@ -28,13 +31,14 @@ end
 -- Assume user has the folder at the moment
 function fileLocations.getStorageDir()
     local userOS = love.system.getOS()
+    local sep = physfs.getDirSeparator()
 
     if userOS == "Windows" then
-        return os.getenv("LocalAppData"):gsub("\\", "/") .. "/" .. loennUpper
+        return os.getenv("LocalAppData") .. sep .. loennUpper
 
     elseif userOS == "Linux" then
         -- TODO - Is this good enough? Better alternative?
-        return os.getenv("HOME") .. "/." .. loennLower
+        return os.getenv("HOME") .. sep .. "." .. loennLower
 
     elseif userOS == "OS X" then
         -- TODO

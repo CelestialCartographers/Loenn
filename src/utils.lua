@@ -1,5 +1,6 @@
 local fileLocations = require("file_locations")
 local serialize = require("serialize")
+local physfs = require("physfs")
 
 local utils = {}
 
@@ -45,7 +46,6 @@ function utils.loadImageAbsPath(path)
     return love.graphics.newImage(data)
 end
 
-
 -- TODO - Get Vex to look at the lambda versions
 function utils.humanizeVariableName(name)
     local res = name
@@ -76,7 +76,21 @@ function utils.parseHexColor(color)
 end
 
 function utils.filename(path)
-    return path:match("[^/]+$")
+    return path:match("[^" .. physfs.getDirSeparator() .. "]+$")
+end
+
+function utils.dirname(path, sep)
+    local sep = sep or physfs.getDirSeparator()
+    local path = path
+
+    return path:match("(.*" .. sep .. ")")
+end
+
+function utils.joindir(...)
+    local paths = {...}
+    local sep = physfs.getDirSeparator()
+
+    return table.concat(paths, sep)
 end
 
 function utils.fileExtension(path)

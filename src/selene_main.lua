@@ -8,7 +8,7 @@ love.graphics.setDefaultFilter("nearest", "nearest", 1)
 love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
 local inputHandler = require("input_handler")
-require("filesystem_mount_workaround")
+require("love_filesystem_unsandboxing")
 
 local celesteRender = require("celeste_render")
 local fileLocations = require("file_locations")
