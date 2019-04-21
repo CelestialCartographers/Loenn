@@ -7,9 +7,14 @@ love.keyboard.setKeyRepeat(true)
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
 love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
+-- Set up configs for first run
+local startup = require("initial_startup")
+startup:init()
+
 local inputHandler = require("input_handler")
 require("love_filesystem_unsandboxing")
 
+local utils = require("utils")
 local celesteRender = require("celeste_render")
 local fileLocations = require("file_locations")
 local fonts = require("fonts")
@@ -40,7 +45,7 @@ tasks.newTask(
     end
 )
 
-local mapFile = fileLocations.getStorageDir() .. "/Maps/7-Summit.bin"
+local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
 
 viewerState.loadMap(mapFile)
 

@@ -1,9 +1,7 @@
 local filesystem = require("filesystem")
+local config = require("config")
 
 local fileLocations = {}
-
--- TODO - Sorta deprecated, keep around for now
-fileLocations.useInternal = false
 
 local loennUpper = "Loenn"
 local loennLower = "loenn"
@@ -27,6 +25,14 @@ function fileLocations.getStorageDir()
     elseif userOS == "iOS" then
         -- TODO
     end
+end
+
+function fileLocations.getSettingsDir()
+    return filesystem.joinpath(fileLocations.getStorageDir(), "settings.conf")
+end
+
+function fileLocations.getCelesteDir()
+    return config.readConfig(fileLocations.getSettingsDir()).celeste_dir
 end
 
 return fileLocations

@@ -15,8 +15,8 @@ local matrix = require("matrix")
 
 local celesteRender = {}
 
-local tilesetFileFg = fileLocations.getStorageDir() .. "/XML/ForegroundTiles.xml"
-local tilesetFileBg = fileLocations.getStorageDir() .. "/XML/BackgroundTiles.xml"
+local tilesetFileFg = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Graphics", "ForegroundTiles.xml")
+local tilesetFileBg = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Graphics", "BackgroundTiles.xml")
 
 celesteRender.tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
 celesteRender.tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)

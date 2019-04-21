@@ -14,11 +14,10 @@ function config.readConfig(filename)
 
     if fh then
         local content = fh:read("*a")
-
         res = utils.unserialize(content)
+        
+        fh:close()
     end
-
-    fh:close()
 
     return res
 end
