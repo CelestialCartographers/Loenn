@@ -1,6 +1,6 @@
 local fileLocations = require("file_locations")
 local serialize = require("serialize")
-local physfs = require("physfs")
+local filesystem = require("filesystem")
 
 local utils = {}
 
@@ -75,34 +75,6 @@ function utils.parseHexColor(color)
     return false, 0, 0, 0
 end
 
-function utils.filename(path, sep)
-    local sep = sep or physfs.getDirSeparator()
-
-    return path:match("[^" .. sep .. "]+$")
-end
-
-function utils.dirname(path, sep)
-    local sep = sep or physfs.getDirSeparator()
-    local path = path
-
-    return path:match("(.*" .. sep .. ")")
-end
-
-function utils.joinpath(...)
-    local paths = {...}
-    local sep = physfs.getDirSeparator()
-
-    return table.concat(paths, sep)
-end
-
-function utils.fileExtension(path)
-    return path:match("[^.]+$")
-end
-
-function utils.stripExtension(path)
-    return path:sub(1, #path - #utils.fileExtension(path) - 1)
-end
-
 function utils.typeof(v)
     local typ = type(v)
 
@@ -155,6 +127,11 @@ function utils.rerequire(lib)
     utils.unrequre(lib)
 
     return require(lib)
+end
+
+-- Add all of filesystem helper into utils
+for k, v <- filesystem do
+    utils[k] = v
 end
 
 return utils

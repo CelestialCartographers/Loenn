@@ -1,4 +1,4 @@
-local physfs = require("physfs")
+local filesystem = require("filesystem")
 
 local fileLocations = {}
 
@@ -10,14 +10,13 @@ local loennLower = "loenn"
 
 function fileLocations.getStorageDir()
     local userOS = love.system.getOS()
-    local sep = physfs.getDirSeparator()
 
     if userOS == "Windows" then
-        return os.getenv("LocalAppData") .. sep .. loennUpper
+        return filesystem.joinpath(os.getenv("LocalAppData"), loennUpper)
 
     elseif userOS == "Linux" then
         -- TODO - Is this good enough? Better alternative?
-        return os.getenv("HOME") .. sep .. "." .. loennLower
+        return filesystem.joinpath(os.getenv("HOME"), "." .. loennLower)
 
     elseif userOS == "OS X" then
         -- TODO

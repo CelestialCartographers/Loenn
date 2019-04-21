@@ -31,8 +31,7 @@ function config.writeConfig(filename, data, pretty)
         success, content = utils.serialize(data, pretty)
 
         if success then
-            print(filename, utils.dirname(filename))
-            print(lfs.mkdir(utils.dirname(filename)))
+            lfs.mkdir(utils.dirname(filename))
             fh = io.open(filename, "wb")
             
             if fh then
