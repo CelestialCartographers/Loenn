@@ -1,4 +1,5 @@
 local utils = require("utils")
+local lfs = require("lfs_ffi")
 
 local config = {}
 
@@ -22,7 +23,6 @@ function config.readConfig(filename)
     return res
 end
 
--- TODO - Currently assuming directory exists
 function config.writeConfig(filename, data, pretty)
     local pretty = pretty == nil or pretty
     local success, content = false, nil
@@ -31,6 +31,8 @@ function config.writeConfig(filename, data, pretty)
         success, content = utils.serialize(data, pretty)
 
         if success then
+            print(filename, utils.dirname(filename))
+            print(lfs.mkdir(utils.dirname(filename)))
             fh = io.open(filename, "wb")
             
             if fh then

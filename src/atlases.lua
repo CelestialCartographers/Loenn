@@ -3,8 +3,8 @@ local spriteLoader = require("sprite_loader")
 
 local atlases = {}
 
-local celesteAtlasFolder = fileLocations.getResourceDir() .. "/Atlases/"
-local gameplayMeta = fileLocations.getResourceDir() .. "/Atlases/Gameplay.meta"
+local celesteAtlasFolder = fileLocations.getStorageDir() .. "/Atlases/"
+local gameplayMeta = fileLocations.getStorageDir() .. "/Atlases/Gameplay.meta"
 
 atlases.gameplay = spriteLoader.loadSpriteAtlas(gameplayMeta, celesteAtlasFolder)
 

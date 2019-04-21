@@ -1,3 +1,5 @@
 /builds/*
 /src/celesteResources/*
 /.vscode/*
+/src/*.dll
+/src/*.so

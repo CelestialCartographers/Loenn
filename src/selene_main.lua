@@ -40,7 +40,7 @@ tasks.newTask(
     end
 )
 
-local mapFile = fileLocations.getResourceDir() .. "/Maps/7-Summit.bin"
+local mapFile = fileLocations.getStorageDir() .. "/Maps/7-Summit.bin"
 
 viewerState.loadMap(mapFile)
 
