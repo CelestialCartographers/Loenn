@@ -75,8 +75,10 @@ function utils.parseHexColor(color)
     return false, 0, 0, 0
 end
 
-function utils.filename(path)
-    return path:match("[^" .. physfs.getDirSeparator() .. "]+$")
+function utils.filename(path, sep)
+    local sep = sep or physfs.getDirSeparator()
+
+    return path:match("[^" .. sep .. "]+$")
 end
 
 function utils.dirname(path, sep)
@@ -86,7 +88,7 @@ function utils.dirname(path, sep)
     return path:match("(.*" .. sep .. ")")
 end
 
-function utils.joindir(...)
+function utils.joinpath(...)
     local paths = {...}
     local sep = physfs.getDirSeparator()
 
