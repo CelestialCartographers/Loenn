@@ -1,8 +1,19 @@
-/builds/*
+/*
+
+# directories
+!/lib
+!/src
+
+# files
+!/.gitignore
+!/.gitmodules
+!/LICENSE
+!/README.md
+!/run.bat
+!/run.sh
+
+# other
+/lib/*
 /src/celesteResources/*
-/.vscode/*
 /src/*.dll
 /src/*.so
-/meta/*
-/lib/*
-/build.bat
