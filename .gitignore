@@ -4,4 +4,5 @@
 /src/*.dll
 /src/*.so
 /meta/*
+/lib/*
 /build.bat
