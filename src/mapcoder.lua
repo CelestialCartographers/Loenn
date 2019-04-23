@@ -74,13 +74,15 @@ end
 
 function mapcoder.decodeFile(path, header)
     local header = header or "CELESTE MAP"
-    local fh = utils.getFileHandle(path, "rb")
+    local fh = io.open(path, mode)
     local res = {}
 
-    if #header > 0 and binfile.readString(fh) ~= header then
-        print("Invalid Celeste map file")
+    if not fh then
+        return false, "File not found"
+    end
 
-        return false
+    if #header > 0 and binfile.readString(fh) ~= header then
+        return false, "Invalid Celeste map file"
     end
 
     local package = binfile.readString(fh)

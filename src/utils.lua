@@ -107,6 +107,12 @@ function utils.getRoomAtCoords(x, y, map)
     return false
 end
 
+function utils.mod1(n, d)
+    m = n % d
+
+    return m == 0 and d or m
+end
+
 -- Clear the cache of a required library
 function utils.unrequire(lib)
     package.loaded[lib] = nil
