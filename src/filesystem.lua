@@ -1,4 +1,5 @@
 local lfs = require("lfs_ffi")
+local nfd = require("nfd")
 local physfs = require("physfs")
 
 local filesystem = {}
@@ -43,11 +44,27 @@ filesystem.dir = lfs.dir
 filesystem.rmdir = lfs.rmdir
 
 function filesystem.isFile(path)
-    return lfs.attributes(path).mode == "file"
+    local attrs = lfs.attributes(path)
+    
+    return attrs and attrs.mode == "file"
 end
 
 function filesystem.isDirectory(path)
-    return lfs.attributes(path).mode == "directory"
+    local attrs = lfs.attributes(path)
+
+    return attrs and attrs.mode == "directory"
+end
+
+function filesystem.saveDialog(path, filter)
+    -- TODO - This is a blocking call, consider running in own thread
+    
+    return nfd.save(filter, nil, path)
+end
+
+function filesystem.openDialog(path, filter)
+    -- TODO - This is a blocking call, consider running in own thread
+    
+    return nfd.open(filter, nil, path)
 end
 
 return filesystem
