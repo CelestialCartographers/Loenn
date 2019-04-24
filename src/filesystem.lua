@@ -46,6 +46,8 @@ filesystem.chdir = lfs.chdir
 filesystem.dir = lfs.dir
 filesystem.rmdir = lfs.rmdir
 
+filesystem.remove = os.remove
+
 function filesystem.isFile(path)
     local attrs = lfs.attributes(path)
     

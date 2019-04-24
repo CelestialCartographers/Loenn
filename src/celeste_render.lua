@@ -33,7 +33,7 @@ local decalsBgDepth = 9000
 
 local triggersDepth = -math.huge
 
-local PRINT_BATCHING_DURATION = true
+local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = false
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = true
 
