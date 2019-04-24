@@ -71,7 +71,7 @@ function love.update(dt)
     
     if viewerState.map then
         -- TODO - Find some sane values for this
-        celesteRender.processTasks(1 / 20, 20)
+        celesteRender.processTasks(viewerState, 1 / 60, math.huge, 1 / 240, math.huge)
 
     else
         loading:update(dt)

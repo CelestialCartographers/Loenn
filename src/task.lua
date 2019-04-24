@@ -26,6 +26,9 @@ function tasks.processTasks(calcTime, maxTasks, customTasks)
 
             if not success then
                 print("! Task Failed:", res)
+
+                task.done = true
+                task.success = false
             end
 
             if success and res then
@@ -38,7 +41,11 @@ function tasks.processTasks(calcTime, maxTasks, customTasks)
             task.timeTotal += deltaTime
         end
 
+        task.done = true
+        task.success = true
+
         task:callback()
+
         table.remove(tasks, 1)
         tasksDone += 1
     end
@@ -47,12 +54,16 @@ function tasks.processTasks(calcTime, maxTasks, customTasks)
 end
 
 -- TODO - Unwrap lambda properly
-function tasks.newTask(func, callback, tasks)
+-- TODO - Make arguments more sane?
+function tasks.newTask(func, callback, tasks, data)
     local tasks = tasks or globalTasks
     local task = {
         coroutine = coroutine.create(function() func() end),
         callback = callback or function() end,
-        timeTotal = 0
+        timeTotal = 0,
+        done = false,
+        success = false,
+        data = data or {}
     }
     
     table.insert(tasks, task)

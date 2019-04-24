@@ -85,7 +85,7 @@ end
 function roomStruct.encode(room)
     local res = {}
 
-    res.__name = "level"
+    res.__name = "room"
     res.__children = {}
 
     res.name = room.name

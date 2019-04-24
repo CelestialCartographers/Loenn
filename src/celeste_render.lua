@@ -35,24 +35,46 @@ local triggersDepth = -math.huge
 
 local PRINT_BATCHING_DURATION = true
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = false
+local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = true
 
 -- Room cache
 local roomCache = {}
 
 local batchingTasks = {}
 
-function celesteRender.sortBatchingTasks(map, tasks)
-    -- TODO
-    -- Return visible tasks in first array, non visible in other
+function celesteRender.sortBatchingTasks(state, tasks)
+    local visibleTasks = {}
+    local nonVisibileTasks = {}
 
-    return tasks, {}
+    for i = #batchingTasks, 1, -1 do
+        local task = batchingTasks[i]
+        local viewport = state.viewport
+        local room = task.data.room
+
+        if not task.done then
+            if viewport.visible and viewportHandler.roomVisible(room, viewport) then
+                table.insert(visibleTasks, task)
+
+            else
+                table.insert(nonVisibileTasks, task)
+            end
+
+        else
+            table.remove(batchingTasks, i)
+        end
+    end
+
+    return visibleTasks, nonVisibileTasks
 end
 
-function celesteRender.processTasks(calcTime, maxTasks)
-    local visible, notVisible = celesteRender.sortBatchingTasks(nil, batchingTasks) -- TODO
+function celesteRender.processTasks(state, calcTime, maxTasks, backgroundTime, backgroundTasks)
+    local visible, notVisible = celesteRender.sortBatchingTasks(state, batchingTasks)
+
+    local backgroundTime = backgroundTime or calcTime
+    local backgroundTasks = backgroundTasks or maxTasks
 
     local success, timeSpent, tasksDone = tasks.processTasks(calcTime, maxTasks, visible)
-    tasks.processTasks(calcTime - timeSpent, maxTasks - tasksDone, notVisible)
+    tasks.processTasks(backgroundTime - timeSpent, backgroundTasks - tasksDone, notVisible)
 end
 
 function celesteRender.clearBatchingTasks()
@@ -61,6 +83,10 @@ end
 
 function celesteRender.invalidateRoomCache(roomName, key)
     if roomName then
+        if utils.typeof(roomName) == "room" then
+            roomName = roomName.name
+        end
+
         if key and roomCache[roomName] then
             roomCache[roomName][key] = nil
 
@@ -179,7 +205,8 @@ local function getRoomTileBatch(room, tiles, fg)
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
         (-> celesteRender.getTilesBatch(tiles, meta, fg)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
-        batchingTasks
+        batchingTasks,
+        {room = room}
     )
 
     return roomCache[room.name][key].result
@@ -252,7 +279,8 @@ local function getRoomDecalsBatch(room, decals, fg)
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
         (-> getDecalsBatch(decals)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
-        batchingTasks
+        batchingTasks,
+        {room = room}
     )
 
     return roomCache[room.name][key].result
@@ -347,7 +375,8 @@ function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw)
     roomCache[room.name].entities = roomCache[room.name].entities or tasks.newTask(
         (-> getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
-        batchingTasks
+        batchingTasks,
+        {room = room}
     )
 
     return roomCache[room.name].entities.result
@@ -408,7 +437,8 @@ function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
     roomCache[room.name].triggers = roomCache[room.name].triggers or tasks.newTask(
         (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
-        batchingTasks
+        batchingTasks,
+        {room = room}
     )
 
     return roomCache[room.name].triggers.result
@@ -535,7 +565,7 @@ function celesteRender.drawRoom(room, viewport, selected)
             -- Invalidate the canvas, so it is updated properly when the selected room changes
             -- TODO - Move into code responsible for changing selected room?
 
-            celesteRender.invalidateRoomCache(room, "canvas")
+            celesteRender.invalidateRoomCache(room.name, "canvas")
             drawRoomFromBatches(room, viewport, selected)
 
         else
@@ -578,7 +608,7 @@ function celesteRender.drawMap(state)
             end
 
             for i, room <- map.rooms do
-                if viewportHandler.roomVisible(room, viewport) then
+                if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or viewportHandler.roomVisible(room, viewport) then
                     celesteRender.drawRoom(room, viewport, room == state.selectedRoom)
                 end
             end
