@@ -77,7 +77,7 @@ function tool.draw()
                 local fg = tool.layer == "tilesFg"
                 local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
 
-                previewBatch = celesteRender.getTilesBatch(tiles, meta, fg)
+                previewBatch = celesteRender.getTilesBatch(room, tiles, meta, fg)
             end
 
             love.graphics.push()

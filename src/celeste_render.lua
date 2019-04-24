@@ -148,7 +148,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     return quadCache:get0(quadX, quadY)
 end
 
-function celesteRender.getTilesBatch(tiles, meta, fg)
+function celesteRender.getTilesBatch(room, tiles, meta, fg)
     local tiles = tiles.matrix
 
     -- Getting upvalues
@@ -169,8 +169,11 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
     local width, height = tiles:size
     local batch = smartDrawingBatch.createUnorderedBatch()
 
+    utils.setRandomSeed(room.name)
+
     for x = 1, width do
         for y = 1, height do
+            local rng = math.random(1, 256)
             local tile = tiles:getInbounds(x, y)
 
             if tile ~= airTile then
@@ -178,7 +181,7 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
                 local quadCount = quads:len
 
                 if quadCount > 0 then
-                    local randQuad = quadCount == 1 and quads[1] or quads[math.random(1, quadCount)]
+                    local randQuad = quads[utils.mod1(rng, quadCount)]
                     local texture = meta.paths[tile] or empty
 
                     local spriteMeta = atlases.gameplay[texture]
@@ -203,7 +206,7 @@ local function getRoomTileBatch(room, tiles, fg)
 
     roomCache[room.name] = roomCache[room.name] or {}
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
-        (-> celesteRender.getTilesBatch(tiles, meta, fg)),
+        (-> celesteRender.getTilesBatch(room, tiles, meta, fg)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
         batchingTasks,
         {room = room}

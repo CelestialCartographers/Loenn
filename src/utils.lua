@@ -126,6 +126,37 @@ function utils.rerequire(lib)
     return require(lib)
 end
 
+function utils.setRandomSeed(v)
+    if type(v) == "number" then
+        math.randomseed(v)
+
+    elseif type(v) == "string" and #v >= 1 then
+        local s = string.byte(v, 1)
+
+        for i = 2, #v do
+            s *= 256
+            s += string.byte(v)
+        end
+
+        math.randomseed(s)
+    end
+end
+
+function utils.deepcopy(v)
+    if type(v) == "table" then
+        local res = {}
+
+        for key, value <- v do
+            res[key] = utils.deepcopy(value)
+        end
+
+        return res
+
+    else
+        return v
+    end
+end
+
 -- Add all of filesystem helper into utils
 for k, v <- filesystem do
     utils[k] = v
