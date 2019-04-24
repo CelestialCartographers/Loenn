@@ -1,5 +1,6 @@
 local lfs = require("lfs_ffi")
 local nfd = require("nfd")
+local http = require("socket.http")
 local physfs = require("physfs")
 
 local filesystem = {}
@@ -17,6 +18,8 @@ function filesystem.dirname(path, sep)
     return path:match("(.*" .. sep .. ")")
 end
 
+-- TODO, Sanitize parts with leading/trailing separator
+-- IE {"foo", "/bar/"} becomes "foo//bar", expected "foo/bar"
 function filesystem.joinpath(...)
     local paths = {...}
     local sep = physfs.getDirSeparator()
@@ -67,6 +70,61 @@ function filesystem.openDialog(path, filter)
     -- TODO - Verify arguments, documentation was very existant 
 
     return nfd.open(filter, nil, path)
+end
+
+function filesystem.downloadURL(url, filename)
+    local body, code, headers = http.request(url)
+
+    if body and code == 200 then
+        filesystem.mkdir(filesystem.dirname(filename))
+        local fh = io.open(filename, "wb")
+
+        if fh then
+            fh:write(body)
+            fh:close()
+
+            return true
+        end
+    end
+
+    return false
+end
+
+function filesystem.copyFromLoveFilesystem(mountPoint, output, folder)
+    local filesTablePath = folder and filesystem.joinpath(mountPoint, folder) or mountPoint
+    local filesTable = love.filesystem.getDirectoryItems(filesTablePath)
+
+    local outputTarget = folder and filesystem.joinpath(output, folder) or output
+    filesystem.mkdir(outputTarget)
+
+    for i, file <- filesTable do
+        local path = folder and filesystem.joinpath(folder, file) or file
+        local mountPath = filesystem.joinpath(mountPoint, path)
+        local info = love.filesystem.getInfo(mountPath)
+
+        if info.type == "file" then
+            local fh = io.open(filesystem.joinpath(output, path), "wb")
+
+            if fh then
+                local data = love.filesystem.read(mountPath)
+
+                fh:write(data)
+                fh:close()
+            end
+
+        elseif info.type == "directory" then
+            filesystem.copyFromLoveFilesystem(mountPoint, output, path)
+        end
+    end
+end
+
+-- Unzip using phyfs unsandboxed mount system, and then manually copying out files
+function filesystem.unzip(zipPath, outputDir)
+    love.filesystem.mountUnsandboxed(zipPath, "temp/", 0)
+
+    filesystem.copyFromLoveFilesystem("temp", outputDir)
+
+    love.filesystem.unmount("temp")
 end
 
 return filesystem

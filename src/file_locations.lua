@@ -27,12 +27,12 @@ function fileLocations.getStorageDir()
     end
 end
 
-function fileLocations.getSettingsDir()
+function fileLocations.getSettingsPath()
     return filesystem.joinpath(fileLocations.getStorageDir(), "settings.conf")
 end
 
 function fileLocations.getCelesteDir()
-    return config.readConfig(fileLocations.getSettingsDir()).celeste_dir
+    return config.readConfig(fileLocations.getSettingsPath()).celeste_dir
 end
 
 return fileLocations

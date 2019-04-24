@@ -3,7 +3,7 @@ local fileLocations = require("file_locations")
 local utils = require("utils")
 local filesystem = require("filesystem")
 
-local settingsPath = fileLocations.getSettingsDir()
+local settingsPath = fileLocations.getSettingsPath()
 
 local startup = {}
 
