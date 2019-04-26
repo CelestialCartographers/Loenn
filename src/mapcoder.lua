@@ -77,8 +77,6 @@ function mapcoder.decodeFile(path, header)
     local fh = io.open(path, "rb")
     local res = {}
 
-    print(path)
-
     if not fh then
         return false, "File not found"
     end

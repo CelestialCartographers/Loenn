@@ -1,7 +1,9 @@
 local filesystem = require("filesystem")
+local github = require("github")
+local configs = require("configs")
 
--- TODO - Add way to get the correct url for updating
 -- TODO - Prompt to restart the program afterwards
+-- TODO - Track "current" version
 
 local updater = {}
 
@@ -10,38 +12,75 @@ function updater.canUpdate()
     return love.filesystem.isFused() or filesystem.fileExtension(love.filesystem.getSource()) == "love"
 end
 
+function updater.getRelevantRelease(releaseId)
+    local success, releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
+    local releaseId = releaseId or (success and #releases > 0 and releases[1].id)
+
+    if releaseId then
+        for i, release <- releases do
+            if release.id == releaseId then
+                return true, release
+            end
+        end
+    end
+
+    return false, nil
+end
+
+function updater.getRelevantReleaseAsset(releaseId, operatingSystem)
+    local success, release = updater.getRelevantRelease(releaseId)
+    local operatingSystem = operatingSystem or love.system.getOS()
+
+    if success then
+        for i, asset <- release.assets do
+            if asset.name:match("^" .. operatingSystem .. "%-") then
+                return true, asset
+            end
+        end
+    end
+
+    return false, nil
+end
+
 -- TODO - Test
 -- Make sure this works on at least Windows and Linux, assume that Linux code would work on OS X as well
-function updater.update(url)
+function updater.update(releaseId)
     if updater.canUpdate() then
-        local appDir = love.filesystem.getSourceBaseDirectory()
-        local userOS = love.system.getOS() 
+        local success, asset = updater.getRelevantReleaseAsset(releaseId, operatingSystem)
 
-        if userOS == "Windows" then
-            -- TODO
+        if success then
+            local url = asset.browser_download_url
+            local name = asset.name
 
-            return false
+            local appDir = love.filesystem.getSourceBaseDirectory()
+            local userOS = love.system.getOS() 
 
-        elseif userOS == "Linux" then
-            -- TODO - Sanitize this
-            -- Move current files into .old or equivalent
-            -- Download and extract files, and then delete .old
+            if userOS == "Windows" then
+                -- TODO
 
-            local zipPath = filesystem.joinpath(appDir, "update.zip")
-            local success = filesystem.downloadURL(url, zipPath)
+                return false
 
-            if success then
-                filesystem.unzip(zipPath, appDir)
+            elseif userOS == "Linux" then
+                -- TODO - Sanitize this
+                -- Move current files into .old or equivalent
+                -- Download and extract files, and then delete .old
 
-                filesystem.remove(zipPath)
+                local zipPath = filesystem.joinpath(appDir, name)
+                local success = filesystem.downloadURL(url, zipPath)
 
-                return true
+                if success then
+                    filesystem.unzip(zipPath, appDir)
+
+                    filesystem.remove(zipPath)
+
+                    return true
+                end
+
+            elseif userOS == "OS X" then
+                -- TODO
+
+                return false
             end
-
-        elseif userOS == "OS X" then
-            -- TODO
-
-            return false
         end
     end
 
