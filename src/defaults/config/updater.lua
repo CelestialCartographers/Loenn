@@ -1,4 +1,4 @@
 return {
     github_author = "CelestialCartographer",
-    github_repo = "TODO"
+    github_repo = "Loenn"
 }

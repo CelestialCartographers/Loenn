@@ -33,7 +33,7 @@ function updater.getRelevantReleaseAsset(releaseId, operatingSystem)
 
     if success then
         for i, asset <- release.assets do
-            if asset.name:match("^" .. operatingSystem .. "%-") then
+            if asset.name:match("-" .. operatingSystem .. ".zip$") then
                 return true, asset
             end
         end
