@@ -12,13 +12,13 @@ function updater.canUpdate()
     return love.filesystem.isFused() or filesystem.fileExtension(love.filesystem.getSource()) == "love"
 end
 
-function updater.getRelevantRelease(releaseId)
+function updater.getRelevantRelease(tagName)
     local success, releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
-    local releaseId = releaseId or (success and #releases > 0 and releases[1].id)
+    local tagName = tagName or (success and #releases > 0 and releases[1].tag_name)
 
-    if releaseId then
+    if tagName then
         for i, release <- releases do
-            if release.id == releaseId then
+            if release.tag_name == tagName then
                 return true, release
             end
         end
@@ -27,13 +27,15 @@ function updater.getRelevantRelease(releaseId)
     return false, nil
 end
 
-function updater.getRelevantReleaseAsset(releaseId, operatingSystem)
-    local success, release = updater.getRelevantRelease(releaseId)
+function updater.getRelevantReleaseAsset(tagName, operatingSystem)
+    local success, release = updater.getRelevantRelease(tagName)
     local operatingSystem = operatingSystem or love.system.getOS()
 
     if success then
         for i, asset <- release.assets do
-            if asset.name:match("-" .. operatingSystem .. ".zip$") then
+            local assetOS = asset:match("-([A-Za-z0-9_]+)%.zip$"))
+
+            if assetOS:lower() == operatingSystem:lower() or assetOS:lower():gsub("_", " ") == operatingSystem:lower() then
                 return true, asset
             end
         end
@@ -44,9 +46,9 @@ end
 
 -- TODO - Test
 -- Make sure this works on at least Windows and Linux, assume that Linux code would work on OS X as well
-function updater.update(releaseId)
+function updater.update(tagName)
     if updater.canUpdate() then
-        local success, asset = updater.getRelevantReleaseAsset(releaseId, operatingSystem)
+        local success, asset = updater.getRelevantReleaseAsset(tagName, operatingSystem)
 
         if success then
             local url = asset.browser_download_url
