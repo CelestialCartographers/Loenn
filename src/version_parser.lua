@@ -7,7 +7,7 @@ Use tostring() to turn a version object back into a string.
 
 Usage:
   local v = require("version_parser")
-  print(v("v1.4.6") < v(v1.4.7))
+  print(v("v1.4.6") < v("v1.4.7"))
 
 Author: Vexatos
 
