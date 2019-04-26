@@ -82,13 +82,6 @@ function vmt.__le(v, o)
             return false
         end
     end
-    if o[#v + 1] then
-        for i = #v + 1, #o do
-            if o[i] ~= 0 then
-                return false
-            end
-        end
-    end
     return true
 end
 
