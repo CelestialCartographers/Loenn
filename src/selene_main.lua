@@ -1,10 +1,5 @@
 -- love.load() is not called again, put stuff here.
 
-local v = require("version")
-print(v("v1.24.5") > v("v1.3.5"))
-print(v("v1.24.5") < v("v1.24"))
-print(v("v1.24.5") == v("v1.24"))
-
 love.window.setTitle("Lönn Demo")
 
 love.keyboard.setKeyRepeat(true)
