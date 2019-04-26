@@ -1,12 +1,13 @@
 --[==[
 
-Simple semantic version parsing library.
+Simple version parsing library for versions
+of the format "vX.Y.Z.P".
 Allows creating comparable version objects.
 Use tostring() to turn a version object back into a string.
 
 Usage:
-  local version = require("version")
-  print(version("v1.4.6") < version(v1.4.7))
+  local v = require("version_parser")
+  print(v("v1.4.6") < v(v1.4.7))
 
 Author: Vexatos
 
@@ -57,13 +58,15 @@ function vmt.__lt(v, o)
         return false
     end
     for i = 1, #v do
-        if v[i] < o[i] then
+        if not o[i] then
+            return false
+        elseif v[i] < o[i] then
             return true
         elseif v[i] > o[i] then
             return false
         end
     end
-    return false
+    return o[#v + 1] and 0 < o[#v + 1]
 end
 
 function vmt.__le(v, o)
@@ -71,10 +74,19 @@ function vmt.__le(v, o)
         return false
     end
     for i = 1, #v do
-        if v[i] < o[i] then
+        if not o[i] then
+            return v[i] == 0
+        elseif v[i] < o[i] then
             return true
         elseif v[i] > o[i] then
             return false
+        end
+    end
+    if o[#v + 1] then
+        for i = #v + 1, #o do
+            if o[i] ~= 0 then
+                return false
+            end
         end
     end
     return true
@@ -89,7 +101,7 @@ function library_mt.__call(lib, s)
         return nil, "invalid version string: " .. s
     end
     local newv = {}
-    for subv in s:gsub("^%a*(%d[%d.]*).*", "%1"):gmatch("[^.]") do
+    for subv in s:gsub("^%a*(%d[%d.]*).*", "%1"):gmatch("[^.]+") do
         nv = tonumber(subv)
         if not nv then
             return nil, "invalid version string: " .. s
