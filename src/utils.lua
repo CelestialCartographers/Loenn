@@ -121,7 +121,7 @@ end
 -- Clear the cache and return a new uncached version of the library
 -- Highly unrecommended to use this for anything
 function utils.rerequire(lib)
-    utils.unrequre(lib)
+    utils.unrequire(lib)
 
     return require(lib)
 end

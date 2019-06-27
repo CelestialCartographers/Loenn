@@ -366,7 +366,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
     return batches
 end
 
-function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw)
+function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw, registeredEntities)
     local registeredEntities = registeredEntities or entityHandler.registeredEntities
     
     roomCache[room.name] = roomCache[room.name] or {}

@@ -8,15 +8,20 @@ local entityRegisteryMT = {
     __index = function() return missingEntity end
 }
 
-entities.registeredEntities = setmetatable({}, entityRegisteryMT)
+entities.registeredEntities = nil
 
-function entities.registerEntity(fn, registerAt, internal)
+-- Sets the registry to the given table (or empty one) and sets the missing entity metatable
+function entities.initDefaultRegistry(t)
+    entities.registeredEntities = setmetatable(t or {}, entityRegisteryMT)
+end
+
+function entities.registerEntity(fn, registerAt)
     local registerAt = registerAt or entities.registeredEntities
 
     local pathNoExt = utils.stripExtension(fn)
     local filenameNoExt = utils.filename(pathNoExt, "/")
 
-    local handler = require(pathNoExt)
+    local handler = utils.rerequire(pathNoExt)
     local name = handler.name or filenameNoExt
 
     print("! Registered entity '" .. name .. "' for '" .. name .."'")
@@ -38,5 +43,7 @@ function entities.loadInternalEntities(registerAt, path)
 
     coroutine.yield(registerAt)
 end
+
+entities.initDefaultRegistry()
 
 return entities

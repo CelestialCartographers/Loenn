@@ -3,5 +3,9 @@ return {
     redo = "ctrl + shift + z",
     open = "ctrl + o",
     save = "ctrl + s",
-    saveAs = "ctrl + shift + s"
+    saveAs = "ctrl + shift + s",
+
+    debugReloadEntities = "f5",
+    debugRedrawMap = "f6",
+    debugReloadEverything = "ctrl + f5"
 }
