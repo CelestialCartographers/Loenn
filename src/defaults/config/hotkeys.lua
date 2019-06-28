@@ -7,5 +7,6 @@ return {
 
     debugReloadEntities = "f5",
     debugRedrawMap = "f6",
-    debugReloadEverything = "ctrl + f5"
+    debugReloadEverything = "ctrl + f5",
+    debugMode = "ctrl + shift + j"
 }

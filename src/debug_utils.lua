@@ -24,4 +24,8 @@ function debugUtils.reloadEverything()
     debugUtils.redrawMap()
 end
 
+function debugUtils.debug()
+    debug.debug()
+end
+
 return debugUtils
