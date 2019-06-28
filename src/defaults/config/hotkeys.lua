@@ -12,6 +12,7 @@ return {
     -- Debug
     debugReloadEntities = "f5",
     debugRedrawMap = "f6",
+    debugReloadTools = "f7",
     debugReloadEverything = "ctrl + f5",
     debugMode = "ctrl + shift + j",
 }

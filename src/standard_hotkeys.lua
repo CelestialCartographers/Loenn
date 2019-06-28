@@ -20,6 +20,7 @@ local rawHotkeys = {
     -- Debug hotkeys
     {configs.hotkeys.debugReloadEverything, (-> debugUtils.reloadEverything()), "Reload everything"},
     {configs.hotkeys.debugReloadEntities, (-> debugUtils.reloadEntities()), "Reload entities"},
+    {configs.hotkeys.debugReloadTools, (-> debugUtils.reloadTools()), "Reload tools"},
     {configs.hotkeys.debugRedrawMap, (-> debugUtils.redrawMap()), "Redraw map"},
     {configs.hotkeys.debugMode, (-> debugUtils.debug()), "Debug mode"},
 

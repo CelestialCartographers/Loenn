@@ -29,7 +29,8 @@ local configs = require("configs")
 
 local inputDevice = require("input_device")
 local mapLoaderDevice = require("input_devices/map_loader")
-local toolHandlerDevice = require("input_devices/tool_handler")
+local toolHandlerDevice = require("input_devices/tool_device")
+local toolHandler = require("tool_handler")
 
 inputDevice.newInputDevice(viewportHandler.device)
 inputDevice.newInputDevice(hotkeyHandler.createHotkeyDevice(standardHotkeys))
@@ -39,9 +40,11 @@ inputDevice.newInputDevice(toolHandlerDevice)
 
 love.graphics.setFont(fonts.font)
 
+-- Load internal modules such as tools/entities/triggers etc
 tasks.newTask(
     function()
         entities.loadInternalEntities()
+        toolHandler.loadInternalTools()
     end
 )
 

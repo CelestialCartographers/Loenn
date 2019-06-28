@@ -1,5 +1,6 @@
 local entities = require("entities")
 local celesteRender = require("celeste_render")
+local toolHandler = require("tool_handler")
 
 local debugUtils = {}
 
@@ -11,6 +12,15 @@ function debugUtils.reloadEntities()
     entities.loadInternalEntities()
 end
 
+function debugUtils.reloadTools()
+    print("! Reloading tools")
+
+    toolHandler.currentTool = nil
+    toolHandler.currentToolName = nil
+
+    toolHandler.loadInternalTools()
+end
+
 function debugUtils.redrawMap()
     print("! Redrawing map")
     
@@ -20,7 +30,10 @@ end
 
 -- TODO - Add as more hotswapping becomes available
 function debugUtils.reloadEverything()
+    print("! Reloading everything")
+
     debugUtils.reloadEntities()
+    debugUtils.reloadTools()
     debugUtils.redrawMap()
 end
 
