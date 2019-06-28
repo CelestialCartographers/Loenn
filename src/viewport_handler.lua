@@ -1,10 +1,10 @@
 local inputDevice = require("input_device")
 local utils = require("utils")
+local configs = require("configs")
+
+local movementButton = configs.editor.canvasMoveButton
 
 local viewportHandler = {}
-
--- TODO - Put in config/constants files
-local movementButton = 2
 
 local viewport = {
     x = 0,

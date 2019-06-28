@@ -1,8 +1,16 @@
+-- TODO
+-- Consider making the "cursor" rectangle display the tile and how it would connect
+-- Track placed tiles from press -> release for undo purposes
+
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
 local fonts = require("fonts")
 local matrix = require("matrix")
 local celesteRender = require("celeste_render")
+local configs = require("configs")
+
+local actionButton = configs.editor.toolActionButton
+local cloneButton = configs.editor.objectCloneButton
 
 local tool = {}
 
@@ -13,50 +21,74 @@ tool.image = nil
 tool.layer = "tilesFg"
 tool.material = "a"
 
+local lastTileX, lastTileY = -1, -1
 local lastX, lastY = -1, -1
 
 local previewMatrix = matrix.filled("0", 5, 5)
 local previewBatch = nil
 
--- Test tile placement
-function tool.mousepressed(x, y, button, istouch, pressed)
+-- Attempts to place tile at x, y
+-- Returns true if successful
+function placeTile(room, x, y, material, layer)
+    local tiles = room[layer]
+    local matrix = tiles.matrix
+
+    matrix:set(x, y, material)
+
+    return matrix:inbounds(x, y)
+end
+
+function getTile(room, x, y, layer)
+    local tiles = room[layer]
+    local matrix = tiles.matrix
+
+    matrix:get(x, y)
+end
+
+function handleActionClick(x, y, force)
     local room = state.selectedRoom
 
     if room then
-        local tiles = room[tool.layer]
-        local matrix = tiles.matrix 
+        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
-        local tx, ty = viewportHandler.pixelToTileCoordinates(viewportHandler.getRoomCoordindates(state.selectedRoom, x, y))
+        if lastTileX ~= tx + 1 or lastTileY ~= ty + 1 or force then
+            if placeTile(room, tx + 1, ty + 1, tool.material, tool.layer) then
+                -- TODO - Redraw more efficiently
+                celesteRender.invalidateRoomCache(room.name)
+            end
 
-        -- TODO - Update the room batch and redraw
-        matrix:set(tx + 1, ty + 1, tool.material)
-        celesteRender.invalidateRoomCache(room.name)
+            lastTileX, lastTileY = tx + 1, ty + 1
+        end
+
+        lastX, lastY = x, y
+    end
+end
+
+function handleCloneClick(x, y)
+    local room = state.selectedRoom
+
+    if room then
+        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
+
+        local material = getTile(room, tx + 1, ty + 1, tool.layer)
+
+        if material then
+            tool.material = material
+        end
+    end
+end
+
+function tool.mousepressed(x, y, button, istouch, pressed)
+    if button == actionButton then
+        handleActionClick(x, y)
     end
 end
 
 function tool.mousemoved(x, y, dx, dy, istouch)
-    local room = state.selectedRoom
-
-    if room then
-        local tiles = room[tool.layer]
-        local matrix = tiles.matrix 
-
-        local px, py = viewportHandler.getRoomCoordindates(state.selectedRoom, x, y)
-        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
-
-        if tx ~= lastX or ty ~= lastY then
-            for i = -2, 2 do
-                for j = -2, 2 do
-                    previewMatrix:set(i + 3, j + 3, matrix:get0(tx + i, ty + j, "0"))
-                end
-            end
-
-            previewMatrix:set(3, 3, tool.material)
-
-            lastX = tx
-            lastY = ty
-            previewBatch = nil
-        end
+    if love.mouse.isDown(actionButton) then
+        handleActionClick(x, y)
     end
 end
 
@@ -72,22 +104,8 @@ function tool.draw()
         love.graphics.printf(hudText, 20, 120, viewportHandler.viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
 
         viewportHandler.drawRelativeTo(room.x, room.y, (->
-            if not previewBatch then
-                local tiles = {matrix = previewMatrix}
-                local fg = tool.layer == "tilesFg"
-                local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
-
-                previewBatch = celesteRender.getTilesBatch(room, tiles, meta, fg)
-            end
-
-            love.graphics.push()
-            love.graphics.translate(tx * 8 - 16, ty * 8 - 16)
-
-            previewBatch:draw()
-            love.graphics.setColor(0.3, 0.3, 0.3, 0.3)
-            love.graphics.rectangle("line", 16, 16, 8, 8)
-
-            love.graphics.pop()
+            love.graphics.setColor(0.3, 0.3, 0.3, 0.8)
+            love.graphics.rectangle("line", tx * 8, ty * 8, 8, 8)
 
             return -- TODO - Vex please fix
         ))
