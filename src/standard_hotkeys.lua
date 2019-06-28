@@ -3,6 +3,7 @@ local filesystem = require("filesystem")
 local loadedState = require("loaded_state")
 local fileLocations = require("file_locations")
 local debugUtils = require("debug_utils")
+local viewportHandler = require("viewport_handler")
 
 local hotkeyStruct = require("structs/hotkey")
 
@@ -21,6 +22,10 @@ local rawHotkeys = {
     {configs.hotkeys.debugReloadEntities, (-> debugUtils.reloadEntities()), "Reload entities"},
     {configs.hotkeys.debugRedrawMap, (-> debugUtils.redrawMap()), "Redraw map"},
     {configs.hotkeys.debugMode, (-> debugUtils.debug()), "Debug mode"},
+
+    -- Camera
+    {configs.hotkeys.cameraZoomIn, (-> viewportHandler.zoomIn()), "Zoom in"},
+    {configs.hotkeys.cameraZoomOut, (-> viewportHandler.zoomOut()), "Zoom out"},
 }
 
 local hotkeys = {}

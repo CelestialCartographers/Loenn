@@ -111,20 +111,6 @@ function viewportHandler.drawRelativeTo(x, y, func)
     love.graphics.pop()
 end
 
--- TODO - Add config option to get back WASD movement of viewport?
-function viewportDevice.keypressed(key, scancode, isrepeat)
-    if key == "+" and not isrepeat then
-        viewportHandler.zoomIn()
-
-        return true
-
-    elseif key == "-" and not isrepeat then
-        viewportHandler.zoomOut()
-
-        return true
-    end
-end
-
 function viewportDevice.mousedragmoved(dx, dy, button, istouch)
     if button == movementButton then
         viewport.x -= dx

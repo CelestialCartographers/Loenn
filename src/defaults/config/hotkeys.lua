@@ -5,8 +5,13 @@ return {
     save = "ctrl + s",
     saveAs = "ctrl + shift + s",
 
+    -- Camera
+    cameraZoomIn = "ctrl + plus",
+    cameraZoomOut = "ctrl + minus",
+
+    -- Debug
     debugReloadEntities = "f5",
     debugRedrawMap = "f6",
     debugReloadEverything = "ctrl + f5",
-    debugMode = "ctrl + shift + j"
+    debugMode = "ctrl + shift + j",
 }
