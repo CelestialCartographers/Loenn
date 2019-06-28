@@ -3,8 +3,9 @@ local config = require("config")
 
 local fileLocations = {}
 
+-- TODO - Test if Windows approves of Lönn instead of Loenn
 local loennUpper = "Loenn"
-local loennLower = "loenn"
+local loennLower = "lönn"
 
 function fileLocations.getStorageDir()
     local userOS = love.system.getOS()
@@ -13,8 +14,15 @@ function fileLocations.getStorageDir()
         return filesystem.joinpath(os.getenv("LocalAppData"), loennUpper)
 
     elseif userOS == "Linux" then
-        -- TODO - Is this good enough? Better alternative?
-        return filesystem.joinpath(os.getenv("HOME"), "." .. loennLower)
+        local xdgConfig = os.getenv("XDG_CONFIG_HOME")
+        local home = os.getenv("HOME")
+
+        if xdgConfig then
+            return filesystem.joinpath(xdgConfig, loennLower)
+
+        else
+            return filesystem.joinpath(home, ".config", loennLower)
+        end
 
     elseif userOS == "OS X" then
         -- TODO
