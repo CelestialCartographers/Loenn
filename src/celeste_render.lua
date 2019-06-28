@@ -555,7 +555,7 @@ function celesteRender.drawRoom(room, viewport, selected)
     local redrawRoom = selected or ALWAYS_REDRAW_UNSELECTED_ROOMS
     local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
-    viewportHandler.drawRelativeTo(roomX, roomY, (->
+    viewportHandler.drawRelativeTo(roomX, roomY, function()
         love.graphics.setColor(backgroundColor)
         love.graphics.rectangle("fill", 0, 0, width, height)
 
@@ -576,9 +576,7 @@ function celesteRender.drawRoom(room, viewport, selected)
                 love.graphics.draw(canvas)
             end
         end
-
-        return -- TODO - Vex please fix
-    ))
+    end)
 end
 
 function celesteRender.drawFiller(filler, viewport)
@@ -588,14 +586,12 @@ function celesteRender.drawFiller(filler, viewport)
     local width = filler.width * 8
     local height = filler.height * 8
 
-    viewportHandler.drawRelativeTo(x, y, (->
+    viewportHandler.drawRelativeTo(x, y, function()
         love.graphics.setColor(colors.fillerColor)
         love.graphics.rectangle("fill", 0, 0, width, height)
 
         love.graphics.setColor(colors.default)
-
-        return -- TODO - Vex please fix
-    ))
+    end)
 end
 
 function celesteRender.drawMap(state)

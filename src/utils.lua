@@ -37,14 +37,13 @@ function utils.loadImageAbsPath(path)
     return love.graphics.newImage(data)
 end
 
--- TODO - Get Vex to look at the lambda versions
 function utils.humanizeVariableName(name)
     local res = name
 
     res := gsub("_", " ")
     res := gsub("/", " ")
 
-    res := gsub("(%l)(%u)", function (a, b) return a .. " " .. b end)
+    res := gsub("(%l)(%u)", function(a, b) return a .. " " .. b end)
     res := gsub("(%a)(%a*)", function(a, b) return string.upper(a) .. b end)
 
     res := gsub("%s+", " ")

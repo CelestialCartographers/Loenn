@@ -103,12 +103,10 @@ function tool.draw()
 
         love.graphics.printf(hudText, 20, 120, viewportHandler.viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
 
-        viewportHandler.drawRelativeTo(room.x, room.y, (->
+        viewportHandler.drawRelativeTo(room.x, room.y, function()
             love.graphics.setColor(0.3, 0.3, 0.3, 0.8)
             love.graphics.rectangle("line", tx * 8, ty * 8, 8, 8)
-
-            return -- TODO - Vex please fix
-        ))
+        end)
     end
 end
 
