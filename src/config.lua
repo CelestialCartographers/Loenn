@@ -9,17 +9,17 @@ function config.readConfigData(filename)
     local res
     local tempFilename = filename .. ".saving"
 
-    local tempAttrs = lfs.attributes(tempFilename)
-    local realAttrs = lfs.attributes(filename)
+    local tempExists = utils.isFile(tempFilename)
+    local targetExists = utils.isFile(filename)
 
     -- Program terminated before the config got moved
     -- Temporary file holds the correct data
-    if not realAttrs and tempAttrs then
+    if not targetExists and tempExists then
         os.rename(tempFilename, filename)
     end
 
     -- Program was terminated while config was saved
-    if tempAttrs then
+    if tempExists then
         os.remove(tempFilename)
     end
 
