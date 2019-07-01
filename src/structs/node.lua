@@ -17,7 +17,7 @@ end
 function nodeStruct.decode(data)
     if data.__name == "node" then
         local res = {
-            _typ = "node"
+            _type = "node"
         }
         
         res[1] = data.x

@@ -80,7 +80,7 @@ function startup.init()
             local conf = config.readConfig(settingsPath) or {}
             conf.celeste_dir = celesteDir
 
-            config.writeConfig(settingsPath, conf)
+            config.writeConfig(conf)
         end
 
         return found
