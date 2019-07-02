@@ -1,40 +1,28 @@
+local filesystem = require("filesystem")
+local config = require("config")
+
 local fileLocations = {}
 
-fileLocations.useInternal = false
+-- TODO - Test if Windows approves of Lönn instead of Loenn
+local loennUpper = "Loenn"
+local loennLower = "lönn"
 
-local loennUpper = "L" .. string.char(148) .. "nn"
-local loennLower = "l" .. string.char(148) .. "nn"
-
--- Temporary for now
-function fileLocations.getResourceDir()
-    if useInternal then
-        return "celesteResources"
-
-    else
-        local appdata = os.getenv("LocalAppData")
-        local home = os.getenv("HOME")
-
-        if appdata then
-            return appdata .. "/Loenn"
-
-        else
-            return home .. "/.loenn"
-        end
-    end
-end
-
--- TODO - Figure out how to create this folder automatically
--- Problems with love2d filesystem
--- Assume user has the folder at the moment
 function fileLocations.getStorageDir()
     local userOS = love.system.getOS()
 
     if userOS == "Windows" then
-        return os.getenv("LocalAppData"):gsub("\\", "/") .. "/" .. loennUpper
+        return filesystem.joinpath(os.getenv("LocalAppData"), loennUpper)
 
     elseif userOS == "Linux" then
-        -- TODO - Is this good enough? Better alternative?
-        return os.getenv("HOME") .. "/." .. loennLower
+        local xdgConfig = os.getenv("XDG_CONFIG_HOME")
+        local home = os.getenv("HOME")
+
+        if xdgConfig then
+            return filesystem.joinpath(xdgConfig, loennLower)
+
+        else
+            return filesystem.joinpath(home, ".config", loennLower)
+        end
 
     elseif userOS == "OS X" then
         -- TODO
@@ -45,6 +33,14 @@ function fileLocations.getStorageDir()
     elseif userOS == "iOS" then
         -- TODO
     end
+end
+
+function fileLocations.getSettingsPath()
+    return filesystem.joinpath(fileLocations.getStorageDir(), "settings.conf")
+end
+
+function fileLocations.getCelesteDir()
+    return config.readConfig(fileLocations.getSettingsPath()).celeste_dir
 end
 
 return fileLocations

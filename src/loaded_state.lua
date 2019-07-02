@@ -9,16 +9,19 @@ local state = {}
 
 -- TODO - Check for changes and warn users when we aren't just a map viewer
 function state.loadMap(filename)
-    celesteRender.invalidateRoomCache()
-    celesteRender.clearBatchingTasks()
-
-    state.map = nil
-
     tasks.newTask(
-        (-> mapcoder.decodeFile(filename)),
+        (-> filename and mapcoder.decodeFile(filename)),
         function(task)
-            state.map = mapStruct.decode(task.result)
-            state.selectedRoom = state.map and state.map.rooms[1]
+            if task.result then
+                celesteRender.invalidateRoomCache()
+                celesteRender.clearBatchingTasks()
+
+                state.map = mapStruct.decode(task.result)
+                state.selectedRoom = state.map and state.map.rooms[1]
+
+            else
+                -- TODO - Toast the user
+            end
         end
     )
 end

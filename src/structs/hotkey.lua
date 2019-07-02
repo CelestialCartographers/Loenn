@@ -7,6 +7,9 @@ local specialActivators = {
     gui = keyboardHelper.modifierGUI,
     command = keyboardHelper.modifierGUI,
     winkey = keyboardHelper.modifierGUI,
+
+    plus = "+",
+    minus = "-",
 }
 
 local hotkeyStruct = {}

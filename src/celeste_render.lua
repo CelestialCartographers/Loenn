@@ -15,8 +15,8 @@ local matrix = require("matrix")
 
 local celesteRender = {}
 
-local tilesetFileFg = fileLocations.getResourceDir() .. "/XML/ForegroundTiles.xml"
-local tilesetFileBg = fileLocations.getResourceDir() .. "/XML/BackgroundTiles.xml"
+local tilesetFileFg = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Graphics", "ForegroundTiles.xml")
+local tilesetFileBg = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Graphics", "BackgroundTiles.xml")
 
 celesteRender.tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
 celesteRender.tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
@@ -33,26 +33,48 @@ local decalsBgDepth = 9000
 
 local triggersDepth = -math.huge
 
-local PRINT_BATCHING_DURATION = true
+local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = false
+local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = true
 
 -- Room cache
 local roomCache = {}
 
 local batchingTasks = {}
 
-function celesteRender.sortBatchingTasks(map, tasks)
-    -- TODO
-    -- Return visible tasks in first array, non visible in other
+function celesteRender.sortBatchingTasks(state, tasks)
+    local visibleTasks = {}
+    local nonVisibileTasks = {}
 
-    return tasks, {}
+    for i = #batchingTasks, 1, -1 do
+        local task = batchingTasks[i]
+        local viewport = state.viewport
+        local room = task.data.room
+
+        if not task.done then
+            if viewport.visible and viewportHandler.roomVisible(room, viewport) then
+                table.insert(visibleTasks, task)
+
+            else
+                table.insert(nonVisibileTasks, task)
+            end
+
+        else
+            table.remove(batchingTasks, i)
+        end
+    end
+
+    return visibleTasks, nonVisibileTasks
 end
 
-function celesteRender.processTasks(calcTime, maxTasks)
-    local visible, notVisible = celesteRender.sortBatchingTasks(nil, batchingTasks) -- TODO
+function celesteRender.processTasks(state, calcTime, maxTasks, backgroundTime, backgroundTasks)
+    local visible, notVisible = celesteRender.sortBatchingTasks(state, batchingTasks)
+
+    local backgroundTime = backgroundTime or calcTime
+    local backgroundTasks = backgroundTasks or maxTasks
 
     local success, timeSpent, tasksDone = tasks.processTasks(calcTime, maxTasks, visible)
-    tasks.processTasks(calcTime - timeSpent, maxTasks - tasksDone, notVisible)
+    tasks.processTasks(backgroundTime - timeSpent, backgroundTasks - tasksDone, notVisible)
 end
 
 function celesteRender.clearBatchingTasks()
@@ -61,6 +83,10 @@ end
 
 function celesteRender.invalidateRoomCache(roomName, key)
     if roomName then
+        if utils.typeof(roomName) == "room" then
+            roomName = roomName.name
+        end
+
         if key and roomCache[roomName] then
             roomCache[roomName][key] = nil
 
@@ -122,7 +148,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     return quadCache:get0(quadX, quadY)
 end
 
-function celesteRender.getTilesBatch(tiles, meta, fg)
+function celesteRender.getTilesBatch(room, tiles, meta, fg)
     local tiles = tiles.matrix
 
     -- Getting upvalues
@@ -143,8 +169,11 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
     local width, height = tiles:size
     local batch = smartDrawingBatch.createUnorderedBatch()
 
+    utils.setRandomSeed(room.name)
+
     for x = 1, width do
         for y = 1, height do
+            local rng = math.random(1, 256)
             local tile = tiles:getInbounds(x, y)
 
             if tile ~= airTile then
@@ -152,7 +181,7 @@ function celesteRender.getTilesBatch(tiles, meta, fg)
                 local quadCount = quads:len
 
                 if quadCount > 0 then
-                    local randQuad = quadCount == 1 and quads[1] or quads[math.random(1, quadCount)]
+                    local randQuad = quads[utils.mod1(rng, quadCount)]
                     local texture = meta.paths[tile] or empty
 
                     local spriteMeta = atlases.gameplay[texture]
@@ -177,9 +206,10 @@ local function getRoomTileBatch(room, tiles, fg)
 
     roomCache[room.name] = roomCache[room.name] or {}
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
-        (-> celesteRender.getTilesBatch(tiles, meta, fg)),
+        (-> celesteRender.getTilesBatch(room, tiles, meta, fg)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
-        batchingTasks
+        batchingTasks,
+        {room = room}
     )
 
     return roomCache[room.name][key].result
@@ -252,7 +282,8 @@ local function getRoomDecalsBatch(room, decals, fg)
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
         (-> getDecalsBatch(decals)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
-        batchingTasks
+        batchingTasks,
+        {room = room}
     )
 
     return roomCache[room.name][key].result
@@ -335,7 +366,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
     return batches
 end
 
-function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw)
+function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw, registeredEntities)
     local registeredEntities = registeredEntities or entityHandler.registeredEntities
     
     roomCache[room.name] = roomCache[room.name] or {}
@@ -347,7 +378,8 @@ function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw)
     roomCache[room.name].entities = roomCache[room.name].entities or tasks.newTask(
         (-> getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
-        batchingTasks
+        batchingTasks,
+        {room = room}
     )
 
     return roomCache[room.name].entities.result
@@ -408,7 +440,8 @@ function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
     roomCache[room.name].triggers = roomCache[room.name].triggers or tasks.newTask(
         (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
-        batchingTasks
+        batchingTasks,
+        {room = room}
     )
 
     return roomCache[room.name].triggers.result
@@ -522,7 +555,7 @@ function celesteRender.drawRoom(room, viewport, selected)
     local redrawRoom = selected or ALWAYS_REDRAW_UNSELECTED_ROOMS
     local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
-    viewportHandler.drawRelativeTo(roomX, roomY, (->
+    viewportHandler.drawRelativeTo(roomX, roomY, function()
         love.graphics.setColor(backgroundColor)
         love.graphics.rectangle("fill", 0, 0, width, height)
 
@@ -535,7 +568,7 @@ function celesteRender.drawRoom(room, viewport, selected)
             -- Invalidate the canvas, so it is updated properly when the selected room changes
             -- TODO - Move into code responsible for changing selected room?
 
-            celesteRender.invalidateRoomCache(room, "canvas")
+            celesteRender.invalidateRoomCache(room.name, "canvas")
             drawRoomFromBatches(room, viewport, selected)
 
         else
@@ -543,9 +576,7 @@ function celesteRender.drawRoom(room, viewport, selected)
                 love.graphics.draw(canvas)
             end
         end
-
-        return -- TODO - Vex please fix
-    ))
+    end)
 end
 
 function celesteRender.drawFiller(filler, viewport)
@@ -555,14 +586,12 @@ function celesteRender.drawFiller(filler, viewport)
     local width = filler.width * 8
     local height = filler.height * 8
 
-    viewportHandler.drawRelativeTo(x, y, (->
+    viewportHandler.drawRelativeTo(x, y, function()
         love.graphics.setColor(colors.fillerColor)
         love.graphics.rectangle("fill", 0, 0, width, height)
 
         love.graphics.setColor(colors.default)
-
-        return -- TODO - Vex please fix
-    ))
+    end)
 end
 
 function celesteRender.drawMap(state)
@@ -578,7 +607,7 @@ function celesteRender.drawMap(state)
             end
 
             for i, room <- map.rooms do
-                if viewportHandler.roomVisible(room, viewport) then
+                if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or viewportHandler.roomVisible(room, viewport) then
                     celesteRender.drawRoom(room, viewport, room == state.selectedRoom)
                 end
             end

@@ -8,18 +8,23 @@ local entityRegisteryMT = {
     __index = function() return missingEntity end
 }
 
-entities.registeredEntities = setmetatable({}, entityRegisteryMT)
+entities.registeredEntities = nil
 
-function entities.registerEntity(fn, registerAt, internal)
+-- Sets the registry to the given table (or empty one) and sets the missing entity metatable
+function entities.initDefaultRegistry(t)
+    entities.registeredEntities = setmetatable(t or {}, entityRegisteryMT)
+end
+
+function entities.registerEntity(fn, registerAt)
     local registerAt = registerAt or entities.registeredEntities
 
     local pathNoExt = utils.stripExtension(fn)
-    local filenameNoExt = utils.filename(pathNoExt)
+    local filenameNoExt = utils.filename(pathNoExt, "/")
 
-    local handler = require(pathNoExt)
+    local handler = utils.rerequire(pathNoExt)
     local name = handler.name or filenameNoExt
 
-    print("! Registered entity '" .. name .. "'")
+    print("! Registered entity '" .. name .. "' for '" .. name .."'")
 
     registerAt[name] = handler
 end
@@ -30,12 +35,15 @@ function entities.loadInternalEntities(registerAt, path)
     local path = path or "entities"
 
     for i, file <- love.filesystem.getDirectoryItems(path) do
-        entities.registerEntity(path .. "/" .. file, registerAt)
+        -- Always use Linux paths here
+        entities.registerEntity(utils.joinpath(path, file):gsub("\\", "/"), registerAt)
 
         coroutine.yield()
     end
 
     coroutine.yield(registerAt)
 end
+
+entities.initDefaultRegistry()
 
 return entities

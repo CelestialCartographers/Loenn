@@ -47,8 +47,17 @@ end
 
 function matrixMt.__index.set(self, x, y, val)
     if x >= 1 and x <= self._width and y >= 0 and y <= self._height then
-        return self:setInbounds(x, y, val)
+        self:setInbounds(x, y, val)
     end
+end
+
+-- Inbounds functions just for external validation
+function matrixMt.__index.inbounds(self, x, y)
+    return x >= 1 and x <= self._width and y >= 0 and y <= self._height
+end
+
+function matrixMt.__index.inbounds0(self, x, y)
+    return x >= 0 and x < self._width and y >= 0 and y < self._height
 end
 
 

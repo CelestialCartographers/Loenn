@@ -7,9 +7,14 @@ love.keyboard.setKeyRepeat(true)
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
 love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
-local inputHandler = require("input_handler")
-require("filesystem_mount_workaround")
+-- Set up configs for first run
+local startup = require("initial_startup")
+startup:init()
 
+local inputHandler = require("input_handler")
+require("love_filesystem_unsandboxing")
+
+local utils = require("utils")
 local celesteRender = require("celeste_render")
 local fileLocations = require("file_locations")
 local fonts = require("fonts")
@@ -25,7 +30,8 @@ local uiHandler = require("ui_handler")
 
 local inputDevice = require("input_device")
 local mapLoaderDevice = require("input_devices/map_loader")
-local toolHandlerDevice = require("input_devices/tool_handler")
+local toolHandlerDevice = require("input_devices/tool_device")
+local toolHandler = require("tool_handler")
 
 inputDevice.newInputDevice(uiHandler)
 inputDevice.newInputDevice(viewportHandler.device)
@@ -36,13 +42,15 @@ inputDevice.newInputDevice(toolHandlerDevice)
 
 love.graphics.setFont(fonts.font)
 
+-- Load internal modules such as tools/entities/triggers etc
 tasks.newTask(
     function()
         entities.loadInternalEntities()
+        toolHandler.loadInternalTools()
     end
 )
 
-local mapFile = fileLocations.getResourceDir() .. "/Maps/7-Summit.bin"
+local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
 
 viewerState.loadMap(mapFile)
 
@@ -68,7 +76,7 @@ function love.update(dt)
     
     if viewerState.map then
         -- TODO - Find some sane values for this
-        celesteRender.processTasks(1 / 20, 20)
+        celesteRender.processTasks(viewerState, 1 / 60, math.huge, 1 / 240, math.huge)
 
     else
         loading:update(dt)

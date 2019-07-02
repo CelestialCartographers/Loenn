@@ -1,4 +1,5 @@
 local fonts = require("fonts")
+local utils = require("utils")
 
 local loading = {}
 
@@ -22,7 +23,7 @@ loading.textOffsetX = (fonts.font:getWidth(loading.text .. "..") * loading.textS
 loading.textOffsetY = loading.quadSize / 2
 
 function loading:drawLoadScreen(viewport)
-    local currentQuad = math.floor(self.currentTime / self.duration * #self.quads) + 1
+    local currentQuad = utils.mod1(math.floor(self.currentTime / self.duration * #self.quads) + 1, #self.quads)
 
     local dots = string.rep(".", currentQuad - 1)
 

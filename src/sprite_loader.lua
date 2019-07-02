@@ -68,7 +68,7 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
         local dataFile = binfile.readString(fh)
         local sprites = binfile.readSignedShort(fh)
 
-        local dataFilePath = atlasDir .. dataFile .. ".data"
+        local dataFilePath = utils.joinpath(atlasDir, dataFile .. ".data")
 
         local spritesImage = spriteLoader.loadDataImage(dataFilePath)
         local spritesWidth, spritesHeight = spritesImage:getDimensions

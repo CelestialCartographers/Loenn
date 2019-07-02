@@ -1,16 +1,17 @@
-local currentTool = require("tools/brush")
+local toolHandler = require("tool_handler")
 
 local state = require("loaded_state")
 local viewport = require("viewport_handler")
 local utils = require("utils")
+local configs = require("configs")
 
--- TODO - Put in config/constants files
--- Button that is considered a "click" for tools, such as painting a tile or placing entity
-local actionButton = 1
+local actionButton = configs.editor.toolActionButton
 
 local toolProxyMt = {
     __index = function(self, event)
         if state.map ~= nil then
+            local currentTool = toolHandler.currentTool
+
             if currentTool and currentTool[event] then
                 return currentTool[event]
             end
@@ -26,6 +27,8 @@ local device = setmetatable({_enabled = true, _type = "device"}, toolProxyMt)
 -- Don't send clicks that would "swap" the target room
 function device.mousepressed(x, y, button, istouch, presses)
     if state.map ~= nil then
+        local currentTool = toolHandler.currentTool
+        
         if button == actionButton then
             local mapX, mapY = viewport.getMapCoordinates(x, y)
 

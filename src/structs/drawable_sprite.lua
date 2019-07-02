@@ -1,4 +1,5 @@
 local atlases = require("atlases")
+local utils = require("utils")
 
 local drawableSpriteStruct = {}
 
@@ -40,6 +41,31 @@ function drawableSpriteMt.__index.setOffset(self, offsetX, offsetY)
     return self
 end
 
+local function setColor(target, color)
+    local colorType = type(color)
+
+    if colorType == "string" then
+        local success, r, g, b = utils.parseHexColor(color)
+
+        if success then
+            target.color = {r, g, b}
+        end
+
+        return success
+    
+    elseif colorType == "table" and (#color == 3 or #color == 4) then
+        target.color = color
+
+        return true
+    end
+
+    return false
+end
+
+function drawableSpriteMt.__index.setColor(self, color)
+    return setColor(self, color)
+end
+
 function drawableSpriteMt.__index.draw(self)
     local offsetX = self.offsetX or ((self.jx or 0.0) * self.meta.realWidth + self.meta.offsetX)
     local offsetY = self.offsetY or ((self.jy or 0.0) * self.meta.realHeight + self.meta.offsetY)
@@ -77,10 +103,11 @@ function drawableSpriteStruct.spriteFromTexture(texture, data)
     drawableSprite.rotation = data.r or 0
 
     drawableSprite.depth = data.depth
-    drawableSprite.color = data.color
 
     drawableSprite.meta = spriteMeta
     drawableSprite.quad = spriteMeta and spriteMeta.quad or nil
+
+    setColor(drawableSprite, data.color)
 
     return setmetatable(drawableSprite, drawableSpriteMt)
 end

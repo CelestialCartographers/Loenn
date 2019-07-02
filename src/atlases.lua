@@ -1,10 +1,11 @@
 local fileLocations = require("file_locations")
 local spriteLoader = require("sprite_loader")
+local utils = require("utils")
 
 local atlases = {}
 
-local celesteAtlasFolder = fileLocations.getResourceDir() .. "/Atlases/"
-local gameplayMeta = fileLocations.getResourceDir() .. "/Atlases/Gameplay.meta"
+local celesteAtlasFolder = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Graphics", "Atlases")
+local gameplayMeta = utils.joinpath(celesteAtlasFolder, "Gameplay.meta")
 
 atlases.gameplay = spriteLoader.loadSpriteAtlas(gameplayMeta, celesteAtlasFolder)
 
