@@ -81,7 +81,7 @@ Whenever that happens, we might just continue like before; it might well be that
 
 The project is developed and licensed under the [MIT license](LICENSE).
 
-The Lönn logo has All Rights Reserved and may only be distributed with original copies of this software. Should you fork the project, do not use the original logo in any way.
+The Lönn logo has All Rights Reserved and may only be distributed with original copies of this software. Should you fork the project, do not use the original logo in any way. We would also prefer if you changed the project's name so that it can not be confused with the original.
 
 Lönn contains and uses code from the following projects:
   * [dkjson](https://github.com/LuaDist/dkjson)
