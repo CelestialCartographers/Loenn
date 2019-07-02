@@ -83,7 +83,7 @@ The project is developed and licensed under the [MIT license](LICENSE).
 
 The Lönn logo has All Rights Reserved and may only be distributed with original copies of this software. Should you fork the project, do not use the original logo in any way.
 
-In addition, it contains and uses code from the following projects:
+Lönn contains and uses code from the following projects:
   * [dkjson](https://github.com/LuaDist/dkjson)
   * [An ffi implementation](https://github.com/spacewander/luafilesystem) of [luafilesystem](https://github.com/keplerproject/luafilesystem)
   * [Selene](https://github.com/Vexatos/Selene)
