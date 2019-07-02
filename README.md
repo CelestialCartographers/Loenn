@@ -16,7 +16,7 @@ Lönn is a visual level maker and editor for the game Celeste. It allows editing
 
 The program is still in an early state, some things are still missing and it is under active development. If you spot something that is missing, it will most likely be added some time in the near future. If you spot a bug or the program crashes, please report it.
 
-Lönn is a successor to [Lönn](https://github.com/CelestialCartographers/Lönn), a visual level maker based on [Maple](https://github.com/CelestialCartographers/Maple). If you want to be able to generate and edit maps using code, give Maple a try.
+Lönn is a successor to [Ahorn](https://github.com/CelestialCartographers/Ahorn), a visual level maker based on [Maple](https://github.com/CelestialCartographers/Maple). If you want to be able to generate and edit maps using code, give Maple a try.
 
 This project is an unofficial map maker and level editor, it is merely a fan project aiming to aid map development until something official is available. None of this code is developed by or connected to the Celeste development team.
 
