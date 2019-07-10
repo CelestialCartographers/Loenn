@@ -95,7 +95,7 @@ Feel free to also ask for development help in the Discord server mentioned above
 
 ## License
 
-The project is developed and licensed under the [MIT license](LICENSE).
+The project's source code and assets, other than the exceptions stated below, are developed and licensed under the [MIT license](LICENSE).
 
 The Lönn logo has All Rights Reserved and may only be distributed with original copies of this software. Should you fork the project, do not use the original logo in any way. We would also prefer if you changed the project's name so that it can not be confused with the original.
 
