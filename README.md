@@ -36,9 +36,6 @@ Download the [latest release][latest-release] for your operating system and extr
 
 ## Usage
 
-The possible actions in Lönn are listed on the right, just select one to use it.
-Hold right click to move around the map. Left click is your main way to place an object or select something. Tools like rectangle or line require holding left click while moving across the screen. Scroll to zoom.
-
 Lönn supports a couple of keybinds and special mouse functionality, with more to come. The following list might not be comprehensive.
  - Ctrl + Plus: Zoom In
  - Ctrl + Minus: Zoom Out
@@ -51,7 +48,11 @@ If you have any question, [**ask us on `#map_making` on Discord**][discord-map-m
 
 ## Some pictures
 
-**TODO**
+Lönn's main window
+![The main window](docs/examples/example1.png)
+
+Close-up of a room
+![Showing selections](docs/examples/example2.png)
 
 ## Frequently Asked Questions
 
@@ -84,6 +85,7 @@ That's not a question, but please report any bug you find!
 Whenever that happens, we might just continue like before; it might well be that the official editor will not be quite as powerful as Lönn tries to be. It might not ever exist. We'll see.
 
 ## Development Tools
+
 To make Lönn easier to develop and make plugins for, it also includes the following keybinds.
  - Ctrl + F5: Reload as much as possible
  - F5: Reload entities and triggers
