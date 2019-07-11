@@ -36,7 +36,7 @@ Download the [latest release][latest-release] for Windows and extract the `.zip`
 
 First, [install love2d](https://love2d.org/).
 
-Download the [latest release][latest-release] for your operating system and extract the `.zip` file you get into an empty directory. Launch `lönn.love` to start the program.
+Download the [latest release][latest-release] for your operating system and extract the `.zip` file you get into an empty directory. Launch `Lönn.sh` to start the program, or run it directly using `love Lönn.love`.
 
 ## Usage
 
