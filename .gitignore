@@ -10,8 +10,6 @@
 !/.gitmodules
 !/LICENSE
 !/README.md
-!/run.bat
-!/run.sh
 
 # other
 /lib/*
