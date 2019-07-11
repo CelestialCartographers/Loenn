@@ -1,6 +1,3 @@
--- TODO - Figure out how to ship luasec on Linux/Windows
--- Worst case make this optional
-
 local json = require("dkjson")
 local https = require("https")
 

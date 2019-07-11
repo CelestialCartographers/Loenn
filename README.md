@@ -115,7 +115,6 @@ Lönn also depends on the following projects:
   * [LÖVE](https://love2d.org/)
   * [A fork](https://github.com/Vexatos/nativefiledialog/tree/master/lua) of [lua bindings](https://github.com/Alloyed/nativefiledialog/tree/master/lua) for [nativefiledialog](https://github.com/mlabbe/nativefiledialog)
   * [love-nuklear](https://github.com/keharriso/love-nuklear)
-  * [luasec](https://github.com/brunoos/luasec)
-  * [Working binaries](https://github.com/pkulchenko/ZeroBraneStudio) for [luasec](https://github.com/brunoos/luasec/)
+  * [lua-https](https://bitbucket.org/bartbes/lua-https)
 
 Many thanks go to these projects.
