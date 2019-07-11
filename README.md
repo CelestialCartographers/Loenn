@@ -5,9 +5,9 @@
 [maple]: https://github.com/CelestialCartographers/Maple "The Maple Map Editing Library"
 
 [![discord](https://img.shields.io/discord/403698615446536203.svg?color=7289da&logo=discord&logoColor=ffffff)][discord-map-making]
-[![downloads](https://img.shields.io/github/downloads/CelestialCartographers/Loenn/total.svg)](https://github.com/CelestialCartographers/Loenn/releases)
-[![Latest Version](https://img.shields.io/github/tag/CelestialCartographers/Loenn.svg?label=version)][latest-release]
-[![License](https://img.shields.io/github/license/CelestialCartographers/Loenn.svg)](LICENSE)
+[![downloads](https://img.shields.io/github/downloads/CelestialCartographers/loenn/total.svg)](https://github.com/CelestialCartographers/Loenn/releases)
+[![Latest Version](https://img.shields.io/github/tag/CelestialCartographers/loenn.svg?label=version)][latest-release]
+[![License](https://img.shields.io/github/license/CelestialCartographers/loenn.svg)](LICENSE)
 [![saythanks](https://img.shields.io/badge/say-thanks-ff69b4.svg)](https://saythanks.io/to/Cruor)
 
 (we're in `#map_making` on the "Mt. Celeste Climbing Association" Discord server)
