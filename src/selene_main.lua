@@ -1,6 +1,8 @@
 -- love.load() is not called again, put stuff here.
 
-love.window.setTitle("Lönn Demo")
+local meta = require("meta")
+
+love.window.setTitle(meta.title)
 
 love.keyboard.setKeyRepeat(true)
 

@@ -18,23 +18,27 @@ function utils.aabbCheck(r1, r2)
     return not (r2.x >= r1.x + r1.width or r2.x + r2.width <= r1.x or r2.y >= r1.y + r1.height or r2.y + r2.height <= r1.y)
 end
 
-function utils.getFileHandle(path, mode)
-    return io.open(path, mode)
+function utils.getFileHandle(path, mode, internal)
+    if internal then
+        return love.filesystem.newFile(path, mode:gsub("b", ""))
+        
+    else
+        return io.open(path, mode)
+    end
 end
 
-function utils.readAll(path, mode)
-    local file = utils.getFileHandle(path, mode)
-    local res = file:read("*a")
 
-    file:close()
+function utils.readAll(path, mode, internal)
+    local mode = mode or "rb"
+    local file = utils.getFileHandle(path, mode, internal)
 
-    return res
-end
+    if file then
+        local res = internal and file:read() or file:read("*a")
 
-function utils.loadImageAbsPath(path)
-    local data = love.filesystem.newFileData(readAll(path, "rb"), "image.png")
+        file:close()
 
-    return love.graphics.newImage(data)
+        return res
+    end
 end
 
 function utils.humanizeVariableName(name)

@@ -18,15 +18,15 @@ local rawHotkeys = {
     {configs.hotkeys.save, (-> print("SAVE")), "Save file"},
 
     -- Debug hotkeys
-    {configs.hotkeys.debugReloadEverything, (-> debugUtils.reloadEverything()), "Reload everything"},
-    {configs.hotkeys.debugReloadEntities, (-> debugUtils.reloadEntities()), "Reload entities"},
-    {configs.hotkeys.debugReloadTools, (-> debugUtils.reloadTools()), "Reload tools"},
-    {configs.hotkeys.debugRedrawMap, (-> debugUtils.redrawMap()), "Redraw map"},
-    {configs.hotkeys.debugMode, (-> debugUtils.debug()), "Debug mode"},
+    {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},
+    {configs.hotkeys.debugReloadEntities, debugUtils.reloadEntities, "Reload entities"},
+    {configs.hotkeys.debugReloadTools, debugUtils.reloadTools, "Reload tools"},
+    {configs.hotkeys.debugRedrawMap, debugUtils.redrawMap, "Redraw map"},
+    {configs.hotkeys.debugMode, debugUtils.debug, "Debug mode"},
 
     -- Camera
-    {configs.hotkeys.cameraZoomIn, (-> viewportHandler.zoomIn()), "Zoom in"},
-    {configs.hotkeys.cameraZoomOut, (-> viewportHandler.zoomOut()), "Zoom out"},
+    {configs.hotkeys.cameraZoomIn, viewportHandler.zoomIn, "Zoom in"},
+    {configs.hotkeys.cameraZoomOut, viewportHandler.zoomOut, "Zoom out"},
 }
 
 local hotkeys = {}
