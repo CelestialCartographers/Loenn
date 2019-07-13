@@ -92,7 +92,7 @@ function menubar.update(ui)
     if ui:windowBegin(menubar.name, menubar.x, menubar.y, menubar.width, menubar.height, unpack(flags)) then
         --ui:layoutRow('dynamic', 30, 2)
         makeMenubar(ui, menubarItems)
-        print("---")
+        --print("---")
 
 	    ui:windowEnd()
     end

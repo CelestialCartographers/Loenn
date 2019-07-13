@@ -1,6 +1,7 @@
 local nuklear = require("nuklear")
 
 local roomList = require("windows/room_list")
+local updater = require("windows/updater")
 local menubar = require("windows/menubar")
 
 local uiMt = {}
@@ -12,7 +13,8 @@ uiHandler.ui = nuklear.newUI()
 uiHandler.active = true
 uiHandler.windows = {
     roomList,
-    menubar
+    menubar,
+    updater
 }
 
 function uiHandler.update(dt)
