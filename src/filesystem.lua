@@ -1,6 +1,6 @@
 local lfs = require("lfs_ffi")
 local nfd = require("nfd")
-local http = require("socket.http")
+local https = require("https")
 local physfs = require("physfs")
 
 local filesystem = {}
@@ -74,8 +74,13 @@ function filesystem.openDialog(path, filter)
     return nfd.open(filter, nil, path)
 end
 
-function filesystem.downloadURL(url, filename)
-    local body, code, headers = http.request(url)
+function filesystem.downloadURL(url, filename, headers)
+    local code, body, headers = https.request(url, {
+        headers = headers or {
+            ["User-Agent"] = "curl/7.58.0",
+            ["Accept"] = "*/*"
+        }
+    })
 
     if body and code == 200 then
         filesystem.mkdir(filesystem.dirname(filename))
@@ -87,6 +92,11 @@ function filesystem.downloadURL(url, filename)
 
             return true
         end
+
+    elseif code >= 300 and code <= 399 then
+        local redirect = headers["Location"]:match("^%s*(.*)%s*$")
+
+        return filesystem.downloadURL(redirect, filename)
     end
 
     return false
