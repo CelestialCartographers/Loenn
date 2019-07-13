@@ -1,15 +1,28 @@
 local filesystem = require("filesystem")
 local github = require("github")
 local configs = require("configs")
+local utils = require("utils")
 
 -- TODO - Prompt to restart the program afterwards
--- TODO - Track "current" version
 
 local updater = {}
 
 -- Only allow if install is "fused" (.exe on Windows) or ran from a .love
 function updater.canUpdate()
     return love.filesystem.isFused() or filesystem.fileExtension(love.filesystem.getSource()) == "love"
+end
+
+function updater.getAvailableUpdates()
+    local success, releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
+    local res = {}
+
+    for i, release <- releases do
+        if release.tag_name then
+            table.insert(res, release.tag_name)
+        end
+    end
+
+    return res
 end
 
 function updater.getRelevantRelease(tagName)
@@ -33,7 +46,7 @@ function updater.getRelevantReleaseAsset(tagName, operatingSystem)
 
     if success then
         for i, asset <- release.assets do
-            local assetOS = asset:match("-([A-Za-z0-9_]+)%.zip$"))
+            local assetOS = asset.name:match("-([A-Za-z0-9_]+)%.zip$")
 
             if assetOS:lower() == operatingSystem:lower() or assetOS:lower():gsub("_", " ") == operatingSystem:lower() then
                 return true, asset
@@ -55,12 +68,13 @@ function updater.update(tagName)
             local name = asset.name
 
             local appDir = love.filesystem.getSourceBaseDirectory()
-            local userOS = love.system.getOS() 
+            local userOS = love.system.getOS()
 
             if userOS == "Windows" then
-                -- TODO
+                -- TODO - Tell user to do stuff themselves
+                love.system.openURL(url)
 
-                return false
+                return true
 
             elseif userOS == "Linux" then
                 -- TODO - Sanitize this
@@ -72,7 +86,6 @@ function updater.update(tagName)
 
                 if success then
                     filesystem.unzip(zipPath, appDir)
-
                     filesystem.remove(zipPath)
 
                     return true

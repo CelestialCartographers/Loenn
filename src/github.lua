@@ -3,11 +3,20 @@ local https = require("https")
 
 local github = {}
 
+github._cache = {}
+github._cacheTime = 300
+
 github._baseUrl = "https://api.github.com"
 github._baseReleasesUrl = github._baseUrl .. "/repos/%s/%s/releases"
 
-local function getUrlJsonData(url)
-    local resp = {}
+local function getUrlJsonData(url, force)
+    if github._cache[url] then
+        local lastFetch = github._cache[url].time
+
+        if lastFetch + github._cacheTime >= os.time() and not force and github._cache[url].data then
+            return true, github._cache[url].data
+        end
+    end
 
     local code, body = https.request(url, {
         headers = {
@@ -16,7 +25,14 @@ local function getUrlJsonData(url)
     })
 
     if code == 200 then
-        return true, json.decode(body)
+        local data = json.decode(body)
+
+        github._cache[url] = {
+            time = os.time(),
+            data = data
+        }
+
+        return true, data
     end
 
     return false, nil
