@@ -30,17 +30,15 @@ end
 
 -- Use inputDeviceMt if no other metatable is already set for the device
 function inputHandler.newInputDevice(device, devices)
-    local newDevice = device
-    
     devices = devices or inputHandler.inputDevices
 
     if not getmetatable(device) then
-        newDevice = setmetatable(newDevice, inputDeviceMt)
+        device = setmetatable(device, inputDeviceMt)
     end
 
-    table.insert(devices, newDevice)
+    table.insert(devices, device)
 
-    return newDevice
+    return device
 end
 
 return inputHandler

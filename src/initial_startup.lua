@@ -61,7 +61,7 @@ function startup.findCelesteDirectory()
         local selected = filesystem.openDialog()
 
         if selected then
-            local valid, fixed = startup.verifyCelesteDir(selected) 
+            local valid, fixed = startup.verifyCelesteDir(selected)
 
             if valid then
                 return true, fixed
@@ -75,7 +75,7 @@ end
 function startup.init()
     if startup.requiresInit() then
         local found, celesteDir = startup.findCelesteDirectory()
-        
+
         if found then
             local conf = config.readConfig(settingsPath) or {}
             conf.celeste_dir = celesteDir

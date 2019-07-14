@@ -28,7 +28,7 @@ local device = setmetatable({_enabled = true, _type = "device"}, toolProxyMt)
 function device.mousepressed(x, y, button, istouch, presses)
     if state.map ~= nil then
         local currentTool = toolHandler.currentTool
-        
+
         if button == actionButton then
             local mapX, mapY = viewport.getMapCoordinates(x, y)
 

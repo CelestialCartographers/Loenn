@@ -81,7 +81,7 @@ local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTil
 
     else
         local center = meta.center[tile]
-        
+
         return center:len > 0 and center or defaultQuad, defaultSprite
     end
 end
@@ -100,6 +100,7 @@ end
 
 local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wildcard)
     if masks then
+        -- Getting upvalue
         local checkTile = checkTile
 
         local a, b, c = checkTile(tile, tiles:get(x - 1, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y - 1, tile), ignore, air, wildcard)
@@ -107,7 +108,7 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
         local g, h, i = checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard)
 
         for j, maskData <- masks do
-            if checkMaskFromTiles(maskData.mask, a, b, c, d, nil, f, g, h, j) then
+            if checkMaskFromTiles(maskData.mask, a, b, c, d, nil, f, g, h, i) then
                 return true, maskData.quads, maskData.sprites
             end
         end

@@ -57,7 +57,7 @@ end
 -- TODO - Make arguments more sane?
 function tasksHandler.newTask(func, callback, tasks, data)
     tasks = tasks or globalTasks
-    
+
     local task = {
         coroutine = coroutine.create(function() func() end),
         callback = callback or function() end,
@@ -66,7 +66,7 @@ function tasksHandler.newTask(func, callback, tasks, data)
         success = false,
         data = data or {}
     }
-    
+
     table.insert(tasks, task)
 
     return task

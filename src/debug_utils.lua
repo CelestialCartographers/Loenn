@@ -23,7 +23,7 @@ end
 
 function debugUtils.redrawMap()
     print("! Redrawing map")
-    
+
     celesteRender.invalidateRoomCache()
     celesteRender.clearBatchingTasks()
 end

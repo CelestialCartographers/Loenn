@@ -21,7 +21,7 @@ end
 function utils.getFileHandle(path, mode, internal)
     if internal then
         return love.filesystem.newFile(path, mode:gsub("b", ""))
-        
+
     else
         return io.open(path, mode)
     end
@@ -85,7 +85,7 @@ function utils.group(t, by)
     for k, v <- t do
         local key = by(k, v)
         res[key] = res[key] or $()
-        
+
         res[key] += v
     end
 

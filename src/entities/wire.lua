@@ -18,7 +18,7 @@ function wire.draw(room, entity)
             tr, tg, tb = r, g, b
         end
     end
-    
+
     local start = {entity.x, entity.y}
     local stop = entity.nodes[1]
     local control = {

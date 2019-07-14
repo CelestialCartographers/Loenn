@@ -73,7 +73,7 @@ end
 function love.update(dt)
     tasks.processTasks(1 / 144)
     inputHandler.update(dt)
-    
+
     if viewerState.map then
         -- TODO - Find some sane values for this
         celesteRender.processTasks(viewerState, 1 / 60, math.huge, 1 / 240, math.huge)

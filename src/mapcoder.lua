@@ -74,7 +74,7 @@ end
 
 function mapcoder.decodeFile(path, header)
     header = header or "CELESTE MAP"
-    
+
     local fh = io.open(path, "rb")
     local res = {}
 
@@ -217,7 +217,7 @@ function mapcoder.encodeTable(fh, data, lookup)
     binfile.writeShort(fh, #children)
 
     for i, child <- children do
-    mapcoder.encodeTable(fh, child, lookup)
+        mapcoder.encodeTable(fh, child, lookup)
     end
 end
 
@@ -238,7 +238,7 @@ function mapcoder.encodeFile(path, data, header)
     header = header or "CELESTE MAP"
 
     local fh = utils.getFileHandle(path, "wb")
-    
+
     local stringsSeen = countStrings(data)
     local lookupStrings = $()
 
@@ -258,7 +258,7 @@ function mapcoder.encodeFile(path, data, header)
         binfile.writeString(fh, lookup)
     end
 
-    encodeTable(fh, data, lookupStrings)
+    mapcoder.encodeTable(fh, data, lookupStrings)
 
     fh:close()
 

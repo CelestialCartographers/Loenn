@@ -49,7 +49,7 @@ filesystem.remove = os.remove
 
 function filesystem.isFile(path)
     local attrs = lfs.attributes(path)
-    
+
     return attrs and attrs.mode == "file"
 end
 
@@ -61,14 +61,14 @@ end
 
 function filesystem.saveDialog(path, filter)
     -- TODO - This is a blocking call, consider running in own thread
-    -- TODO - Verify arguments, documentation was very existant 
+    -- TODO - Verify arguments, documentation was very existant
 
     return nfd.save(filter, nil, path)
 end
 
 function filesystem.openDialog(path, filter)
     -- TODO - This is a blocking call, consider running in own thread
-    -- TODO - Verify arguments, documentation was very existant 
+    -- TODO - Verify arguments, documentation was very existant
 
     return nfd.open(filter, nil, path)
 end

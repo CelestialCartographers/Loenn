@@ -28,7 +28,7 @@ function config.readConfigData(filename)
     if fh then
         local content = fh:read("*a")
         res = utils.unserialize(content)
-        
+
         fh:close()
     end
 
@@ -40,7 +40,7 @@ end
 -- This prevents corruption of data if program is terminated while writing
 function config.writeConfigData(filename, data, pretty)
     pretty = pretty == nil or pretty
-    
+
     local success, content = false, nil
 
     if data then
@@ -49,8 +49,8 @@ function config.writeConfigData(filename, data, pretty)
 
         if success then
             lfs.mkdir(utils.dirname(filename))
-            fh = io.open(tempFilename, "wb")
-            
+            local fh = io.open(tempFilename, "wb")
+
             if fh then
                 fh:write(content)
                 fh:close()

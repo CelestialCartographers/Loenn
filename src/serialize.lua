@@ -17,7 +17,7 @@ function serialize.countKeys(t)
 
     for k, v in pairs(t) do
         if type(k) == "number" then
-            numerical = numerical +1
+            numerical = numerical + 1
         end
 
         total = total + 1
@@ -63,7 +63,7 @@ function serialize.serialize(t, pretty, seen, depth, success)
                 key = "[" .. string.format("%q", k) .. "]"
 
             elseif ktyp == "number" then
-                if numIndices > length then 
+                if numIndices > length then
                     key = "[" .. tonumber(k) .. "]"
 
                 else

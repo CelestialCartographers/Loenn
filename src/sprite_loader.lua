@@ -87,10 +87,10 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
             local sprite = {
                 x = binfile.readSignedShort(fh),
                 y = binfile.readSignedShort(fh),
-                
+
                 width = binfile.readSignedShort(fh),
                 height = binfile.readSignedShort(fh),
-                
+
                 offsetX = binfile.readSignedShort(fh),
                 offsetY = binfile.readSignedShort(fh),
                 realWidth = binfile.readSignedShort(fh),

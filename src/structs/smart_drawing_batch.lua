@@ -81,7 +81,7 @@ unorderedDrawingBatchMt.__index = {}
 
 function unorderedDrawingBatchMt.__index.add(self, meta, quad, x, y, r, sx, sy, jx, jy, ox, oy)
     local image = meta.image
-    
+
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 

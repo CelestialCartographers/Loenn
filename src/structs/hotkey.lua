@@ -74,7 +74,7 @@ hotkeyMt.__index = {}
 hotkeyMt.__index.active = hotkeyStruct.hotkeyActive
 hotkeyMt.__index.callbackIfActive = hotkeyStruct.callbackIfActive
 
-function hotkeyMt.__call(self) 
+function hotkeyMt.__call(self)
     self:callback()
 end
 

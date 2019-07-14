@@ -142,7 +142,7 @@ function viewportDevice.wheelmoved(dx, dy)
 
     elseif dy < 0 then
         viewportHandler.zoomOut()
-        
+
         return true
     end
 end

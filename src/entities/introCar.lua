@@ -19,7 +19,7 @@ function introCar.sprite(room, entity)
     local wheelSprite = drawableSpriteStruct.spriteFromTexture(wheelsTexture, entity)
     wheelSprite:setJustification(0.5, 1.0)
     wheelSprite.depth = 3
-    
+
     sprites += bodySprite
     sprites += wheelSprite
 

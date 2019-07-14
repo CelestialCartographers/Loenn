@@ -9,7 +9,7 @@ local function isBackground(room, entity)
 
     local tx = math.floor(x / 8) + 1
     local ty = math.floor(y / 8) + 1
-    
+
     return room.tilesFg.matrix:get(tx, ty, "0") == "0"
 end
 

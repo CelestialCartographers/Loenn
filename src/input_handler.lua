@@ -3,10 +3,7 @@ local inputDevice = require("input_device")
 local inputHandler = {}
 
 local mouseButtonsPressed = {}
-
 local dragTreshold = 2
-
-local echoDevice = true
 
 function inputHandler.getMouseDrag(x, y, button)
     local from = mouseButtonsPressed[button]

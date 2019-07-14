@@ -52,7 +52,7 @@ local function setColor(target, color)
         end
 
         return success
-    
+
     elseif colorType == "table" and (#color == 3 or #color == 4) then
         target.color = color
 
@@ -84,7 +84,7 @@ end
 
 function drawableSpriteStruct.spriteFromTexture(texture, data)
     data = data or {}
-    
+
     local atlas = data.atlas or "gameplay"
     local spriteMeta = atlases[atlas][texture]
 

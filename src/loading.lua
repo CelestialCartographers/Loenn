@@ -6,13 +6,13 @@ local loading = {}
 loading.spriteSheet = love.graphics.newImage("assets/loading-256.png")
 loading.quadSize = 256
 loading.quads = {}
- 
+
 for y = 0, loading.spriteSheet:getHeight() - loading.quadSize, loading.quadSize do
     for x = 0, loading.spriteSheet:getWidth() - loading.quadSize, loading.quadSize do
         table.insert(loading.quads, love.graphics.newQuad(x, y, loading.quadSize, loading.quadSize, loading.spriteSheet:getDimensions()))
     end
 end
- 
+
 loading.duration = 1
 loading.currentTime = 0
 

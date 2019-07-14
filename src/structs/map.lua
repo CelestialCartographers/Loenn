@@ -51,7 +51,7 @@ function mapStruct.encode(map)
             __children = children
         })
     end
-    
+
     if map.rooms:len > 0 then
         local children = {}
 

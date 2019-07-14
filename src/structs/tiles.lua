@@ -26,7 +26,6 @@ end
 
 function tilesStruct.tileStringToMatrix(tiles)
     tiles = tiles:gsub("\r\n", "\n")
-    
     local lines = tiles:split("\n")
 
     local cols = 0

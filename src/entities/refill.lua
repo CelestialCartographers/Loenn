@@ -10,7 +10,7 @@ refill.depth = -100
 
 function refill.sprite(room, entity)
     local texture = getTexture(entity)
-    
+
     return drawableSpriteStruct.spriteFromTexture(texture, entity)
 end
 

@@ -134,7 +134,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
 
     local quadCache = cache[tile][fg]
     local quadX, quadY = quad[1], quad[2]
-    
+
     if not quadCache:get0(quadX, quadY) then
         local spriteMeta = atlases.gameplay[texture]
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
@@ -369,7 +369,7 @@ end
 
 function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw, registeredEntities)
     registeredEntities = registeredEntities or entityHandler.registeredEntities
-    
+
     roomCache[room.name] = roomCache[room.name] or {}
 
     if forceRedraw and roomCache[room.name].entities.result ~= nil then
@@ -402,7 +402,7 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
             local height = trigger.height or 16
 
             love.graphics.setColor(colors.triggerColor)
-            
+
             love.graphics.rectangle("line", x, y, width, height)
             love.graphics.rectangle("fill", x, y, width, height)
 
@@ -415,7 +415,7 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
             local offsetY = (textHeight - height) / 2
 
             love.graphics.printf(displayName, x, y, width, "center", 0, triggerFontSize, triggerFontSize, offsetX, offsetY)
-            
+
             love.graphics.setColor(colors.default)
         end
 
@@ -529,7 +529,7 @@ local function getRoomCanvas(room, viewport, selected)
 
         if orderedBatches then
             local canvas = love.graphics.newCanvas(room.width or 0, room.height or 0)
-        
+
             canvas:renderTo(function()
                 for depth, batch <- orderedBatches do
                     batch:draw()

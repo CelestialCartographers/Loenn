@@ -6,6 +6,6 @@ function love.conf(t)
 	t.window.minheight = 720
 
 	t.window.icon = "assets/logo-256.png"
-	
+
 	t.window.vsync = true
 end

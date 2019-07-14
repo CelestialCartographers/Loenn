@@ -19,7 +19,7 @@ function nodeStruct.decode(data)
         local res = {
             _type = "node"
         }
-        
+
         res[1] = data.x
         res[2] = data.y
 
@@ -34,7 +34,7 @@ function nodeStruct.encode(node)
 
     res.x = node[1]
     res.y = node[2]
-   
+
     return res
 end
 
