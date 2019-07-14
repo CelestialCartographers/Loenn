@@ -60,7 +60,7 @@ end
 
 function viewportHandler.getMapCoordinates(x, y)
     local mouseX, mouseY = viewportHandler.getMousePosition()
-    local x, y = x or mouseX, y or mouseY
+    x, y = x or mouseX, y or mouseY
 
     return math.floor((x + viewport.x) / viewport.scale), math.floor((y + viewport.y) / viewport.scale)
 end

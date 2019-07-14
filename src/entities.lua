@@ -16,7 +16,7 @@ function entities.initDefaultRegistry(t)
 end
 
 function entities.registerEntity(fn, registerAt)
-    local registerAt = registerAt or entities.registeredEntities
+    registerAt = registerAt or entities.registeredEntities
 
     local pathNoExt = utils.stripExtension(fn)
     local filenameNoExt = utils.filename(pathNoExt, "/")
@@ -31,8 +31,8 @@ end
 
 -- TODO - Santize user paths
 function entities.loadInternalEntities(registerAt, path)
-    local registerAt = registerAt or entities.registeredEntities
-    local path = path or "entities"
+    registerAt = registerAt or entities.registeredEntities
+    path = path or "entities"
 
     for i, file <- love.filesystem.getDirectoryItems(path) do
         -- Always use Linux paths here

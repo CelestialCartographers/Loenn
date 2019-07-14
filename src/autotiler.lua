@@ -106,8 +106,8 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
         local d, f = checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard)
         local g, h, i = checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard)
 
-        for i, maskData <- masks do
-            if checkMaskFromTiles(maskData.mask, a, b, c, d, e, f, g, h, i) then
+        for j, maskData <- masks do
+            if checkMaskFromTiles(maskData.mask, a, b, c, d, nil, f, g, h, j) then
                 return true, maskData.quads, maskData.sprites
             end
         end
@@ -189,7 +189,7 @@ function autotiler.loadTilesetXML(fn)
         center[id] = copy and $(table.shallowcopy(center[copy]())) or $()
         masks[id] = copy and $(table.shallowcopy(masks[copy]())) or $()
 
-        currentMasks = $()
+        local currentMasks = $()
 
         for j, child <- tileset.set or {} do
             local attrs = child._attr or child

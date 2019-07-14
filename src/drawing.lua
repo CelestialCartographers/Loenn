@@ -16,8 +16,9 @@ function drawing.getCurvePoint(start, stop, control, percent)
 end
 
 function drawing.getSimpleCurve(start, stop, control, resolution)
-    local control = control or {(start[1] + stop[1]) / 2, (start[2] + stop[2]) / 2}
-    local resolution = resolution or 16
+    control = control or {(start[1] + stop[1]) / 2, (start[2] + stop[2]) / 2}
+    resolution = resolution or 16
+    
     local res = $()
 
     for i = 0, resolution do

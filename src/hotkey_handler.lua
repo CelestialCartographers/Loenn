@@ -7,7 +7,7 @@ local hotkeyHandler = {}
 -- Register hotkey to hotkey group registerHotkey(hotkey[, group])
 -- Make a hotkey and then add to hotkey group registerHotkey(activator, callback[, group])
 function hotkeyHandler.registerHotkey(hotkey, hotkeys)
-    local hotkeys = hotkeys or defaultHotkeys
+    hotkeys = hotkeys or defaultHotkeys
 
     table.insert(hotkeys, hotkey)
 end

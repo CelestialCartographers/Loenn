@@ -4,8 +4,8 @@ local tilesStruct = {}
 
 -- TODO - Add minimized version
 function tilesStruct.matrixToTileString(matrix, seperator, empty)
-    local seperator = seperator or ""
-    local empty = empty or "0"
+    seperator = seperator or ""
+    empty = empty or "0"
 
     local width, height = matrix:size
 
@@ -25,7 +25,8 @@ function tilesStruct.matrixToTileString(matrix, seperator, empty)
 end
 
 function tilesStruct.tileStringToMatrix(tiles)
-    local tiles = tiles:gsub("\r\n", "\n")
+    tiles = tiles:gsub("\r\n", "\n")
+    
     local lines = tiles:split("\n")
 
     local cols = 0

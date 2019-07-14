@@ -6,14 +6,13 @@ local physfs = require("physfs")
 local filesystem = {}
 
 function filesystem.filename(path, sep)
-    local sep = sep or physfs.getDirSeparator()
+    sep = sep or physfs.getDirSeparator()
 
     return path:match("[^" .. sep .. "]+$")
 end
 
 function filesystem.dirname(path, sep)
-    local sep = sep or physfs.getDirSeparator()
-    local path = path
+    sep = sep or physfs.getDirSeparator()
 
     return path:match("(.*" .. sep .. ")")
 end
@@ -75,7 +74,7 @@ function filesystem.openDialog(path, filter)
 end
 
 function filesystem.downloadURL(url, filename, headers)
-    local code, body, headers = https.request(url, {
+    local code, body, requestHeaders = https.request(url, {
         headers = headers or {
             ["User-Agent"] = "curl/7.58.0",
             ["Accept"] = "*/*"
@@ -94,9 +93,9 @@ function filesystem.downloadURL(url, filename, headers)
         end
 
     elseif code >= 300 and code <= 399 then
-        local redirect = headers["Location"]:match("^%s*(.*)%s*$")
+        local redirect = requestHeaders["Location"]:match("^%s*(.*)%s*$")
 
-        return filesystem.downloadURL(redirect, filename)
+        return filesystem.downloadURL(redirect, filename, headers)
     end
 
     return false

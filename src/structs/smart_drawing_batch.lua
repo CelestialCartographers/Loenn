@@ -82,8 +82,8 @@ unorderedDrawingBatchMt.__index = {}
 function unorderedDrawingBatchMt.__index.add(self, meta, quad, x, y, r, sx, sy, jx, jy, ox, oy)
     local image = meta.image
     
-    local offsetX = offsetX or ((jx or 0.0) * meta.realWidth + meta.offsetX)
-    local offsetY = offsetY or ((jy or 0.0) * meta.realHeight + meta.offsetY)
+    local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
+    local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
     self._lookup[image] = self._lookup[image] or love.graphics.newSpriteBatch(image, 1000, spriteBatchMode)
     self._lookup[image]:add(quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)

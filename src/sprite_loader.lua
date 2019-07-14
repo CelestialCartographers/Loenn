@@ -97,7 +97,7 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
                 realHeight = binfile.readSignedShort(fh),
 
                 image = spritesImage,
-                filename = spritesFn
+                filename = dataFilePath
             }
 
             sprite.quad = love.graphics.newQuad(sprite.x, sprite.y, sprite.width, sprite.height, spritesWidth, spritesHeight)

@@ -14,7 +14,7 @@ function inputHandler.getMouseDrag(x, y, button)
     local dx, dy = x - startX, y - startY
     local consideredDrag = math.abs(dx) >= dragTreshold and math.abs(dy) >= dragTreshold
 
-    return startX, startY, button, dx, dy, consideredDrag
+    return startX, startY, dx, dy, consideredDrag
 end
 
 function inputHandler.getMouseDragDelta(x, y, button, istouch)
@@ -52,7 +52,7 @@ end
 function love.mousereleased(x, y, button, istouch, presses)
     inputDevice.sendEvent("mousereleased", x, y, button, istouch, presses)
 
-    local startX, startY, button, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
+    local startX, startY, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
 
     if consideredDrag then
         inputDevice.sendEvent("mousedrag", startX, startY, button, dx, dy)

@@ -83,7 +83,8 @@ function drawableSpriteMt.__index.draw(self)
 end
 
 function drawableSpriteStruct.spriteFromTexture(texture, data)
-    local data = data or {}
+    data = data or {}
+    
     local atlas = data.atlas or "gameplay"
     local spriteMeta = atlases[atlas][texture]
 

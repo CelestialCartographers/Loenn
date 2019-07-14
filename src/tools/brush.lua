@@ -5,7 +5,7 @@
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
 local fonts = require("fonts")
-local matrix = require("matrix")
+local matrixLib = require("matrix")
 local celesteRender = require("celeste_render")
 local configs = require("configs")
 
@@ -24,12 +24,12 @@ tool.material = "a"
 local lastTileX, lastTileY = -1, -1
 local lastX, lastY = -1, -1
 
-local previewMatrix = matrix.filled("0", 5, 5)
+local previewMatrix = matrixLib.filled("0", 5, 5)
 local previewBatch = nil
 
 -- Attempts to place tile at x, y
 -- Returns true if successful
-function placeTile(room, x, y, material, layer)
+local function placeTile(room, x, y, material, layer)
     local tiles = room[layer]
     local matrix = tiles.matrix
 
@@ -38,14 +38,14 @@ function placeTile(room, x, y, material, layer)
     return matrix:inbounds(x, y)
 end
 
-function getTile(room, x, y, layer)
+local function getTile(room, x, y, layer)
     local tiles = room[layer]
     local matrix = tiles.matrix
 
     matrix:get(x, y)
 end
 
-function handleActionClick(x, y, force)
+local function handleActionClick(x, y, force)
     local room = state.selectedRoom
 
     if room then
@@ -65,7 +65,7 @@ function handleActionClick(x, y, force)
     end
 end
 
-function handleCloneClick(x, y)
+local function handleCloneClick(x, y)
     local room = state.selectedRoom
 
     if room then

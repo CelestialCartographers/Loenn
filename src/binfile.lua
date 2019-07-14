@@ -157,8 +157,8 @@ function binfile.readRunLengthEncoded(fh)
     local res = ""
 
     for i = 1, bytes, 2 do
-        times = binfile.readByte(fh)
-        char = fh:read(1)
+        local times = binfile.readByte(fh)
+        local char = fh:read(1)
 
         res ..= char:rep(times)
     end
@@ -166,9 +166,9 @@ function binfile.readRunLengthEncoded(fh)
     return res
 end
 
-function binfile.encodeRunLength(value)
+function binfile.encodeRunLength(str)
     local res = $()
-    local value = $(value)
+    local value = $(str)
 
     local count = 1
     local current = value[1]

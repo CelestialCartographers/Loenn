@@ -7,7 +7,7 @@ function mapcoder.look(fh, lookup)
     return lookup[binfile.readShort(fh) + 1]
 end
 
-decodeFunctions = {
+local decodeFunctions = {
     binfile.readBool,
     binfile.readByte,
     binfile.readSignedShort,
@@ -73,7 +73,8 @@ local function decodeElement(fh, lookup)
 end
 
 function mapcoder.decodeFile(path, header)
-    local header = header or "CELESTE MAP"
+    header = header or "CELESTE MAP"
+    
     local fh = io.open(path, "rb")
     local res = {}
 
@@ -104,8 +105,9 @@ function mapcoder.decodeFile(path, header)
     return res
 end
 
-function countStrings(data, seen)
-    local seen = seen or {}
+local function countStrings(data, seen)
+    seen = seen or {}
+
     local name = data.__name or ""
     local children = data.__children or {}
 
@@ -134,7 +136,7 @@ local integerBits = {
     {typeHeaders.signedLong, -2147483648, 2147483647, binfile.writeSignedLong},
 }
 
-function encodeNumber(fh, n, lookup)
+function mapcoder.encodeNumber(fh, n, lookup)
     local float = n ~= math.floor(n)
 
     if float then
@@ -155,16 +157,16 @@ function encodeNumber(fh, n, lookup)
     end
 end
 
-function encodeBoolean(fh, b, lookup)
+function mapcoder.encodeBoolean(fh, b, lookup)
     binfile.writeByte(fh, typeHeaders.bool)
     binfile.writeBool(fh, b)
 end
 
-function findInLookup(lookup, s)
+local function findInLookup(lookup, s)
     return lookup:index(look -> look == s)
 end
 
-function encodeString(fh, s, lookup)
+function mapcoder.encodeString(fh, s, lookup)
     local index = findInLookup(lookup, s)
 
     if index then
@@ -187,7 +189,7 @@ function encodeString(fh, s, lookup)
     end
 end
 
-function encodeTable(fh, data, lookup)
+function mapcoder.encodeTable(fh, data, lookup)
     local index = findInLookup(lookup, data.__name)
 
     local attributes = {}
@@ -209,31 +211,32 @@ function encodeTable(fh, data, lookup)
         local attrIndex = findInLookup(lookup, attr)
 
         binfile.writeShort(fh, attrIndex - 1)
-        encodeValue(fh, value, lookup)
+        mapcoder.encodeValue(fh, value, lookup)
     end
 
     binfile.writeShort(fh, #children)
 
     for i, child <- children do
-        encodeTable(fh, child, lookup)
+    mapcoder.encodeTable(fh, child, lookup)
     end
 end
 
 local encodingFunctions = {
-    number = encodeNumber,
-    boolean = encodeBoolean,
-    string = encodeString,
-    table = encodeTable
+    number = mapcoder.encodeNumber,
+    boolean = mapcoder.encodeBoolean,
+    string = mapcoder.encodeString,
+    table = mapcoder.encodeTable
 }
 
-function encodeValue(fh, value, lookup)
+function mapcoder.encodeValue(fh, value, lookup)
     coroutine.yield()
 
     encodingFunctions[type(value)](fh, value, lookup)
 end
 
 function mapcoder.encodeFile(path, data, header)
-    local header = header or "CELESTE MAP"
+    header = header or "CELESTE MAP"
+
     local fh = utils.getFileHandle(path, "wb")
     
     local stringsSeen = countStrings(data)

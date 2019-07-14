@@ -39,7 +39,8 @@ end
 -- Save to temporary filename first and then move to the correct filename
 -- This prevents corruption of data if program is terminated while writing
 function config.writeConfigData(filename, data, pretty)
-    local pretty = pretty == nil or pretty
+    pretty = pretty == nil or pretty
+    
     local success, content = false, nil
 
     if data then

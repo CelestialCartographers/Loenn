@@ -29,8 +29,7 @@ end
 
 
 function utils.readAll(path, mode, internal)
-    local mode = mode or "rb"
-    local file = utils.getFileHandle(path, mode, internal)
+    local file = utils.getFileHandle(path, mode or "rb", internal)
 
     if file then
         local res = internal and file:read() or file:read("*a")
@@ -57,7 +56,7 @@ function utils.humanizeVariableName(name)
 end
 
 function utils.parseHexColor(color)
-    local color := match("^#?([0-9a-fA-F]+)$")
+    color := match("^#?([0-9a-fA-F]+)$")
 
     if color and #color == 6 then
         local number = tonumber(color, 16)
@@ -111,7 +110,7 @@ function utils.getRoomAtCoords(x, y, map)
 end
 
 function utils.mod1(n, d)
-    m = n % d
+    local m = n % d
 
     return m == 0 and d or m
 end

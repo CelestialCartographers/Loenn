@@ -1,16 +1,16 @@
 local globalTasks = {}
 
-local tasks = {}
+local tasksHandler = {}
 
 -- Processes tasks from table for at around calcTime (default until done) and atmost maxTasks (default all)
 -- Returns processingStatus, timeSpent
-function tasks.processTasks(calcTime, maxTasks, customTasks)
+function tasksHandler.processTasks(time, maxTasks, customTasks)
     local tasks = customTasks or globalTasks
 
     local timeSpent = 0
     local tasksDone = 0
 
-    local calcTime = calcTime or math.huge
+    local calcTime = time or math.huge
     local tasksAllowed = maxTasks or math.huge
 
     while #tasks > 0 and tasksDone < tasksAllowed do
@@ -55,8 +55,9 @@ end
 
 -- TODO - Unwrap lambda properly
 -- TODO - Make arguments more sane?
-function tasks.newTask(func, callback, tasks, data)
-    local tasks = tasks or globalTasks
+function tasksHandler.newTask(func, callback, tasks, data)
+    tasks = tasks or globalTasks
+    
     local task = {
         coroutine = coroutine.create(function() func() end),
         callback = callback or function() end,
@@ -71,4 +72,4 @@ function tasks.newTask(func, callback, tasks, data)
     return task
 end
 
-return tasks
+return tasksHandler

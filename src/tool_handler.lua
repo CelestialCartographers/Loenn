@@ -27,7 +27,7 @@ function toolHandler.loadTool(fn)
 end
 
 function toolHandler.loadInternalTools(path)
-    local path = path or "tools"
+    path = path or "tools"
 
     for i, file <- love.filesystem.getDirectoryItems(path) do
         -- Always use Linux paths here

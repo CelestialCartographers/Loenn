@@ -25,9 +25,9 @@ function updater.getAvailableUpdates()
     return res
 end
 
-function updater.getRelevantRelease(tagName)
+function updater.getRelevantRelease(target)
     local success, releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
-    local tagName = tagName or (success and #releases > 0 and releases[1].tag_name)
+    local tagName = target or (success and #releases > 0 and releases[1].tag_name)
 
     if tagName then
         for i, release <- releases do
@@ -40,15 +40,15 @@ function updater.getRelevantRelease(tagName)
     return false, nil
 end
 
-function updater.getRelevantReleaseAsset(tagName, operatingSystem)
+function updater.getRelevantReleaseAsset(tagName, targetOS)
     local success, release = updater.getRelevantRelease(tagName)
-    local operatingSystem = operatingSystem or love.system.getOS()
+    local userOS = targetOS or love.system.getOS()
 
     if success then
         for i, asset <- release.assets do
             local assetOS = asset.name:match("-([A-Za-z0-9_]+)%.zip$")
 
-            if assetOS:lower() == operatingSystem:lower() or assetOS:lower():gsub("_", " ") == operatingSystem:lower() then
+            if assetOS:lower() == userOS:lower() or assetOS:lower():gsub("_", " ") == userOS:lower() then
                 return true, asset
             end
         end
@@ -61,7 +61,7 @@ end
 -- Make sure this works on at least Windows and Linux, assume that Linux code would work on OS X as well
 function updater.update(tagName)
     if updater.canUpdate() then
-        local success, asset = updater.getRelevantReleaseAsset(tagName, operatingSystem)
+        local success, asset = updater.getRelevantReleaseAsset(tagName)
 
         if success then
             local url = asset.browser_download_url
@@ -82,9 +82,9 @@ function updater.update(tagName)
                 -- Download and extract files, and then delete .old
 
                 local zipPath = filesystem.joinpath(appDir, name)
-                local success = filesystem.downloadURL(url, zipPath)
+                local downloaded = filesystem.downloadURL(url, zipPath)
 
-                if success then
+                if downloaded then
                     filesystem.unzip(zipPath, appDir)
                     filesystem.remove(zipPath)
 

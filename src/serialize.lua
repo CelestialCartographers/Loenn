@@ -39,10 +39,10 @@ end
 function serialize.serialize(t, pretty, seen, depth, success)
     local res = {}
 
-    local seen = seen or {}
-    local depth = depth or 0
-    local pretty = not not pretty
-    local success = success == nil or success
+    seen = seen or {}
+    depth = depth or 0
+    pretty = not not pretty
+    success = success == nil or success
 
     local keyCount, numIndices = serialize.countKeys(t)
     local length = serialize.numericalLength(t)

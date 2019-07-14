@@ -20,7 +20,7 @@ function hotkeyStruct.sanitize(activator)
     local activators = $()
 
     for i, part <- parts do
-        local part = part:match("^%s*(.-)%s*$"):lower
+        part = part:match("^%s*(.-)%s*$"):lower
 
         if specialActivators[part] then
             activators += specialActivators[part]

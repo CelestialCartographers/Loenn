@@ -70,8 +70,8 @@ end
 function celesteRender.processTasks(state, calcTime, maxTasks, backgroundTime, backgroundTasks)
     local visible, notVisible = celesteRender.sortBatchingTasks(state, batchingTasks)
 
-    local backgroundTime = backgroundTime or calcTime
-    local backgroundTasks = backgroundTasks or maxTasks
+    backgroundTime = backgroundTime or calcTime
+    backgroundTasks = backgroundTasks or maxTasks
 
     local success, timeSpent, tasksDone = tasks.processTasks(calcTime, maxTasks, visible)
     tasks.processTasks(backgroundTime - timeSpent, backgroundTasks - tasksDone, notVisible)
@@ -138,18 +138,18 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     if not quadCache:get0(quadX, quadY) then
         local spriteMeta = atlases.gameplay[texture]
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
-        local quad = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
+        local res = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
-        quadCache:set0(quadX, quadY, quad)
+        quadCache:set0(quadX, quadY, res)
 
-        return quad
+        return res
     end
 
     return quadCache:get0(quadX, quadY)
 end
 
 function celesteRender.getTilesBatch(room, tiles, meta, fg)
-    local tiles = tiles.matrix
+    tiles = tiles.matrix
 
     -- Getting upvalues
     local gameplayAtlas = atlases.gameplay
@@ -177,12 +177,13 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
             local tile = tiles:getInbounds(x, y)
 
             if tile ~= airTile then
+                -- TODO - Render overlay sprites
                 local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
                 local quadCount = quads:len
 
                 if quadCount > 0 then
                     local randQuad = quads[utils.mod1(rng, quadCount)]
-                    local texture = meta.paths[tile] or empty
+                    local texture = meta.paths[tile] or emptyTile
 
                     local spriteMeta = atlases.gameplay[texture]
                     local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
@@ -340,7 +341,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
                         batch:addFromDrawable(sprites)
 
                     else
-                        for i, sprite <- sprites do
+                        for j, sprite <- sprites do
                             if utils.typeof(sprite) == "drawableSprite" then
                                 local batch = getOrCreateSmartBatch(batches, sprite.depth or defaultDepth)
                                 batch:addFromDrawable(sprite)
@@ -367,7 +368,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
 end
 
 function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw, registeredEntities)
-    local registeredEntities = registeredEntities or entityHandler.registeredEntities
+    registeredEntities = registeredEntities or entityHandler.registeredEntities
     
     roomCache[room.name] = roomCache[room.name] or {}
 
@@ -478,8 +479,8 @@ function celesteRender.getRoomBatches(room, viewport)
                     depthBatches[depth] = batches
 
                 else
-                    for depth, batch <- batches do
-                        depthBatches[depth] = batch
+                    for d, batch <- batches do
+                        depthBatches[d] = batch
                     end
                 end
 
@@ -510,7 +511,7 @@ function celesteRender.getRoomBatches(room, viewport)
     return roomCache[room.name].complete
 end
 
-function drawRoomFromBatches(room, viewport, selected)
+local function drawRoomFromBatches(room, viewport, selected)
     local orderedBatches = celesteRender.getRoomBatches(room, viewport)
 
     if orderedBatches then
@@ -520,7 +521,7 @@ function drawRoomFromBatches(room, viewport, selected)
     end
 end
 
-function getRoomCanvas(room, viewport, selected)
+local function getRoomCanvas(room, viewport, selected)
     roomCache[room.name] = roomCache[room.name] or {}
 
     if not roomCache[room.name].canvas then
