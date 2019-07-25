@@ -95,7 +95,7 @@ function library_mt.__call(lib, s)
     end
     local newv = {}
     for subv in s:gsub("^%a*(%d[%d.]*).*", "%1"):gmatch("[^.]+") do
-        nv = tonumber(subv)
+        local nv = tonumber(subv)
         if not nv then
             return nil, "invalid version string: " .. s
         end
