@@ -367,7 +367,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
     return batches
 end
 
-function celesteRender.getEntityBatch(room, entities, viewport, forceRedraw, registeredEntities)
+function celesteRender.getEntityBatch(room, entities, viewport, registeredEntities, forceRedraw)
     registeredEntities = registeredEntities or entityHandler.registeredEntities
 
     roomCache[room.name] = roomCache[room.name] or {}
@@ -462,6 +462,19 @@ local depthBatchingFunctions = {
     {"Foreground Decals", "decalsFg", celesteRender.getDecalsFgBatch, decalsFgDepth},
     {"Triggers", "triggers", celesteRender.getTriggerBatch, triggersDepth}
 }
+
+-- Force all non finished room batch tasks to finish
+function celesteRender.forceRoomBatchRender(room, viewport)
+    for i, data <- depthBatchingFunctions do
+        local description, key, func, depth = unpack(data)
+        local result = func(room, room[key], viewport)
+        local task = roomCache[room.name][key]
+
+        if not result and task then
+            tasks.processTask(task)
+        end
+    end
+end
 
 function celesteRender.getRoomBatches(room, viewport)
     roomCache[room.name] = roomCache[room.name] or {}

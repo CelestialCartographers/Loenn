@@ -6,6 +6,16 @@ toolHandler.tools = {}
 toolHandler.currentTool = nil
 toolHandler.currentToolName = nil
 
+function toolHandler.selectTool(name)
+    local handler = toolHandler.tools[name]
+
+    if handler then
+        toolHandler.currentTool = handler
+        toolHandler.currentToolName = name
+    end
+
+    return handler ~= nil
+end
 
 function toolHandler.loadTool(fn)
     local pathNoExt = utils.stripExtension(fn)
@@ -19,8 +29,7 @@ function toolHandler.loadTool(fn)
     toolHandler.tools[name] = handler
 
     if not toolHandler.currentTool then
-        toolHandler.currentTool = handler
-        toolHandler.currentToolName = name
+        toolHandler.selectTool(name)
     end
 
     return name

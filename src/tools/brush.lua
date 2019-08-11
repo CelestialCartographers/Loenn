@@ -15,9 +15,9 @@ local cloneButton = configs.editor.objectCloneButton
 local tool = {}
 
 tool._type = "tool"
-
 tool.name = "Brush"
 tool.image = nil
+
 tool.layer = "tilesFg"
 tool.material = "a"
 
@@ -42,7 +42,7 @@ local function getTile(room, x, y, layer)
     local tiles = room[layer]
     local matrix = tiles.matrix
 
-    matrix:get(x, y)
+    return matrix:get(x, y)
 end
 
 local function handleActionClick(x, y, force)
@@ -55,7 +55,9 @@ local function handleActionClick(x, y, force)
         if lastTileX ~= tx + 1 or lastTileY ~= ty + 1 or force then
             if placeTile(room, tx + 1, ty + 1, tool.material, tool.layer) then
                 -- TODO - Redraw more efficiently
-                celesteRender.invalidateRoomCache(room.name)
+                celesteRender.invalidateRoomCache(room, tool.layer)
+                celesteRender.invalidateRoomCache(room, "complete")
+                celesteRender.forceRoomBatchRender(room, viewport)
             end
 
             lastTileX, lastTileY = tx + 1, ty + 1
@@ -83,6 +85,9 @@ end
 function tool.mousepressed(x, y, button, istouch, pressed)
     if button == actionButton then
         handleActionClick(x, y)
+
+    elseif button == cloneButton then
+        handleCloneClick(x, y)
     end
 end
 

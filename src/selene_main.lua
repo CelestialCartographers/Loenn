@@ -73,7 +73,7 @@ function love.draw()
 end
 
 function love.update(dt)
-    tasks.processTasks(1 / 144)
+    tasks.processTasks(1 / 16)
     inputHandler.update(dt)
 
     if viewerState.map then
