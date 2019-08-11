@@ -28,6 +28,7 @@ local viewportHandler = require("viewport_handler")
 local hotkeyHandler = require("hotkey_handler")
 local standardHotkeys = require("standard_hotkeys")
 local configs = require("configs")
+local atlases = require("atlases")
 
 local inputDevice = require("input_device")
 local mapLoaderDevice = require("input_devices/map_loader")
@@ -50,8 +51,9 @@ tasks.newTask(
     end
 )
 
-local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
+atlases.initCelesteAtlasesTask()
 
+local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
 viewerState.loadMap(mapFile)
 
 function love.draw()
