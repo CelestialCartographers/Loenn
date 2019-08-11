@@ -3,6 +3,7 @@ local binfile = require("binfile")
 
 local spriteLoader = {}
 
+-- TODO - See if this can be optimized
 function spriteLoader.loadDataImage(fn)
     local fh = utils.getFileHandle(fn, "rb")
 
@@ -44,9 +45,15 @@ function spriteLoader.loadDataImage(fn)
                 repeatsLeft -= 1
             end
         end
+
+        coroutine.yield()
     end
 
-    return love.graphics.newImage(image)
+    local res = love.graphics.newImage(image)
+
+    coroutine.yield(res)
+
+    return res
 end
 
 function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
@@ -97,15 +104,23 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
                 realHeight = binfile.readSignedShort(fh),
 
                 image = spritesImage,
-                filename = dataFilePath
+                filename = dataFilePath,
+
+                loadedAt = love.timer.getTime()
             }
 
             sprite.quad = love.graphics.newQuad(sprite.x, sprite.y, sprite.width, sprite.height, spritesWidth, spritesHeight)
             res[path] = sprite
         end
+
+        if i ~= count then
+            coroutine.yield()
+        end
     end
 
     fh:close()
+
+    coroutine.yield(res)
 
     return res
 end
