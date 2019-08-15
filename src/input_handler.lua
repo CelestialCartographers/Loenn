@@ -1,4 +1,5 @@
 local inputDevice = require("input_device")
+local sceneHandler = require("scene_handler")
 
 local inputHandler = {}
 
@@ -26,19 +27,19 @@ function inputHandler.getMouseDragDelta(x, y, button, istouch)
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    inputDevice.sendEvent("keypressed", key, scancode, isrepeat)
+    sceneHandler.sendEvent("keypressed", key, scancode, isrepeat)
 end
 
 function love.keyreleased(key, scancode)
-    inputDevice.sendEvent("keyreleased", key, scancode)
+    sceneHandler.sendEvent("keyreleased", key, scancode)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
     for button, data <- mouseButtonsPressed do
-        inputDevice.sendEvent("mousedragmoved", inputHandler.getMouseDragDelta(x, y, button, istouch))
+        sceneHandler.sendEvent("mousedragmoved", inputHandler.getMouseDragDelta(x, y, button, istouch))
     end
 
-    inputDevice.sendEvent("mousemoved", x, y, dx, dy, istouch)
+    sceneHandler.sendEvent("mousemoved", x, y, dx, dy, istouch)
 end
 
 -- Don't send the event here, make sure it is not a drag first
@@ -47,46 +48,46 @@ function love.mousepressed(x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
-    inputDevice.sendEvent("mousereleased", x, y, button, istouch, presses)
+    sceneHandler.sendEvent("mousereleased", x, y, button, istouch, presses)
 
     local startX, startY, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
 
     if consideredDrag then
-        inputDevice.sendEvent("mousedrag", startX, startY, button, dx, dy)
+        sceneHandler.sendEvent("mousedrag", startX, startY, button, dx, dy)
 
     else
-        inputDevice.sendEvent("mousepressed", startX, startY, button, istouch, presses)
+        sceneHandler.sendEvent("mousepressed", startX, startY, button, istouch, presses)
     end
 
     mouseButtonsPressed[button] = nil
 end
 
 function love.resize(width, height)
-    inputDevice.sendEvent("resize", width, height)
+    sceneHandler.sendEvent("resize", width, height)
 end
 
 function love.wheelmoved(dx, dy)
-    inputDevice.sendEvent("wheelmoved", dx, dy)
+    sceneHandler.sendEvent("wheelmoved", dx, dy)
 end
 
 function love.visible(visible)
-    inputDevice.sendEvent("visible", visible)
+    sceneHandler.sendEvent("visible", visible)
 end
 
 function love.filedropped(file)
-    inputDevice.sendEvent("filedropped", file)
+    sceneHandler.sendEvent("filedropped", file)
 end
 
 function love.directorydropped(path)
-    inputDevice.sendEvent("directorydropped", path)
+    sceneHandler.sendEvent("directorydropped", path)
 end
 
 function inputHandler.update(dt)
-    inputDevice.sendEvent("update", dt)
+    sceneHandler.sendEvent("update", dt)
 end
 
 function inputHandler.draw()
-    inputDevice.sendEvent("draw")
+    sceneHandler.sendEvent("draw")
 end
 
 return inputHandler

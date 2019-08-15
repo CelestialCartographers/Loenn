@@ -1,7 +1,5 @@
 local inputHandler = {}
 
-inputHandler.inputDevices = {}
-
 local function unhandledEvent()
     -- Do nothing
 end
@@ -11,9 +9,7 @@ local inputDeviceMt = {
 }
 
 -- TODO - Add a way to specify what device group we are sending to?
-function inputHandler.sendEvent(event, ...)
-    local devices = inputHandler.inputDevices
-
+function inputHandler.sendEvent(devices, event, ...)
     if event then
         for i, device <- devices do
             if device._enabled then
@@ -29,9 +25,7 @@ function inputHandler.sendEvent(event, ...)
 end
 
 -- Use inputDeviceMt if no other metatable is already set for the device
-function inputHandler.newInputDevice(device, devices)
-    devices = devices or inputHandler.inputDevices
-
+function inputHandler.newInputDevice(devices, device)
     if not getmetatable(device) then
         device = setmetatable(device, inputDeviceMt)
     end

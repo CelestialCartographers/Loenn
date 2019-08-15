@@ -13,6 +13,7 @@ love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 local startup = require("initial_startup")
 startup:init()
 
+local sceneHandler = require("scene_handler")
 local inputHandler = require("input_handler")
 require("love_filesystem_unsandboxing")
 
@@ -35,11 +36,9 @@ local mapLoaderDevice = require("input_devices/map_loader")
 local toolHandlerDevice = require("input_devices/tool_device")
 local toolHandler = require("tool_handler")
 
-inputDevice.newInputDevice(viewportHandler.device)
-inputDevice.newInputDevice(hotkeyHandler.createHotkeyDevice(standardHotkeys))
 
-inputDevice.newInputDevice(mapLoaderDevice)
-inputDevice.newInputDevice(toolHandlerDevice)
+sceneHandler.loadInternalScenes()
+sceneHandler.changeScene("Loading")
 
 love.graphics.setFont(fonts.font)
 
@@ -57,30 +56,11 @@ local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps",
 viewerState.loadMap(mapFile)
 
 function love.draw()
-    local viewport = viewerState.viewport
-
-    if viewerState.map then
-        celesteRender.drawMap(viewerState)
-
-        love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
-        love.graphics.printf("Room: " .. viewerState.selectedRoom.name, 20, 80, viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
-
-    else
-        loading:drawLoadScreen(viewport)
-    end
-
-    inputHandler.draw()
+    sceneHandler.sendEvent("draw")
 end
 
 function love.update(dt)
     tasks.processTasks(1 / 16)
-    inputHandler.update(dt)
 
-    if viewerState.map then
-        -- TODO - Find some sane values for this
-        celesteRender.processTasks(viewerState, 1 / 60, math.huge, 1 / 240, math.huge)
-
-    else
-        loading:update(dt)
-    end
+    sceneHandler.sendEvent("update", dt)
 end
