@@ -8,7 +8,6 @@ local inputDeviceMt = {
     __index = function() return unhandledEvent end
 }
 
--- TODO - Add a way to specify what device group we are sending to?
 function inputHandler.sendEvent(devices, event, ...)
     if event then
         for i, device <- devices do
@@ -17,11 +16,13 @@ function inputHandler.sendEvent(devices, event, ...)
                 local consumed = device[event](unpack(args))
 
                 if consumed then
-                    return
+                    return true
                 end
             end
         end
     end
+
+    return false
 end
 
 -- Use inputDeviceMt if no other metatable is already set for the device

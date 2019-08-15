@@ -38,6 +38,10 @@ function sceneHandler.getScene(name)
     return sceneHandler.scenes[name]
 end
 
+function sceneHandler.getCurrentScene()
+    return sceneHandler.scenes[sceneHandler.currentScene]
+end
+
 function sceneHandler.changeScene(name)
     local prevName = sceneHandler.currentScene
 

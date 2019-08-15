@@ -17,7 +17,7 @@ end
 
 function sceneStruct.create(scene)
     if not scene.name then
-        error("! Scene missing name.")
+        error("Scene missing name.")
     end
 
     local res = utils.deepcopy(scene)

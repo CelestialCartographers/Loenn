@@ -8,7 +8,8 @@ function editorScene:loaded()
     self.fonts = require("fonts")
 
     local inputDevice = require("input_device")
-    
+    local standardHotkeys = require("standard_hotkeys")
+
     local viewportHandler = require("viewport_handler")
     local hotkeyHandler = require("hotkey_handler")
     local mapLoaderDevice = require("input_devices/map_loader")

@@ -1,6 +1,7 @@
 local entities = require("entities")
 local celesteRender = require("celeste_render")
 local toolHandler = require("tool_handler")
+local sceneHandler = require("scene_handler")
 
 local debugUtils = {}
 
@@ -21,6 +22,20 @@ function debugUtils.reloadTools()
     toolHandler.loadInternalTools()
 end
 
+function debugUtils.reloadScenes()
+    print("! Reloading scenes")
+
+    local scene = sceneHandler.getCurrentScene()
+
+    sceneHandler.loadInternalScenes()
+
+    if scene then
+        sceneHandler.currentScene = nil
+        scene:exit()
+        sceneHandler.changeScene(scene.name)
+    end
+end
+
 function debugUtils.redrawMap()
     print("! Redrawing map")
 
@@ -34,6 +49,7 @@ function debugUtils.reloadEverything()
 
     debugUtils.reloadEntities()
     debugUtils.reloadTools()
+    debugUtils.reloadScenes()
     debugUtils.redrawMap()
 end
 
