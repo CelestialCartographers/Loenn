@@ -3,6 +3,9 @@ local editorScene = {}
 editorScene.name = "Editor"
 
 function editorScene:loaded()
+    local giraffe = require("giraffe/src/giraffe")
+    giraffe.windows.addWindow(require("windows/test_window"))
+
     self.viewerState = require("loaded_state")
     self.celesteRender = require("celeste_render")
     self.fonts = require("fonts")
@@ -15,6 +18,7 @@ function editorScene:loaded()
     local mapLoaderDevice = require("input_devices/map_loader")
     local toolHandlerDevice = require("input_devices/tool_device")
 
+    inputDevice.newInputDevice(self.inputDevices, giraffe.windows)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
     inputDevice.newInputDevice(self.inputDevices, hotkeyHandler.createHotkeyDevice(standardHotkeys))
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)

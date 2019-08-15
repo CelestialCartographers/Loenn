@@ -16,3 +16,4 @@
 /src/celesteResources/*
 /src/*.dll
 /src/*.so
+/src/giraffe/*
