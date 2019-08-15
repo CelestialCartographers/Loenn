@@ -32,6 +32,8 @@ function editorScene:draw()
         love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
         love.graphics.printf("Room: " .. self.viewerState.selectedRoom.name, 20, 80, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
     end
+
+    self:propagateEvent("draw")
 end
 
 function editorScene:update(dt)
@@ -39,6 +41,8 @@ function editorScene:update(dt)
         -- TODO - Find some sane values for this
         self.celesteRender.processTasks(self.viewerState, 1 / 60, math.huge, 1 / 240, math.huge)
     end
+
+    self:propagateEvent("update", dt)
 end
 
 return editorScene

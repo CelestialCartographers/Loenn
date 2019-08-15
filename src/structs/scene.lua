@@ -5,13 +5,23 @@ local sceneStruct = {}
 
 local sceneMt = {}
 
+local sceneStructFunctions = {}
+
+function sceneStructFunctions:propagateEvent(event, ...)
+    if self.inputDevices then
+        return inputDeviceHandler.sendEvent(self.inputDevices, event, ...)
+    end
+end
+
 function sceneMt.__index(self, key)
     -- Send event to input devices
 
+    if sceneStructFunctions[key] then
+        return sceneStructFunctions[key]
+    end
+
     return function(self, ...)
-        if self.inputDevices then
-            inputDeviceHandler.sendEvent(self.inputDevices, key, ...)
-        end
+        return self:propagateEvent(key, ...)
     end
 end
 
