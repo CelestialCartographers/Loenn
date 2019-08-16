@@ -1,10 +1,25 @@
+local utils = require("utils")
+
 local editorScene = {}
 
 editorScene.name = "Editor"
 
 function editorScene:loaded()
-    local giraffe = require("giraffe/src/giraffe")
-    giraffe.windows.addWindow(require("windows/test_window"))
+    local giraffe = require("giraffe")
+    local testWindow = require("windows/test_window")
+
+    local win1 = utils.deepcopy(testWindow)
+    local win2 = utils.deepcopy(testWindow)
+
+    win1.x = 200
+    win2.x = 300
+    win2.y += 50
+
+    win1.title = "Window 1"
+    win2.title = "Window 2"
+
+    giraffe.windows.addWindow(win1)
+    giraffe.windows.addWindow(win2)
 
     self.viewerState = require("loaded_state")
     self.celesteRender = require("celeste_render")
