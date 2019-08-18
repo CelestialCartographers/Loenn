@@ -5,6 +5,8 @@ local fileLocations = require("file_locations")
 local debugUtils = require("debug_utils")
 local viewportHandler = require("viewport_handler")
 
+local giraffe = require("giraffe/giraffe")
+
 local hotkeyStruct = require("structs/hotkey")
 
 -- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
@@ -27,6 +29,17 @@ local rawHotkeys = {
     -- Camera
     {configs.hotkeys.cameraZoomIn, viewportHandler.zoomIn, "Zoom in"},
     {configs.hotkeys.cameraZoomOut, viewportHandler.zoomOut, "Zoom out"},
+
+    -- Test
+    {"ctrl + l", function()
+        print("ctrl + l", "window stuff")
+        for i, win <- giraffe.windows.windows do
+            print(win.title)
+            win.movable = not win.movable
+            win.header = win.movable
+            win.resizable = win.movable
+        end
+    end, "Lock window movement"},
 }
 
 local hotkeys = {}
