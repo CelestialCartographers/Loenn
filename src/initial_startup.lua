@@ -39,8 +39,14 @@ function startup.findSteamDirectory()
     local userOS = love.system.getOS()
 
     if userOS == "Windows" then
-        --TODO - Registry magic
-        return false
+        -- TODO - Look for custom game specific install directory?
+        local registry = require("registry")
+
+        local steam64Bits = registry.getKey("HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam")
+        local steam32Bits = registry.getKey("HKLM\\SOFTWARE\\Valve\\Steam")
+        local steamDir = steam64Bits and steam64Bits.InstallPath or steam32Bits and steam32Bits.InstallPath
+
+        return steamDir
 
     elseif userOS == "OS X" then
         return filesystem.joinpath(os.getenv("HOME"), "Library", "Application Support", "Steam")
