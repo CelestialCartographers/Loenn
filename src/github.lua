@@ -1,5 +1,6 @@
+local utils = require("utils")
 local json = require("dkjson")
-local https = require("https")
+local hasHttps, https = utils.tryrequire("https")
 
 local github = {}
 
@@ -10,6 +11,10 @@ github._baseUrl = "https://api.github.com"
 github._baseReleasesUrl = github._baseUrl .. "/repos/%s/%s/releases"
 
 local function getUrlJsonData(url, force)
+    if not hasHttps then
+        return false, nil
+    end
+    
     if github._cache[url] then
         local lastFetch = github._cache[url].time
 

@@ -1,5 +1,6 @@
 local serialize = require("serialize")
 local filesystem = require("filesystem")
+local requireUtils = require("require_utils")
 
 local utils = {}
 
@@ -115,19 +116,6 @@ function utils.mod1(n, d)
     return m == 0 and d or m
 end
 
--- Clear the cache of a required library
-function utils.unrequire(lib)
-    package.loaded[lib] = nil
-end
-
--- Clear the cache and return a new uncached version of the library
--- Highly unrecommended to use this for anything
-function utils.rerequire(lib)
-    utils.unrequire(lib)
-
-    return require(lib)
-end
-
 function utils.setRandomSeed(v)
     if type(v) == "number" then
         math.randomseed(v)
@@ -158,6 +146,16 @@ function utils.deepcopy(v)
         return v
     end
 end
+
+function utils.clamp(value, min, max)
+    return math.min(math.max(value, min), max)
+end
+
+-- Add all of require utils into utils
+for k, v <- requireUtils do
+    utils[k] = v
+end
+
 
 -- Add all of filesystem helper into utils
 for k, v <- filesystem do

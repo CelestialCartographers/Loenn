@@ -1,7 +1,8 @@
 local lfs = require("lfs_ffi")
 local nfd = require("nfd")
-local https = require("https")
 local physfs = require("physfs")
+local requireUtils = require("require_utils")
+local hasHttp, https = requireUtils.tryrequire("https")
 
 local filesystem = {}
 
@@ -17,7 +18,7 @@ function filesystem.dirname(path, sep)
     return path:match("(.*" .. sep .. ")")
 end
 
--- TODO, Sanitize parts with leading/trailing separator
+-- TODO - Sanitize parts with leading/trailing separator
 -- IE {"foo", "/bar/"} becomes "foo//bar", expected "foo/bar"
 function filesystem.joinpath(...)
     local paths = {...}
@@ -74,6 +75,10 @@ function filesystem.openDialog(path, filter)
 end
 
 function filesystem.downloadURL(url, filename, headers)
+    if not hasHttps then
+        return false, nil
+    end
+
     local code, body, requestHeaders = https.request(url, {
         headers = headers or {
             ["User-Agent"] = "curl/7.58.0",
