@@ -9,6 +9,9 @@ love.keyboard.setKeyRepeat(true)
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
 love.graphics.setBackgroundColor(0.1, 0.1, 0.1)
 
+local fonts = require("fonts")
+love.graphics.setFont(fonts.font)
+
 -- Set up configs for first run
 local startup = require("initial_startup")
 startup:init()
@@ -20,7 +23,6 @@ require("love_filesystem_unsandboxing")
 local utils = require("utils")
 local celesteRender = require("celeste_render")
 local fileLocations = require("file_locations")
-local fonts = require("fonts")
 local loading = require("loading")
 local tasks = require("task")
 local entities = require("entities")
@@ -30,6 +32,7 @@ local hotkeyHandler = require("hotkey_handler")
 local standardHotkeys = require("standard_hotkeys")
 local configs = require("configs")
 local atlases = require("atlases")
+local threadHandler = require("thread_handler")
 
 local inputDevice = require("input_device")
 local mapLoaderDevice = require("input_devices/map_loader")
@@ -39,8 +42,6 @@ local toolHandler = require("tool_handler")
 
 sceneHandler.loadInternalScenes()
 sceneHandler.changeScene("Loading")
-
-love.graphics.setFont(fonts.font)
 
 -- Load internal modules such as tools/entities/triggers etc
 tasks.newTask(
@@ -61,6 +62,7 @@ end
 
 function love.update(dt)
     tasks.processTasks(1 / 16)
-
+   
     sceneHandler.sendEvent("update", dt)
+    threadHandler.update(dt)
 end

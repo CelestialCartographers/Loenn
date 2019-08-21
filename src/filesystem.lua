@@ -2,6 +2,8 @@ local lfs = require("lfs_ffi")
 local nfd = require("nfd")
 local physfs = require("physfs")
 local requireUtils = require("require_utils")
+local threadHandler = require("thread_handler")
+
 local hasHttp, https = requireUtils.tryrequire("https")
 
 local filesystem = {}
@@ -60,18 +62,54 @@ function filesystem.isDirectory(path)
     return attrs and attrs.mode == "directory"
 end
 
-function filesystem.saveDialog(path, filter)
-    -- TODO - This is a blocking call, consider running in own thread
+-- Return thread if called with callback
+-- Otherwise block and return the selected file
+function filesystem.saveDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
+    
+    if callback then
+        local code = [[
+            local args = {...}
+            local channelName, path, filter = unpack(args)
+            local channel = love.thread.getChannel(channelName)
 
-    return nfd.save(filter, nil, path)
+            local nfd = require("nfd")
+
+            local res = nfd.save(filter, nil, path)
+            channel:push(res)
+        ]]
+
+        return threadHandler.createStartWithCallback(code, callback, path, filter)
+
+    else
+
+        return nfd.save(filter, nil, path)
+    end
 end
 
-function filesystem.openDialog(path, filter)
-    -- TODO - This is a blocking call, consider running in own thread
+-- Return thread if called with callback
+-- Otherwise block and return the selected file
+function filesystem.openDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
-    return nfd.open(filter, nil, path)
+    if callback then
+        local code = [[
+            local args = {...}
+            local channelName, path, filter = unpack(args)
+            local channel = love.thread.getChannel(channelName)
+
+            local nfd = require("nfd")
+
+            local res = nfd.open(filter, nil, path)
+            channel:push(res)
+        ]]
+
+        return threadHandler.createStartWithCallback(code, callback, path, filter)
+
+    else
+
+        return nfd.open(filter, nil, path)
+    end
 end
 
 function filesystem.downloadURL(url, filename, headers)
