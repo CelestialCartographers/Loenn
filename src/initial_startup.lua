@@ -5,6 +5,11 @@ local filesystem = require("filesystem")
 
 local settingsPath = fileLocations.getSettingsPath()
 
+local linuxSteamDirs = {
+    filesystem.joinpath(os.getenv("HOME"), ".local", "share", "Steam"),
+    filesystem.joinpath(os.getenv("HOME"), ".steam", "steam"),
+}
+
 local startup = {}
 
 function startup.verifyCelesteDir(path)
@@ -35,13 +40,19 @@ function startup.findSteamDirectory()
 
     if userOS == "Windows" then
         --TODO - Registry magic
-        return "Get Cruor to implement the registry stuff :)"
+        return false
 
     elseif userOS == "OS X" then
         return filesystem.joinpath(os.getenv("HOME"), "Library", "Application Support", "Steam")
 
     elseif userOS == "Linux" then
-        return filesystem.joinpath(os.getenv("HOME"), ".local", "share", "Steam")
+        for i, path <- linuxSteamDirs do
+            if filesystem.isDirectory(path) then
+                return path
+            end
+        end
+
+        return false
     end
 end
 
