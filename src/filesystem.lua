@@ -4,7 +4,7 @@ local physfs = require("physfs")
 local requireUtils = require("require_utils")
 local threadHandler = require("thread_handler")
 
-local hasHttp, https = requireUtils.tryrequire("https")
+local hasHttps, https = requireUtils.tryrequire("https")
 
 local filesystem = {}
 
@@ -66,7 +66,7 @@ end
 -- Otherwise block and return the selected file
 function filesystem.saveDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
-    
+
     if callback then
         local code = [[
             local args = {...}

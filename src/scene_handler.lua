@@ -22,7 +22,7 @@ end
 
 -- Use inputsceneMt if no other metatable is already set for the scene
 function sceneHandler.addScene(scene)
-    scenes = sceneHandler.scenes
+    local scenes = sceneHandler.scenes
 
     if utils.typeof(scene) ~= "scene" then
         scene = sceneStruct.create(scene)
@@ -81,7 +81,7 @@ function sceneHandler.loadInternalScenes(path)
 
     for i, file <- love.filesystem.getDirectoryItems(path) do
         -- Always use Linux paths here
-        sceneHandler.addSceneFromFilename(utils.joinpath(path, file):gsub("\\", "/"), registerAt)
+        sceneHandler.addSceneFromFilename(utils.joinpath(path, file):gsub("\\", "/"))
     end
 end
 

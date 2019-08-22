@@ -3,8 +3,9 @@ local utils = {}
 local shownWarningFor = {}
 
 function utils.tryrequire(lib, verbose)
+    verbose = verbose == nil or verbose
+
     local success, res = pcall(require, lib)
-    local verbose = verbose == nil or verbose
 
     if not success then
         if not shownWarningFor[lib] and verbose then

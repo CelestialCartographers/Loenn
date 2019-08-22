@@ -14,7 +14,7 @@ local function getUrlJsonData(url, force)
     if not hasHttps then
         return false, nil
     end
-    
+
     if github._cache[url] then
         local lastFetch = github._cache[url].time
 

@@ -19,7 +19,7 @@ local jumpthru = {}
 
 jumpthru.depth = -9000
 
-function getQuad(sprite, texture, index)
+local function getQuad(sprite, texture, index)
     quadCache[texture] = quadCache[texture] or {}
 
     if not quadCache[texture][index] then
