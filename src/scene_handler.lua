@@ -56,9 +56,15 @@ function sceneHandler.changeScene(name)
         prevScene:exit(name)
     end
 
-    newScene:enter(prevName)
-
     sceneHandler.currentScene = name
+
+    if not newScene._firstEnter then
+        newScene._firstEnter = true
+
+        newScene:firstEnter(prevName)
+    end
+
+    newScene:enter(prevName)
 
     return true
 end

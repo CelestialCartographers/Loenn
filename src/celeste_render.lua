@@ -408,13 +408,7 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
 
             love.graphics.setColor(colors.triggerTextColor)
 
-            local longest, lines = font:getWrap(displayName, width)
-            local textHeight = #lines * (font:getHeight() * font:getLineHeight())
-
-            local offsetX = 0
-            local offsetY = (textHeight - height) / 2
-
-            love.graphics.printf(displayName, x, y, width, "center", 0, triggerFontSize, triggerFontSize, offsetX, offsetY)
+            drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
 
             love.graphics.setColor(colors.default)
         end

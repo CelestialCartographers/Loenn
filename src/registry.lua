@@ -20,7 +20,7 @@ end
 
 -- Does not validate that the key exists or not
 function registry.getKey(key)
-    local cmd = string.format([[reg.exe query "%s" /z 2>NULL]], key)
+    local cmd = string.format([[reg.exe query "%s" /z 2>NUL]], key)
     local rawResult = io.popen(cmd):read("*all")
 
     return registry.parseResult(rawResult)

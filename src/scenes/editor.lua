@@ -2,7 +2,7 @@ local editorScene = {}
 
 editorScene.name = "Editor"
 
-function editorScene:loaded()
+function editorScene:firstEnter()
     self.viewerState = require("loaded_state")
     self.celesteRender = require("celeste_render")
     self.fonts = require("fonts")

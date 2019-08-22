@@ -26,6 +26,30 @@ function loadingScene:loaded()
     self.textOffsetY = self.quadSize / 2
 end
 
+function loadingScene:firstEnter()
+    local tasks = require("task")
+
+    local entities = require("entities")
+    local atlases = require("atlases")
+    local toolHandler = require("tool_handler")
+
+    local fileLocations = require("file_locations")
+    local viewerState = require("loaded_state")
+
+    -- Load internal modules such as tools/entities/triggers etc
+    tasks.newTask(
+        function()
+            entities.loadInternalEntities()
+            toolHandler.loadInternalTools()
+        end
+    )
+
+    atlases.initCelesteAtlasesTask()
+
+    local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
+    viewerState.loadMap(mapFile)
+end
+
 function loadingScene:draw()
     local windowWidth, windowHeight = love.graphics.getWidth(), love.graphics.getHeight()
 

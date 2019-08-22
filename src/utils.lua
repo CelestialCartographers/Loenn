@@ -41,6 +41,10 @@ function utils.readAll(path, mode, internal)
     end
 end
 
+function utils.trim(s)
+    return string.match(s, "^%s*(.*%S)") or ""
+end
+
 function utils.humanizeVariableName(name)
     local res = name
 

@@ -82,7 +82,6 @@ function filesystem.saveDialog(path, filter, callback)
         return threadHandler.createStartWithCallback(code, callback, path, filter)
 
     else
-
         return nfd.save(filter, nil, path)
     end
 end
@@ -107,7 +106,6 @@ function filesystem.openDialog(path, filter, callback)
         return threadHandler.createStartWithCallback(code, callback, path, filter)
 
     else
-
         return nfd.open(filter, nil, path)
     end
 end
