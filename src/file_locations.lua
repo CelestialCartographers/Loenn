@@ -3,25 +3,24 @@ local config = require("config")
 
 local fileLocations = {}
 
--- TODO - Test if Windows approves of Lönn instead of Loenn
-local loennUpper = "Loenn"
-local loennLower = "lönn"
+local loennWindowsFolderName = "L" .. string.char(246) .. "nn"
+local loennLinuxFolderName = "Lönn"
 
 function fileLocations.getStorageDir()
     local userOS = love.system.getOS()
 
     if userOS == "Windows" then
-        return filesystem.joinpath(os.getenv("LocalAppData"), loennUpper)
+        return filesystem.joinpath(os.getenv("LocalAppData"), loennWindowsFolderName)
 
     elseif userOS == "Linux" then
         local xdgConfig = os.getenv("XDG_CONFIG_HOME")
         local home = os.getenv("HOME")
 
         if xdgConfig then
-            return filesystem.joinpath(xdgConfig, loennLower)
+            return filesystem.joinpath(xdgConfig, loennLinuxFolderName)
 
         else
-            return filesystem.joinpath(home, ".config", loennLower)
+            return filesystem.joinpath(home, ".config", loennLinuxFolderName)
         end
 
     elseif userOS == "OS X" then
