@@ -32,6 +32,7 @@ function debugUtils.reloadScenes()
     if scene then
         sceneHandler.currentScene = nil
         scene:exit()
+        scene._firstEnter = nil
         sceneHandler.changeScene(scene.name)
     end
 end

@@ -1,7 +1,10 @@
 local lfs = require("lfs_ffi")
 local nfd = require("nfd")
-local https = require("https")
 local physfs = require("physfs")
+local requireUtils = require("require_utils")
+local threadHandler = require("thread_handler")
+
+local hasHttps, https = requireUtils.tryrequire("https")
 
 local filesystem = {}
 
@@ -17,7 +20,7 @@ function filesystem.dirname(path, sep)
     return path:match("(.*" .. sep .. ")")
 end
 
--- TODO, Sanitize parts with leading/trailing separator
+-- TODO - Sanitize parts with leading/trailing separator
 -- IE {"foo", "/bar/"} becomes "foo//bar", expected "foo/bar"
 function filesystem.joinpath(...)
     local paths = {...}
@@ -59,21 +62,59 @@ function filesystem.isDirectory(path)
     return attrs and attrs.mode == "directory"
 end
 
-function filesystem.saveDialog(path, filter)
-    -- TODO - This is a blocking call, consider running in own thread
+-- Return thread if called with callback
+-- Otherwise block and return the selected file
+function filesystem.saveDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
-    return nfd.save(filter, nil, path)
+    if callback then
+        local code = [[
+            local args = {...}
+            local channelName, path, filter = unpack(args)
+            local channel = love.thread.getChannel(channelName)
+
+            local nfd = require("nfd")
+
+            local res = nfd.save(filter, nil, path)
+            channel:push(res)
+        ]]
+
+        return threadHandler.createStartWithCallback(code, callback, path, filter)
+
+    else
+        return nfd.save(filter, nil, path)
+    end
 end
 
-function filesystem.openDialog(path, filter)
-    -- TODO - This is a blocking call, consider running in own thread
+-- Return thread if called with callback
+-- Otherwise block and return the selected file
+function filesystem.openDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
-    return nfd.open(filter, nil, path)
+    if callback then
+        local code = [[
+            local args = {...}
+            local channelName, path, filter = unpack(args)
+            local channel = love.thread.getChannel(channelName)
+
+            local nfd = require("nfd")
+
+            local res = nfd.open(filter, nil, path)
+            channel:push(res)
+        ]]
+
+        return threadHandler.createStartWithCallback(code, callback, path, filter)
+
+    else
+        return nfd.open(filter, nil, path)
+    end
 end
 
 function filesystem.downloadURL(url, filename, headers)
+    if not hasHttps then
+        return false, nil
+    end
+
     local code, body, requestHeaders = https.request(url, {
         headers = headers or {
             ["User-Agent"] = "curl/7.58.0",

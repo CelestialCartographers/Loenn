@@ -10,6 +10,10 @@ local startup = {}
 function startup.verifyCelesteDir(path)
     -- Check for some files/directories to check if this could be a actuall Celeste install containing the files we need
 
+    if not path then
+        return false, nil
+    end
+
     -- Get the base path for Celeste dir
     if filesystem.filename(path) == "Celeste.exe" then
         path = filesystem.dirname(path)
@@ -34,14 +38,31 @@ function startup.findSteamDirectory()
     local userOS = love.system.getOS()
 
     if userOS == "Windows" then
-        --TODO - Registry magic
-        return "Get Cruor to implement the registry stuff :)"
+        -- TODO - Look for custom game specific install directory?
+        local registry = require("registry")
+
+        local steam64Bits = registry.getKey("HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam")
+        local steam32Bits = registry.getKey("HKLM\\SOFTWARE\\Valve\\Steam")
+        local steamDir = steam64Bits and steam64Bits.InstallPath or steam32Bits and steam32Bits.InstallPath
+
+        return steamDir
 
     elseif userOS == "OS X" then
         return filesystem.joinpath(os.getenv("HOME"), "Library", "Application Support", "Steam")
 
     elseif userOS == "Linux" then
-        return filesystem.joinpath(os.getenv("HOME"), ".local", "share", "Steam")
+        local linuxSteamDirs = {
+            filesystem.joinpath(os.getenv("HOME"), ".local", "share", "Steam"),
+            filesystem.joinpath(os.getenv("HOME"), ".steam", "steam"),
+        }
+
+        for i, path <- linuxSteamDirs do
+            if filesystem.isDirectory(path) then
+                return path
+            end
+        end
+
+        return false
     end
 end
 
@@ -51,42 +72,22 @@ function startup.findCelesteDirectory()
     if steam then
         local celesteSteam = filesystem.joinpath(steam, "steamapps", "common", "Celeste")
 
-        if filesystem.isDirectory(celesteSteam) then
+        if filesystem.isDirectory(celesteSteam) and startup.verifyCelesteDir(celesteSteam) then
             return true, celesteSteam
         end
     end
-
-    -- Couldn't auto detect, select manually
-    while true do
-        local selected = filesystem.openDialog()
-
-        if selected then
-            local valid, fixed = startup.verifyCelesteDir(selected)
-
-            if valid then
-                return true, fixed
-            end
-        end
-
-        -- TODO - Notify user about this being correct or not
-    end
 end
 
-function startup.init()
-    if startup.requiresInit() then
-        local found, celesteDir = startup.findCelesteDirectory()
-
-        if found then
-            local conf = config.readConfig(settingsPath) or {}
-            conf.celeste_dir = celesteDir
-
-            config.writeConfig(conf)
-        end
-
-        return found
+function startup.savePath(path)
+    -- Get the base path for Celeste dir
+    if filesystem.filename(path) == "Celeste.exe" then
+        path = filesystem.dirname(path)
     end
 
-    return true
+    local conf = config.readConfig(settingsPath) or {}
+    conf.celeste_dir = path
+
+    config.writeConfig(conf)
 end
 
 return startup

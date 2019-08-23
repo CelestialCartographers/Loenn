@@ -57,7 +57,7 @@ local function handleActionClick(x, y, force)
                 -- TODO - Redraw more efficiently
                 celesteRender.invalidateRoomCache(room, tool.layer)
                 celesteRender.invalidateRoomCache(room, "complete")
-                celesteRender.forceRoomBatchRender(room, viewport)
+                celesteRender.forceRoomBatchRender(room, viewportHandler.viewport)
             end
 
             lastTileX, lastTileY = tx + 1, ty + 1

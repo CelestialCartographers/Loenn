@@ -1,3 +1,5 @@
+local utils = require("utils")
+
 local drawing = {}
 
 function drawing.drawSprite(spriteMeta, x, y, r, sx, sy, ox, oy)
@@ -33,6 +35,30 @@ function drawing.getRelativeQuad(spriteMeta, x, y, width, height)
     local qx, qy, qw, qh = spriteMeta.quad:getViewport
 
     return love.graphics.newQuad(qx + x, qy + y, width, height, image:getDimensions)
+end
+
+-- TODO - Vertical offset is wrong based on scale?
+function drawing.printCenteredText(text, x, y, width, height, font, fontSize, trim)
+    font = font or love.graphics.getFont()
+    fontSize = fontSize or 1
+
+    trim = trim or trim == nil
+    text = trim and utils.trim(text) or text
+
+    local longest, lines = font:getWrap(text, width / fontSize)
+    local textHeight = #lines * (font:getHeight() * font:getLineHeight())
+
+    local offsetX = 0
+    local offsetY = (height - textHeight) / 2
+
+    love.graphics.push()
+
+    love.graphics.translate(x + offsetX, y + offsetY)
+    love.graphics.scale(fontSize, fontSize)
+
+    love.graphics.printf(text, 0, 0, width / fontSize, "center")
+
+    love.graphics.pop()
 end
 
 return drawing

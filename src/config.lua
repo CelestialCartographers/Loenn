@@ -56,6 +56,7 @@ function config.writeConfigData(filename, data, pretty)
                 fh:close()
 
                 os.rename(tempFilename, filename)
+                os.remove(tempFilename)
 
             else
                 success = false

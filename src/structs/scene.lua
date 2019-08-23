@@ -20,8 +20,10 @@ function sceneMt.__index(self, key)
         return sceneStructFunctions[key]
     end
 
-    return function(self, ...)
-        return self:propagateEvent(key, ...)
+    if key:sub(1, 1) ~= "_" then
+        return function(self, ...)
+            return self:propagateEvent(key, ...)
+        end
     end
 end
 

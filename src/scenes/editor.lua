@@ -4,7 +4,7 @@ local editorScene = {}
 
 editorScene.name = "Editor"
 
-function editorScene:loaded()
+function editorScene:firstEnter()
     local giraffe = require("giraffe")
     local testWindow = require("windows/test_window")
 
