@@ -141,10 +141,10 @@ function utils.deepcopy(v)
         local res = {}
 
         for key, value <- v do
-            res[key] = utils.deepcopy(value)
+            res[key] = utils.deepcopy(rawget(v, key))
         end
 
-        return res
+        return setmetatable(res, getmetatable(v))
 
     else
         return v

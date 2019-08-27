@@ -1,7 +1,10 @@
 local theme = require("giraffe.theme")
+local windowStruct = require("giraffe.window")
 local giraffe = require("giraffe")
 
 local window = {}
+
+-- TODO - Test window in window
 
 window.title = "Window Test!"
 
@@ -22,25 +25,28 @@ window.theme = {
     }
 }
 
-function window:loaded()
-    self.image = love.graphics.newImage("assets/logo-256.png")
-    self.buttonTest = giraffe.button({
+window.widgets = {
+    giraffe.button({
         x = 10,
         y = 10,
-    
+
         width = 100,
         height = 100,
-    
-        content = love.graphics.newImage("assetsTesting/hardened_clay_stained_purple.png"),
-    
+
+        content = "Foobar", --love.graphics.newImage("assetsTesting/hardened_clay_stained_purple.png"),
+
         pressed = function(self, x, y)
             print(":O", x, y)
         end,
 
         update = function(self)
-            --self.content = self._hovered and "Hi mouse :)" or "Come back D:"
+            self.content = self._hovered and "Hi mouse :)" or "Come back D:"
         end
     })
+}
+
+function window:loaded()
+    self.image = love.graphics.newImage("assets/logo-256.png")
 end
 
 function window:draw()
@@ -48,24 +54,19 @@ function window:draw()
     love.graphics.setColor(1.0, 0.7, 0.7)
     love.graphics.print(self._thingActive and "Hello there thing" or "Hello", 20, 256, 0, 4, 4)
 
-    self.buttonTest:draw()
-end
-
-function window:update(dt)
-    --print(self.x, self.y, self.width, self.height, dt)
-    self.buttonTest:update()
+    windowStruct.defaults.draw(self)
 end
 
 function window:mousepressed(x, y, button, istouch, presses)
     print(self.title, "mousepressed", x, y, button)
 
-    self.buttonTest:mousepressed(x, y, button, istouch, presses)
+    windowStruct.defaults.mousepressed(self, x, y, button, istouch, presses)
 end
 
 function window:mousemoved(x, y, dx, dy)
     self._thingActive = x > 20 and x < 100
-    
-    self.buttonTest:mousemoved(x, y, dx, dy)
+
+    windowStruct.defaults.mousemoved(self, x, y, dx, dy)
 end
 
 return window
