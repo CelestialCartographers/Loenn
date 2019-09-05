@@ -41,32 +41,32 @@ window.widgets = {
 
         update = function(self)
             self.content = self._hovered and "Hi mouse :)" or "Come back D:"
+        end,
+
+        resize = function(self, width, height)
+            self.width = width / 2
+            self:updateRectangle()
+        end
+    }),
+    giraffe.button({
+        x = 10,
+        y = 120,
+
+        width = 100,
+        height = 100,
+
+        content = "D:",
+
+        update = function(self, dt)
+            self.content = self._focused and ":)" or "FOCUS ME :("
+        end,
+
+        pressed = function(self, x, y)
+            print("D:", x, y)
         end
     })
 }
 
-function window:loaded()
-    self.image = love.graphics.newImage("assets/logo-256.png")
-end
-
-function window:draw()
-    love.graphics.draw(self.image, -20, -20)
-    love.graphics.setColor(1.0, 0.7, 0.7)
-    love.graphics.print(self._thingActive and "Hello there thing" or "Hello", 20, 256, 0, 4, 4)
-
-    windowStruct.defaults.draw(self)
-end
-
-function window:mousepressed(x, y, button, istouch, presses)
-    print(self.title, "mousepressed", x, y, button)
-
-    windowStruct.defaults.mousepressed(self, x, y, button, istouch, presses)
-end
-
-function window:mousemoved(x, y, dx, dy)
-    self._thingActive = x > 20 and x < 100
-
-    windowStruct.defaults.mousemoved(self, x, y, dx, dy)
-end
+window.image = love.graphics.newImage("assets/logo-256.png")
 
 return window

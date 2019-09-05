@@ -8,18 +8,32 @@ function editorScene:firstEnter()
     local giraffe = require("giraffe")
     local testWindow = require("windows/test_window")
 
+    giraffe.init() -- TODO -Move this out later
+
     local win1 = utils.deepcopy(testWindow)
     local win2 = utils.deepcopy(testWindow)
+    local win3 = utils.deepcopy(testWindow)
 
     win1.x = 200
     win2.x = 300
     win2.y += 50
+    win3.x = 10
+    win3.y = 10
 
     win1.title = "Window 1"
     win2.title = "Window 2"
+    win3.title = "Sub Window 1"
+    
+    win3.width = 100
+    win3.height = 100
 
-    giraffe.windows.addWindow(win1)
-    giraffe.windows.addWindow(win2)
+    -- TODO - Investigate bug with adding widgets after making it a window
+    table.insert(win2.widgets, giraffe.window(win3))
+
+    giraffe.windows.widgets = {
+        giraffe.window(win1),
+        giraffe.window(win2)
+    }
 
     self.viewerState = require("loaded_state")
     self.celesteRender = require("celeste_render")
