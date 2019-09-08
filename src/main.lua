@@ -3,6 +3,8 @@ function love.load()
 
     love.filesystem.setRequirePath(path)
 
+    love.filesystem.mount(love.filesystem.getSourceBaseDirectory(), "", true)
+
     require("selene").load()
     require("selene/selene/wrappers/searcher/love2d/searcher").load()
 
