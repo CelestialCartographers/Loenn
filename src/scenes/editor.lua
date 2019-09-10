@@ -8,7 +8,15 @@ function editorScene:firstEnter()
     local giraffe = require("giraffe")
     local testWindow = require("windows/test_window")
 
-    giraffe.init() -- TODO -Move this out later
+    giraffe.init() -- TODO - Move this out later
+
+    local group = giraffe.group({
+        x = 0,
+        y = 0,
+        width = love.graphics.getWidth(),
+        height = love.graphics.getHeight(),
+        _enabled = true
+    })
 
     local win1 = utils.deepcopy(testWindow)
     local win2 = utils.deepcopy(testWindow)
@@ -30,10 +38,9 @@ function editorScene:firstEnter()
     -- TODO - Investigate bug with adding widgets after making it a window
     table.insert(win2.widgets, giraffe.window(win3))
 
-    giraffe.windows.widgets = {
-        giraffe.window(win1),
-        giraffe.window(win2)
-    }
+    table.insert(group.widgets, giraffe.window(win1))
+    table.insert(group.widgets, giraffe.window(win2))
+
 
     self.viewerState = require("loaded_state")
     self.celesteRender = require("celeste_render")
@@ -47,7 +54,7 @@ function editorScene:firstEnter()
     local mapLoaderDevice = require("input_devices/map_loader")
     local toolHandlerDevice = require("input_devices/tool_device")
 
-    inputDevice.newInputDevice(self.inputDevices, giraffe.windows)
+    inputDevice.newInputDevice(self.inputDevices, group)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
     inputDevice.newInputDevice(self.inputDevices, hotkeyHandler.createHotkeyDevice(standardHotkeys))
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)

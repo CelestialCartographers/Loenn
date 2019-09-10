@@ -4,8 +4,6 @@ local giraffe = require("giraffe")
 
 local window = {}
 
--- TODO - Test window in window
-
 window.title = "Window Test!"
 
 window.x = 200
@@ -15,13 +13,13 @@ window.width = 400
 window.height = 300
 
 window.theme = {
-    window = {
-        --background = {0.7, 0.7, 0.7},
+    body = {
         background = love.graphics.newImage("assetsTesting/hardened_clay_stained_light_blue.png"),
         backgroundImageMode = "tiling",
-
-        titleBackground = love.graphics.newImage("assetsTesting/hardened_clay_stained_purple.png"),
-        titleBackgroundImageMode = "tiling"
+    },
+    title = {
+        background = love.graphics.newImage("assetsTesting/hardened_clay_stained_purple.png"),
+        backgroundImageMode = "tiling"
     }
 }
 
