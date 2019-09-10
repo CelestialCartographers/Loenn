@@ -34,6 +34,10 @@ function love.keyreleased(key, scancode)
     sceneHandler.sendEvent("keyreleased", key, scancode)
 end
 
+function love.textinput(text)
+    sceneHandler.sendEvent("textinput", text)
+end
+
 function love.mousemoved(x, y, dx, dy, istouch)
     for button, data <- mouseButtonsPressed do
         sceneHandler.sendEvent("mousedragmoved", inputHandler.getMouseDragDelta(x, y, button, istouch))

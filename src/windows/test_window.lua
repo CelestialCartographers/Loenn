@@ -62,6 +62,16 @@ window.widgets = {
         pressed = function(self, x, y)
             print("D:", x, y)
         end
+    }),
+    giraffe.textfield({
+        x = 110,
+        y = 10,
+
+        width = 100,
+        height = 100,
+
+        content = {""},
+        multiLine = true
     })
 }
 
