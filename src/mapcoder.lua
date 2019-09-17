@@ -42,6 +42,8 @@ local function decodeValue(fh, lookup, typ)
 end
 
 local function decodeElement(fh, lookup)
+    coroutine.yield()
+
     local name = mapcoder.look(fh, lookup)
     local element = {__name=name}
     local attributeCount = binfile.readByte(fh)
@@ -67,8 +69,6 @@ local function decodeElement(fh, lookup)
         end
     end
 
-    coroutine.yield()
-
     return element
 end
 
@@ -89,10 +89,10 @@ function mapcoder.decodeFile(path, header)
     local package = binfile.readString(fh)
 
     local lookupLength = binfile.readShort(fh)
-    local lookup = $()
+    local lookup = {}
 
     for i = 1, lookupLength do
-        lookup += binfile.readString(fh)
+        table.insert(lookup, binfile.readString(fh))
     end
 
     res = decodeElement(fh, lookup)
@@ -190,6 +190,8 @@ function mapcoder.encodeString(fh, s, lookup)
 end
 
 function mapcoder.encodeTable(fh, data, lookup)
+    coroutine.yield()
+
     local index = findInLookup(lookup, data.__name)
 
     local attributes = {}
@@ -229,8 +231,6 @@ local encodingFunctions = {
 }
 
 function mapcoder.encodeValue(fh, value, lookup)
-    coroutine.yield()
-
     encodingFunctions[type(value)](fh, value, lookup)
 end
 
@@ -240,15 +240,13 @@ function mapcoder.encodeFile(path, data, header)
     local fh = utils.getFileHandle(path, "wb")
 
     local stringsSeen = countStrings(data)
-    local lookupStrings = $()
+    local lookupStrings = {}
 
     for s, c <- stringsSeen do
-        lookupStrings += {s, c}
+        table.insert(lookupStrings, {s, c})
     end
 
-    lookupStrings := sortby(v -> v[2])
-    lookupStrings := reverse
-    lookupStrings := map(v -> v[1])
+    lookupStrings = $(lookupStrings):sortby(v -> v[2]):reverse():map(v -> v[1])
 
     binfile.writeString(fh, header)
     binfile.writeString(fh, data._package or "")

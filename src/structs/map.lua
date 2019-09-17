@@ -10,8 +10,7 @@ function mapStruct.decode(data)
         _raw = data
     }
 
-    map.package = data._package -- TODO?
-    map.style = {} -- TODO
+    map.package = data._package
 
     map.rooms = {}
     map.fillers = {}
@@ -79,7 +78,7 @@ function mapStruct.encode(map)
         })
     end
 
-    style = {
+    local style = {
         __name = "Style",
         __children = {}
     }

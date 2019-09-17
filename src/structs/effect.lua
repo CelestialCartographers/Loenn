@@ -21,12 +21,12 @@ function effectStruct.encode(effect)
     local res = {}
 
     for k, v <- effect do
-        res[k] = v
+        if k:sub(1, 1) ~= "_" then
+            res[k] = v
+        end
     end
 
-    res._type = nil
-    res.__name = res._name
-    res._name = nil
+    res.__name = effect._name
 
     return res
 end

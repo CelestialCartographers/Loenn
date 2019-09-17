@@ -19,11 +19,12 @@ function parallaxStruct.encode(parallax)
     local res = {}
 
     for k, v <- parallax do
-        res[k] = v
+        if k:sub(1, 1) ~= "_" then
+            res[k] = v
+        end
     end
 
     res.__name = "parallax"
-    res._type = nil
 
     return res
 end

@@ -30,7 +30,7 @@ function applyStruct.decode(data)
             table.insert(res.__children, effectStruct.decode(child))
         end
     end
-    
+
     return res
 end
 
@@ -38,14 +38,16 @@ function applyStruct.encode(apply)
     local res = {}
 
     for k, v <- apply do
-        res[k] = v
+        if k:sub(1, 1) ~= "_" then
+            res[k] = v
+        end
     end
 
     res.__children = {}
 
     for i, backdrop <- apply.__children or {} do
         local typ = utils.typeof(backdrop)
-        
+
         if typ == "parallax" then
             table.insert(res.__children, parallaxStruct.encode(backdrop))
 
@@ -58,7 +60,6 @@ function applyStruct.encode(apply)
     end
 
     res.__name = "apply"
-    res._type = nil
 
     return res
 end

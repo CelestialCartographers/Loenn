@@ -124,20 +124,20 @@ function binfile.readVariableLength(fh)
 end
 
 function binfile.getVariableLength(fh, length)
-    local res = $()
+    local res = {}
 
     while length > 127 do
-        res += length % 128 + 128
+        table.insert(res, length % 128 + 128)
         length = math.floor(length / 128)
     end
 
-    res += length
+    table.insert(res, length)
 
     return res
 end
 
 function binfile.writeVariableLength(fh, length)
-    binfile.writeByteArray(fh, binfile.getVariableLength(fh, length)())
+    binfile.writeByteArray(fh, binfile.getVariableLength(fh, length))
 end
 
 function binfile.readString(fh)
@@ -166,8 +166,9 @@ function binfile.readRunLengthEncoded(fh)
     return res
 end
 
+-- TODO - This is slow, consider doing it with FFI
 function binfile.encodeRunLength(str)
-    local res = $()
+    local res = {}
     local value = $(str)
 
     local count = 1
@@ -176,8 +177,8 @@ function binfile.encodeRunLength(str)
     for index, char <- value do
         if index > 1 then
             if char ~= current or count == 255 then
-                res += count
-                res += string.byte(current)
+                table.insert(res, count)
+                table.insert(res, string.byte(current))
 
                 count = 1
                 current = char
@@ -188,10 +189,10 @@ function binfile.encodeRunLength(str)
         end
     end
 
-    res += count
-    res += string.byte(current)
+    table.insert(res, count)
+    table.insert(res, string.byte(current))
 
-    return res()
+    return res
 end
 
 function binfile.writeRunLengthEncoded(fh, value)

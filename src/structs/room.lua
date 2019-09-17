@@ -89,7 +89,7 @@ end
 function roomStruct.encode(room)
     local res = {}
 
-    res.__name = "room"
+    res.__name = "level"
     res.__children = {}
 
     res.name = room.name
@@ -123,7 +123,7 @@ function roomStruct.encode(room)
 
         if room[key] then
             local encoded = struct.encode(room[key])
-            
+
             encoded.__name = raw
 
             table.insert(res.__children, encoded)
