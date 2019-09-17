@@ -17,7 +17,7 @@ end
 function objectTilesStruct.encode(tiles)
     local res = {}
 
-    res.innerText = tilesStruct.matrixToTileString(tiles.matrix, ",", "-1")
+    res.innerText = tilesStruct.matrixToTileStringMinimized(tiles.matrix, ",", "-1")
 
     return res
 end

@@ -2,7 +2,6 @@ local matrix = require("matrix")
 
 local tilesStruct = {}
 
--- TODO - Add minimized version
 function tilesStruct.matrixToTileString(matrix, seperator, empty)
     seperator = seperator or ""
     empty = empty or "0"
@@ -12,13 +11,68 @@ function tilesStruct.matrixToTileString(matrix, seperator, empty)
     local lines = {}
 
     for y = 1, height do
-        local rowData = {}
+        local row = {}
 
         for x = 1, width do
-            table.insert(rowData, matrix:getInbounds(x, y))
+            table.insert(row, matrix:getInbounds(x, y))
         end
 
-        table.insert(lines, table.concat(rowData, seperator))
+        table.insert(lines, table.concat(row, seperator))
+    end
+
+    return table.concat(lines, "\n")
+end
+
+local function getRelevantCols(matrix, empty)
+    empty = empty or "0"
+
+    local width, height = matrix:size
+    local relevantCols = {}
+
+    for y = 1, height do
+        for x = width, 1, -1 do
+            if matrix:getInbounds(x, y) ~= empty then
+                table.insert(relevantCols, x)
+
+                break
+            end
+        end
+
+        if #relevantCols ~= y then
+            table.insert(relevantCols, 0)
+        end
+    end
+
+    return relevantCols
+end
+
+local function getRelevantRowCount(relevantCols)
+    for y = #relevantCols, 1, -1 do
+        if relevantCols[y] > 0 then
+            return y
+        end
+    end
+
+    return 0
+end
+
+function tilesStruct.matrixToTileStringMinimized(matrix, seperator, empty)
+    seperator = seperator or ""
+    empty = empty or "0"
+
+    local width, height = matrix:size
+    local relevantCols = getRelevantCols(matrix, empty)
+    local relevantRowsCount = getRelevantRowCount(relevantCols)
+    local lines = {}
+
+    for y = 1, relevantRowsCount do
+        local row = {}
+
+        for x = 1, relevantCols[y] do
+            table.insert(row, matrix:getInbounds(x, y))
+        end
+
+        table.insert(lines, table.concat(row, seperator))
     end
 
     return table.concat(lines, "\n")
@@ -65,7 +119,7 @@ end
 function tilesStruct.encode(tiles)
     local res = {}
 
-    res.innerText = tilesStruct.matrixToTileString(tiles.matrix)
+    res.innerText = tilesStruct.matrixToTileStringMinimized(tiles.matrix)
 
     return res
 end
