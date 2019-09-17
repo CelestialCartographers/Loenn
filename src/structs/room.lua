@@ -1,13 +1,15 @@
 local entityStruct = require("structs/entity")
 local triggerStruct = require("structs/trigger")
 local tilesStruct = require("structs/tiles")
+local objectTilesStruct = require("structs/object_tiles")
 local decalStruct = require("structs/decal")
 
 local roomStruct = {}
 
 local structSingleNames = {
     solids = {"tilesFg", tilesStruct},
-    bg = {"tilesBg", tilesStruct}
+    bg = {"tilesBg", tilesStruct},
+    objtiles = {"tilesObj", objectTilesStruct}
 }
 
 local structMutlipleNames = {
@@ -51,20 +53,20 @@ function roomStruct.decode(data)
 
     room.color = data.c or 0
 
-    room.entities = $()
-    room.triggers = $()
+    room.entities = {}
+    room.triggers = {}
 
-    room.decalsFg = $()
-    room.decalsBg = $()
+    room.decalsFg = {}
+    room.decalsBg = {}
 
     room.tilesFg = nil
     room.tilesBg = nil
-    room.tilesObj = {} -- Haha, no.
+    room.tilesObj = nil
 
     for key, value <- data.__children or {} do
         local name = value.__name
 
-        if structSingleNames[name] then
+        if structSingleNames[name] and value then
             local target, struct = unpack(structSingleNames[name])
 
             room[target] = struct.decode(value)
@@ -72,9 +74,11 @@ function roomStruct.decode(data)
 
         if structMutlipleNames[name] then
             for i, d <- value.__children or {} do
-                local target, struct = unpack(structMutlipleNames[name])
+                if d then
+                    local target, struct = unpack(structMutlipleNames[name])
 
-                room[target] += struct.decode(d)
+                    table.insert(room[target], struct.decode(d))
+                end
             end
         end
     end
@@ -116,17 +120,20 @@ function roomStruct.encode(room)
 
     for raw, meta <- structSingleNames do
         local key, struct = unpack(meta)
-        local encoded = struct.encode(room[key])
 
-        encoded.__name = raw
+        if room[key] then
+            local encoded = struct.encode(room[key])
+            
+            encoded.__name = raw
 
-        table.insert(res.__children, encoded)
+            table.insert(res.__children, encoded)
+        end
     end
 
     for raw, meta <- structMutlipleNames do
         local key, struct = unpack(meta)
 
-        if room[key]:len > 0 or #room[key] > 0 then
+        if #room[key] > 0 then
             local children = {}
 
             for j, target <- room[key] do

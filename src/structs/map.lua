@@ -1,5 +1,6 @@
 local roomStruct = require("structs/room")
 local fillerStruct = require("structs/filler")
+local styleStruct = require("structs/style")
 
 local mapStruct = {}
 
@@ -12,18 +13,31 @@ function mapStruct.decode(data)
     map.package = data._package -- TODO?
     map.style = {} -- TODO
 
-    map.rooms = $()
-    map.fillers = $()
+    map.rooms = {}
+    map.fillers = {}
+
+    map.stylesFg = {}
+    map.stylesBg = {}
 
     for i, d <- data.__children do
         if d.__name == "levels" then
             for j, room <- d.__children or {} do
-                map.rooms += roomStruct.decode(room)
+                table.insert(map.rooms, roomStruct.decode(room))
             end
 
         elseif d.__name == "Filler" then
             for j, filler <- d.__children or {} do
-                map.fillers += fillerStruct.decode(filler)
+                table.insert(map.fillers, fillerStruct.decode(filler))
+            end
+
+        elseif d.__name == "Style" then
+            for j, style <- d.__children or {} do
+                if style.__name == "Foregrounds" then
+                    map.stylesFg = styleStruct.decode(style)
+                
+                elseif style.__name == "Backgrounds" then
+                    map.stylesBg = styleStruct.decode(style)
+                end
             end
         end
     end
@@ -39,7 +53,7 @@ function mapStruct.encode(map)
 
     res.__children = {}
 
-    if map.fillers:len > 0 then
+    if #map.fillers > 0 then
         local children = {}
 
         for i, filler <- map.fillers do
@@ -52,7 +66,7 @@ function mapStruct.encode(map)
         })
     end
 
-    if map.rooms:len > 0 then
+    if #map.rooms > 0 then
         local children = {}
 
         for i, room <- map.rooms do
@@ -64,6 +78,23 @@ function mapStruct.encode(map)
             __children = children
         })
     end
+
+    style = {
+        __name = "Style",
+        __children = {}
+    }
+
+    table.insert(style.__children, {
+        __name = "Foregrounds",
+        __children = styleStruct.encode(map.stylesFg)
+    })
+
+    table.insert(style.__children, {
+        __name = "Backgrounds",
+        __children = styleStruct.encode(map.stylesBg)
+    })
+
+    table.insert(res.__children, style)
 
     return res
 end

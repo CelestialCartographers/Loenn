@@ -24,8 +24,11 @@ function tilesStruct.matrixToTileString(matrix, seperator, empty)
     return table.concat(lines, "\n")
 end
 
-function tilesStruct.tileStringToMatrix(tiles)
+function tilesStruct.tileStringToMatrix(tiles, seperator, empty)
+    seperator = seperator or 1
+    empty = empty or "0"
     tiles = tiles:gsub("\r\n", "\n")
+
     local lines = tiles:split("\n")
 
     local cols = 0
@@ -35,10 +38,10 @@ function tilesStruct.tileStringToMatrix(tiles)
         cols = math.max(cols, #line)
     end
 
-    local res = matrix.filled("0", cols, rows)
+    local res = matrix.filled(empty, cols, rows)
 
     for y, line <- lines do
-        local chars = line:split(1)
+        local chars = line:split(seperator)
 
         for x, char <- chars do
             res:setInbounds(x, y, char)
