@@ -52,7 +52,7 @@ function mapStruct.encode(map)
 
     res.__children = {}
 
-    if #map.fillers > 0 then
+    if map.fillers and #map.fillers > 0 then
         local children = {}
 
         for i, filler <- map.fillers do
@@ -65,7 +65,7 @@ function mapStruct.encode(map)
         })
     end
 
-    if #map.rooms > 0 then
+    if map.rooms and #map.rooms > 0 then
         local children = {}
 
         for i, room <- map.rooms do

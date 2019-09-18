@@ -47,7 +47,7 @@ function loadingScene:firstEnter()
     atlases.initCelesteAtlasesTask()
 
     local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
-    viewerState.loadMap(mapFile)
+    viewerState.loadFile(mapFile)
 end
 
 function loadingScene:draw()
