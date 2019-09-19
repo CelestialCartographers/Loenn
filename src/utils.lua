@@ -15,6 +15,14 @@ function utils.stripByteOrderMark(s)
     return s
 end
 
+function utils.rectangle(x, y, width, height)
+    return {x = x, y = y, width = width, height = height}
+end
+
+function utils.point(x, y)
+    return {x = x, y = y, width = 1, height = 1}
+end
+
 function utils.aabbCheck(r1, r2)
     return not (r2.x >= r1.x + r1.width or r2.x + r2.width <= r1.x or r2.y >= r1.y + r1.height or r2.y + r2.height <= r1.y)
 end

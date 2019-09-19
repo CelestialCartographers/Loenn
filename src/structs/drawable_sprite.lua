@@ -66,6 +66,46 @@ function drawableSpriteMt.__index.setColor(self, color)
     return setColor(self, color)
 end
 
+-- TODO - Handle rotation
+-- TODO - Verify that scales are correct
+function drawableSpriteMt.__index.getRectangleRaw(self)
+    local width = self.meta.width
+    local height = self.meta.height
+
+    local realWidth = self.meta.realWidth
+    local realHeight = self.meta.realHeight
+
+    local offsetX = self.meta.offsetX
+    local offsetY = self.meta.offsetY
+
+    local drawX = math.floor(self.x - (realWidth * self.jx + offsetX) * self.scaleX)
+    local drawY = math.floor(self.y - (realWidth * self.jy + offsetY) * self.scaleY)
+
+    drawX += (self.scaleX < 0 and width * self.scaleX or 0)
+    drawY += (self.scaleY < 0 and height * self.scaleY or 0)
+
+    return drawX, drawY, width * math.abs(self.scaleX), height * math.abs(self.scaleY)
+end
+
+function drawableSpriteMt.__index.getRectangle(self)
+    return utils.rectangle(self:getRectangleRaw())
+end
+
+function drawableSpriteMt.__index.drawRectangle(self, mode, color)
+    mode = mode or "fill"
+
+    if color then
+        local r, g, b, a = love.graphics.getColor()
+
+        love.graphics.setColor(color)
+        love.graphics.rectangle(mode, self:getRectangleRaw())
+        love.graphics.setColor(r, g, b, a)
+
+    else
+        love.graphics.rectangle(mode, self:getRectangleRaw())
+    end
+end
+
 function drawableSpriteMt.__index.draw(self)
     local offsetX = self.offsetX or ((self.jx or 0.0) * self.meta.realWidth + self.meta.offsetX)
     local offsetY = self.offsetY or ((self.jy or 0.0) * self.meta.realHeight + self.meta.offsetY)
