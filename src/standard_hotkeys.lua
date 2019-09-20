@@ -5,7 +5,7 @@ local fileLocations = require("file_locations")
 local debugUtils = require("debug_utils")
 local viewportHandler = require("viewport_handler")
 
-local hotkeyStruct = require("structs/hotkey")
+local hotkeyStruct = require("structs.hotkey")
 
 -- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
 

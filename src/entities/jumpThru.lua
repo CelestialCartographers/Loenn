@@ -1,4 +1,4 @@
-local drawableSpriteStruct = require("structs/drawable_sprite")
+local drawableSpriteStruct = require("structs.drawable_sprite")
 local drawing = require("drawing")
 
 -- For future use I guess?

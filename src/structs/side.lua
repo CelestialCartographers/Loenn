@@ -1,5 +1,5 @@
 local utils = require("utils")
-local mapStruct = require("structs/map")
+local mapStruct = require("structs.map")
 
 local sideStruct = {}
 

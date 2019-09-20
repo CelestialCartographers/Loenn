@@ -176,7 +176,7 @@ end
 
 -- Add filesystem specific helper methods
 local osFilename = love.system.getOS():lower():gsub(" ", "_")
-local osHelper = require("os_helpers/" .. osFilename)
+local osHelper = require("os_helpers." .. osFilename)
 
 function utils.getProcessId()
     return osHelper.getProcessId and osHelper.getProcessId()

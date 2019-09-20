@@ -1,8 +1,8 @@
-local entityStruct = require("structs/entity")
-local triggerStruct = require("structs/trigger")
-local tilesStruct = require("structs/tiles")
-local objectTilesStruct = require("structs/object_tiles")
-local decalStruct = require("structs/decal")
+local entityStruct = require("structs.entity")
+local triggerStruct = require("structs.trigger")
+local tilesStruct = require("structs.tiles")
+local objectTilesStruct = require("structs.object_tiles")
+local decalStruct = require("structs.decal")
 
 local roomStruct = {}
 
@@ -82,8 +82,6 @@ function roomStruct.decode(data)
             end
         end
     end
-
-    print(room.windPattern)
 
     return room
 end

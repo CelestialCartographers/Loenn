@@ -12,8 +12,8 @@ function editorScene:firstEnter()
 
     local viewportHandler = require("viewport_handler")
     local hotkeyHandler = require("hotkey_handler")
-    local mapLoaderDevice = require("input_devices/map_loader")
-    local toolHandlerDevice = require("input_devices/tool_device")
+    local mapLoaderDevice = require("input_devices.map_loader")
+    local toolHandlerDevice = require("input_devices.tool_device")
 
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
     inputDevice.newInputDevice(self.inputDevices, hotkeyHandler.createHotkeyDevice(standardHotkeys))

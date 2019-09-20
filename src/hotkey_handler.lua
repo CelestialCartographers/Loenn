@@ -1,4 +1,4 @@
-local hotkeyStruct = require("structs/hotkey")
+local hotkeyStruct = require("structs.hotkey")
 local utils = require("utils")
 
 local defaultHotkeys = {}

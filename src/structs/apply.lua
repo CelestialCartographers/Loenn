@@ -1,6 +1,6 @@
 local utils = require("utils")
-local parallaxStruct = require("structs/parallax")
-local effectStruct = require("structs/effect")
+local parallaxStruct = require("structs.parallax")
+local effectStruct = require("structs.effect")
 
 local applyStruct = {}
 

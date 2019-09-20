@@ -1,4 +1,4 @@
-local nodeStruct = require("structs/node")
+local nodeStruct = require("structs.node")
 
 local entityStruct = {}
 

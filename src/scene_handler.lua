@@ -1,4 +1,4 @@
-local sceneStruct = require("structs/scene")
+local sceneStruct = require("structs.scene")
 local utils = require("utils")
 
 local sceneHandler = {}

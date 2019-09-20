@@ -9,7 +9,7 @@ configs._defaultPath = "defaults/config"
 for i, file <- love.filesystem.getDirectoryItems(configs._defaultPath) do
     local filenameNoExt = utils.stripExtension(file)
 
-    configs[filenameNoExt] = require(configs._defaultPath .. "/" .. filenameNoExt)
+    configs[filenameNoExt] = require(configs._defaultPath .. "." .. filenameNoExt)
 end
 
 return configs

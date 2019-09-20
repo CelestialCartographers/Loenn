@@ -1,6 +1,6 @@
-local roomStruct = require("structs/room")
-local fillerStruct = require("structs/filler")
-local styleStruct = require("structs/style")
+local roomStruct = require("structs.room")
+local fillerStruct = require("structs.filler")
+local styleStruct = require("structs.style")
 
 local mapStruct = {}
 

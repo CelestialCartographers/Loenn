@@ -4,7 +4,7 @@ local mapcoder = require("mapcoder")
 local celesteRender = require("celeste_render")
 local sceneHandler = require("scene_handler")
 
-local sideStruct = require("structs/side")
+local sideStruct = require("structs.side")
 
 local state = {}
 
