@@ -49,7 +49,7 @@ function roomStruct.decode(data)
     room.music = data.music or "music_oldsite_awake"
     room.musicAlternative = data.alt_music or ""
 
-    room.windPattern = data.windPattern and "None"
+    room.windPattern = data.windPattern or "None"
 
     room.color = data.c or 0
 
@@ -82,6 +82,8 @@ function roomStruct.decode(data)
             end
         end
     end
+
+    print(room.windPattern)
 
     return room
 end
