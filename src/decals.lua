@@ -5,12 +5,10 @@ local decalUtils = {}
 local decalsPrefix = "^decals/"
 local decalFrameSuffix = "%d*$"
 
+-- A frame should only be kept if it has no trailing number
+-- Or if the trailing number is 0, 00, 000, ... etc
 local function keepFrame(name)
     local numberSuffix = name:match(decalFrameSuffix)
-
-    if #numberSuffix == 0 then
-        return true
-    end
 
     for i = 1, #numberSuffix do
         if numberSuffix:sub(i, i) ~= "0" then
