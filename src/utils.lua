@@ -97,9 +97,9 @@ function utils.group(t, by)
 
     for k, v <- t do
         local key = by(k, v)
-        res[key] = res[key] or $()
+        res[key] = res[key] or {}
 
-        res[key] += v
+        table.insert(res[key], v)
     end
 
     return res

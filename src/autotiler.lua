@@ -77,12 +77,12 @@ local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTil
     if checkPadding(tiles, x, y, airTile, emptyTile) then
         local padding = meta.padding[tile]
 
-        return padding:len > 0 and padding or defaultQuad, defaultSprite
+        return #padding > 0 and padding or defaultQuad, defaultSprite
 
     else
         local center = meta.center[tile]
 
-        return center:len > 0 and center or defaultQuad, defaultSprite
+        return #center > 0 and center or defaultQuad, defaultSprite
     end
 end
 
@@ -142,16 +142,16 @@ function autotiler.getAllQuads(tiles, meta)
 end
 
 local function convertTileString(s)
-    local res = $()
+    local res = {}
     local parts = $(s):split(";")
 
     for i, part <- parts do
         local numbers = $(part):split(",")
 
-        res += {
+        table.insert(res, {
             tonumber(numbers[1]),
             tonumber(numbers[2])
-        }
+        })
     end
 
     return res
@@ -186,11 +186,11 @@ function autotiler.loadTilesetXML(fn)
             ignores[id] = table.flip($(ignore):split(";"))
         end
 
-        padding[id] = copy and $(table.shallowcopy(padding[copy]())) or $()
-        center[id] = copy and $(table.shallowcopy(center[copy]())) or $()
-        masks[id] = copy and $(table.shallowcopy(masks[copy]())) or $()
+        padding[id] = copy and table.shallowcopy(padding[copy]) or {}
+        center[id] = copy and table.shallowcopy(center[copy]) or {}
+        masks[id] = copy and table.shallowcopy(masks[copy]) or {}
 
-        local currentMasks = $()
+        local currentMasks = {}
 
         for j, child <- tileset.set or {} do
             local attrs = child._attr or child
@@ -206,15 +206,15 @@ function autotiler.loadTilesetXML(fn)
                 center[id] = convertTileString(tiles)
 
             else
-                currentMasks += {
+                table.insert(currentMasks, {
                     mask = convertMaskString(mask),
                     quads = convertTileString(tiles),
                     sprites = sprites
-                }
+                })
             end
         end
 
-        if currentMasks:len > 0 then
+        if #currentMasks > 0 then
             masks[id] = sortByScore(currentMasks)
         end
     end

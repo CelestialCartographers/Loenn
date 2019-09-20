@@ -17,16 +17,16 @@ local hotkeyStruct = {}
 -- TODO - Validate that the key constant exists?
 function hotkeyStruct.sanitize(activator)
     local parts = string.split(activator, "+")
-    local activators = $()
+    local activators = {}
 
     for i, part <- parts do
         part = part:match("^%s*(.-)%s*$"):lower
 
         if specialActivators[part] then
-            activators += specialActivators[part]
+            table.insert(activators, specialActivators[part])
 
         else
-            activators += part
+            table.insert(activators, part)
         end
     end
 

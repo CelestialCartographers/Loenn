@@ -179,7 +179,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
             if tile ~= airTile then
                 -- TODO - Render overlay sprites
                 local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
-                local quadCount = quads:len
+                local quadCount = #quads
 
                 if quadCount > 0 then
                     local randQuad = quads[utils.mod1(rng, quadCount)]
@@ -334,9 +334,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
                 local sprites = handler.sprite(room, entity, viewport)
 
                 if sprites then
-                    local spriteCount = sprites.len and sprites:len or #sprites
-
-                    if spriteCount == 0 and utils.typeof(sprites) == "drawableSprite" then
+                    if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
                         local batch = getOrCreateSmartBatch(batches, sprites.depth or defaultDepth)
                         batch:addFromDrawable(sprites)
 

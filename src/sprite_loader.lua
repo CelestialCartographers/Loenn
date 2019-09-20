@@ -67,7 +67,7 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
     local count = binfile.readShort(fh)
 
     local res = {
-        _imageMeta = $(),
+        _imageMeta = {},
         _count = count
     }
 
@@ -80,12 +80,12 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
         local spritesImage = spriteLoader.loadDataImage(dataFilePath)
         local spritesWidth, spritesHeight = spritesImage:getDimensions
 
-        res._imageMeta += {
+        table.insert(res._imageMeta, {
             image = spritesImage,
             width = spritesWidth,
             height = spritesHeight,
             path = dataFilePath
-        }
+        })
 
         for j = 1, sprites do
             local pathRaw = binfile.readString(fh)
