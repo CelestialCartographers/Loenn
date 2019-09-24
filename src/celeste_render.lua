@@ -166,8 +166,9 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
 
     local drawableSpriteType = "drawableSprite"
 
+    -- TODO - Figure out sane sector sizes for the batch
     local width, height = tiles:size
-    local batch = smartDrawingBatch.createUnorderedBatch()
+    local batch = smartDrawingBatch.createMatrixBatch(false, width, height, 16, 16)
 
     utils.setRandomSeed(room.name)
 
@@ -188,7 +189,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
                     local spriteMeta = atlases.gameplay[texture]
                     local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
 
-                    batch:add(spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+                    batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
                 end
             end
         end
