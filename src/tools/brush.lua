@@ -6,8 +6,8 @@ local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
 local fonts = require("fonts")
 local matrixLib = require("matrix")
-local celesteRender = require("celeste_render")
 local configs = require("configs")
+local brushHelper = require("brush_helper")
 
 local actionButton = configs.editor.toolActionButton
 local cloneButton = configs.editor.objectCloneButton
@@ -27,24 +27,6 @@ local lastX, lastY = -1, -1
 local previewMatrix = matrixLib.filled("0", 5, 5)
 local previewBatch = nil
 
--- Attempts to place tile at x, y
--- Returns true if successful
-local function placeTile(room, x, y, material, layer)
-    local tiles = room[layer]
-    local matrix = tiles.matrix
-
-    matrix:set(x, y, material)
-
-    return matrix:inbounds(x, y)
-end
-
-local function getTile(room, x, y, layer)
-    local tiles = room[layer]
-    local matrix = tiles.matrix
-
-    return matrix:get(x, y)
-end
-
 local function handleActionClick(x, y, force)
     local room = state.selectedRoom
 
@@ -53,12 +35,7 @@ local function handleActionClick(x, y, force)
         local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
         if lastTileX ~= tx + 1 or lastTileY ~= ty + 1 or force then
-            if placeTile(room, tx + 1, ty + 1, tool.material, tool.layer) then
-                -- TODO - Redraw more efficiently
-                celesteRender.invalidateRoomCache(room, tool.layer)
-                celesteRender.invalidateRoomCache(room, "complete")
-                celesteRender.forceRoomBatchRender(room, viewportHandler.viewport)
-            end
+            brushHelper.placeTile(room, tx + 1, ty + 1, tool.material, tool.layer)
 
             lastTileX, lastTileY = tx + 1, ty + 1
         end
@@ -74,7 +51,7 @@ local function handleCloneClick(x, y)
         local px, py = viewportHandler.getRoomCoordindates(room, x, y)
         local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
-        local material = getTile(room, tx + 1, ty + 1, tool.layer)
+        local material = brushHelper.getTile(room, tx + 1, ty + 1, tool.layer)
 
         if material then
             tool.material = material

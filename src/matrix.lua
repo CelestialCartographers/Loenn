@@ -22,7 +22,7 @@ function matrixMt.__index.get0(self, x, y, def)
 end
 
 function matrixMt.__index.get(self, x, y, def)
-    if x >= 1 and x <= self._width and y >= 0 and y <= self._height then
+    if x >= 1 and x <= self._width and y >= 1 and y <= self._height then
         return self:getInbounds(x, y)
 
     else
@@ -53,7 +53,7 @@ end
 
 -- Inbounds functions just for external validation
 function matrixMt.__index.inbounds(self, x, y)
-    return x >= 1 and x <= self._width and y >= 0 and y <= self._height
+    return x >= 1 and x <= self._width and y >= 1 and y <= self._height
 end
 
 function matrixMt.__index.inbounds0(self, x, y)

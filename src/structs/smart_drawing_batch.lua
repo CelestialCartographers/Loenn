@@ -143,9 +143,19 @@ function matrixDrawingBatchMt.__index.set(self, x, y, meta, quad, drawX, drawY, 
 
     local sectorX, sectorY = getSectorCoordinate(x, y, self._sectorWidth, self._sectorHeight)
 
-    self._matrix:set(x, y, {meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy})
+    if meta then
+        self._matrix:set(x, y, {meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy})
+
+    else
+        self._matrix:set(x, y, false)
+    end
+
     self._dirty:set(sectorX, sectorY, true)
     self._canRender = false
+end
+
+function matrixDrawingBatchMt.__index.get(self, x, y, def)
+    return self._matrix:get(x, y, def)
 end
 
 function matrixDrawingBatchMt.__index.populateBatch(self, sectorX, sectorY)

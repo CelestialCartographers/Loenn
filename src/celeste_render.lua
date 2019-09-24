@@ -99,6 +99,18 @@ function celesteRender.invalidateRoomCache(roomName, key)
     end
 end
 
+function celesteRender.getRoomCache(roomName, key)
+    if utils.typeof(roomName) == "room" then
+        roomName = roomName.name
+    end
+
+    if roomCache[roomName] and roomCache[roomName][key] then
+        return roomCache[roomName][key]
+    end
+
+    return false
+end
+
 function celesteRender.getRoomBackgroundColor(room, selected)
     local roomColor = room.color or 0
     local color = colors.roomBackgroundDefault
@@ -149,7 +161,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
 end
 
 function celesteRender.getTilesBatch(room, tiles, meta, fg)
-    tiles = tiles.matrix
+    local tilesMatrix = tiles.matrix
 
     -- Getting upvalues
     local gameplayAtlas = atlases.gameplay
@@ -167,7 +179,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
     local drawableSpriteType = "drawableSprite"
 
     -- TODO - Figure out sane sector sizes for the batch
-    local width, height = tiles:size
+    local width, height = tilesMatrix:size()
     local batch = smartDrawingBatch.createMatrixBatch(false, width, height, 16, 16)
 
     utils.setRandomSeed(room.name)
@@ -175,11 +187,11 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
     for x = 1, width do
         for y = 1, height do
             local rng = math.random(1, 256)
-            local tile = tiles:getInbounds(x, y)
+            local tile = tilesMatrix:getInbounds(x, y)
 
             if tile ~= airTile then
                 -- TODO - Render overlay sprites
-                local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+                local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
                 local quadCount = #quads
 
                 if quadCount > 0 then
