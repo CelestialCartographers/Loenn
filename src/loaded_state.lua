@@ -19,6 +19,7 @@ function state.loadFile(filename)
                 celesteRender.invalidateRoomCache()
                 celesteRender.clearBatchingTasks()
 
+                state.filename = filename
                 state.side = sideStruct.decode(task.result)
                 state.map = state.side.map
                 state.selectedRoom = state.map and state.map.rooms[1]
@@ -37,7 +38,7 @@ function state.saveFile(filename)
         (-> filename and mapcoder.encodeFile(filename, sideStruct.encode(state.side))),
         function(task)
             if task.result then
-                -- Success
+                state.filename = filename
 
             else
                 -- TODO - Toast the user
