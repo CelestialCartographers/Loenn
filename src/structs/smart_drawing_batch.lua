@@ -52,7 +52,7 @@ function orderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
 end
 
 function orderedDrawingBatchMt.__index.draw(self)
-    for i, drawable <- self._drawables do
+    for i, drawable in ipairs(self._drawables) do
         local typ = utils.typeof(drawable)
 
         if typ == "drawableFunction" then
@@ -103,7 +103,7 @@ function unorderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
 end
 
 function unorderedDrawingBatchMt.__index.draw(self)
-    for image, batch <- self._lookup do
+    for image, batch in pairs(self._lookup) do
         love.graphics.draw(batch, 0, 0)
     end
 end
@@ -195,12 +195,9 @@ function matrixDrawingBatchMt.__index.draw(self)
         self:updateBatches()
     end
 
-    local width, height = self._batches:size()
-
-    for x = 1, width do
-        for y = 1, height do
-            self._batches:getInbounds(x, y):draw()
-        end
+    -- We don't need the x, y coordinates, iterate like a normal table
+    for i, batch in ipairs(self._batches) do
+        batch:draw()
     end
 
     self._canRender = true

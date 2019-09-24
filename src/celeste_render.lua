@@ -173,7 +173,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
     local emptyTile = " "
     local wildcard = "*"
 
-    local defaultQuad = ${{0, 0}}
+    local defaultQuad = {{0, 0}}
     local defaultSprite = ""
 
     local drawableSpriteType = "drawableSprite"
@@ -256,7 +256,7 @@ end
 local function getDecalsBatch(decals)
     local batch = smartDrawingBatch.createOrderedBatch()
 
-    for i, decal <- decals do
+    for i, decal in ipairs(decals) do
         local texture = decal.texture
         local meta = atlases.gameplay[texture]
 
@@ -336,7 +336,7 @@ end
 local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)
     local batches = {}
 
-    for i, entity <- entities do
+    for i, entity in ipairs(entities) do
         local name = entity._name
         local handler = registeredEntities[name]
 
@@ -352,7 +352,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
                         batch:addFromDrawable(sprites)
 
                     else
-                        for j, sprite <- sprites do
+                        for j, sprite in ipairs(sprites) do
                             if utils.typeof(sprite) == "drawableSprite" then
                                 local batch = getOrCreateSmartBatch(batches, sprite.depth or defaultDepth)
                                 batch:addFromDrawable(sprite)
@@ -367,7 +367,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
                 batch:addFromDrawable(drawableFunction.fromFunction(handler.draw, room, entity, viewport))
             end
 
-            if i % 10 == 0 then
+            if i % 25 == 0 then
                 coroutine.yield()
             end
         end
@@ -397,11 +397,13 @@ function celesteRender.getEntityBatch(room, entities, viewport, registeredEntiti
     return roomCache[room.name].entities.result
 end
 
+-- TODO - Make this saner in terms of setColor calls?
+-- This could just be one rendering function
 local function getTriggerBatchTaskFunc(room, triggers, viewport)
     local font = love.graphics.getFont()
     local batch = smartDrawingBatch.createOrderedBatch()
 
-    for i, trigger <- triggers do
+    for i, trigger in ipairs(triggers) do
         local func = function()
             local name = trigger._name or ""
             local displayName = utils.humanizeVariableName(name)
@@ -470,7 +472,7 @@ local depthBatchingFunctions = {
 
 -- Force all non finished room batch tasks to finish
 function celesteRender.forceRoomBatchRender(room, viewport)
-    for i, data <- depthBatchingFunctions do
+    for i, data in ipairs(depthBatchingFunctions) do
         local description, key, func, depth = unpack(data)
         local result = func(room, room[key], viewport)
         local task = roomCache[room.name][key]
@@ -488,7 +490,7 @@ function celesteRender.getRoomBatches(room, viewport)
         local depthBatches = {}
         local done = true
 
-        for i, data <- depthBatchingFunctions do
+        for i, data in ipairs(depthBatchingFunctions) do
             local description, key, func, depth = unpack(data)
             local batches = func(room, room[key], viewport)
 
@@ -497,7 +499,7 @@ function celesteRender.getRoomBatches(room, viewport)
                     depthBatches[depth] = batches
 
                 else
-                    for d, batch <- batches do
+                    for d, batch in ipairs(batches) do
                         depthBatches[d] = batch
                     end
                 end
@@ -515,7 +517,7 @@ function celesteRender.getRoomBatches(room, viewport)
 
         local orderedBatches = $()
 
-        for depth, batches <- depthBatches do
+        for depth, batches in pairs(depthBatches) do
             orderedBatches += {depth, batches}
         end
 
@@ -619,13 +621,13 @@ function celesteRender.drawMap(state)
         local viewport = state.viewport
 
         if viewport.visible then
-            for i, filler <- map.fillers do
+            for i, filler in ipairs(map.fillers) do
                 if viewportHandler.fillerVisible(filler, viewport) then
                     celesteRender.drawFiller(filler, viewport)
                 end
             end
 
-            for i, room <- map.rooms do
+            for i, room in ipairs(map.rooms) do
                 if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or viewportHandler.roomVisible(room, viewport) then
                     celesteRender.drawRoom(room, viewport, room == state.selectedRoom)
                 end

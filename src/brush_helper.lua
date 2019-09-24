@@ -9,17 +9,16 @@ local brushHelper = {}
 -- This version does not update the drawing, only set the data
 -- TODO - Support matrix of materials when Rectangle tool is made
 function brushHelper.placeTileRaw(room, x, y, material, layer)
-    local tiles = room[layer]
-    local matrix = tiles.matrix
+    local tilesMatrix = room[layer].matrix
 
-    matrix:set(x, y, material)
+    tilesMatrix:set(x, y, material)
 
-    return matrix:inbounds(x, y)
+    return tilesMatrix:inbounds(x, y)
 end
 
 function brushHelper.generateFakeTilesMatrix(room, x, y, material, layer)
     local typ = utils.typeof(material)
-    
+
     local tilesMatrix = nil
     local width, height = 5, 5
 
@@ -63,21 +62,27 @@ function brushHelper.generateFakeTilesMatrix(room, x, y, material, layer)
 end
 
 function brushHelper.generateFakeTiles(room, x, y, material, layer)
-    local fg = layer == "tilesFg"
-    local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
     local fakeTilesMatrix = brushHelper.generateFakeTilesMatrix(room, x, y, material, layer)
-
     local fakeTiles = {
         _type = "tiles",
         matrix = fakeTilesMatrix
     }
+
+    return fakeTiles
+end
+
+function brushHelper.generateFakeTilesBatch(room, fakeTiles, layer)
+    local fg = layer == "tilesFg"
+    local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
 
     return celesteRender.getTilesBatch(room, fakeTiles, meta, fg)
 end
 
 function brushHelper.updateRender(room, x, y, material, layer)
     local batch = celesteRender.getRoomCache(room.name, layer).result
-    local fakeBatch = brushHelper.generateFakeTiles(room, x, y, material, layer)
+
+    local fakeTiles = brushHelper.generateFakeTiles(room, x, y, material, layer)
+    local fakeBatch = brushHelper.generateFakeTilesBatch(room, fakeTiles, layer)
 
     local width, height = fakeBatch._matrix:size()
 
@@ -105,10 +110,9 @@ function brushHelper.placeTile(room, x, y, material, layer)
 end
 
 function brushHelper.getTile(room, x, y, layer)
-    local tiles = room[layer]
-    local matrix = tiles.matrix
+    local tilesMatrix = room[layer].matrix
 
-    return matrix:get(x, y, "0")
+    return tilesMatrix:get(x, y, "0")
 end
 
 return brushHelper
