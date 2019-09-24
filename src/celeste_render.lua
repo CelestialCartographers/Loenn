@@ -499,7 +499,7 @@ function celesteRender.getRoomBatches(room, viewport)
                     depthBatches[depth] = batches
 
                 else
-                    for d, batch in ipairs(batches) do
+                    for d, batch in pairs(batches) do
                         depthBatches[d] = batch
                     end
                 end
