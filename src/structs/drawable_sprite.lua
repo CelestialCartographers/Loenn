@@ -1,5 +1,6 @@
 local atlases = require("atlases")
 local utils = require("utils")
+local drawing = require("drawing")
 
 local drawableSpriteStruct = {}
 
@@ -111,11 +112,10 @@ function drawableSpriteMt.__index.draw(self)
     local offsetY = self.offsetY or ((self.jy or 0.0) * self.meta.realHeight + self.meta.offsetY)
 
     if self.color and type(self.color) == "table" then
-        local prevColor = {love.graphics.getColor()}
-
-        love.graphics.setColor(self.color)
-        love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
-        love.graphics.setColor(prevColor)
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(self.color)
+            love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+        end)
 
     else
         love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)

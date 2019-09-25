@@ -257,33 +257,26 @@ local function clearCanvasArea(batch, x, y)
     love.graphics.setCanvas()
 end
 
--- TODO - General color handling improvements in Lönn, so we don't have to fix it properly here
 local function drawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
     local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
-    local r, g, b, a = love.graphics.getColor()
     love.graphics.setCanvas(batch._canvas)
-    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
 
     love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
 
     love.graphics.setCanvas()
-    love.graphics.setColor(r, g, b, a)
 end
 
 -- Code duplication to reduce C calls needed
--- TODO - General color handling improvements in Lönn, so we don't have to fix it properly here
 local function redrawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
     local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
-    local r, g, b, a = love.graphics.getColor()
     love.graphics.setCanvas(batch._canvas)
     love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
-    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
 
     love.graphics.clear(0.0, 0.0, 0.0, 0.0)
     love.graphics.setScissor()
@@ -291,7 +284,6 @@ local function redrawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, ro
     love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
 
     love.graphics.setCanvas()
-    love.graphics.setColor(r, g, b, a)
 end
 
 local gridCanvasBatchMt = {}

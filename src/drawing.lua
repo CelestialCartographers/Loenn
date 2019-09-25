@@ -61,4 +61,12 @@ function drawing.printCenteredText(text, x, y, width, height, font, fontSize, tr
     love.graphics.pop()
 end
 
+function drawing.callKeepOriginalColor(func)
+    local pr, pg, pb, pa = love.graphics.getColor()
+
+    func()
+
+    love.graphics.setColor(pr, pg, pb, pa)
+end
+
 return drawing

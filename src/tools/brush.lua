@@ -8,6 +8,8 @@ local fonts = require("fonts")
 local matrixLib = require("matrix")
 local configs = require("configs")
 local brushHelper = require("brush_helper")
+local colors = require("colors")
+local drawing = require("drawing")
 
 local actionButton = configs.editor.toolActionButton
 local cloneButton = configs.editor.objectCloneButton
@@ -86,8 +88,10 @@ function tool.draw()
         love.graphics.printf(hudText, 20, 120, viewportHandler.viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
 
         viewportHandler.drawRelativeTo(room.x, room.y, function()
-            love.graphics.setColor(0.3, 0.3, 0.3, 0.8)
-            love.graphics.rectangle("line", tx * 8, ty * 8, 8, 8)
+            drawing.callKeepOriginalColor(function()
+                love.graphics.setColor(colors.brushColor)
+                love.graphics.rectangle("line", tx * 8, ty * 8, 8, 8)
+            end)
         end)
     end
 end

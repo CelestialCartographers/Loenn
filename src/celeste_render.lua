@@ -414,16 +414,16 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
             local width = trigger.width or 16
             local height = trigger.height or 16
 
-            love.graphics.setColor(colors.triggerColor)
+            drawing.callKeepOriginalColor(function() 
+                love.graphics.setColor(colors.triggerColor)
 
-            love.graphics.rectangle("line", x, y, width, height)
-            love.graphics.rectangle("fill", x, y, width, height)
-
-            love.graphics.setColor(colors.triggerTextColor)
-
-            drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
-
-            love.graphics.setColor(colors.default)
+                love.graphics.rectangle("line", x, y, width, height)
+                love.graphics.rectangle("fill", x, y, width, height)
+    
+                love.graphics.setColor(colors.triggerTextColor)
+    
+                drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
+            end)
         end
 
         batch:addFromDrawable(drawableFunction.fromFunction(func))
@@ -577,13 +577,13 @@ function celesteRender.drawRoom(room, viewport, selected)
     local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
     viewportHandler.drawRelativeTo(roomX, roomY, function()
-        love.graphics.setColor(backgroundColor)
-        love.graphics.rectangle("fill", 0, 0, width, height)
-
-        love.graphics.setColor(borderColor)
-        love.graphics.rectangle("line", 0, 0, width, height)
-
-        love.graphics.setColor(colors.default)
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(backgroundColor)
+            love.graphics.rectangle("fill", 0, 0, width, height)
+    
+            love.graphics.setColor(borderColor)
+            love.graphics.rectangle("line", 0, 0, width, height)
+        end)
 
         if redrawRoom then
             -- Invalidate the canvas, so it is updated properly when the selected room changes
@@ -608,10 +608,10 @@ function celesteRender.drawFiller(filler, viewport)
     local height = filler.height * 8
 
     viewportHandler.drawRelativeTo(x, y, function()
-        love.graphics.setColor(colors.fillerColor)
-        love.graphics.rectangle("fill", 0, 0, width, height)
-
-        love.graphics.setColor(colors.default)
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(colors.fillerColor)
+            love.graphics.rectangle("fill", 0, 0, width, height)
+        end)
     end)
 end
 

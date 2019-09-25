@@ -29,6 +29,8 @@ colors.roomBorderDefault = {255 / 255, 255 / 255, 255 / 255}
 
 colors.fillerColor = {68 / 255, 68 / 255, 68 / 255}
 
+colors.brushColor = {77 / 255, 77 / 255, 77 / 255, 204 / 255}
+
 colors.default = {255 / 255, 255 / 255, 255 / 255}
 
 return colors
