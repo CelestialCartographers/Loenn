@@ -78,6 +78,8 @@ function brushHelper.generateFakeTilesBatch(room, fakeTiles, layer)
     return celesteRender.getTilesBatch(room, fakeTiles, meta, fg)
 end
 
+-- TODO - This doesn't use the same random quads as the initial render would
+-- Making it inconsistent, and also wasting time on unneeded rerendering
 function brushHelper.updateRender(room, x, y, material, layer)
     local batch = celesteRender.getRoomCache(room.name, layer).result
 

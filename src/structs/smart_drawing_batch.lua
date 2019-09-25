@@ -235,4 +235,122 @@ function smartDrawingBatch.createMatrixBatch(default, width, height, sectorWidth
 end
 
 
+local function getSectionStart(batch, x, y)
+    local cellWidth = batch._cellWidth
+    local cellHeight = batch._cellHeight
+    
+    local sectionX = (x - 1) * cellWidth
+    local sectionY = (y - 1) * cellHeight
+
+    return sectionX, sectionY, cellWidth, cellHeight
+end
+
+local function clearCanvasArea(batch, x, y)
+    local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
+
+    love.graphics.setCanvas(batch._canvas)
+    love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
+
+    love.graphics.clear(0.0, 0.0, 0.0, 0.0)
+
+    love.graphics.setScissor()
+    love.graphics.setCanvas()
+end
+
+-- TODO - General color handling improvements in Lönn, so we don't have to fix it properly here
+local function drawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
+    local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
+    local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
+    local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
+
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setCanvas(batch._canvas)
+    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
+
+    love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+
+    love.graphics.setCanvas()
+    love.graphics.setColor(r, g, b, a)
+end
+
+-- Code duplication to reduce C calls needed
+-- TODO - General color handling improvements in Lönn, so we don't have to fix it properly here
+local function redrawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
+    local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
+    local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
+    local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
+
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setCanvas(batch._canvas)
+    love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
+    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
+
+    love.graphics.clear(0.0, 0.0, 0.0, 0.0)
+    love.graphics.setScissor()
+
+    love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+
+    love.graphics.setCanvas()
+    love.graphics.setColor(r, g, b, a)
+end
+
+local gridCanvasBatchMt = {}
+gridCanvasBatchMt.__index = {}
+
+function gridCanvasBatchMt.__index.set(self, x, y, meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
+    -- Exit early if we already have the value set
+    if self._ignoreSettingSameValue then
+        local target = self._matrix:get(x, y)
+
+        if target and target[1] == meta and target[2] == quad then
+            return
+        end
+    end
+
+    if meta then
+        local prev = self._matrix:get(x, y)
+
+        self._matrix:set(x, y, {meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy})
+
+        -- If we previously had a value we also need to clear first
+        if prev then
+            redrawCanvasArea(self, x, y, meta, quad, drawX, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
+
+        else
+            drawCanvasArea(self, x, y, meta, quad, drawX, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
+        end
+
+    else
+        self._matrix:set(x, y, false)
+        clearCanvasArea(self, x, y)
+    end
+end
+
+function gridCanvasBatchMt.__index.get(self, x, y, def)
+    return self._matrix:get(x, y, def)
+end
+
+function gridCanvasBatchMt.__index.draw(self)
+    love.graphics.draw(self._canvas, 0, 0)
+end
+
+-- Works like the matrix drawing batch, but assumes that a "cell" can be replaced by painting over its space and then drawn again
+-- Does not work when the grid items can cause overlaping
+-- ignoreSettingSameValue doesn't cause redraws when the value seemingly hasn't changed
+function smartDrawingBatch.createGridCanvasBatch(default, width, height, cellWidth, cellHeight, ignoreSettingSameValue)
+    local res = {
+        _type = "gridCanvasDrawingBatch",
+    }
+
+    res._width = width
+    res._height = height
+    res._cellWidth = cellWidth
+    res._cellHeight = cellHeight
+    res._ignoreSettingSameValue = ignoreSettingSameValue
+    res._matrix = matrix.filled(default, width, height)
+    res._canvas = love.graphics.newCanvas(math.max(width * 8, 1), math.max(height * 8, 1))
+
+    return setmetatable(res, gridCanvasBatchMt)
+end
+
 return smartDrawingBatch

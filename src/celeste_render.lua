@@ -180,7 +180,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
 
     -- TODO - Figure out sane sector sizes for the batch
     local width, height = tilesMatrix:size()
-    local batch = smartDrawingBatch.createMatrixBatch(false, width, height, 16, 16)
+    local batch = smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8)
 
     utils.setRandomSeed(room.name)
 
