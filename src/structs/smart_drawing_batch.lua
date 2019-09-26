@@ -245,45 +245,35 @@ local function getSectionStart(batch, x, y)
     return sectionX, sectionY, cellWidth, cellHeight
 end
 
+-- Assumes Canvas is set for performance reasons
+-- Doesn't clear scissor itself for performance reasons, clear manually after batch processing
 local function clearCanvasArea(batch, x, y)
     local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
 
-    love.graphics.setCanvas(batch._canvas)
     love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
-
     love.graphics.clear(0.0, 0.0, 0.0, 0.0)
-
-    love.graphics.setScissor()
-    love.graphics.setCanvas()
 end
 
+-- Assumes Canvas is set for performance reasons
 local function drawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
     local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
-
-    love.graphics.setCanvas(batch._canvas)
-
+    
     love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
-
-    love.graphics.setCanvas()
 end
 
--- Code duplication to reduce C calls needed
+-- Assumes Canvas is set for performance reasons
+-- Doesn't clear scissor itself for performance reasons, clear manually after batch processing
 local function redrawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
     local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
-    love.graphics.setCanvas(batch._canvas)
     love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
-
     love.graphics.clear(0.0, 0.0, 0.0, 0.0)
-    love.graphics.setScissor()
 
     love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
-
-    love.graphics.setCanvas()
 end
 
 local gridCanvasBatchMt = {}
@@ -306,15 +296,16 @@ function gridCanvasBatchMt.__index.set(self, x, y, meta, quad, drawX, drawY, r, 
 
         -- If we previously had a value we also need to clear first
         if prev then
-            redrawCanvasArea(self, x, y, meta, quad, drawX, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
+            table.insert(self._dirtyScissorCells, {x, y, redrawCanvasArea})
 
         else
-            drawCanvasArea(self, x, y, meta, quad, drawX, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
+            table.insert(self._dirtyDrawCells, {x, y})
         end
 
     else
         self._matrix:set(x, y, false)
-        clearCanvasArea(self, x, y)
+
+        table.insert(self._dirtyScissorCells, {x, y, clearCanvasArea})
     end
 end
 
@@ -322,6 +313,41 @@ function gridCanvasBatchMt.__index.get(self, x, y, def)
     return self._matrix:get(x, y, def)
 end
 
+function gridCanvasBatchMt.__index.updateDirtyRegions(self)
+    if #self._dirtyDrawCells > 0 or #self._dirtyScissorCells > 0 then
+        love.graphics.setCanvas(self._canvas)
+
+        for i, cell in ipairs(self._dirtyDrawCells) do
+            local x, y = unpack(cell)
+            local value = self._matrix:get(x, y, false)
+
+            drawCanvasArea(self, x, y, unpack(value))
+        end
+
+        for i, cell in ipairs(self._dirtyScissorCells) do
+            local x, y, func = unpack(cell)
+            local value = self._matrix:get(x, y, false)
+
+            if value then
+                func(self, x, y, unpack(value))
+            
+            else
+                func(self, x, y)
+            end
+        end
+            
+        love.graphics.setScissor()
+        love.graphics.setCanvas()
+
+        self._dirtyScissorCells = {}
+        self._dirtyDrawCells = {}
+    end
+end
+
+gridCanvasBatchMt.__index.process = gridCanvasBatchMt.__index.updateDirtyRegions
+
+-- While it is tempting to run process in draw, we are not allowed to use setCanvas during love.draw
+-- Running process in draw will just cause it to do the draw calls intended for the canvas in the main window instead
 function gridCanvasBatchMt.__index.draw(self)
     love.graphics.draw(self._canvas, 0, 0)
 end
@@ -341,6 +367,10 @@ function smartDrawingBatch.createGridCanvasBatch(default, width, height, cellWid
     res._ignoreSettingSameValue = ignoreSettingSameValue
     res._matrix = matrix.filled(default, width, height)
     res._canvas = love.graphics.newCanvas(math.max(width * 8, 1), math.max(height * 8, 1))
+
+    -- Two different tables to increase the amount of assumptions we can make
+    res._dirtyScissorCells = {}
+    res._dirtyDrawCells = {}
 
     return setmetatable(res, gridCanvasBatchMt)
 end

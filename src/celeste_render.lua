@@ -178,7 +178,6 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
 
     local drawableSpriteType = "drawableSprite"
 
-    -- TODO - Figure out sane sector sizes for the batch
     local width, height = tilesMatrix:size()
     local batch = smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8)
 
@@ -207,6 +206,10 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
         end
 
         coroutine.yield()
+    end
+
+    if batch.process then 
+        batch:process()
     end
 
     coroutine.yield(batch)

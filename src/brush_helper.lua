@@ -103,6 +103,10 @@ function brushHelper.updateRender(room, x, y, material, layer)
             end
         end
     end
+
+    if batch.process then 
+        batch:process()
+    end
 end
 
 function brushHelper.placeTile(room, x, y, material, layer)
