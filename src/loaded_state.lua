@@ -24,11 +24,11 @@ function state.loadFile(filename)
                 state.map = state.side.map
                 state.selectedRoom = state.map and state.map.rooms[1]
 
-                sceneHandler.changeScene("Editor")
-
             else
-                -- TODO - Toast the user
+                -- TODO - Toast the user, failed to load
             end
+
+            sceneHandler.changeScene("Editor")
         end
     )
 end
@@ -41,7 +41,7 @@ function state.saveFile(filename)
                 state.filename = filename
 
             else
-                -- TODO - Toast the user
+                -- TODO - Toast the user, failed to save
             end
         end
     )
