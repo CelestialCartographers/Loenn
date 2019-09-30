@@ -71,20 +71,21 @@ function brushHelper.generateFakeTiles(room, x, y, material, layer)
     return fakeTiles
 end
 
-function brushHelper.generateFakeTilesBatch(room, fakeTiles, layer)
+function brushHelper.generateFakeTilesBatch(room, x, y, fakeTiles, layer)
     local fg = layer == "tilesFg"
     local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
+    local width, height = fakeTiles.matrix:size()
+    local random = celesteRender.getRoomRandomMatrix(room, layer)
+    local randomSlice = random:getSlice(x - 2, y - 2, x + width - 3, y + height - 3, "0")
 
-    return celesteRender.getTilesBatch(room, fakeTiles, meta, fg)
+    return celesteRender.getTilesBatch(room, fakeTiles, meta, fg, randomSlice)
 end
 
--- TODO - This doesn't use the same random quads as the initial render would
--- Making it inconsistent, and also wasting time on unneeded rerendering
 function brushHelper.updateRender(room, x, y, material, layer)
     local batch = celesteRender.getRoomCache(room.name, layer).result
 
     local fakeTiles = brushHelper.generateFakeTiles(room, x, y, material, layer)
-    local fakeBatch = brushHelper.generateFakeTilesBatch(room, fakeTiles, layer)
+    local fakeBatch = brushHelper.generateFakeTilesBatch(room, x, y, fakeTiles, layer)
 
     local width, height = fakeBatch._matrix:size()
 
@@ -104,7 +105,7 @@ function brushHelper.updateRender(room, x, y, material, layer)
         end
     end
 
-    if batch.process then 
+    if batch.process then
         batch:process()
     end
 end

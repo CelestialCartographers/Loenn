@@ -37,8 +37,8 @@ local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = false
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = true
 
--- Room cache
 local roomCache = {}
+local roomRandomMatrixCache = {}
 
 local batchingTasks = {}
 
@@ -99,6 +99,39 @@ function celesteRender.invalidateRoomCache(roomName, key)
     end
 end
 
+function celesteRender.getRoomRandomMatrix(room, key)
+    local roomName = room.name
+    local tileWidth, tileHeight = room[key].matrix:size()
+    local regen = false
+
+    if roomRandomMatrixCache[roomName] and roomRandomMatrixCache[roomName][key] then
+        local m = roomRandomMatrixCache[roomName][key]
+        local randWidth, randHeight = m:size()
+
+        regen = tileWidth ~= randWidth or tileHeight ~= randHeight
+
+    else
+        regen = true
+    end
+
+    if regen then
+        utils.setRandomSeed(roomName)
+
+        local m = matrix.filled(0, tileWidth, tileHeight)
+
+        for x = 1, tileWidth do
+            for y = 1, tileHeight do
+                m:setInbounds(x, y, math.random(1, 256))
+            end
+        end
+
+        roomRandomMatrixCache[roomName] = roomRandomMatrixCache[roomName] or {}
+        roomRandomMatrixCache[roomName][key] = m
+    end
+
+    return roomRandomMatrixCache[roomName][key]
+end
+
 function celesteRender.getRoomCache(roomName, key)
     if utils.typeof(roomName) == "room" then
         roomName = roomName.name
@@ -149,7 +182,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
 
     if not quadCache:get0(quadX, quadY) then
         local spriteMeta = atlases.gameplay[texture]
-        local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
+        local spritesWidth, spritesHeight = spriteMeta.image:getDimensions()
         local res = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
         quadCache:set0(quadX, quadY, res)
@@ -160,7 +193,8 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     return quadCache:get0(quadX, quadY)
 end
 
-function celesteRender.getTilesBatch(room, tiles, meta, fg)
+-- randomMatrix is for custom randomness, mostly to give the correct "slice" of the matrix when making fake tiles
+function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
     local tilesMatrix = tiles.matrix
 
     -- Getting upvalues
@@ -181,11 +215,11 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
     local width, height = tilesMatrix:size()
     local batch = smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8)
 
-    utils.setRandomSeed(room.name)
+    local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, fg and "tilesFg" or "tilesBg")
 
     for x = 1, width do
         for y = 1, height do
-            local rng = math.random(1, 256)
+            local rng = random:getInbounds(x, y)
             local tile = tilesMatrix:getInbounds(x, y)
 
             if tile ~= airTile then
@@ -208,7 +242,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
         coroutine.yield()
     end
 
-    if batch.process then 
+    if batch.process then
         batch:process()
     end
 

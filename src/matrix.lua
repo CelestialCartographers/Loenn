@@ -65,6 +65,20 @@ function matrixMt.__index.size(self)
     return self._width, self._height
 end
 
+function matrixMt.__index.getSlice(self, x1, y1, x2, y2, def)
+    local res = matrix.filled(def, math.abs(x2 - x1) + 1, math.abs(y2 - y1) + 1)
+
+    local startX, endX = math.min(x1, x2), math.max(x1, x2)
+    local startY, endY = math.min(y1, y2), math.max(y1, y2)
+
+    for x = startX, endX do
+        for y = startY, endY do
+            res:setInbounds(x - startX + 1, y - startY + 1, self:get(x, y, def))
+        end
+    end
+
+    return res
+end
 
 function matrix.filled(default, width, height)
     local m = {
@@ -98,6 +112,21 @@ function matrix.fromTable(t, width, height)
     new._height = height
 
     return setmetatable(new, matrixMt)
+end
+
+function matrix.fromFunction(func, width, height)
+    local m = {
+        _type = "matrix"
+    }
+
+    for i = 1, width * height do
+        m[i] = func(i, width, height)
+    end
+
+    m._width = width
+    m._height = height
+
+    return setmetatable(m, matrixMt)
 end
 
 return matrix
