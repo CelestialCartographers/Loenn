@@ -37,7 +37,7 @@ end
 -- TODO - Make and use a tasked version of sideStruct encode
 function state.saveFile(filename)
     tasks.newTask(
-        (-> filename and mapcoder.encodeFile(filename, sideStruct.encode(state.side))),
+        (-> filename and state.side and mapcoder.encodeFile(filename, sideStruct.encode(state.side))),
         function(task)
             if task.result then
                 state.filename = filename

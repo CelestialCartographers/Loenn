@@ -11,9 +11,9 @@ local hotkeyStruct = require("structs.hotkey")
 local rawHotkeys = {
     {configs.hotkeys.redo, (-> print("REDO")), "Redo last action"},
     {configs.hotkeys.undo, (-> print("UNDO")), "Undo last action"},
-    {configs.hotkeys.open, (-> loadedState.loadFile(filesystem.openDialog(fileLocations.getCelesteDir()))), "Open file"},
+    {configs.hotkeys.open, (-> filesystem.openDialog(fileLocations.getCelesteDir(), nil, loadedState.loadFile)), "Open file"},
     {configs.hotkeys.save, (-> loadedState.filename and loadedState.saveFile(loadedState.filename)), "Save file"},
-    {configs.hotkeys.saveAs, (-> loadedState.filename and loadedState.saveFile(filesystem.saveDialog(loadedState.filename))), "Save file as"},
+    {configs.hotkeys.saveAs, (-> loadedState.side and filesystem.saveDialog(loadedState.filename, nil, loadedState.saveFile)), "Save file as"},
 
     -- Debug hotkeys
     {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},
