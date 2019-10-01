@@ -63,7 +63,7 @@ function roomStruct.decode(data)
     room.tilesBg = nil
     room.tilesObj = nil
 
-    for key, value <- data.__children or {} do
+    for key, value in ipairs(data.__children or {}) do
         local name = value.__name
 
         if structSingleNames[name] and value then
@@ -73,12 +73,10 @@ function roomStruct.decode(data)
         end
 
         if structMutlipleNames[name] then
-            for i, d <- value.__children or {} do
-                if d then
-                    local target, struct = unpack(structMutlipleNames[name])
+            for i, d in ipairs(value.__children or {}) do
+                local target, struct = unpack(structMutlipleNames[name])
 
-                    table.insert(room[target], struct.decode(d))
-                end
+                table.insert(room[target], struct.decode(d))
             end
         end
     end
@@ -118,7 +116,7 @@ function roomStruct.encode(room)
 
     res.c = room.color
 
-    for raw, meta <- structSingleNames do
+    for raw, meta in pairs(structSingleNames) do
         local key, struct = unpack(meta)
 
         if room[key] then
@@ -130,13 +128,13 @@ function roomStruct.encode(room)
         end
     end
 
-    for raw, meta <- structMutlipleNames do
+    for raw, meta in pairs(structMutlipleNames) do
         local key, struct = unpack(meta)
 
         if #room[key] > 0 then
             local children = {}
 
-            for j, target <- room[key] do
+            for j, target in ipairs(room[key]) do
                 table.insert(children, struct.encode(target))
             end
 

@@ -18,22 +18,22 @@ function mapStruct.decode(data)
     map.stylesFg = {}
     map.stylesBg = {}
 
-    for i, d <- data.__children do
+    for i, d in ipairs(data.__children) do
         if d.__name == "levels" then
-            for j, room <- d.__children or {} do
+            for j, room in ipairs(d.__children or {}) do
                 table.insert(map.rooms, roomStruct.decode(room))
             end
 
         elseif d.__name == "Filler" then
-            for j, filler <- d.__children or {} do
+            for j, filler in ipairs(d.__children or {}) do
                 table.insert(map.fillers, fillerStruct.decode(filler))
             end
 
         elseif d.__name == "Style" then
-            for j, style <- d.__children or {} do
+            for j, style in ipairs(d.__children or {}) do
                 if style.__name == "Foregrounds" then
                     map.stylesFg = styleStruct.decode(style)
-                
+
                 elseif style.__name == "Backgrounds" then
                     map.stylesBg = styleStruct.decode(style)
                 end
@@ -55,7 +55,7 @@ function mapStruct.encode(map)
     if map.fillers and #map.fillers > 0 then
         local children = {}
 
-        for i, filler <- map.fillers do
+        for i, filler in ipairs(map.fillers) do
             table.insert(children, fillerStruct.encode(filler))
         end
 
@@ -68,7 +68,7 @@ function mapStruct.encode(map)
     if map.rooms and #map.rooms > 0 then
         local children = {}
 
-        for i, room <- map.rooms do
+        for i, room in ipairs(map.rooms) do
             table.insert(children, roomStruct.encode(room))
         end
 

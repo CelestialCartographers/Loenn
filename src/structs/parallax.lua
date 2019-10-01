@@ -1,12 +1,12 @@
 local parallaxStruct = {}
 
 function parallaxStruct.decode(data)
-    res = {
+    local res = {
         _type = "parallax",
         _raw = data
     }
-    
-    for k, v <- data or {} do
+
+    for k, v in pairs(data or {}) do
         if not string.match(k, "^__") then
             res[k] = v
         end
@@ -18,7 +18,7 @@ end
 function parallaxStruct.encode(parallax)
     local res = {}
 
-    for k, v <- parallax do
+    for k, v in pairs(parallax) do
         if k:sub(1, 1) ~= "_" then
             res[k] = v
         end

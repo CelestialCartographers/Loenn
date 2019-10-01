@@ -24,7 +24,7 @@ function decalUtils.getDecalNames(removeFrames)
 
     local res = {}
 
-    for name, sprite <- atlases.gameplay do
+    for name, sprite in pairs(atlases.gameplay) do
         if name:match(decalsPrefix) then
             if not removeFrames or keepFrame(name) then
                 table.insert(res, name)

@@ -113,7 +113,7 @@ local function countStrings(data, seen)
 
     seen[name] = (seen[name] or 0) + 1
 
-    for k, v <- data do
+    for k, v in pairs(data) do
         if type(k) == "string" and k ~= "__name" and k ~= "__children" then
             seen[k] = (seen[k] or 0) + 1
         end
@@ -123,7 +123,7 @@ local function countStrings(data, seen)
         end
     end
 
-    for i, child <- children do
+    for i, child in ipairs(children) do
         countStrings(child, seen)
     end
 
@@ -144,7 +144,7 @@ function mapcoder.encodeNumber(fh, n, lookup)
         binfile.writeFloat(fh, n)
 
     else
-        for i, d <- integerBits do
+        for i, d in ipairs(integerBits) do
             local header, min, max, func = d[1], d[2], d[3], d[4]
 
             if n >= min and n <= max then
@@ -199,7 +199,7 @@ function mapcoder.encodeTable(fh, data, lookup)
 
     local children = data.__children or {}
 
-    for attr, value <- data do
+    for attr, value in pairs(data) do
         if attr ~= "__children" and attr ~= "__name" then
             attributes[attr] = value
             attributeCount += 1
@@ -209,7 +209,7 @@ function mapcoder.encodeTable(fh, data, lookup)
     binfile.writeShort(fh, index - 1)
     binfile.writeByte(fh, attributeCount)
 
-    for attr, value <- attributes do
+    for attr, value in pairs(attributes) do
         local attrIndex = findInLookup(lookup, attr)
 
         binfile.writeShort(fh, attrIndex - 1)
@@ -218,7 +218,7 @@ function mapcoder.encodeTable(fh, data, lookup)
 
     binfile.writeShort(fh, #children)
 
-    for i, child <- children do
+    for i, child in ipairs(children) do
         mapcoder.encodeTable(fh, child, lookup)
     end
 end
@@ -234,6 +234,7 @@ function mapcoder.encodeValue(fh, value, lookup)
     encodingFunctions[type(value)](fh, value, lookup)
 end
 
+-- TODO - Use buffer so we don't corrupt the bin midway if we fail
 function mapcoder.encodeFile(path, data, header)
     header = header or "CELESTE MAP"
 
@@ -242,7 +243,7 @@ function mapcoder.encodeFile(path, data, header)
     local stringsSeen = countStrings(data)
     local lookupStrings = {}
 
-    for s, c <- stringsSeen do
+    for s, c in pairs(stringsSeen) do
         table.insert(lookupStrings, {s, c})
     end
 

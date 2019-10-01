@@ -7,9 +7,9 @@ local styleStruct = {}
 
 -- Only returns children decoded
 function styleStruct.decode(data)
-    res = {}
+    local res = {}
 
-    for i, child <- data.__children or {} do
+    for i, child in ipairs(data.__children or {}) do
         if child.__name == "parallax" then
             table.insert(res, parallaxStruct.decode(child))
 
@@ -29,9 +29,9 @@ end
 function styleStruct.encode(style)
     local res = {}
 
-    for i, backdrop <- style do
+    for i, backdrop in ipairs(style) do
         local typ = utils.typeof(backdrop)
-        
+
         if typ == "parallax" then
             table.insert(res, parallaxStruct.encode(backdrop))
 

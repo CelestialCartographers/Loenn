@@ -10,7 +10,9 @@ local decoderBlacklist = {
 }
 
 local encoderBlacklist = {
-    map = true
+    map = true,
+    _raw = true,
+    _type = true
 }
 
 local function tableify(data, t)
@@ -21,13 +23,13 @@ local function tableify(data, t)
 
     t[name] = {}
 
-    for k, v <- data do
+    for k, v in pairs(data) do
         if k:sub(1, 1) ~= "_" then
             t[name][k] = v
         end
     end
 
-    for i, child <- children do
+    for i, child in ipairs(children) do
         tableify(child, t)
     end
 
@@ -40,7 +42,7 @@ local function binfileify(name, data, topLevel)
         __children = {}
     }
 
-    for k, v <- data do
+    for k, v in pairs(data) do
         if type(v) == "table" then
             table.insert(res.__children, binfileify(k, v))
 
@@ -62,7 +64,7 @@ function sideStruct.decode(data)
         _raw = data
     }
 
-    for k, v <- data.__children or {} do
+    for i, v in ipairs(data.__children or {}) do
         local name = v.__name
 
         if not decoderBlacklist[name] then
@@ -78,7 +80,7 @@ end
 function sideStruct.encode(side)
     local res = mapStruct.encode(side.map)
 
-    for k, v <- side do
+    for k, v in pairs(side) do
         if not encoderBlacklist[k] then
             table.insert(res.__children, binfileify(k, v))
         end
