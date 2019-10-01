@@ -2,6 +2,8 @@ local editorScene = {}
 
 editorScene.name = "Editor"
 
+editorScene._displayWipe = true
+
 function editorScene:firstEnter()
     self.viewerState = require("loaded_state")
     self.celesteRender = require("celeste_render")
@@ -32,7 +34,7 @@ function editorScene:draw()
     self:propagateEvent("draw")
 end
 
-function editorScene:update(dt)
+function editorScene:update(dt)    
     if self.viewerState.map then
         -- TODO - Find some sane values for this
         self.celesteRender.processTasks(self.viewerState, 1 / 60, math.huge, 1 / 240, math.huge)

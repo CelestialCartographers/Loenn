@@ -9,6 +9,7 @@ local sideStruct = require("structs.side")
 local state = {}
 
 -- TODO - Check for changes and warn users when we aren't just a map viewer
+-- TODO - Make and use a tasked version of sideStruct decode
 function state.loadFile(filename)
     sceneHandler.changeScene("Loading")
 
@@ -33,6 +34,7 @@ function state.loadFile(filename)
     )
 end
 
+-- TODO - Make and use a tasked version of sideStruct encode
 function state.saveFile(filename)
     tasks.newTask(
         (-> filename and mapcoder.encodeFile(filename, sideStruct.encode(state.side))),

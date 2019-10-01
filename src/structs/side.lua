@@ -57,19 +57,22 @@ local function binfileify(name, data, topLevel)
 end
 
 function sideStruct.decode(data)
-    local res = {}
+    local side = {
+        _type = "map",
+        _raw = data
+    }
 
     for k, v <- data.__children or {} do
         local name = v.__name
 
         if not decoderBlacklist[name] then
-            tableify(v, res)
+            tableify(v, side)
         end
     end
 
-    res.map = mapStruct.decode(data)
+    side.map = mapStruct.decode(data)
 
-    return res
+    return side
 end
 
 function sideStruct.encode(side)

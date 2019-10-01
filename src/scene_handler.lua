@@ -6,10 +6,33 @@ local sceneHandler = {}
 sceneHandler.scenes = {}
 sceneHandler.currentScene = nil
 
+sceneHandler.wipeRemaining = 0
+sceneHandler.wipeDuration = 0
+sceneHandler.defaultWipeDuration = 0.6
+
+function sceneHandler.defaultStencil()
+    local p = 1 - sceneHandler.wipeDuration / sceneHandler.wipeRemaining
+    local width, height = love.graphics.getWidth(), love.graphics.getHeight()
+
+    local radius = math.sqrt((width / 2)^2 + (height / 2)^2) * p
+
+    love.graphics.circle("fill", width / 2, height / 2, radius)
+end
+
+function sceneHandler.defaultWipe(total, remaining, draw)
+   love.graphics.stencil(sceneHandler.defaultStencil, "replace")
+   love.graphics.setStencilTest("equal", 1)
+ 
+   local res = draw()
+ 
+   love.graphics.setStencilTest()
+
+   return res
+end
+
 function sceneHandler.sendEvent(event, ...)
     local args = {...}
-    local name = sceneHandler.currentScene
-    local scene = sceneHandler.scenes[name]
+    local scene = sceneHandler.getCurrentScene()
 
     if not scene then
         return false
@@ -18,6 +41,21 @@ function sceneHandler.sendEvent(event, ...)
     scene[event](scene, unpack(args))
 
     return true
+end
+
+function sceneHandler.draw()
+    if sceneHandler.wipeDuration > 0 and sceneHandler.getCurrentScene() and sceneHandler.getCurrentScene()._displayWipe then
+        return sceneHandler.defaultWipe(sceneHandler.wipeRemaining, sceneHandler.wipeDuration, function() return sceneHandler.sendEvent("draw") end)
+
+    else
+        return sceneHandler.sendEvent("draw")
+    end
+end
+
+function sceneHandler.update(dt)
+    sceneHandler.wipeDuration = math.max(0, sceneHandler.wipeDuration - dt)
+
+    return sceneHandler.sendEvent("update", dt)
 end
 
 -- Use inputsceneMt if no other metatable is already set for the scene
@@ -65,6 +103,9 @@ function sceneHandler.changeScene(name)
     end
 
     newScene:enter(prevName)
+
+    sceneHandler.wipeDuration = sceneHandler.defaultWipeDuration
+    sceneHandler.wipeRemaining = sceneHandler.wipeDuration
 
     return true
 end
