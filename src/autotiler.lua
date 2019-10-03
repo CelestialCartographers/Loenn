@@ -184,7 +184,10 @@ function autotiler.loadTilesetXML(fn)
 
         local currentMasks = {}
 
-        for j, child in ipairs(tileset.set or {}) do
+        -- Doesn't store single child tags in list, pack it into a table for easier use
+        local tilesetSets = tileset.set and (#tileset.set > 0 and tileset.set or {tileset.set}) or {}
+
+        for j, child in ipairs(tilesetSets) do
             local attrs = child._attr or child
 
             local mask = attrs.mask
