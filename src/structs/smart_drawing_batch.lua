@@ -220,16 +220,10 @@ function smartDrawingBatch.createMatrixBatch(default, width, height, sectorWidth
     res._sectorWidth = sectorWidth
     res._sectorHeight = sectorHeight
     res._matrix = matrix.filled(default, width, height)
-    res._batches = matrix.filled(false, sectorsMatrixWidth, sectorsMatrixHeight)
+    res._batches = matrix.fromFunction(smartDrawingBatch.createUnorderedBatch, sectorsMatrixWidth, sectorsMatrixHeight)
     res._dirty = matrix.filled(true, sectorsMatrixWidth, sectorsMatrixHeight)
     res._canRender = false
     res._dirtyIfNotEqual = dirtyIfNotEqual == nil or dirtyIfNotEqual
-
-    for x = 1, sectorsMatrixWidth do
-        for y = 1, sectorsMatrixHeight do
-            res._batches:setInbounds(x, y, smartDrawingBatch.createUnorderedBatch())
-        end
-    end
 
     return setmetatable(res, matrixDrawingBatchMt)
 end
@@ -238,7 +232,7 @@ end
 local function getSectionStart(batch, x, y)
     local cellWidth = batch._cellWidth
     local cellHeight = batch._cellHeight
-    
+
     local sectionX = (x - 1) * cellWidth
     local sectionY = (y - 1) * cellHeight
 
@@ -259,7 +253,7 @@ local function drawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot,
     local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
-    
+
     love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
 end
 
@@ -330,12 +324,12 @@ function gridCanvasBatchMt.__index.updateDirtyRegions(self)
 
             if value then
                 func(self, x, y, unpack(value))
-            
+
             else
                 func(self, x, y)
             end
         end
-            
+
         love.graphics.setScissor()
         love.graphics.setCanvas()
 

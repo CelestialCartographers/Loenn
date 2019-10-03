@@ -117,13 +117,7 @@ function celesteRender.getRoomRandomMatrix(room, key)
     if regen then
         utils.setRandomSeed(roomName)
 
-        local m = matrix.filled(0, tileWidth, tileHeight)
-
-        for x = 1, tileWidth do
-            for y = 1, tileHeight do
-                m:setInbounds(x, y, math.random(1, 256))
-            end
-        end
+        local m = matrix.fromFunction(math.random, tileWidth, tileHeight)
 
         roomRandomMatrixCache[roomName] = roomRandomMatrixCache[roomName] or {}
         roomRandomMatrixCache[roomName][key] = m
@@ -172,8 +166,8 @@ end
 function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     if not cache[tile] then
         cache[tile] = {
-            [false] = matrix.filled(false, 6, 15),
-            [true] = matrix.filled(false, 6, 15)
+            [false] = matrix.filled(nil, 6, 15),
+            [true] = matrix.filled(nil, 6, 15)
         }
     end
 
