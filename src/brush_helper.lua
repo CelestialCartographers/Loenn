@@ -62,14 +62,14 @@ local function addMissingNeighbors(x, y, needsUpdate, addedUpdate)
     addNeighborIfMissing(x + 1, y, needsUpdate, addedUpdate)
 
     addNeighborIfMissing(x - 1, y + 1, needsUpdate, addedUpdate)
-    addNeighborIfMissing(x , y + 1, needsUpdate, addedUpdate)
+    addNeighborIfMissing(x, y + 1, needsUpdate, addedUpdate)
     addNeighborIfMissing(x + 1, y + 1, needsUpdate, addedUpdate)
 end
 
 -- Has some duplication from celesteRender getTilesBatch for performance reasons
 -- needsUpdate set up as {x1, y1, x2, y2, ..., xn, yn} for performance reasons, less table creation than {{x1, y1}, ...}
 -- In the material, "0" is considered the tile air, while " " is considered "no change"
--- Does not use placeTilesRaw for performance reasons, and becase we explicitly need to track what changed
+-- Does not use placeTilesRaw for performance reasons, and because we explicitly need to track what changed
 -- TODO - Verify that it works with matrix materials once tools are ready
 function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local fg = layer == "tilesFg"
@@ -113,7 +113,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
 
                     table.insert(needsUpdate, tx)
                     table.insert(needsUpdate, ty)
-                    
+
                     addMissingNeighbors(x, y, needsUpdate, addedUpdate)
                 end
             end
@@ -122,7 +122,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     else
         local target = tilesMatrix:get(x, y, "0")
 
-        if target ~= material and mat ~= " " then
+        if target ~= material and material ~= " " then
             tilesMatrix:set(x, y, material)
 
             table.insert(needsUpdate, x)

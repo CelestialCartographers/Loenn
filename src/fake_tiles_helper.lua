@@ -1,3 +1,7 @@
+local celesteRender = require("celeste_render")
+local utils = require("utils")
+local matrix = require("matrix")
+
 local fakeTilesHelper = {}
 
 function fakeTilesHelper.generateFakeTilesMatrix(room, x, y, material, layer)
@@ -60,7 +64,7 @@ function fakeTilesHelper.generateFakeTilesBatch(room, x, y, fakeTiles, layer)
     local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
     local width, height = fakeTiles.matrix:size()
     local random = celesteRender.getRoomRandomMatrix(room, layer)
-    local randomSlice = random:getSlice(x - 2, y - 2, x + width - 3, y + height - 3, "0")
+    local randomSlice = random:getSlice(x - 2, y - 2, x + width - 3, y + height - 3, 0)
 
     return celesteRender.getTilesBatch(room, fakeTiles, meta, fg, randomSlice)
 end

@@ -6,7 +6,7 @@ local decalStruct = require("structs.decal")
 
 local roomStruct = {}
 
-local structSingleNames = {
+local structTilesNames = {
     solids = {"tilesFg", tilesStruct},
     bg = {"tilesBg", tilesStruct},
     objtiles = {"tilesObj", objectTilesStruct}
@@ -63,13 +63,16 @@ function roomStruct.decode(data)
     room.tilesBg = nil
     room.tilesObj = nil
 
+    local roomTilesWidth = math.ceil(room.width / 8)
+    local roomTilesHeight = math.ceil(room.height / 8)
+
     for key, value in ipairs(data.__children or {}) do
         local name = value.__name
 
-        if structSingleNames[name] and value then
-            local target, struct = unpack(structSingleNames[name])
+        if structTilesNames[name] and value then
+            local target, struct = unpack(structTilesNames[name])
 
-            room[target] = struct.decode(value)
+            room[target] = struct.resize(struct.decode(value), roomTilesWidth, roomTilesHeight)
         end
 
         if structMutlipleNames[name] then
@@ -116,7 +119,7 @@ function roomStruct.encode(room)
 
     res.c = room.color
 
-    for raw, meta in pairs(structSingleNames) do
+    for raw, meta in pairs(structTilesNames) do
         local key, struct = unpack(meta)
 
         if room[key] then

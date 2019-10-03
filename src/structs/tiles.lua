@@ -105,15 +105,47 @@ function tilesStruct.tileStringToMatrix(tiles, seperator, empty)
     return res
 end
 
-function tilesStruct.decode(data)
-    local tiles = {
-        _type = "tiles",
-        _raw = data
-    }
+-- Returns nil if no resizing is needed
+function tilesStruct.resizeMatrix(tiles, width, height, def)
+    local tilesMatrix = tiles.matrix
+    local tilesWidth, tilesHeight = tilesMatrix:size
 
-    tiles.matrix = tilesStruct.tileStringToMatrix(data.innerText or "")
+    if tilesWidth ~= width or tilesHeight ~= height then
+        local newTilesMatrix = matrix.filled(nil, width, height)
+
+        for x = 1, width do
+            for y = 1, height do
+                newTilesMatrix:set(x, y, tilesMatrix:get(x, y, def))
+            end
+        end
+
+        return newTilesMatrix
+    end
+end
+
+function tilesStruct.resize(tiles, width, height, def)
+    local newTilesMatrix = tilesStruct.resizeMatrix(tiles, width, height, def or "0")
+
+    if newTilesMatrix then
+        return tilesStruct.fromMatrix(newTilesMatrix)
+    end
 
     return tiles
+end
+
+function tilesStruct.fromMatrix(m, raw)
+    local tiles = {
+        _type = "tiles",
+        raw = raw
+    }
+
+    tiles.matrix = m
+
+    return tiles
+end
+
+function tilesStruct.decode(data)
+    return tilesStruct.fromMatrix(tilesStruct.tileStringToMatrix(data.innerText or ""), data)
 end
 
 function tilesStruct.encode(tiles)

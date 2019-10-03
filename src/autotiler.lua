@@ -88,7 +88,7 @@ end
 
 local function getMaskQuads(masks, adjacent)
     if masks then
-        for i, maskData <- masks do
+        for i, maskData in ipairs(masks) do
             if checkMask(adjacent, maskData.mask) then
                 return true, maskData.quads, maskData.sprites
             end
@@ -107,7 +107,7 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
         local d, f = checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard)
         local g, h, i = checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard)
 
-        for j, maskData <- masks do
+        for j, maskData in ipairs(masks) do
             if checkMaskFromTiles(maskData.mask, a, b, c, d, nil, f, g, h, i) then
                 return true, maskData.quads, maskData.sprites
             end
@@ -131,14 +131,6 @@ function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, def
     else
         return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
     end
-end
-
--- TODO - TBI, see if its actually worth it
-function autotiler.getAllQuads(tiles, meta)
-    local width, height = tiles:size
-    local res = table.filled(false, {width, height})
-
-    return res
 end
 
 local function convertTileString(s)
@@ -173,7 +165,7 @@ function autotiler.loadTilesetXML(fn)
     -- TODO - sort tilesets that copy others to the end?
     -- Is this needed?
 
-    for i, tileset <- handler.root.Data.Tileset do
+    for i, tileset in ipairs(handler.root.Data.Tileset) do
         local id = tileset._attr.id
         local path = tileset._attr.path
         local copy = tileset._attr.copy
@@ -192,7 +184,7 @@ function autotiler.loadTilesetXML(fn)
 
         local currentMasks = {}
 
-        for j, child <- tileset.set or {} do
+        for j, child in ipairs(tileset.set or {}) do
             local attrs = child._attr or child
 
             local mask = attrs.mask
