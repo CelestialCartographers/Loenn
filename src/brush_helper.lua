@@ -54,6 +54,7 @@ local function addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
 end
 
 local function addMissingNeighbors(x, y, needsUpdate, addedUpdate)
+    -- Around the target tile
     addNeighborIfMissing(x - 1, y - 1, needsUpdate, addedUpdate)
     addNeighborIfMissing(x, y - 1, needsUpdate, addedUpdate)
     addNeighborIfMissing(x + 1, y - 1, needsUpdate, addedUpdate)
@@ -64,6 +65,13 @@ local function addMissingNeighbors(x, y, needsUpdate, addedUpdate)
     addNeighborIfMissing(x - 1, y + 1, needsUpdate, addedUpdate)
     addNeighborIfMissing(x, y + 1, needsUpdate, addedUpdate)
     addNeighborIfMissing(x + 1, y + 1, needsUpdate, addedUpdate)
+
+    -- Tiles used to check for center/padding
+    addNeighborIfMissing(x + 2, y, needsUpdate, addedUpdate)
+    addNeighborIfMissing(x - 2, y, needsUpdate, addedUpdate)
+
+    addNeighborIfMissing(x, y + 2, needsUpdate, addedUpdate)
+    addNeighborIfMissing(x, y - 2, needsUpdate, addedUpdate)
 end
 
 -- Has some duplication from celesteRender getTilesBatch for performance reasons
