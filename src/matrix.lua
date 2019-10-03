@@ -41,7 +41,7 @@ end
 
 function matrixMt.__index.set0(self, x, y, val)
     if x >= 0 and x < self._width and y >= 0 and y < self._height then
-        return self:set0Inbounds(x, y, val)
+        self:set0Inbounds(x, y, val)
     end
 end
 
@@ -85,8 +85,10 @@ function matrix.filled(default, width, height)
         _type = "matrix"
     }
 
-    for i = 1, width * height do
-        m[i] = default
+    if default ~= nil then
+        for i = 1, width * height do
+            m[i] = default
+        end
     end
 
     m._width = width

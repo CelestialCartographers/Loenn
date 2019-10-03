@@ -21,9 +21,9 @@ local tilesetFileBg = utils.joinpath(fileLocations.getCelesteDir(), "Content", "
 celesteRender.tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
 celesteRender.tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
 
-local triggerFontSize = 1
+celesteRender.tilesSpriteMetaCache = {}
 
-local tilesSpriteMetaCache = {}
+local triggerFontSize = 1
 
 local tilesFgDepth = -10000
 local tilesBgDepth = 10000
@@ -199,7 +199,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
 
     -- Getting upvalues
     local gameplayAtlas = atlases.gameplay
-    local cache = tilesSpriteMetaCache
+    local cache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = meta
 
