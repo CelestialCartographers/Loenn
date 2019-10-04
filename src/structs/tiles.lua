@@ -106,7 +106,7 @@ function tilesStruct.tileStringToMatrix(tiles, seperator, empty)
 end
 
 -- Returns nil if no resizing is needed
-function tilesStruct.resizeMatrix(tiles, width, height, def)
+function tilesStruct.resizeMatrix(tiles, width, height, default)
     local tilesMatrix = tiles.matrix
     local tilesWidth, tilesHeight = tilesMatrix:size
 
@@ -115,7 +115,7 @@ function tilesStruct.resizeMatrix(tiles, width, height, def)
 
         for x = 1, width do
             for y = 1, height do
-                newTilesMatrix:set(x, y, tilesMatrix:get(x, y, def))
+                newTilesMatrix:set(x, y, tilesMatrix:get(x, y, default))
             end
         end
 
@@ -123,8 +123,8 @@ function tilesStruct.resizeMatrix(tiles, width, height, def)
     end
 end
 
-function tilesStruct.resize(tiles, width, height, def)
-    local newTilesMatrix = tilesStruct.resizeMatrix(tiles, width, height, def or "0")
+function tilesStruct.resize(tiles, width, height, default)
+    local newTilesMatrix = tilesStruct.resizeMatrix(tiles, width, height, default or "0")
 
     if newTilesMatrix then
         return tilesStruct.fromMatrix(newTilesMatrix)

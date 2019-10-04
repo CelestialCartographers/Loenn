@@ -9,14 +9,14 @@ orderedDrawingBatchMt.__index = {}
 local spriteBatchMode = "static"
 
 -- TODO - Make tinting smarter? Batch based on color?
-function orderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
+function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
     local typ = utils.typeof(drawable)
 
     if typ == "drawableSprite" then
         local image = drawable.meta.image
 
-        local offsetX = drawable.offsetX or ((drawable.jx or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX)
-        local offsetY = drawable.offsetY or ((drawable.jy or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY)
+        local offsetX = drawable.offsetX or ((drawable.justificationX or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX)
+        local offsetY = drawable.offsetY or ((drawable.justificationY or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY)
 
         if drawable.color and type(drawable.color) == "table" then
             -- Special case
@@ -51,7 +51,7 @@ function orderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
     self._prevTyp = typ
 end
 
-function orderedDrawingBatchMt.__index.draw(self)
+function orderedDrawingBatchMt.__index:draw()
     for i, drawable in ipairs(self._drawables) do
         local typ = utils.typeof(drawable)
 
@@ -64,7 +64,7 @@ function orderedDrawingBatchMt.__index.draw(self)
     end
 end
 
-function orderedDrawingBatchMt.__index.clear(self)
+function orderedDrawingBatchMt.__index:clear()
     self._drawables = {}
     self._lastBatch = nil
     self._lastImage = nil
@@ -86,7 +86,7 @@ end
 local unorderedDrawingBatchMt = {}
 unorderedDrawingBatchMt.__index = {}
 
-function unorderedDrawingBatchMt.__index.add(self, meta, quad, x, y, r, sx, sy, jx, jy, ox, oy)
+function unorderedDrawingBatchMt.__index:add(meta, quad, x, y, r, sx, sy, jx, jy, ox, oy)
     local image = meta.image
 
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
@@ -96,19 +96,19 @@ function unorderedDrawingBatchMt.__index.add(self, meta, quad, x, y, r, sx, sy, 
     self._lookup[image]:add(quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
 end
 
-function unorderedDrawingBatchMt.__index.addFromDrawable(self, drawable)
+function unorderedDrawingBatchMt.__index:addFromDrawable(drawable)
     if utils.typeof(drawable) == "drawableSprite" then
-        self:add(drawable.meta, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.jx, drawable.jy, drawable.offsetX, drawable.offsetY)
+        self:add(drawable.meta, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.justificationX, drawable.justificationY, drawable.offsetX, drawable.offsetY)
     end
 end
 
-function unorderedDrawingBatchMt.__index.draw(self)
+function unorderedDrawingBatchMt.__index:draw()
     for image, batch in pairs(self._lookup) do
         love.graphics.draw(batch, 0, 0)
     end
 end
 
-function unorderedDrawingBatchMt.__index.clear(self)
+function unorderedDrawingBatchMt.__index:clear()
     self._lookup = {}
 end
 
@@ -131,7 +131,7 @@ end
 local matrixDrawingBatchMt = {}
 matrixDrawingBatchMt.__index = {}
 
-function matrixDrawingBatchMt.__index.set(self, x, y, meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
+function matrixDrawingBatchMt.__index:set(x, y, meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
     -- Exit early if we already have the value set
     if self._dirtyIfNotEqual then
         local target = self._matrix:get(x, y)
@@ -154,11 +154,11 @@ function matrixDrawingBatchMt.__index.set(self, x, y, meta, quad, drawX, drawY, 
     self._canRender = false
 end
 
-function matrixDrawingBatchMt.__index.get(self, x, y, def)
-    return self._matrix:get(x, y, def)
+function matrixDrawingBatchMt.__index:get(x, y, default)
+    return self._matrix:get(x, y, default)
 end
 
-function matrixDrawingBatchMt.__index.populateBatch(self, sectorX, sectorY)
+function matrixDrawingBatchMt.__index:populateBatch(sectorX, sectorY)
     local batch = self._batches:getInbounds(sectorX, sectorY)
 
     local startX = 1 + (sectorX - 1) * self._sectorWidth
@@ -176,7 +176,7 @@ function matrixDrawingBatchMt.__index.populateBatch(self, sectorX, sectorY)
 end
 
 -- Clears and updates all dirty sector batches
-function matrixDrawingBatchMt.__index.updateBatches(self)
+function matrixDrawingBatchMt.__index:updateBatches()
     local width, height = self._batches:size()
 
     for x = 1, width do
@@ -190,7 +190,7 @@ function matrixDrawingBatchMt.__index.updateBatches(self)
     end
 end
 
-function matrixDrawingBatchMt.__index.draw(self)
+function matrixDrawingBatchMt.__index:draw()
     if not self._canRender then
         self:updateBatches()
     end
@@ -273,7 +273,7 @@ end
 local gridCanvasBatchMt = {}
 gridCanvasBatchMt.__index = {}
 
-function gridCanvasBatchMt.__index.set(self, x, y, meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
+function gridCanvasBatchMt.__index:set(x, y, meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
     -- Exit early if we already have the value set
     if self._ignoreSettingSameValue then
         local target = self._matrix:get(x, y)
@@ -303,11 +303,11 @@ function gridCanvasBatchMt.__index.set(self, x, y, meta, quad, drawX, drawY, r, 
     end
 end
 
-function gridCanvasBatchMt.__index.get(self, x, y, def)
-    return self._matrix:get(x, y, def)
+function gridCanvasBatchMt.__index:get(x, y, default)
+    return self._matrix:get(x, y, default)
 end
 
-function gridCanvasBatchMt.__index.updateDirtyRegions(self)
+function gridCanvasBatchMt.__index:updateDirtyRegions()
     if #self._dirtyDrawCells > 0 or #self._dirtyScissorCells > 0 then
         love.graphics.setCanvas(self._canvas)
 
@@ -342,7 +342,7 @@ gridCanvasBatchMt.__index.process = gridCanvasBatchMt.__index.updateDirtyRegions
 
 -- While it is tempting to run process in draw, we are not allowed to use setCanvas during love.draw
 -- Running process in draw will just cause it to do the draw calls intended for the canvas in the main window instead
-function gridCanvasBatchMt.__index.draw(self)
+function gridCanvasBatchMt.__index:draw()
     love.graphics.draw(self._canvas, 0, 0)
 end
 

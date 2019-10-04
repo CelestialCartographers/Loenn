@@ -3,8 +3,8 @@ local tilesStruct = require("structs.tiles")
 
 local objectTilesStruct = {}
 
-function objectTilesStruct.resize(tiles, width, height, def)
-    local newTilesMatrix = tilesStruct.resizeMatrix(tiles, width, height, def or "-1")
+function objectTilesStruct.resize(tiles, width, height, default)
+    local newTilesMatrix = tilesStruct.resizeMatrix(tiles, width, height, default or "-1")
 
     if newTilesMatrix then
         return objectTilesStruct.fromMatrix(newTilesMatrix)

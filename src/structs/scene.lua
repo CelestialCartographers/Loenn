@@ -13,7 +13,7 @@ function sceneStructFunctions:propagateEvent(event, ...)
     end
 end
 
-function sceneMt.__index(self, key)
+function sceneMt:__index(key)
     -- Send event to input devices
 
     if sceneStructFunctions[key] then

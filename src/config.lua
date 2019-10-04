@@ -116,13 +116,13 @@ function config.writeConfig(conf)
     end
 end
 
-function configMt.__index(self, key)
+function configMt:__index(key)
     config.updateConfig(self)
 
     return self.data[key]
 end
 
-function configMt.__newindex(self, key, value)
+function configMt:__newindex(key, value)
     local valueChanged = value ~= self[key]
 
     self.data[key] = value
