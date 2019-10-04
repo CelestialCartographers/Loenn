@@ -1,5 +1,6 @@
 local utils = require("utils")
 local binfile = require("binfile")
+local tasks = require("task")
 
 local spriteLoader = {}
 
@@ -46,12 +47,12 @@ function spriteLoader.loadDataImage(fn)
             end
         end
 
-        coroutine.yield()
+        tasks.yield()
     end
 
     local res = love.graphics.newImage(image)
 
-    coroutine.yield(res)
+    tasks.update(res)
 
     return res
 end
@@ -114,13 +115,13 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir)
         end
 
         if i ~= count then
-            coroutine.yield()
+            tasks.yield()
         end
     end
 
     fh:close()
 
-    coroutine.yield(res)
+    tasks.update(res)
 
     return res
 end

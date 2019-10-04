@@ -1,4 +1,5 @@
 local utils = require("utils")
+local tasks = require("task")
 
 local toolHandler = {}
 
@@ -42,10 +43,10 @@ function toolHandler.loadInternalTools(path)
         -- Always use Linux paths here
         toolHandler.loadTool(utils.joinpath(path, file):gsub("\\", "/"))
 
-        coroutine.yield()
+        tasks.yield()
     end
 
-    coroutine.yield(toolHandler.tools)
+    tasks.update(toolHandler.tools)
 end
 
 return toolHandler

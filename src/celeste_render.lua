@@ -233,14 +233,14 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
             end
         end
 
-        coroutine.yield()
+        tasks.yield()
     end
 
     if batch.process then
         batch:process()
     end
 
-    coroutine.yield(batch)
+    tasks.update(batch)
 
     return batch
 end
@@ -311,11 +311,11 @@ local function getDecalsBatch(decals)
         end
 
         if i % 25 == 0 then
-            coroutine.yield()
+            tasks.yield()
         end
     end
 
-    coroutine.yield(batch)
+    tasks.update(batch)
 
     return batch
 end
@@ -399,12 +399,12 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
             end
 
             if i % 25 == 0 then
-                coroutine.yield()
+                tasks.yield()
             end
         end
     end
 
-    coroutine.yield(batches)
+    tasks.update(batches)
 
     return batches
 end
@@ -460,11 +460,11 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
         batch:addFromDrawable(drawableFunction.fromFunction(func))
 
         if i % 25 == 0 then
-            coroutine.yield()
+            tasks.yield()
         end
     end
 
-    coroutine.yield(batch)
+    tasks.update(batch)
 
     return batch
 end

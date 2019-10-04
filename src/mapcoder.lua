@@ -100,7 +100,7 @@ function mapcoder.decodeFile(path, header)
 
     fh:close()
 
-    coroutine.yield(res)
+    coroutine.yield("update", res)
 
     return res
 end
