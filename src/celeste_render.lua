@@ -572,26 +572,32 @@ local function drawRoomFromBatches(room, viewport, selected)
     end
 end
 
+-- Return the canvas if it is ready, otherwise make a task for it
 local function getRoomCanvas(room, viewport, selected)
+    local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+
     roomCache[room.name] = roomCache[room.name] or {}
 
-    if not roomCache[room.name].canvas then
-        local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+    if orderedBatches and not roomCache[room.name].canvas then
+        roomCache[room.name].canvas = tasks.newTask(
+            function(task)
+                local canvas = love.graphics.newCanvas(room.width or 0, room.height or 0)
 
-        if orderedBatches then
-            local canvas = love.graphics.newCanvas(room.width or 0, room.height or 0)
-
-            canvas:renderTo(function()
-                for depth, batch <- orderedBatches do
-                    batch:draw()
-                end
-            end)
-
-            roomCache[room.name].canvas = canvas
-        end
+                canvas:renderTo(function()
+                    for depth, batch <- orderedBatches do
+                        batch:draw()
+                    end
+                end)
+    
+                tasks.update(canvas)
+            end,
+            nil,
+            batchingTasks,
+            {room = room}
+        )
     end
 
-    return roomCache[room.name].canvas
+    return roomCache[room.name].canvas and roomCache[room.name].canvas.result
 end
 
 function celesteRender.drawRoom(room, viewport, selected)
@@ -646,8 +652,6 @@ function celesteRender.drawFiller(filler, viewport)
     end)
 end
 
--- TODO - Move canvas rendering operations into a update function
--- Currently it visually breaks wipes, and shouldn't be in the render function regardless
 function celesteRender.drawMap(state)
     if state.map then
         local map = state.map

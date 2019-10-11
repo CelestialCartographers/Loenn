@@ -32,8 +32,6 @@ function state.loadFile(filename)
                     end
                 )
 
-                print("Loaded binary data")
-
             else
                 -- TODO - Toast the user, failed to load
             end

@@ -54,16 +54,23 @@ function tasksHandler.update(...)
     coroutine.yield("update", ...)
 end
 
+function tasksHandler.delayProcessing()
+    coroutine.yield("delayProcessing")
+end
+
+-- Returns completion status, if the process needs to wait for a different process, and the time it spent processing
 function tasksHandler.processTask(task, time)
     local timeSpent = 0
     local calcTime = time or math.huge
 
     while coroutine.status(task.coroutine) ~= "dead" do
+        local waiting = waitingForResume[task] and waitingForResume[task] > 0
+
         -- Can't process if we are over the time limit, or waiting for another task
-        if timeSpent >= calcTime or waitingForResume[task] then
+        if timeSpent >= calcTime or waiting then
             task.processedCount += 1
 
-            return false, timeSpent
+            return false, waiting, timeSpent
         end
 
         local start = love.timer.getTime()
@@ -71,12 +78,18 @@ function tasksHandler.processTask(task, time)
 
         if success then
             if status == "waitFor" then
-                task.processedYieldCount = 0
+                task.processedYieldCount += 1
                 task.processedWaitingCount += 1
+
                 addWaitingFor(task, res)
 
             elseif status == "update" then
                 task.result = res
+
+            elseif status == "delayProcessing" then
+                task.processedWaitingCount += 1
+
+                return false, true, timeSpent
             end
 
         else
@@ -100,7 +113,7 @@ function tasksHandler.processTask(task, time)
 
     task:callback()
 
-    return true, timeSpent
+    return true, false, timeSpent
 end
 
 -- Processes tasks from table for at around calcTime (default until done) and atmost maxTasks (default all)
@@ -118,8 +131,11 @@ function tasksHandler.processTasks(time, maxTasks, customTasks)
 
     while #tasks > 0 and tasksDone < tasksAllowed and timeSpent < calcTime do
         local task = tasks[taskIndex]
+        local finished, delayProcessing, taskTime = tasksHandler.processTask(task, calcTime - timeSpent)
 
-        if waitingForResume[task] then
+        timeSpent += taskTime
+
+        if delayProcessing then
             local lastIndex = taskIndex
             taskIndex = utils.mod1(taskIndex + 1, #tasks)
 
@@ -127,20 +143,15 @@ function tasksHandler.processTasks(time, maxTasks, customTasks)
             if lastIndex == taskIndex then
                 break
             end
+        end
 
-        else
-            local finished, taskTime = tasksHandler.processTask(task, calcTime - timeSpent)
+        if finished then
+            table.remove(tasks, taskIndex)
+            updateWaitingForTaskDone(task)
 
-            timeSpent += taskTime
+            tasksDone += 1
 
-            if finished then
-                table.remove(tasks, taskIndex)
-                updateWaitingForTaskDone(task)
-
-                tasksDone += 1
-
-                taskIndex = utils.mod1(taskIndex, #tasks)
-            end
+            taskIndex = utils.mod1(taskIndex, #tasks)
         end
     end
 
@@ -161,6 +172,10 @@ end
 
 function taskMt.__index:yield()
     tasksHandler.yield()
+end
+
+function taskMt.__index:delayProcessing()
+    tasksHandler.delayProcessing()
 end
 
 taskMt.__index.process = tasksHandler.processTask
