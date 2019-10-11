@@ -61,6 +61,8 @@ function tasksHandler.processTask(task, time)
     while coroutine.status(task.coroutine) ~= "dead" do
         -- Can't process if we are over the time limit, or waiting for another task
         if timeSpent >= calcTime or waitingForResume[task] then
+            task.processedCount += 1
+
             return false, timeSpent
         end
 
@@ -69,6 +71,8 @@ function tasksHandler.processTask(task, time)
 
         if success then
             if status == "waitFor" then
+                task.processedYieldCount = 0
+                task.processedWaitingCount += 1
                 addWaitingFor(task, res)
 
             elseif status == "update" then
@@ -87,10 +91,12 @@ function tasksHandler.processTask(task, time)
 
         timeSpent += deltaTime
         task.timeTotal += deltaTime
+        task.processedYieldCount += 1
     end
 
     task.done = true
     task.success = true
+    task.processedCount += 1
 
     task:callback()
 
@@ -125,12 +131,13 @@ function tasksHandler.processTasks(time, maxTasks, customTasks)
         else
             local finished, taskTime = tasksHandler.processTask(task, calcTime - timeSpent)
 
+            timeSpent += taskTime
+
             if finished then
                 table.remove(tasks, taskIndex)
                 updateWaitingForTaskDone(task)
 
                 tasksDone += 1
-                timeSpent += taskTime
 
                 taskIndex = utils.mod1(taskIndex, #tasks)
             end
@@ -169,6 +176,9 @@ function tasksHandler.newTask(func, callback, tasks, data)
     task.coroutine = coroutine.create(function(task) func(task) end)
     task.callback = callback or emptyCallback
     task.timeTotal = 0
+    task.processedCount = 0
+    task.processedYieldCount = 0
+    task.processedWaitingCount = 0
     task.done = false
     task.success = false
     task.data = data or {}

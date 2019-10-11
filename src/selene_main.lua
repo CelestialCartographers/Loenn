@@ -28,7 +28,7 @@ function love.draw()
 end
 
 function love.update(dt)
-    tasks.processTasks(1 / 16)
+    tasks.processTasks(1 / 32)
 
     sceneHandler.update(dt)
     threadHandler.update(dt)

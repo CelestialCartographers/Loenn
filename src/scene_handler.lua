@@ -8,10 +8,12 @@ sceneHandler.currentScene = nil
 
 sceneHandler.wipeRemaining = 0
 sceneHandler.wipeDuration = 0
+sceneHandler.wipeRenderedOnce = false
+sceneHandler.wipeFinished = false
 sceneHandler.defaultWipeDuration = 0.6
 
 function sceneHandler.defaultStencil()
-    local p = 1 - sceneHandler.wipeDuration / sceneHandler.wipeRemaining
+    local p = 1 - sceneHandler.wipeRemaining / sceneHandler.wipeDuration
     local width, height = love.graphics.getWidth(), love.graphics.getHeight()
 
     local radius = math.sqrt((width / 2)^2 + (height / 2)^2) * p
@@ -44,7 +46,10 @@ function sceneHandler.sendEvent(event, ...)
 end
 
 function sceneHandler.draw()
-    if sceneHandler.wipeDuration > 0 and sceneHandler.getCurrentScene() and sceneHandler.getCurrentScene()._displayWipe then
+    if not sceneHandler.wipeFinished and sceneHandler.getCurrentScene() and sceneHandler.getCurrentScene()._displayWipe then
+        sceneHandler.wipeRenderedOnce = true
+        sceneHandler.wipeFinished = sceneHandler.wipeRemaining == 0
+
         return sceneHandler.defaultWipe(sceneHandler.wipeRemaining, sceneHandler.wipeDuration, function() return sceneHandler.sendEvent("draw") end)
 
     else
@@ -53,7 +58,9 @@ function sceneHandler.draw()
 end
 
 function sceneHandler.update(dt)
-    sceneHandler.wipeDuration = math.max(0, sceneHandler.wipeDuration - dt)
+    if sceneHandler.wipeRenderedOnce then
+        sceneHandler.wipeRemaining = math.max(0, sceneHandler.wipeRemaining - dt)
+    end
 
     return sceneHandler.sendEvent("update", dt)
 end
@@ -106,6 +113,8 @@ function sceneHandler.changeScene(name)
 
     sceneHandler.wipeDuration = sceneHandler.defaultWipeDuration
     sceneHandler.wipeRemaining = sceneHandler.wipeDuration
+    sceneHandler.wipeRenderedOnce = false
+    sceneHandler.wipeFinished = false
 
     return true
 end
