@@ -1,3 +1,4 @@
+local tasks = require("task")
 local utils = require("utils")
 local mapStruct = require("structs.map")
 
@@ -60,7 +61,7 @@ end
 
 function sideStruct.decode(data)
     local side = {
-        _type = "map",
+        _type = "side",
         _raw = data
     }
 
@@ -74,7 +75,36 @@ function sideStruct.decode(data)
 
     side.map = mapStruct.decode(data)
 
+    tasks.update(side)
+
     return side
+end
+
+function sideStruct.decodeTaskable(data, tasksTarget)
+    local sideTask = tasks.newTask(
+        function(task)
+            local side = {}
+            local mapTask = tasks.newTask(-> mapStruct.decode(data), nil, tasksTarget)
+
+            task:waitFor(mapTask)
+            side.map = mapTask.result
+
+            for i, v in ipairs(data.__children or {}) do
+                local name = v.__name
+        
+                if not decoderBlacklist[name] then
+                    tableify(v, side)
+                end
+            end
+        
+            tasks.update(side)
+        end,
+        nil,
+        tasksTarget
+    )
+
+    tasks.waitFor(sideTask)
+    tasks.update(sideTask.result)
 end
 
 function sideStruct.encode(side)
@@ -87,6 +117,27 @@ function sideStruct.encode(side)
     end
 
     return res
+end
+
+function sideStruct.encodeTaskable(side, tasksTarget)
+    local sideTask = tasks.newTask(
+        function(task)
+            local mapTask = tasks.newTask(-> mapStruct.encode(side.map), nil, tasksTarget)
+
+            tasks.waitFor(mapTask)
+            local res = mapTask.result
+        
+            for k, v in pairs(side) do
+                if not encoderBlacklist[k] then
+                    table.insert(res.__children, binfileify(k, v))
+                end
+            end
+        
+            tasks.update(res)
+        end,
+        nil,
+        tasksTarget
+    )
 end
 
 return sideStruct

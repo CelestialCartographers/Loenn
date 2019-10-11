@@ -1,3 +1,4 @@
+local tasks = require("task")
 local roomStruct = require("structs.room")
 local fillerStruct = require("structs.filler")
 local styleStruct = require("structs.style")
@@ -22,12 +23,15 @@ function mapStruct.decode(data)
         if d.__name == "levels" then
             for j, room in ipairs(d.__children or {}) do
                 table.insert(map.rooms, roomStruct.decode(room))
+                tasks.yield()
             end
 
         elseif d.__name == "Filler" then
             for j, filler in ipairs(d.__children or {}) do
                 table.insert(map.fillers, fillerStruct.decode(filler))
             end
+
+            tasks.yield()
 
         elseif d.__name == "Style" then
             for j, style in ipairs(d.__children or {}) do
@@ -38,8 +42,12 @@ function mapStruct.decode(data)
                     map.stylesBg = styleStruct.decode(style)
                 end
             end
+
+            tasks.yield()
         end
     end
+    
+    tasks.update(map)
 
     return map
 end
@@ -76,6 +84,8 @@ function mapStruct.encode(map)
             __name = "levels",
             __children = children
         })
+
+        tasks.yield()
     end
 
     local style = {
@@ -94,6 +104,8 @@ function mapStruct.encode(map)
     })
 
     table.insert(res.__children, style)
+
+    tasks.update(res)
 
     return res
 end

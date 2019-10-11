@@ -646,6 +646,8 @@ function celesteRender.drawFiller(filler, viewport)
     end)
 end
 
+-- TODO - Move canvas rendering operations into a update function
+-- Currently it visually breaks wipes, and shouldn't be in the render function regardless
 function celesteRender.drawMap(state)
     if state.map then
         local map = state.map

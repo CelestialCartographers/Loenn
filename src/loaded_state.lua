@@ -15,38 +15,57 @@ function state.loadFile(filename)
 
     tasks.newTask(
         (-> filename and mapcoder.decodeFile(filename)),
-        function(task)
-            if task.result then
-                celesteRender.invalidateRoomCache()
-                celesteRender.clearBatchingTasks()
+        function(binTask)
+            if binTask.result then
+                tasks.newTask(
+                    (-> sideStruct.decodeTaskable(binTask.result)),
+                    function(decodeTask)
+                        celesteRender.invalidateRoomCache()
+                        celesteRender.clearBatchingTasks()
+        
+                        state.filename = filename
+                        state.side = decodeTask.result
+                        state.map = state.side.map
+                        state.selectedRoom = state.map and state.map.rooms[1]
 
-                state.filename = filename
-                state.side = sideStruct.decode(task.result)
-                state.map = state.side.map
-                state.selectedRoom = state.map and state.map.rooms[1]
+                        sceneHandler.changeScene("Editor")
+                    end
+                )
+
+                print("Loaded binary data")
 
             else
                 -- TODO - Toast the user, failed to load
             end
-
-            sceneHandler.changeScene("Editor")
         end
     )
 end
 
 -- TODO - Make and use a tasked version of sideStruct encode
 function state.saveFile(filename)
-    tasks.newTask(
-        (-> filename and state.side and mapcoder.encodeFile(filename, sideStruct.encode(state.side))),
-        function(task)
-            if task.result then
-                state.filename = filename
+    if filename and state.side then
+        tasks.newTask(
+            (-> sideStruct.encodeTaskable(state.side)),
+            function(encodeTask)
+                if encodeTask.result then
+                    tasks.newTask(
+                        (-> mapcoder.encodeFile(filename, encodeTask.result)),
+                        function(binTask)
+                            if binTask.result then
+                                state.filename = filename
+                
+                            else
+                                -- TODO - Toast the user, failed to save
+                            end
+                        end
+                    )
 
-            else
-                -- TODO - Toast the user, failed to save
+                else
+                    -- TODO - Toast the user, failed to save
+                end
             end
-        end
-    )
+        )
+    end
 end
 
 function state.selectRoom(room)
