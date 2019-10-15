@@ -5,19 +5,17 @@ local fileLocations = require("file_locations")
 local debugUtils = require("debug_utils")
 local viewportHandler = require("viewport_handler")
 
-local giraffe = require("giraffe/giraffe")
+local giraffe = require("giraffe.giraffe")
 
-local hotkeyStruct = require("structs/hotkey")
+local hotkeyStruct = require("structs.hotkey")
 
 -- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
-
--- TODO - Order automatically? Smarter detection? Might be needed since users can configure them
--- Order dependent, takes first matching regardless of "extra" modifiers
 local rawHotkeys = {
     {configs.hotkeys.redo, (-> print("REDO")), "Redo last action"},
     {configs.hotkeys.undo, (-> print("UNDO")), "Undo last action"},
-    {configs.hotkeys.open, (-> loadedState.loadMap(filesystem.openDialog(fileLocations.getCelesteDir()))), "Open file"},
-    {configs.hotkeys.save, (-> print("SAVE")), "Save file"},
+    {configs.hotkeys.open, (-> filesystem.openDialog(fileLocations.getCelesteDir(), nil, loadedState.loadFile)), "Open file"},
+    {configs.hotkeys.save, (-> loadedState.filename and loadedState.saveFile(loadedState.filename)), "Save file"},
+    {configs.hotkeys.saveAs, (-> loadedState.side and filesystem.saveDialog(loadedState.filename, nil, loadedState.saveFile)), "Save file as"},
 
     -- Debug hotkeys
     {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},

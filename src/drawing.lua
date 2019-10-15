@@ -21,13 +21,13 @@ function drawing.getSimpleCurve(start, stop, control, resolution)
     control = control or {(start[1] + stop[1]) / 2, (start[2] + stop[2]) / 2}
     resolution = resolution or 16
 
-    local res = $()
+    local res = {}
 
     for i = 0, resolution do
-        res += drawing.getCurvePoint(start, stop, control, i / resolution)
+        table.insert(res, drawing.getCurvePoint(start, stop, control, i / resolution))
     end
 
-    return res()
+    return res
 end
 
 function drawing.getRelativeQuad(spriteMeta, x, y, width, height)
@@ -59,6 +59,14 @@ function drawing.printCenteredText(text, x, y, width, height, font, fontSize, tr
     love.graphics.printf(text, 0, 0, width / fontSize, "center")
 
     love.graphics.pop()
+end
+
+function drawing.callKeepOriginalColor(func)
+    local pr, pg, pb, pa = love.graphics.getColor()
+
+    func()
+
+    love.graphics.setColor(pr, pg, pb, pa)
 end
 
 return drawing

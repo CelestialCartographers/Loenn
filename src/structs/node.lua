@@ -3,7 +3,7 @@ local nodeStruct = {}
 function nodeStruct.decodeNodes(children)
     local res = {}
 
-    for i, data <- children or {} do
+    for i, data in ipairs(children or {}) do
         local node = nodeStruct.decode(data)
 
         if node then

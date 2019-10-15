@@ -1,5 +1,7 @@
-local roomStruct = require("structs/room")
-local fillerStruct = require("structs/filler")
+local tasks = require("task")
+local roomStruct = require("structs.room")
+local fillerStruct = require("structs.filler")
+local styleStruct = require("structs.style")
 
 local mapStruct = {}
 
@@ -9,24 +11,43 @@ function mapStruct.decode(data)
         _raw = data
     }
 
-    map.package = data._package -- TODO?
-    map.style = {} -- TODO
+    map.package = data._package
 
-    map.rooms = $()
-    map.fillers = $()
+    map.rooms = {}
+    map.fillers = {}
 
-    for i, d <- data.__children do
+    map.stylesFg = {}
+    map.stylesBg = {}
+
+    for i, d in ipairs(data.__children) do
         if d.__name == "levels" then
-            for j, room <- d.__children or {} do
-                map.rooms += roomStruct.decode(room)
+            for j, room in ipairs(d.__children or {}) do
+                table.insert(map.rooms, roomStruct.decode(room))
+                tasks.yield()
             end
 
         elseif d.__name == "Filler" then
-            for j, filler <- d.__children or {} do
-                map.fillers += fillerStruct.decode(filler)
+            for j, filler in ipairs(d.__children or {}) do
+                table.insert(map.fillers, fillerStruct.decode(filler))
             end
+
+            tasks.yield()
+
+        elseif d.__name == "Style" then
+            for j, style in ipairs(d.__children or {}) do
+                if style.__name == "Foregrounds" then
+                    map.stylesFg = styleStruct.decode(style)
+
+                elseif style.__name == "Backgrounds" then
+                    map.stylesBg = styleStruct.decode(style)
+                end
+            end
+
+            tasks.yield()
         end
     end
+    
+    tasks.update(map)
 
     return map
 end
@@ -39,10 +60,10 @@ function mapStruct.encode(map)
 
     res.__children = {}
 
-    if map.fillers:len > 0 then
+    if map.fillers and #map.fillers > 0 then
         local children = {}
 
-        for i, filler <- map.fillers do
+        for i, filler in ipairs(map.fillers) do
             table.insert(children, fillerStruct.encode(filler))
         end
 
@@ -52,10 +73,10 @@ function mapStruct.encode(map)
         })
     end
 
-    if map.rooms:len > 0 then
+    if map.rooms and #map.rooms > 0 then
         local children = {}
 
-        for i, room <- map.rooms do
+        for i, room in ipairs(map.rooms) do
             table.insert(children, roomStruct.encode(room))
         end
 
@@ -63,7 +84,28 @@ function mapStruct.encode(map)
             __name = "levels",
             __children = children
         })
+
+        tasks.yield()
     end
+
+    local style = {
+        __name = "Style",
+        __children = {}
+    }
+
+    table.insert(style.__children, {
+        __name = "Foregrounds",
+        __children = styleStruct.encode(map.stylesFg)
+    })
+
+    table.insert(style.__children, {
+        __name = "Backgrounds",
+        __children = styleStruct.encode(map.stylesBg)
+    })
+
+    table.insert(res.__children, style)
+
+    tasks.update(res)
 
     return res
 end

@@ -24,12 +24,12 @@ sceneHandler.loadInternalScenes()
 sceneHandler.changeScene("Startup")
 
 function love.draw()
-    sceneHandler.sendEvent("draw")
+    sceneHandler.draw()
 end
 
 function love.update(dt)
-    tasks.processTasks(1 / 16)
+    tasks.processTasks(1 / 32)
 
-    sceneHandler.sendEvent("update", dt)
+    sceneHandler.update(dt)
     threadHandler.update(dt)
 end

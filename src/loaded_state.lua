@@ -4,31 +4,66 @@ local mapcoder = require("mapcoder")
 local celesteRender = require("celeste_render")
 local sceneHandler = require("scene_handler")
 
-local mapStruct = require("structs/map")
+local sideStruct = require("structs.side")
 
 local state = {}
 
 -- TODO - Check for changes and warn users when we aren't just a map viewer
-function state.loadMap(filename)
+-- TODO - Make and use a tasked version of sideStruct decode
+function state.loadFile(filename)
     sceneHandler.changeScene("Loading")
 
     tasks.newTask(
         (-> filename and mapcoder.decodeFile(filename)),
-        function(task)
-            if task.result then
-                celesteRender.invalidateRoomCache()
-                celesteRender.clearBatchingTasks()
+        function(binTask)
+            if binTask.result then
+                tasks.newTask(
+                    (-> sideStruct.decodeTaskable(binTask.result)),
+                    function(decodeTask)
+                        celesteRender.invalidateRoomCache()
+                        celesteRender.clearBatchingTasks()
+        
+                        state.filename = filename
+                        state.side = decodeTask.result
+                        state.map = state.side.map
+                        state.selectedRoom = state.map and state.map.rooms[1]
 
-                state.map = mapStruct.decode(task.result)
-                state.selectedRoom = state.map and state.map.rooms[1]
-
-                sceneHandler.changeScene("Editor")
+                        sceneHandler.changeScene("Editor")
+                    end
+                )
 
             else
-                -- TODO - Toast the user
+                -- TODO - Toast the user, failed to load
             end
         end
     )
+end
+
+-- TODO - Make and use a tasked version of sideStruct encode
+function state.saveFile(filename)
+    if filename and state.side then
+        tasks.newTask(
+            (-> sideStruct.encodeTaskable(state.side)),
+            function(encodeTask)
+                if encodeTask.result then
+                    tasks.newTask(
+                        (-> mapcoder.encodeFile(filename, encodeTask.result)),
+                        function(binTask)
+                            if binTask.result then
+                                state.filename = filename
+                
+                            else
+                                -- TODO - Toast the user, failed to save
+                            end
+                        end
+                    )
+
+                else
+                    -- TODO - Toast the user, failed to save
+                end
+            end
+        )
+    end
 end
 
 function state.selectRoom(room)

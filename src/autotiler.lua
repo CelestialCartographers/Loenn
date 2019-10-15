@@ -77,18 +77,18 @@ local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTil
     if checkPadding(tiles, x, y, airTile, emptyTile) then
         local padding = meta.padding[tile]
 
-        return padding:len > 0 and padding or defaultQuad, defaultSprite
+        return #padding > 0 and padding or defaultQuad, defaultSprite
 
     else
         local center = meta.center[tile]
 
-        return center:len > 0 and center or defaultQuad, defaultSprite
+        return #center > 0 and center or defaultQuad, defaultSprite
     end
 end
 
 local function getMaskQuads(masks, adjacent)
     if masks then
-        for i, maskData <- masks do
+        for i, maskData in ipairs(masks) do
             if checkMask(adjacent, maskData.mask) then
                 return true, maskData.quads, maskData.sprites
             end
@@ -107,7 +107,7 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
         local d, f = checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard)
         local g, h, i = checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard)
 
-        for j, maskData <- masks do
+        for j, maskData in ipairs(masks) do
             if checkMaskFromTiles(maskData.mask, a, b, c, d, nil, f, g, h, i) then
                 return true, maskData.quads, maskData.sprites
             end
@@ -133,25 +133,17 @@ function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, def
     end
 end
 
--- TODO - TBI, see if its actually worth it
-function autotiler.getAllQuads(tiles, meta)
-    local width, height = tiles:size
-    local res = table.filled(false, {width, height})
-
-    return res
-end
-
 local function convertTileString(s)
-    local res = $()
+    local res = {}
     local parts = $(s):split(";")
 
     for i, part <- parts do
         local numbers = $(part):split(",")
 
-        res += {
+        table.insert(res, {
             tonumber(numbers[1]),
             tonumber(numbers[2])
-        }
+        })
     end
 
     return res
@@ -173,7 +165,7 @@ function autotiler.loadTilesetXML(fn)
     -- TODO - sort tilesets that copy others to the end?
     -- Is this needed?
 
-    for i, tileset <- handler.root.Data.Tileset do
+    for i, tileset in ipairs(handler.root.Data.Tileset) do
         local id = tileset._attr.id
         local path = tileset._attr.path
         local copy = tileset._attr.copy
@@ -186,13 +178,16 @@ function autotiler.loadTilesetXML(fn)
             ignores[id] = table.flip($(ignore):split(";"))
         end
 
-        padding[id] = copy and $(table.shallowcopy(padding[copy]())) or $()
-        center[id] = copy and $(table.shallowcopy(center[copy]())) or $()
-        masks[id] = copy and $(table.shallowcopy(masks[copy]())) or $()
+        padding[id] = copy and table.shallowcopy(padding[copy]) or {}
+        center[id] = copy and table.shallowcopy(center[copy]) or {}
+        masks[id] = copy and table.shallowcopy(masks[copy]) or {}
 
-        local currentMasks = $()
+        local currentMasks = {}
 
-        for j, child <- tileset.set or {} do
+        -- Doesn't store single child tags in list, pack it into a table for easier use
+        local tilesetSets = tileset.set and (#tileset.set > 0 and tileset.set or {tileset.set}) or {}
+
+        for j, child in ipairs(tilesetSets) do
             local attrs = child._attr or child
 
             local mask = attrs.mask
@@ -206,15 +201,15 @@ function autotiler.loadTilesetXML(fn)
                 center[id] = convertTileString(tiles)
 
             else
-                currentMasks += {
+                table.insert(currentMasks, {
                     mask = convertMaskString(mask),
                     quads = convertTileString(tiles),
                     sprites = sprites
-                }
+                })
             end
         end
 
-        if currentMasks:len > 0 then
+        if #currentMasks > 0 then
             masks[id] = sortByScore(currentMasks)
         end
     end

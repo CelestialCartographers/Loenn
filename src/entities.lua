@@ -1,8 +1,9 @@
 local utils = require("utils")
+local tasks = require("task")
 
 local entities = {}
 
-local missingEntity = require("defaults/viewer/entity")
+local missingEntity = require("defaults.viewer.entity")
 
 local entityRegisteryMT = {
     __index = function() return missingEntity end
@@ -38,10 +39,10 @@ function entities.loadInternalEntities(registerAt, path)
         -- Always use Linux paths here
         entities.registerEntity(utils.joinpath(path, file):gsub("\\", "/"), registerAt)
 
-        coroutine.yield()
+        tasks.yield()
     end
 
-    coroutine.yield(registerAt)
+    tasks.update(registerAt)
 end
 
 entities.initDefaultRegistry()

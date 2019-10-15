@@ -1,13 +1,15 @@
-local entityStruct = require("structs/entity")
-local triggerStruct = require("structs/trigger")
-local tilesStruct = require("structs/tiles")
-local decalStruct = require("structs/decal")
+local entityStruct = require("structs.entity")
+local triggerStruct = require("structs.trigger")
+local tilesStruct = require("structs.tiles")
+local objectTilesStruct = require("structs.object_tiles")
+local decalStruct = require("structs.decal")
 
 local roomStruct = {}
 
-local structSingleNames = {
+local structTilesNames = {
     solids = {"tilesFg", tilesStruct},
-    bg = {"tilesBg", tilesStruct}
+    bg = {"tilesBg", tilesStruct},
+    objtiles = {"tilesObj", objectTilesStruct}
 }
 
 local structMutlipleNames = {
@@ -47,34 +49,37 @@ function roomStruct.decode(data)
     room.music = data.music or "music_oldsite_awake"
     room.musicAlternative = data.alt_music or ""
 
-    room.windPattern = data.windPattern and "None"
+    room.windPattern = data.windPattern or "None"
 
     room.color = data.c or 0
 
-    room.entities = $()
-    room.triggers = $()
+    room.entities = {}
+    room.triggers = {}
 
-    room.decalsFg = $()
-    room.decalsBg = $()
+    room.decalsFg = {}
+    room.decalsBg = {}
 
     room.tilesFg = nil
     room.tilesBg = nil
-    room.tilesObj = {} -- Haha, no.
+    room.tilesObj = nil
 
-    for key, value <- data.__children or {} do
+    local roomTilesWidth = math.ceil(room.width / 8)
+    local roomTilesHeight = math.ceil(room.height / 8)
+
+    for key, value in ipairs(data.__children or {}) do
         local name = value.__name
 
-        if structSingleNames[name] then
-            local target, struct = unpack(structSingleNames[name])
+        if structTilesNames[name] and value then
+            local target, struct = unpack(structTilesNames[name])
 
-            room[target] = struct.decode(value)
+            room[target] = struct.resize(struct.decode(value), roomTilesWidth, roomTilesHeight)
         end
 
         if structMutlipleNames[name] then
-            for i, d <- value.__children or {} do
+            for i, d in ipairs(value.__children or {}) do
                 local target, struct = unpack(structMutlipleNames[name])
 
-                room[target] += struct.decode(d)
+                table.insert(room[target], struct.decode(d))
             end
         end
     end
@@ -85,7 +90,7 @@ end
 function roomStruct.encode(room)
     local res = {}
 
-    res.__name = "room"
+    res.__name = "level"
     res.__children = {}
 
     res.name = room.name
@@ -114,22 +119,25 @@ function roomStruct.encode(room)
 
     res.c = room.color
 
-    for raw, meta <- structSingleNames do
+    for raw, meta in pairs(structTilesNames) do
         local key, struct = unpack(meta)
-        local encoded = struct.encode(room[key])
 
-        encoded.__name = raw
+        if room[key] then
+            local encoded = struct.encode(room[key])
 
-        table.insert(res.__children, encoded)
+            encoded.__name = raw
+
+            table.insert(res.__children, encoded)
+        end
     end
 
-    for raw, meta <- structMutlipleNames do
+    for raw, meta in pairs(structMutlipleNames) do
         local key, struct = unpack(meta)
 
-        if room[key]:len > 0 or #room[key] > 0 then
+        if #room[key] > 0 then
             local children = {}
 
-            for j, target <- room[key] do
+            for j, target in ipairs(room[key]) do
                 table.insert(children, struct.encode(target))
             end
 

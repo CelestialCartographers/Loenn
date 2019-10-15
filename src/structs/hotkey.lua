@@ -15,18 +15,32 @@ local specialActivators = {
 local hotkeyStruct = {}
 
 -- TODO - Validate that the key constant exists?
-function hotkeyStruct.sanitize(activator)
+-- Exact match means that ctrl + s will only be valid on ctrl + s, and not ctrl + alt + s and so on
+function hotkeyStruct.sanitize(activator, exactMatch)
+    exactMatch = exactMatch == nil or exactMatch
     local parts = string.split(activator, "+")
-    local activators = $()
+    local activators = {}
+
+    local usedModifiers = {}
 
     for i, part <- parts do
         part = part:match("^%s*(.-)%s*$"):lower
 
         if specialActivators[part] then
-            activators += specialActivators[part]
+            table.insert(activators, specialActivators[part])
+
+            usedModifiers[part] = true
 
         else
-            activators += part
+            table.insert(activators, part)
+        end
+    end
+
+    if exactMatch then
+        for name, func <- keyboardHelper.nameToModifierFunction do
+            if not usedModifiers[name] then
+                table.insert(activators, function() return not specialActivators[name]() end)
+            end
         end
     end
 
@@ -74,7 +88,7 @@ hotkeyMt.__index = {}
 hotkeyMt.__index.active = hotkeyStruct.hotkeyActive
 hotkeyMt.__index.callbackIfActive = hotkeyStruct.callbackIfActive
 
-function hotkeyMt.__call(self)
+function hotkeyMt:__call()
     self:callback()
 end
 

@@ -1,5 +1,5 @@
 local viewportHandler = require("viewport_handler")
-local drawableSpriteStruct = require("structs/drawable_sprite")
+local drawableSpriteStruct = require("structs.drawable_sprite")
 
 local templeEye = {}
 

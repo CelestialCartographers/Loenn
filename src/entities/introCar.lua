@@ -1,4 +1,4 @@
-local drawableSpriteStruct = require("structs/drawable_sprite")
+local drawableSpriteStruct = require("structs.drawable_sprite")
 local colors = require("xna_colors")
 
 local introCar = {}
@@ -9,7 +9,7 @@ local pavementTexture = "scenery/car/pavement"
 local wheelsTexture = "scenery/car/wheels"
 
 function introCar.sprite(room, entity)
-    local sprites = $()
+    local sprites = {}
     local hasRoadAndBarriers = entity.hasRoadAndBarriers
 
     local bodySprite = drawableSpriteStruct.spriteFromTexture(bodyTexture, entity)
@@ -20,8 +20,8 @@ function introCar.sprite(room, entity)
     wheelSprite:setJustification(0.5, 1.0)
     wheelSprite.depth = 3
 
-    sprites += bodySprite
-    sprites += wheelSprite
+    table.insert(sprites, bodySprite)
+    table.insert(sprites, wheelSprite)
 
     if hasRoadAndBarriers then
         local barrier1Sprite = drawableSpriteStruct.spriteFromTexture(barrierTexture, entity)
@@ -35,8 +35,8 @@ function introCar.sprite(room, entity)
         barrier2Sprite.depth = 5
         barrier2Sprite.color = colors.DarkGray
 
-        sprites += barrier1Sprite
-        sprites += barrier2Sprite
+        table.insert(sprites, barrier1Sprite)
+        table.insert(sprites, barrier2Sprite)
 
         -- TODO - Add pavement
     end

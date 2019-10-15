@@ -17,4 +17,11 @@ function keyboard.modifierGUI()
     return love.keyboard.isDown("lgui") or love.keyboard.isDown("rgui")
 end
 
+keyboard.nameToModifierFunction = {
+    ctrl = keyboard.modifierControl,
+    shift = keyboard.modifierShift,
+    alt = keyboard.modifierAlt,
+    gui = keyboard.modifierGUI,
+}
+
 return keyboard

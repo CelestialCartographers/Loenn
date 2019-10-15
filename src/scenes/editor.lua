@@ -4,6 +4,8 @@ local editorScene = {}
 
 editorScene.name = "Editor"
 
+editorScene._displayWipe = true
+
 function editorScene:firstEnter()
     local giraffe = require("giraffe")
     local testWindow = require("windows/test_window")
@@ -51,8 +53,8 @@ function editorScene:firstEnter()
 
     local viewportHandler = require("viewport_handler")
     local hotkeyHandler = require("hotkey_handler")
-    local mapLoaderDevice = require("input_devices/map_loader")
-    local toolHandlerDevice = require("input_devices/tool_device")
+    local mapLoaderDevice = require("input_devices.map_loader")
+    local toolHandlerDevice = require("input_devices.tool_device")
 
     inputDevice.newInputDevice(self.inputDevices, group)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)

@@ -1,4 +1,4 @@
-local nodeStruct = require("structs/node")
+local nodeStruct = require("structs.node")
 
 local triggerStruct = {}
 
@@ -26,7 +26,7 @@ function triggerStruct.decode(data)
     trigger._name = data.__name
     trigger._id = data.id
 
-    for k, v <- data do
+    for k, v in pairs(data) do
         if not ignoredAttrs[k] then
             trigger[k] = v
         end
@@ -45,7 +45,7 @@ function triggerStruct.encode(trigger)
     res.__name = trigger._name
     res.id = trigger._id
 
-    for k, v <- trigger do
+    for k, v in pairs(trigger) do
         if not ignoredAttrs[k] then
             res[k] = v
         end
@@ -54,7 +54,7 @@ function triggerStruct.encode(trigger)
     if trigger.nodes then
         res.__children = {}
 
-        for i, node <- trigger.nodes do
+        for i, node in ipairs(trigger.nodes) do
             table.insert(res.__children, nodeStruct.encode(node))
         end
     end

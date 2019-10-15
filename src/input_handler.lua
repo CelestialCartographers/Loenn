@@ -88,12 +88,4 @@ function love.directorydropped(path)
     sceneHandler.sendEvent("directorydropped", path)
 end
 
-function inputHandler.update(dt)
-    sceneHandler.sendEvent("update", dt)
-end
-
-function inputHandler.draw()
-    sceneHandler.sendEvent("draw")
-end
-
 return inputHandler

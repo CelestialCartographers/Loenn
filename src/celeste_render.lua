@@ -7,9 +7,9 @@ local tasks = require("task")
 local utils = require("utils")
 local atlases = require("atlases")
 local entityHandler = require("entities")
-local smartDrawingBatch = require("structs/smart_drawing_batch")
-local drawableSprite = require("structs/drawable_sprite")
-local drawableFunction = require("structs/drawable_function")
+local smartDrawingBatch = require("structs.smart_drawing_batch")
+local drawableSprite = require("structs.drawable_sprite")
+local drawableFunction = require("structs.drawable_function")
 local viewportHandler = require("viewport_handler")
 local matrix = require("matrix")
 
@@ -21,9 +21,9 @@ local tilesetFileBg = utils.joinpath(fileLocations.getCelesteDir(), "Content", "
 celesteRender.tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
 celesteRender.tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
 
-local triggerFontSize = 1
+celesteRender.tilesSpriteMetaCache = {}
 
-local tilesSpriteMetaCache = {}
+local triggerFontSize = 1
 
 local tilesFgDepth = -10000
 local tilesBgDepth = 10000
@@ -37,8 +37,8 @@ local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = false
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = true
 
--- Room cache
 local roomCache = {}
+local roomRandomMatrixCache = {}
 
 local batchingTasks = {}
 
@@ -99,6 +99,45 @@ function celesteRender.invalidateRoomCache(roomName, key)
     end
 end
 
+function celesteRender.getRoomRandomMatrix(room, key)
+    local roomName = room.name
+    local tileWidth, tileHeight = room[key].matrix:size()
+    local regen = false
+
+    if roomRandomMatrixCache[roomName] and roomRandomMatrixCache[roomName][key] then
+        local m = roomRandomMatrixCache[roomName][key]
+        local randWidth, randHeight = m:size()
+
+        regen = tileWidth ~= randWidth or tileHeight ~= randHeight
+
+    else
+        regen = true
+    end
+
+    if regen then
+        utils.setRandomSeed(roomName)
+
+        local m = matrix.fromFunction(math.random, tileWidth, tileHeight)
+
+        roomRandomMatrixCache[roomName] = roomRandomMatrixCache[roomName] or {}
+        roomRandomMatrixCache[roomName][key] = m
+    end
+
+    return roomRandomMatrixCache[roomName][key]
+end
+
+function celesteRender.getRoomCache(roomName, key)
+    if utils.typeof(roomName) == "room" then
+        roomName = roomName.name
+    end
+
+    if roomCache[roomName] and roomCache[roomName][key] then
+        return roomCache[roomName][key]
+    end
+
+    return false
+end
+
 function celesteRender.getRoomBackgroundColor(room, selected)
     local roomColor = room.color or 0
     local color = colors.roomBackgroundDefault
@@ -127,8 +166,8 @@ end
 function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     if not cache[tile] then
         cache[tile] = {
-            [false] = matrix.filled(false, 6, 15),
-            [true] = matrix.filled(false, 6, 15)
+            [false] = matrix.filled(nil, 6, 15),
+            [true] = matrix.filled(nil, 6, 15)
         }
     end
 
@@ -137,7 +176,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
 
     if not quadCache:get0(quadX, quadY) then
         local spriteMeta = atlases.gameplay[texture]
-        local spritesWidth, spritesHeight = spriteMeta.image:getDimensions
+        local spritesWidth, spritesHeight = spriteMeta.image:getDimensions()
         local res = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
         quadCache:set0(quadX, quadY, res)
@@ -148,12 +187,13 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     return quadCache:get0(quadX, quadY)
 end
 
-function celesteRender.getTilesBatch(room, tiles, meta, fg)
-    tiles = tiles.matrix
+-- randomMatrix is for custom randomness, mostly to give the correct "slice" of the matrix when making fake tiles
+function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
+    local tilesMatrix = tiles.matrix
 
     -- Getting upvalues
     local gameplayAtlas = atlases.gameplay
-    local cache = tilesSpriteMetaCache
+    local cache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = meta
 
@@ -161,25 +201,25 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
     local emptyTile = " "
     local wildcard = "*"
 
-    local defaultQuad = ${{0, 0}}
+    local defaultQuad = {{0, 0}}
     local defaultSprite = ""
 
     local drawableSpriteType = "drawableSprite"
 
-    local width, height = tiles:size
-    local batch = smartDrawingBatch.createUnorderedBatch()
+    local width, height = tilesMatrix:size()
+    local batch = smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8)
 
-    utils.setRandomSeed(room.name)
+    local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, fg and "tilesFg" or "tilesBg")
 
     for x = 1, width do
         for y = 1, height do
-            local rng = math.random(1, 256)
-            local tile = tiles:getInbounds(x, y)
+            local rng = random:getInbounds(x, y)
+            local tile = tilesMatrix:getInbounds(x, y)
 
             if tile ~= airTile then
                 -- TODO - Render overlay sprites
-                local quads, sprites = autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
-                local quadCount = quads:len
+                local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+                local quadCount = #quads
 
                 if quadCount > 0 then
                     local randQuad = quads[utils.mod1(rng, quadCount)]
@@ -188,15 +228,19 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg)
                     local spriteMeta = atlases.gameplay[texture]
                     local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
 
-                    batch:add(spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+                    batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
                 end
             end
         end
 
-        coroutine.yield()
+        tasks.yield()
     end
 
-    coroutine.yield(batch)
+    if batch.process then
+        batch:process()
+    end
+
+    tasks.update(batch)
 
     return batch
 end
@@ -243,7 +287,7 @@ end
 local function getDecalsBatch(decals)
     local batch = smartDrawingBatch.createOrderedBatch()
 
-    for i, decal <- decals do
+    for i, decal in ipairs(decals) do
         local texture = decal.texture
         local meta = atlases.gameplay[texture]
 
@@ -267,11 +311,11 @@ local function getDecalsBatch(decals)
         end
 
         if i % 25 == 0 then
-            coroutine.yield()
+            tasks.yield()
         end
     end
 
-    coroutine.yield(batch)
+    tasks.update(batch)
 
     return batch
 end
@@ -323,7 +367,7 @@ end
 local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)
     local batches = {}
 
-    for i, entity <- entities do
+    for i, entity in ipairs(entities) do
         local name = entity._name
         local handler = registeredEntities[name]
 
@@ -334,14 +378,12 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
                 local sprites = handler.sprite(room, entity, viewport)
 
                 if sprites then
-                    local spriteCount = sprites.len and sprites:len or #sprites
-
-                    if spriteCount == 0 and utils.typeof(sprites) == "drawableSprite" then
+                    if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
                         local batch = getOrCreateSmartBatch(batches, sprites.depth or defaultDepth)
                         batch:addFromDrawable(sprites)
 
                     else
-                        for j, sprite <- sprites do
+                        for j, sprite in ipairs(sprites) do
                             if utils.typeof(sprite) == "drawableSprite" then
                                 local batch = getOrCreateSmartBatch(batches, sprite.depth or defaultDepth)
                                 batch:addFromDrawable(sprite)
@@ -356,13 +398,13 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
                 batch:addFromDrawable(drawableFunction.fromFunction(handler.draw, room, entity, viewport))
             end
 
-            if i % 10 == 0 then
-                coroutine.yield()
+            if i % 25 == 0 then
+                tasks.yield()
             end
         end
     end
 
-    coroutine.yield(batches)
+    tasks.update(batches)
 
     return batches
 end
@@ -386,11 +428,13 @@ function celesteRender.getEntityBatch(room, entities, viewport, registeredEntiti
     return roomCache[room.name].entities.result
 end
 
+-- TODO - Make this saner in terms of setColor calls?
+-- This could just be one rendering function
 local function getTriggerBatchTaskFunc(room, triggers, viewport)
     local font = love.graphics.getFont()
     local batch = smartDrawingBatch.createOrderedBatch()
 
-    for i, trigger <- triggers do
+    for i, trigger in ipairs(triggers) do
         local func = function()
             local name = trigger._name or ""
             local displayName = utils.humanizeVariableName(name)
@@ -401,26 +445,26 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
             local width = trigger.width or 16
             local height = trigger.height or 16
 
-            love.graphics.setColor(colors.triggerColor)
+            drawing.callKeepOriginalColor(function() 
+                love.graphics.setColor(colors.triggerColor)
 
-            love.graphics.rectangle("line", x, y, width, height)
-            love.graphics.rectangle("fill", x, y, width, height)
-
-            love.graphics.setColor(colors.triggerTextColor)
-
-            drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
-
-            love.graphics.setColor(colors.default)
+                love.graphics.rectangle("line", x, y, width, height)
+                love.graphics.rectangle("fill", x, y, width, height)
+    
+                love.graphics.setColor(colors.triggerTextColor)
+    
+                drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
+            end)
         end
 
         batch:addFromDrawable(drawableFunction.fromFunction(func))
 
         if i % 25 == 0 then
-            coroutine.yield()
+            tasks.yield()
         end
     end
 
-    coroutine.yield(batch)
+    tasks.update(batch)
 
     return batch
 end
@@ -459,7 +503,7 @@ local depthBatchingFunctions = {
 
 -- Force all non finished room batch tasks to finish
 function celesteRender.forceRoomBatchRender(room, viewport)
-    for i, data <- depthBatchingFunctions do
+    for i, data in ipairs(depthBatchingFunctions) do
         local description, key, func, depth = unpack(data)
         local result = func(room, room[key], viewport)
         local task = roomCache[room.name][key]
@@ -477,7 +521,7 @@ function celesteRender.getRoomBatches(room, viewport)
         local depthBatches = {}
         local done = true
 
-        for i, data <- depthBatchingFunctions do
+        for i, data in ipairs(depthBatchingFunctions) do
             local description, key, func, depth = unpack(data)
             local batches = func(room, room[key], viewport)
 
@@ -486,7 +530,7 @@ function celesteRender.getRoomBatches(room, viewport)
                     depthBatches[depth] = batches
 
                 else
-                    for d, batch <- batches do
+                    for d, batch in pairs(batches) do
                         depthBatches[d] = batch
                     end
                 end
@@ -504,7 +548,7 @@ function celesteRender.getRoomBatches(room, viewport)
 
         local orderedBatches = $()
 
-        for depth, batches <- depthBatches do
+        for depth, batches in pairs(depthBatches) do
             orderedBatches += {depth, batches}
         end
 
@@ -528,26 +572,32 @@ local function drawRoomFromBatches(room, viewport, selected)
     end
 end
 
+-- Return the canvas if it is ready, otherwise make a task for it
 local function getRoomCanvas(room, viewport, selected)
+    local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+
     roomCache[room.name] = roomCache[room.name] or {}
 
-    if not roomCache[room.name].canvas then
-        local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+    if orderedBatches and not roomCache[room.name].canvas then
+        roomCache[room.name].canvas = tasks.newTask(
+            function(task)
+                local canvas = love.graphics.newCanvas(room.width or 0, room.height or 0)
 
-        if orderedBatches then
-            local canvas = love.graphics.newCanvas(room.width or 0, room.height or 0)
-
-            canvas:renderTo(function()
-                for depth, batch <- orderedBatches do
-                    batch:draw()
-                end
-            end)
-
-            roomCache[room.name].canvas = canvas
-        end
+                canvas:renderTo(function()
+                    for depth, batch <- orderedBatches do
+                        batch:draw()
+                    end
+                end)
+    
+                tasks.update(canvas)
+            end,
+            nil,
+            batchingTasks,
+            {room = room}
+        )
     end
 
-    return roomCache[room.name].canvas
+    return roomCache[room.name].canvas and roomCache[room.name].canvas.result
 end
 
 function celesteRender.drawRoom(room, viewport, selected)
@@ -564,13 +614,13 @@ function celesteRender.drawRoom(room, viewport, selected)
     local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
     viewportHandler.drawRelativeTo(roomX, roomY, function()
-        love.graphics.setColor(backgroundColor)
-        love.graphics.rectangle("fill", 0, 0, width, height)
-
-        love.graphics.setColor(borderColor)
-        love.graphics.rectangle("line", 0, 0, width, height)
-
-        love.graphics.setColor(colors.default)
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(backgroundColor)
+            love.graphics.rectangle("fill", 0, 0, width, height)
+    
+            love.graphics.setColor(borderColor)
+            love.graphics.rectangle("line", 0, 0, width, height)
+        end)
 
         if redrawRoom then
             -- Invalidate the canvas, so it is updated properly when the selected room changes
@@ -595,10 +645,10 @@ function celesteRender.drawFiller(filler, viewport)
     local height = filler.height * 8
 
     viewportHandler.drawRelativeTo(x, y, function()
-        love.graphics.setColor(colors.fillerColor)
-        love.graphics.rectangle("fill", 0, 0, width, height)
-
-        love.graphics.setColor(colors.default)
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(colors.fillerColor)
+            love.graphics.rectangle("fill", 0, 0, width, height)
+        end)
     end)
 end
 
@@ -608,13 +658,13 @@ function celesteRender.drawMap(state)
         local viewport = state.viewport
 
         if viewport.visible then
-            for i, filler <- map.fillers do
+            for i, filler in ipairs(map.fillers) do
                 if viewportHandler.fillerVisible(filler, viewport) then
                     celesteRender.drawFiller(filler, viewport)
                 end
             end
 
-            for i, room <- map.rooms do
+            for i, room in ipairs(map.rooms) do
                 if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or viewportHandler.roomVisible(room, viewport) then
                     celesteRender.drawRoom(room, viewport, room == state.selectedRoom)
                 end

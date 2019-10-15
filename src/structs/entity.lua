@@ -1,4 +1,4 @@
-local nodeStruct = require("structs/node")
+local nodeStruct = require("structs.node")
 
 local entityStruct = {}
 
@@ -26,7 +26,7 @@ function entityStruct.decode(data)
     entity._name = data.__name
     entity._id = data.id
 
-    for k, v <- data do
+    for k, v in pairs(data) do
         if not ignoredAttrs[k] then
             entity[k] = v
         end
@@ -45,7 +45,7 @@ function entityStruct.encode(entity)
     res.__name = entity._name
     res.id = entity._id
 
-    for k, v <- entity do
+    for k, v in pairs(entity) do
         if not ignoredAttrs[k] then
             res[k] = v
         end
@@ -54,7 +54,7 @@ function entityStruct.encode(entity)
     if entity.nodes then
         res.__children = {}
 
-        for i, node <- entity.nodes do
+        for i, node in ipairs(entity.nodes) do
             table.insert(res.__children, nodeStruct.encode(node))
         end
     end

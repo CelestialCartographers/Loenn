@@ -15,6 +15,14 @@ function utils.stripByteOrderMark(s)
     return s
 end
 
+function utils.rectangle(x, y, width, height)
+    return {x = x, y = y, width = width, height = height}
+end
+
+function utils.point(x, y)
+    return {x = x, y = y, width = 1, height = 1}
+end
+
 function utils.aabbCheck(r1, r2)
     return not (r2.x >= r1.x + r1.width or r2.x + r2.width <= r1.x or r2.y >= r1.y + r1.height or r2.y + r2.height <= r1.y)
 end
@@ -89,9 +97,9 @@ function utils.group(t, by)
 
     for k, v <- t do
         local key = by(k, v)
-        res[key] = res[key] or $()
+        res[key] = res[key] or {}
 
-        res[key] += v
+        table.insert(res[key], v)
     end
 
     return res
@@ -168,7 +176,7 @@ end
 
 -- Add filesystem specific helper methods
 local osFilename = love.system.getOS():lower():gsub(" ", "_")
-local osHelper = require("os_helpers/" .. osFilename)
+local osHelper = require("os_helpers." .. osFilename)
 
 function utils.getProcessId()
     return osHelper.getProcessId and osHelper.getProcessId()
