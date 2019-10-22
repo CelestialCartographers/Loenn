@@ -56,7 +56,7 @@ function editorScene:firstEnter()
     local mapLoaderDevice = require("input_devices.map_loader")
     local toolHandlerDevice = require("input_devices.tool_device")
 
-    inputDevice.newInputDevice(self.inputDevices, group)
+    inputDevice.newInputDevice(self.inputDevices, giraffe.adapter(group))
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
     inputDevice.newInputDevice(self.inputDevices, hotkeyHandler.createHotkeyDevice(standardHotkeys))
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)
