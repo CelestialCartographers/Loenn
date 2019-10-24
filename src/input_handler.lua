@@ -46,21 +46,20 @@ function love.mousemoved(x, y, dx, dy, istouch)
     sceneHandler.sendEvent("mousemoved", x, y, dx, dy, istouch)
 end
 
--- Don't send the event here, make sure it is not a drag first
 function love.mousepressed(x, y, button, istouch, presses)
     mouseButtonsPressed[button] = {x, y, x, y}
 
-    sceneHandler.sendEvent("mousepressedraw", x, y, button, istouch, presses)
+    sceneHandler.sendEvent("mousepressed", x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     local startX, startY, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
 
     if consideredDrag then
-        sceneHandler.sendEvent("mousedrag", startX, startY, button, dx, dy)
+        sceneHandler.sendEvent("mousedraged", startX, startY, button, dx, dy)
 
     else
-        sceneHandler.sendEvent("mousepressed", startX, startY, button, istouch, presses)
+        sceneHandler.sendEvent("mouseclicked", startX, startY, button, istouch, presses)
     end
 
     sceneHandler.sendEvent("mousereleased", x, y, button, istouch, presses)

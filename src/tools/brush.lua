@@ -61,7 +61,7 @@ local function handleCloneClick(x, y)
     end
 end
 
-function tool.mousepressed(x, y, button, istouch, pressed)
+function tool.mouseclicked(x, y, button, istouch, pressed)
     if button == actionButton then
         handleActionClick(x, y)
 
