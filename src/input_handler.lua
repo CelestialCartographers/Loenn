@@ -34,6 +34,10 @@ function love.keyreleased(key, scancode)
     sceneHandler.sendEvent("keyreleased", key, scancode)
 end
 
+function love.textinput(text)
+    sceneHandler.sendEvent("textinput", text)
+end
+
 function love.mousemoved(x, y, dx, dy, istouch)
     for button, data <- mouseButtonsPressed do
         sceneHandler.sendEvent("mousedragmoved", inputHandler.getMouseDragDelta(x, y, button, istouch))
@@ -42,9 +46,10 @@ function love.mousemoved(x, y, dx, dy, istouch)
     sceneHandler.sendEvent("mousemoved", x, y, dx, dy, istouch)
 end
 
--- Don't send the event here, make sure it is not a drag first
 function love.mousepressed(x, y, button, istouch, presses)
     mouseButtonsPressed[button] = {x, y, x, y}
+
+    sceneHandler.sendEvent("mousepressed", x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
@@ -53,10 +58,10 @@ function love.mousereleased(x, y, button, istouch, presses)
     local startX, startY, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
 
     if consideredDrag then
-        sceneHandler.sendEvent("mousedrag", startX, startY, button, dx, dy)
+        sceneHandler.sendEvent("mousedraged", startX, startY, button, dx, dy)
 
     else
-        sceneHandler.sendEvent("mousepressed", startX, startY, button, istouch, presses)
+        sceneHandler.sendEvent("mouseclicked", startX, startY, button, istouch, presses)
     end
 
     mouseButtonsPressed[button] = nil
