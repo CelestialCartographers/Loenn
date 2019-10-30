@@ -19,7 +19,7 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
     if materialType == "matrix" then
         local res = false
         local materialWidth, materialHeight = material:size()
- 
+
         for i = 1, materialWidth do
             for j = i, materialHeight do
                 local tx, ty = x + i - 1, y + j - 1
@@ -38,7 +38,7 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
     else
         local target = tilesMatrix:get(x, y, "0")
 
-        if target ~= material and mat ~= " " then
+        if target ~= material and material ~= " " then
             tilesMatrix:set(x, y, material)
 
             return tilesMatrix:inbounds(x, y)
