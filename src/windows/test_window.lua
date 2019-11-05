@@ -1,8 +1,10 @@
 local theme = require("giraffe.theme")
-local windowStruct = require("giraffe.window")
 local giraffe = require("giraffe")
+local widgetHandler = require("giraffe.widget_handler")
 
 local window = {}
+
+local column = {}
 
 window.title = "Window Test!"
 
@@ -23,18 +25,16 @@ window.theme = {
     }
 }
 
-window.widgets = {
+column.widgets = {
     giraffe.button({
-        x = 10,
-        y = 10,
-
         width = 100,
         height = 100,
 
         content = "Foobar", --love.graphics.newImage("assetsTesting/hardened_clay_stained_purple.png"),
 
         pressed = function(self, x, y)
-            print(":O", x, y)
+            local parent = widgetHandler.getParentWidget(widgetHandler.getParentWidget(widgetHandler.getParentWidget(self)))
+            print(":O", x, y, rawget(parent or {}, "title"))
         end,
 
         update = function(self)
@@ -47,9 +47,6 @@ window.widgets = {
         end
     }),
     giraffe.button({
-        x = 10,
-        y = 120,
-
         width = 100,
         height = 100,
 
@@ -64,17 +61,24 @@ window.widgets = {
         end
     }),
     giraffe.textfield({
-        x = 110,
-        y = 10,
-
         width = 100,
         height = 100,
 
         content = {""},
         multiLine = true
-    })
+    }),
+    giraffe.label({
+        text = "Test Label :)"
+    }),
+    giraffe.label({
+        text = "{#FF7777}Colored {#77FF77}Text {#7777FF}:o",
+        plaintext = false
+    }),
+    giraffe.image({
+        image = "assets/logo-256.png"
+    }),
 }
 
-window.image = love.graphics.newImage("assets/logo-256.png")
+window.widgets = {giraffe.column(column)}
 
 return window
