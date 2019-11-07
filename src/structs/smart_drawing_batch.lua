@@ -43,7 +43,6 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
         end
     end
 
-
     if typ == "drawableFunction" then
         table.insert(self._drawables, drawable)
     end
@@ -309,6 +308,10 @@ end
 
 function gridCanvasBatchMt.__index:updateDirtyRegions()
     if #self._dirtyDrawCells > 0 or #self._dirtyScissorCells > 0 then
+        local previousCanvas = love.graphics.getCanvas()
+
+        love.graphics.push()
+        love.graphics.origin()
         love.graphics.setCanvas(self._canvas)
 
         for i, cell in ipairs(self._dirtyDrawCells) do
@@ -331,18 +334,21 @@ function gridCanvasBatchMt.__index:updateDirtyRegions()
         end
 
         love.graphics.setScissor()
-        love.graphics.setCanvas()
+        love.graphics.setCanvas(previousCanvas)
+        love.graphics.pop()
 
         self._dirtyScissorCells = {}
         self._dirtyDrawCells = {}
+
+        return true
     end
+
+    return false
 end
 
-gridCanvasBatchMt.__index.process = gridCanvasBatchMt.__index.updateDirtyRegions
-
--- While it is tempting to run process in draw, we are not allowed to use setCanvas during love.draw
--- Running process in draw will just cause it to do the draw calls intended for the canvas in the main window instead
 function gridCanvasBatchMt.__index:draw()
+    self:updateDirtyRegions()
+
     love.graphics.draw(self._canvas, 0, 0)
 end
 

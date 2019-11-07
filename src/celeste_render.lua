@@ -236,10 +236,6 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
         tasks.yield()
     end
 
-    if batch.process then
-        batch:process()
-    end
-
     tasks.update(batch)
 
     return batch
@@ -266,22 +262,6 @@ end
 
 function celesteRender.getTilesBgBatch(room, tiles, viewport)
     return getRoomTileBatch(room, tiles, false)
-end
-
-function celesteRender.drawTilesFg(room, tiles)
-    local batch = celesteRender.getTilesFgBatch(room, tiles)
-
-    if batch then
-        love.graphics.draw(batch, 0, 0)
-    end
-end
-
-function celesteRender.drawTilesBg(room, tiles)
-    local batch = celesteRender.getTilesBgBatch()
-
-    if batch then
-        love.graphics.draw(batch, 0, 0)
-    end
 end
 
 local function getDecalsBatch(decals)
@@ -450,9 +430,9 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
 
                 love.graphics.rectangle("line", x, y, width, height)
                 love.graphics.rectangle("fill", x, y, width, height)
-    
+
                 love.graphics.setColor(colors.triggerTextColor)
-    
+
                 drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
             end)
         end
@@ -543,7 +523,7 @@ function celesteRender.getRoomBatches(room, viewport)
         -- Not done, but all the tasks have been started
         -- Attempt to render other rooms while we wait
         if not done then
-            return
+            return false
         end
 
         local orderedBatches = $()
@@ -588,7 +568,7 @@ local function getRoomCanvas(room, viewport, selected)
                         batch:draw()
                     end
                 end)
-    
+
                 tasks.update(canvas)
             end,
             nil,
@@ -617,7 +597,7 @@ function celesteRender.drawRoom(room, viewport, selected)
         drawing.callKeepOriginalColor(function()
             love.graphics.setColor(backgroundColor)
             love.graphics.rectangle("fill", 0, 0, width, height)
-    
+
             love.graphics.setColor(borderColor)
             love.graphics.rectangle("line", 0, 0, width, height)
         end)

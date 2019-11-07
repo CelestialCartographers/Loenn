@@ -174,10 +174,6 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         updateIndex += 2
     end
 
-    if batch.process then
-        batch:process()
-    end
-
     return batch
 end
 
