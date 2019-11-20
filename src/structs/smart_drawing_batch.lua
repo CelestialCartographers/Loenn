@@ -243,8 +243,10 @@ end
 local function clearCanvasArea(batch, x, y)
     local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
 
+    local previousScissorX, previousScissorY, previousScissorW, previousScissorH = love.graphics.getScissor()
     love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
     love.graphics.clear(0.0, 0.0, 0.0, 0.0)
+    love.graphics.setScissor(previousScissorX, previousScissorY, previousScissorW, previousScissorH)
 end
 
 -- Assumes Canvas is set for performance reasons
@@ -263,8 +265,10 @@ local function redrawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, ro
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
+    local previousScissorX, previousScissorY, previousScissorW, previousScissorH = love.graphics.getScissor()
     love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
     love.graphics.clear(0.0, 0.0, 0.0, 0.0)
+    love.graphics.setScissor(previousScissorX, previousScissorY, previousScissorW, previousScissorH)
 
     love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
 end
@@ -309,6 +313,7 @@ end
 function gridCanvasBatchMt.__index:updateDirtyRegions()
     if #self._dirtyDrawCells > 0 or #self._dirtyScissorCells > 0 then
         local previousCanvas = love.graphics.getCanvas()
+        local previousScissorX, previousScissorY, previousScissorW, previousScissorH = love.graphics.getScissor()
 
         love.graphics.push()
         love.graphics.origin()
@@ -333,7 +338,7 @@ function gridCanvasBatchMt.__index:updateDirtyRegions()
             end
         end
 
-        love.graphics.setScissor()
+        love.graphics.setScissor(previousScissorX, previousScissorY, previousScissorW, previousScissorH)
         love.graphics.setCanvas(previousCanvas)
         love.graphics.pop()
 

@@ -7,5 +7,5 @@ function love.conf(t)
 
 	t.window.icon = "assets/logo-256.png"
 
-	t.window.vsync = true
+	t.window.vsync = false
 end
