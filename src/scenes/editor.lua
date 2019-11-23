@@ -30,14 +30,50 @@ function editorScene:firstEnter()
     uie.__label.__default.style.font = love.graphics.newFont(16)
 
     local root = uie.group({
-        uie.row():with({
-            style = {
-                focusedBG = { 0.4, 0.4, 0.4, 0.25 },
-                unfocusedBG = { 0.2, 0.2, 0.2, 0.3 }
-            },
-            onDrag = uiu.nop,
-            root = true
-        }):with(uiu.fillWidth),
+        uie.topbar({
+            { "File", {
+                { "New" },
+                { },
+                { "Open" },
+                { "Recent", {
+                    { "Totally" },
+                    { "Not A Dummy" },
+                    { "Nested Submenu" }
+                } },
+                { },
+                { "Save" },
+                { "Save As..." },
+                { },
+                { "Settings" },
+                { },
+                { "Quit", (-> love.event.quit()) }
+            }},
+
+            { "Edit", {
+                { "Undo" },
+                { "Redo" }
+            }},
+
+            { "Map", {
+                { "Stylegrounds" },
+                { "Metadata" },
+                { "Save Map Image" }
+            }},
+
+            { "Room", {
+                { "Add" },
+                { "Configure" }
+            }},
+
+            { "Help", {
+                { "Update" },
+                { "About" }
+            }},
+
+            { "Debug", {
+                { "Uhh" }
+            }},
+        }),
 
         uie.window("Windowception",
             uie.scrollbox(
