@@ -162,14 +162,12 @@ function editorScene:firstEnter()
                     -- Multi-line labels aren't subjected to the parent element's spacing property.
                     uie.label("This is a two-line label.\nThe following label is updated dynamically."),
 
+                    -- Dynamically updated label.
                     uie.label():with({
                         update = function(el)
                             el.text = "FPS: " .. love.timer.getFPS()
                         end
                     }),
-
-                    -- Dynamically updated label.
-                    uie.label():as("info"),
 
                     uie.button("This is a button.", function(btn)
                         if btn.counter == nil then
