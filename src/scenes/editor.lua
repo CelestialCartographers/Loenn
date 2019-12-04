@@ -87,7 +87,7 @@ function editorScene:firstEnter()
                     end)
                 )
             ):with({
-                calcWidth = (el -> el._inner.width)
+                calcWidth = (el -> el.inner.width)
             }):with(uiu.fillHeight),
 
             uie.column({
@@ -127,7 +127,7 @@ function editorScene:firstEnter()
                     })
                 ):with(uiu.fillHeight(true))
                 :with(uiu.hook{
-                    calcWidth = (orig, el -> el._inner.width),
+                    calcWidth = (orig, el -> el.inner.width),
                     layoutLateLazy = function(orig, el)
                         local parentWidth = el.parent.innerWidth
                         if el.width < parentWidth then
