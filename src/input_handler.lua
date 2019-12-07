@@ -58,7 +58,7 @@ function love.mousereleased(x, y, button, istouch, presses)
     local startX, startY, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
 
     if consideredDrag then
-        sceneHandler.sendEvent("mousedraged", startX, startY, button, dx, dy)
+        sceneHandler.sendEvent("mousedragged", startX, startY, button, dx, dy)
 
     else
         sceneHandler.sendEvent("mouseclicked", startX, startY, button, istouch, presses)
