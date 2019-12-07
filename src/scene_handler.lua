@@ -36,7 +36,7 @@ function sceneHandler.sendEvent(event, ...)
     local args = {...}
     local scene = sceneHandler.getCurrentScene()
 
-    if not scene then
+    if not scene or not scene[event] then
         return false
     end
 

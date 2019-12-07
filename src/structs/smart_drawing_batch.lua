@@ -313,7 +313,8 @@ end
 function gridCanvasBatchMt.__index:updateDirtyRegions()
     if #self._dirtyDrawCells > 0 or #self._dirtyScissorCells > 0 then
         local previousCanvas = love.graphics.getCanvas()
-        local previousScissorX, previousScissorY, previousScissorW, previousScissorH = love.graphics.getScissor()
+
+        local sx, sy, sw, sh = love.graphics.getScissor()
 
         love.graphics.push()
         love.graphics.origin()
@@ -338,7 +339,7 @@ function gridCanvasBatchMt.__index:updateDirtyRegions()
             end
         end
 
-        love.graphics.setScissor(previousScissorX, previousScissorY, previousScissorW, previousScissorH)
+        love.graphics.setScissor(sx, sy, sw, sh)
         love.graphics.setCanvas(previousCanvas)
         love.graphics.pop()
 
