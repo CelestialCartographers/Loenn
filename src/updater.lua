@@ -13,10 +13,10 @@ function updater.canUpdate()
 end
 
 function updater.getAvailableUpdates()
-    local success, releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
+    local releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
     local res = {}
 
-    for i, release <- releases do
+    for i, release <- releases or {} do
         if release.tag_name then
             table.insert(res, release.tag_name)
         end
@@ -26,44 +26,44 @@ function updater.getAvailableUpdates()
 end
 
 function updater.getRelevantRelease(target)
-    local success, releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
-    local tagName = target or (success and #releases > 0 and releases[1].tag_name)
+    local releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
+    local tagName = target or (releases and #releases > 0 and releases[1].tag_name)
 
     if tagName then
         for i, release <- releases do
             if release.tag_name == tagName then
-                return true, release
+                return release
             end
         end
     end
 
-    return false, nil
+    return nil
 end
 
 function updater.getRelevantReleaseAsset(tagName, targetOS)
-    local success, release = updater.getRelevantRelease(tagName)
+    local release = updater.getRelevantRelease(tagName)
     local userOS = targetOS or love.system.getOS()
 
-    if success then
+    if release then
         for i, asset <- release.assets do
             local assetOS = asset.name:match("-([A-Za-z0-9_]+)%.zip$")
 
             if assetOS:lower() == userOS:lower() or assetOS:lower():gsub("_", " ") == userOS:lower() then
-                return true, asset
+                return asset
             end
         end
     end
 
-    return false, nil
+    return nil
 end
 
 -- TODO - Test
 -- Make sure this works on at least Windows and Linux, assume that Linux code would work on OS X as well
 function updater.update(tagName)
     if updater.canUpdate() then
-        local success, asset = updater.getRelevantReleaseAsset(tagName)
+        local asset = updater.getRelevantReleaseAsset(tagName)
 
-        if success then
+        if asset then
             local url = asset.browser_download_url
             local name = asset.name
 
