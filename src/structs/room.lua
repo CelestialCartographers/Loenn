@@ -87,6 +87,58 @@ function roomStruct.decode(data)
     return room
 end
 
+-- Resize a room from a given side
+-- Also cuts off background tiles
+-- Amount in tiles
+function roomStruct.directionalResize(room, side, amount)
+    room.tilesFg = tilesStruct.directionalResize(room.tilesFg, side, amount)
+    room.tilesBg = tilesStruct.directionalResize(room.tilesBg, side, amount)
+    room.tilesObj = objectTilesStruct.directionalResize(room.tilesObj, side, amount)
+
+    local offsetX = side == "left" and amount * 8 or 0
+    local offsetY = side == "up" and amount * 8 or 0
+    local offsetWidth = (side == "left" or side == "right") and amount * 8 or 0
+    local offsetHeight = (side == "up" or side == "down") and amount * 8 or 0
+
+    room.x -= offsetX
+    room.y -= offsetY
+    room.width += offsetWidth
+    room.height += offsetHeight
+
+    for _, targets in ipairs({room.entities, room.triggers, room.decalsFg, room.decalsBg}) do
+        for _, target in ipairs(targets) do
+            target.x += offsetX
+            target.y += offsetY
+        end
+    end
+
+    -- TODO - REMOVE
+    local celesteRender = require("celeste_render")
+    local viewport = require("viewport_handler")
+
+    celesteRender.invalidateRoomCache(room)
+    celesteRender.forceRoomBatchRender(room, viewport.viewport)
+end
+
+-- Moves amount * step in the direction
+-- Step defaults to 8, being a tile
+function roomStruct.directionalMove(room, side, amount, step)
+    step = step or 8
+
+    if side == "left" then
+        room.x -= amount * step
+
+    elseif side == "right" then
+        room.x += amount * step
+
+    elseif side == "up" then
+        room.y -= amount * step
+
+    elseif side == "down" then
+        room.y += amount * step
+    end
+end
+
 function roomStruct.encode(room)
     local res = {}
 

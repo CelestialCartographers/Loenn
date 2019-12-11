@@ -6,6 +6,7 @@ local debugUtils = require("debug_utils")
 local viewportHandler = require("viewport_handler")
 
 local hotkeyStruct = require("structs.hotkey")
+local roomStruct = require("structs.room")
 
 -- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
 local rawHotkeys = {
@@ -14,6 +15,12 @@ local rawHotkeys = {
     {configs.hotkeys.open, (-> filesystem.openDialog(fileLocations.getCelesteDir(), nil, loadedState.loadFile)), "Open file"},
     {configs.hotkeys.save, (-> loadedState.filename and loadedState.saveFile(loadedState.filename)), "Save file"},
     {configs.hotkeys.saveAs, (-> loadedState.side and filesystem.saveDialog(loadedState.filename, nil, loadedState.saveFile)), "Save file as"},
+
+    -- Room Movement
+    {configs.hotkeys.roomMoveLeft, (-> loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, "left", 1)), "Move room left"},
+    {configs.hotkeys.roomMoveRight, (-> loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, "right", 1)), "Move room right"},
+    {configs.hotkeys.roomMoveUp, (-> loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, "up", 1)), "Move room up"},
+    {configs.hotkeys.roomMoveDown, (-> loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, "down", 1)), "Move room down"},
 
     -- Debug hotkeys
     {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},
