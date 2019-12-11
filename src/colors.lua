@@ -31,6 +31,8 @@ colors.fillerColor = {68 / 255, 68 / 255, 68 / 255}
 
 colors.brushColor = {77 / 255, 77 / 255, 77 / 255, 204 / 255}
 
+colors.resizeTriangleColor = {196 / 255, 196 / 255, 196 / 255}
+
 colors.default = {255 / 255, 255 / 255, 255 / 255}
 
 return colors

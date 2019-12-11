@@ -20,6 +20,14 @@ for name, direction in pairs(directions) do
     movementUtils["moveCurrentRoomOnePixel" .. name] = function() 
         return loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, direction, 1, 1)
     end
+
+    movementUtils["growCurrentRoomOneTile" .. name] = function()
+        return loadedState.selectedRoom and roomStruct.directionalResize(loadedState.selectedRoom, direction, 1)
+    end
+
+    movementUtils["shrinkCurrentRoomOneTile" .. name] = function()
+        return loadedState.selectedRoom and roomStruct.directionalResize(loadedState.selectedRoom, direction, -1)
+    end
 end
 
 return movementUtils

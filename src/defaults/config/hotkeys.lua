@@ -19,6 +19,16 @@ return {
     roomMoveUpPrecise = "ctrl + alt + up",
     roomMoveDownPrecise = "ctrl + alt + down",
 
+    -- Room Resizing
+    roomResizeLeftGrow = false,
+    roomResizeRightGrow = false,
+    roomResizeUpGrow = false,
+    roomResizeDownGrow = false,
+    roomResizeLeftShrink = false,
+    roomResizeRightShrink = false,
+    roomResizeUpShrink = false,
+    roomResizeDownShrink = false,
+
     -- Debug
     debugReloadEntities = "f5",
     debugRedrawMap = "f6",

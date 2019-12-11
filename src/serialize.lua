@@ -29,7 +29,7 @@ end
 function serialize.numericalLength(t)
     local index = 0
 
-    while t[index + 1] do
+    while rawget(index, index + 1) ~= nil do
         index = index + 1
     end
 
@@ -58,7 +58,7 @@ function serialize.serialize(t, pretty, seen, depth, success)
         local key = k
         local value = v
 
-        if keywords[k] or not string.match(k, variablePattern)then
+        if keywords[k] or not string.match(k, variablePattern) then
             if ktyp == "string" then
                 key = "[" .. string.format("%q", k) .. "]"
 

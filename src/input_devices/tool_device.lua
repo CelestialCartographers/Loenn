@@ -23,9 +23,8 @@ local toolProxyMt = {
 
 local device = setmetatable({_enabled = true, _type = "device"}, toolProxyMt)
 
-
 -- Don't send clicks that would "swap" the target room
-function device.mousepressed(x, y, button, istouch, presses)
+function device.mouseclicked(x, y, button, istouch, presses)
     if state.map ~= nil then
         local currentTool = toolHandler.currentTool
 
@@ -41,8 +40,8 @@ function device.mousepressed(x, y, button, istouch, presses)
             end
         end
 
-        if currentTool and currentTool.mousepressed then
-            currentTool.mousepressed(x, y, button, istouch, presses)
+        if currentTool and currentTool.mouseclicked then
+            currentTool.mouseclicked(x, y, button, istouch, presses)
         end
     end
 end

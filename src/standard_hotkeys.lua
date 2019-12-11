@@ -3,7 +3,7 @@ local loadedState = require("loaded_state")
 local debugUtils = require("debug_utils")
 local viewportHandler = require("viewport_handler")
 local history = require("history")
-local movementUtils = require("room_movement_utils")
+local roomHotkeyUtils = require("room_hotkey_utils")
 
 local hotkeyStruct = require("structs.hotkey")
 
@@ -16,16 +16,26 @@ local rawHotkeys = {
     {configs.hotkeys.saveAs, loadedState.saveAsCurrentMap, "Save file as"},
 
     -- Room Movement
-    {configs.hotkeys.roomMoveLeft, movementUtils.moveCurrentRoomOneTileLeft, "Move room left one tile"},
-    {configs.hotkeys.roomMoveRight, movementUtils.moveCurrentRoomOneTileRight, "Move room right one tile"},
-    {configs.hotkeys.roomMoveUp, movementUtils.moveCurrentRoomOneTileUp, "Move room up one tile"},
-    {configs.hotkeys.roomMoveDown, movementUtils.moveCurrentRoomOneTileDown, "Move room down one tile"},
+    {configs.hotkeys.roomMoveLeft, roomHotkeyUtils.moveCurrentRoomOneTileLeft, "Move room left one tile"},
+    {configs.hotkeys.roomMoveRight, roomHotkeyUtils.moveCurrentRoomOneTileRight, "Move room right one tile"},
+    {configs.hotkeys.roomMoveUp, roomHotkeyUtils.moveCurrentRoomOneTileUp, "Move room up one tile"},
+    {configs.hotkeys.roomMoveDown, roomHotkeyUtils.moveCurrentRoomOneTileDown, "Move room down one tile"},
 
-    {configs.hotkeys.roomMoveLeftPrecise, movementUtils.moveCurrentRoomOnePixelLeft, "Move room left one pixel"},
-    {configs.hotkeys.roomMoveRightPrecise, movementUtils.moveCurrentRoomOnePixelRight, "Move room right one pixel"},
-    {configs.hotkeys.roomMoveUpPrecise, movementUtils.moveCurrentRoomOnePixelUp, "Move room up one pixel"},
-    {configs.hotkeys.roomMoveDownPrecise, movementUtils.moveCurrentRoomOnePixelDown, "Move room down one pixel"},
+    {configs.hotkeys.roomMoveLeftPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelLeft, "Move room left one pixel"},
+    {configs.hotkeys.roomMoveRightPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelRight, "Move room right one pixel"},
+    {configs.hotkeys.roomMoveUpPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelUp, "Move room up one pixel"},
+    {configs.hotkeys.roomMoveDownPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelDown, "Move room down one pixel"},
 
+    -- Room Resizing
+    {configs.hotkeys.roomResizeLeftGrow, roomHotkeyUtils.growCurrentRoomOneTileLeft, "Grow room one tile left"},
+    {configs.hotkeys.roomResizeRightGrow, roomHotkeyUtils.growCurrentRoomOneTileRight, "Grow room one tile right"},
+    {configs.hotkeys.roomResizeUpGrow, roomHotkeyUtils.growCurrentRoomOneTileUp, "Grow room one tile up"},
+    {configs.hotkeys.roomResizeDownGrow, roomHotkeyUtils.growCurrentRoomOneTileDown, "Grow room one tile down"},
+
+    {configs.hotkeys.roomResizeLeftShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileLeft, "Shrink room one tile left"},
+    {configs.hotkeys.roomResizeRightShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileRight, "Shrink room one tile right"},
+    {configs.hotkeys.roomResizeUpShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileUp, "Shrink room one tile up"},
+    {configs.hotkeys.roomResizeDownShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileDown, "Shrink room one tile down"},
     -- Debug hotkeys
     {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},
     {configs.hotkeys.debugReloadEntities, debugUtils.reloadEntities, "Reload entities"},
@@ -42,7 +52,8 @@ local hotkeys = {}
 
 for i, data <- rawHotkeys do
     local activation, callback, description = unpack(data)
-
+    local hotkey = hotkeyStruct.createHotkey(activation, callback)
+    
     table.insert(hotkeys, hotkeyStruct.createHotkey(activation, callback))
 end
 

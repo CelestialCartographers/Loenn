@@ -19,6 +19,9 @@ local structMutlipleNames = {
     triggers = {"triggers", triggerStruct}
 }
 
+roomStruct.recommendedMinimumWidth = 320
+roomStruct.recommendedMinimumHeight = 184
+
 function roomStruct.decode(data)
     local room = {
         _type = "room",
@@ -111,13 +114,6 @@ function roomStruct.directionalResize(room, side, amount)
             target.y += offsetY
         end
     end
-
-    -- TODO - REMOVE
-    local celesteRender = require("celeste_render")
-    local viewport = require("viewport_handler")
-
-    celesteRender.invalidateRoomCache(room)
-    celesteRender.forceRoomBatchRender(room, viewport.viewport)
 end
 
 -- Moves amount * step in the direction

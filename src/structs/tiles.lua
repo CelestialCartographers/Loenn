@@ -110,15 +110,17 @@ function tilesStruct.resizeMatrix(tiles, width, height, default, offsetX, offset
     local tilesMatrix = tiles.matrix
     local tilesWidth, tilesHeight = tilesMatrix:size()
 
-    offsetX = offsetX or 0
-    offsetY = offsetY or 0
+    local offsetXPos = math.max(offsetX or 0, 0)
+    local offsetYPos = math.max(offsetY or 0, 0)
+    local offsetXNeg = math.min(offsetX or 0, 0)
+    local offsetYNeg = math.min(offsetY or 0, 0)
 
     if tilesWidth ~= width or tilesHeight ~= height or (offsetX ~= 0 and offsetY ~= 0) then
         local newTilesMatrix = matrix.filled(default, width, height)
 
         for x = 1, width do
             for y = 1, height do
-                newTilesMatrix:set(x + offsetX, y + offsetY, tilesMatrix:get(x, y, default))
+                newTilesMatrix:set(x + offsetXPos, y + offsetYPos, tilesMatrix:get(x - offsetXNeg, y - offsetYNeg, default))
             end
         end
 
