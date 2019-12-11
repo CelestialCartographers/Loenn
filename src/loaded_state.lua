@@ -3,6 +3,8 @@ local tasks = require("task")
 local mapcoder = require("mapcoder")
 local celesteRender = require("celeste_render")
 local sceneHandler = require("scene_handler")
+local filesystem = require("filesystem")
+local fileLocations = require("file_locations")
 
 local sideStruct = require("structs.side")
 
@@ -22,7 +24,7 @@ function state.loadFile(filename)
                     function(decodeTask)
                         celesteRender.invalidateRoomCache()
                         celesteRender.clearBatchingTasks()
-        
+
                         state.filename = filename
                         state.side = decodeTask.result
                         state.map = state.side.map
@@ -49,9 +51,9 @@ function state.saveFile(filename)
                     tasks.newTask(
                         (-> mapcoder.encodeFile(filename, encodeTask.result)),
                         function(binTask)
-                            if binTask.result then
+                            if binTask.done and binTask.success then
                                 state.filename = filename
-                
+
                             else
                                 -- TODO - Toast the user, failed to save
                             end
@@ -72,6 +74,27 @@ end
 
 function state.getSelectedRoom()
     return state.selectedRoom
+end
+
+function state.openMap()
+    filesystem.openDialog(fileLocations.getCelesteDir(), nil, state.loadFile)
+end
+
+function state.saveAsCurrentMap()
+    if state.side then
+        filesystem.saveDialog(state.filename, nil, state.saveFile)
+    end
+end
+
+function state.saveCurrentMap()
+    if state.side then
+        if state.filename then
+            state.saveFile(state.filename)
+
+        else
+            state.saveAsCurrentMap()
+        end
+    end
 end
 
 -- The currently loaded map

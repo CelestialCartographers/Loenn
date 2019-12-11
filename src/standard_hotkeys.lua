@@ -1,26 +1,30 @@
 local configs = require("configs")
-local filesystem = require("filesystem")
 local loadedState = require("loaded_state")
-local fileLocations = require("file_locations")
 local debugUtils = require("debug_utils")
 local viewportHandler = require("viewport_handler")
+local history = require("history")
+local movementUtils = require("room_movement_utils")
 
 local hotkeyStruct = require("structs.hotkey")
-local roomStruct = require("structs.room")
 
 -- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
 local rawHotkeys = {
-    {configs.hotkeys.redo, (-> print("REDO")), "Redo last action"},
-    {configs.hotkeys.undo, (-> print("UNDO")), "Undo last action"},
-    {configs.hotkeys.open, (-> filesystem.openDialog(fileLocations.getCelesteDir(), nil, loadedState.loadFile)), "Open file"},
-    {configs.hotkeys.save, (-> loadedState.filename and loadedState.saveFile(loadedState.filename)), "Save file"},
-    {configs.hotkeys.saveAs, (-> loadedState.side and filesystem.saveDialog(loadedState.filename, nil, loadedState.saveFile)), "Save file as"},
+    {configs.hotkeys.redo, history.redo, "Redo last action"},
+    {configs.hotkeys.undo, history.undo, "Undo last action"},
+    {configs.hotkeys.open, loadedState.openMap, "Open file"},
+    {configs.hotkeys.save, loadedState.saveCurrentMap, "Save file"},
+    {configs.hotkeys.saveAs, loadedState.saveAsCurrentMap, "Save file as"},
 
     -- Room Movement
-    {configs.hotkeys.roomMoveLeft, (-> loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, "left", 1)), "Move room left"},
-    {configs.hotkeys.roomMoveRight, (-> loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, "right", 1)), "Move room right"},
-    {configs.hotkeys.roomMoveUp, (-> loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, "up", 1)), "Move room up"},
-    {configs.hotkeys.roomMoveDown, (-> loadedState.selectedRoom and roomStruct.directionalMove(loadedState.selectedRoom, "down", 1)), "Move room down"},
+    {configs.hotkeys.roomMoveLeft, movementUtils.moveCurrentRoomOneTileLeft, "Move room left one tile"},
+    {configs.hotkeys.roomMoveRight, movementUtils.moveCurrentRoomOneTileRight, "Move room right one tile"},
+    {configs.hotkeys.roomMoveUp, movementUtils.moveCurrentRoomOneTileUp, "Move room up one tile"},
+    {configs.hotkeys.roomMoveDown, movementUtils.moveCurrentRoomOneTileDown, "Move room down one tile"},
+
+    {configs.hotkeys.roomMoveLeftPrecise, movementUtils.moveCurrentRoomOnePixelLeft, "Move room left one pixel"},
+    {configs.hotkeys.roomMoveRightPrecise, movementUtils.moveCurrentRoomOnePixelRight, "Move room right one pixel"},
+    {configs.hotkeys.roomMoveUpPrecise, movementUtils.moveCurrentRoomOnePixelUp, "Move room up one pixel"},
+    {configs.hotkeys.roomMoveDownPrecise, movementUtils.moveCurrentRoomOnePixelDown, "Move room down one pixel"},
 
     -- Debug hotkeys
     {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},
