@@ -29,7 +29,7 @@ end
 function serialize.numericalLength(t)
     local index = 0
 
-    while rawget(index, index + 1) ~= nil do
+    while rawget(t, index + 1) ~= nil do
         index = index + 1
     end
 

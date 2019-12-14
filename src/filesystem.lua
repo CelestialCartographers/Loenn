@@ -8,6 +8,8 @@ local hasHttps, https = requireUtils.tryrequire("https")
 
 local filesystem = {}
 
+filesystem.supportWindowsInThreads = love.system.getOS() ~= "OS X"
+
 function filesystem.filename(path, sep)
     sep = sep or physfs.getDirSeparator()
 
@@ -68,18 +70,25 @@ function filesystem.saveDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
     if callback then
-        local code = [[
-            local args = {...}
-            local channelName, path, filter = unpack(args)
-            local channel = love.thread.getChannel(channelName)
+        if filesystem.supportWindowsInThreads then
+            local code = [[
+                local args = {...}
+                local channelName, path, filter = unpack(args)
+                local channel = love.thread.getChannel(channelName)
 
-            local nfd = require("nfd")
+                local nfd = require("nfd")
 
-            local res = nfd.save(filter, nil, path)
-            channel:push(res)
-        ]]
+                local res = nfd.save(filter, nil, path)
+                channel:push(res)
+            ]]
 
-        return threadHandler.createStartWithCallback(code, callback, path, filter)
+            return threadHandler.createStartWithCallback(code, callback, path, filter)
+
+        else
+            callback(nfd.save(filter, nil, path))
+
+            return false, false
+        end
 
     else
         return nfd.save(filter, nil, path)
@@ -92,18 +101,25 @@ function filesystem.openDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
     if callback then
-        local code = [[
-            local args = {...}
-            local channelName, path, filter = unpack(args)
-            local channel = love.thread.getChannel(channelName)
+        if filesystem.supportWindowsInThreads then
+            local code = [[
+                local args = {...}
+                local channelName, path, filter = unpack(args)
+                local channel = love.thread.getChannel(channelName)
 
-            local nfd = require("nfd")
+                local nfd = require("nfd")
 
-            local res = nfd.open(filter, nil, path)
-            channel:push(res)
-        ]]
+                local res = nfd.open(filter, nil, path)
+                channel:push(res)
+            ]]
 
-        return threadHandler.createStartWithCallback(code, callback, path, filter)
+            return threadHandler.createStartWithCallback(code, callback, path, filter)
+
+        else
+            callback(nfd.open(filter, nil, path))
+
+            return false, false
+        end
 
     else
         return nfd.open(filter, nil, path)
