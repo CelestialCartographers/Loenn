@@ -15,7 +15,7 @@ If you drag Celeste.exe in you will to manually close the dialog.
 ]]
 
 local messageThreadsNotSupported = [[
-Please select Celeste.exe in the dialog.
+Please select Celeste.exe or Celeste.app in the dialog.
 ]]
 
 startupScene.name = "Startup"
@@ -63,7 +63,6 @@ end
 
 function startupScene:directorydropped(path)
     if startup.verifyCelesteDir(path) then
-        startup.savePath(path)
         saveGotoLoading(path)
     end
 end

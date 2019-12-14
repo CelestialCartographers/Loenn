@@ -14,9 +14,16 @@ function startup.verifyCelesteDir(path)
         return false, nil
     end
 
+    local filename = filesystem.filename(path)
+    local macOS = love.system.getOS() == "OS X"
+
     -- Get the base path for Celeste dir
-    if filesystem.filename(path) == "Celeste.exe" then
+    if filename == "Celeste.exe" then
         path = filesystem.dirname(path)
+    end
+
+    if macOS and filename == "Celeste.app" then
+        path = filesystem.joinpath(path, "Contents", "MacOS")
     end
 
     if filesystem.isFile(filesystem.joinpath(path, "Celeste.exe")) and filesystem.isDirectory(filesystem.joinpath(path, "Content")) then
