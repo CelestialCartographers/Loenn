@@ -13,6 +13,10 @@ local state = {}
 -- TODO - Check for changes and warn users when we aren't just a map viewer
 -- TODO - Make and use a tasked version of sideStruct decode
 function state.loadFile(filename)
+    if not filename then
+        return
+    end
+
     sceneHandler.changeScene("Loading")
 
     tasks.newTask(
@@ -35,6 +39,8 @@ function state.loadFile(filename)
                 )
 
             else
+                sceneHandler.changeScene("Editor")
+
                 -- TODO - Toast the user, failed to load
             end
         end
