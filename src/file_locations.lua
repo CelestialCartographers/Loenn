@@ -23,8 +23,16 @@ function fileLocations.getStorageDir()
             return filesystem.joinpath(home, ".config", loennLinuxFolderName)
         end
 
-    elseif userOS == "OS X" then
-        -- TODO
+    elseif userOS == "OS X" or userOS == "OSX" then
+        local xdgConfig = os.getenv("XDG_CONFIG_HOME")
+        local home = os.getenv("HOME")
+
+        if xdgConfig then
+            return filesystem.joinpath(xdgConfig, loennLinuxFolderName)
+
+        else
+            return filesystem.joinpath(home, ".config", loennLinuxFolderName)
+        end
 
     elseif userOS == "Android" then
         -- TODO
