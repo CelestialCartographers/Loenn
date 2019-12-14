@@ -34,7 +34,7 @@ end
 function filesystem.splitpath(s)
     local sep = physfs.getDirSeparator()
 
-    return string.split(s, sep)
+    return string.split(s, sep)()
 end
 
 function filesystem.fileExtension(path)

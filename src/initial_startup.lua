@@ -22,8 +22,17 @@ function startup.verifyCelesteDir(path)
         path = filesystem.dirname(path)
     end
 
-    if macOS and filename == "Celeste.app" then
-        path = filesystem.joinpath(path, "Contents", "MacOS")
+    if macOS then
+        local pathParts = filesystem.splitpath(filename)
+        local topDir = pathParts[#pathParts]
+
+        if topDir == "" then
+            topDir = pathParts[#pathParts - 1]
+        end
+
+        if filename == "Celeste.app" or topDir == "Celeste.app" then
+            path = filesystem.joinpath(path, "Contents", "MacOS")
+        end
     end
 
     if filesystem.isFile(filesystem.joinpath(path, "Celeste.exe")) and filesystem.isDirectory(filesystem.joinpath(path, "Content")) then
