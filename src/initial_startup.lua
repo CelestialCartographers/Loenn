@@ -7,11 +7,9 @@ local settingsPath = fileLocations.getSettingsPath()
 
 local startup = {}
 
-function startup.verifyCelesteDir(path)
-    -- Check for some files/directories to check if this could be a actuall Celeste install containing the files we need
-
+function startup.cleanupPath(path)
     if not path then
-        return false, nil
+        return false
     end
 
     local filename = filesystem.filename(path)
@@ -22,22 +20,25 @@ function startup.verifyCelesteDir(path)
         path = filesystem.dirname(path)
     end
 
-    if macOS then
-        local pathParts = filesystem.splitpath(filename)
-        local topDir = pathParts[#pathParts]
+    if macOS and filename == "Celeste.app" then
+        path = filesystem.joinpath(path, "Contents", "MacOS")
+    end
 
-        if topDir == "" then
-            topDir = pathParts[#pathParts - 1]
-        end
+    return path
+end
 
-        if filename == "Celeste.app" or topDir == "Celeste.app" then
-            path = filesystem.joinpath(path, "Contents", "MacOS")
-        end
+function startup.verifyCelesteDir(path)
+    -- Check for some files/directories to check if this could be a actuall Celeste install containing the files we need
+
+    if not path then
+        return false
     end
 
     if filesystem.isFile(filesystem.joinpath(path, "Celeste.exe")) and filesystem.isDirectory(filesystem.joinpath(path, "Content")) then
-        return true, path
+        return true
     end
+
+    return false
 end
 
 function startup.requiresInit()
@@ -87,18 +88,16 @@ function startup.findCelesteDirectory()
 
     if steam then
         local celesteSteam = filesystem.joinpath(steam, "steamapps", "common", "Celeste")
+        local cleanedPath = startup.cleanupPath(celesteSteam)
 
-        if filesystem.isDirectory(celesteSteam) and startup.verifyCelesteDir(celesteSteam) then
+        if cleanedPath and filesystem.isDirectory(celesteSteam) then
             return true, celesteSteam
         end
     end
 end
 
 function startup.savePath(path)
-    -- Get the base path for Celeste dir
-    if filesystem.filename(path) == "Celeste.exe" then
-        path = filesystem.dirname(path)
-    end
+    path = startup.cleanupPath(path)
 
     local conf = config.readConfig(settingsPath) or {}
     conf.celeste_dir = path

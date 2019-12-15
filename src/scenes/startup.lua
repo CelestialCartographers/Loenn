@@ -35,14 +35,16 @@ local function saveGotoLoading(path)
 end
 
 local function checkDialog(path)
-    if startupScene._dialogThread and path == false then
+    if not path then
         love.window.close()
 
         return
     end
 
-    if startup.verifyCelesteDir(path) then
-        saveGotoLoading(path)
+    local cleanPath = startup.cleanupPath(path)
+
+    if startup.verifyCelesteDir(cleanPath) then
+        saveGotoLoading(cleanPath)
 
     else
         startupScene._dialogChannel, startupScene._dialogThread = filesystem.openDialog(nil, nil, checkDialog)
@@ -56,14 +58,18 @@ function startupScene:firstEnter()
 end
 
 function startupScene:filedropped(file)
-    if startup.verifyCelesteDir(file:getFilename()) then
-        saveGotoLoading(file:getFilename())
+    local cleanPath = startup.cleanupPath(file:getFilename())
+
+    if startup.verifyCelesteDir(cleanPath) then
+        saveGotoLoading(cleanPath)
     end
 end
 
 function startupScene:directorydropped(path)
-    if startup.verifyCelesteDir(path) then
-        saveGotoLoading(path)
+    local cleanPath = startup.cleanFilename(path)
+
+    if startup.verifyCelesteDir(cleanPath) then
+        saveGotoLoading(cleanPath)
     end
 end
 
