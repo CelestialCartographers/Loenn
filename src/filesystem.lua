@@ -45,7 +45,10 @@ function filesystem.stripExtension(path)
     return path:sub(1, #path - #filesystem.fileExtension(path) - 1)
 end
 
-filesystem.mkdir = lfs.mkdir
+function filesystem.mkdir(path, mode)
+    return lfs.mkdir(path, mode or 755)
+end
+
 filesystem.chdir = lfs.chdir
 filesystem.dir = lfs.dir
 filesystem.rmdir = lfs.rmdir

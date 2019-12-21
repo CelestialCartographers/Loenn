@@ -136,6 +136,18 @@ function utils.group(t, by)
     return res
 end
 
+function utils.concat(...)
+    local res = {}
+
+    for i, t in ipairs({...}) do
+        for j, v in ipairs(t) do
+            table.insert(res, v)
+        end
+    end
+
+    return res
+end
+
 utils.countKeys = serialize.countKeys
 
 -- Return the 1 index based tile indices for the coordinates
