@@ -42,6 +42,7 @@ function roomStruct.decode(data)
     room.musicLayer4 = data.musicLayer4 == nil or data.musicLayer4
 
     room.musicProgress = data.musicProgress or ""
+    room.ambienceProgress = data.ambienceProgress or ""
 
     room.dark = data.dark == true
     room.space = data.space == true
@@ -49,12 +50,17 @@ function roomStruct.decode(data)
     room.whisper = data.whisper == true
     room.disableDownTransition = data.disableDownTransition == true
 
+    room.delayAlternativeMusicFade = data.delayAltMusicFade == true
+
     room.music = data.music or "music_oldsite_awake"
     room.musicAlternative = data.alt_music or ""
 
     room.windPattern = data.windPattern or "None"
 
     room.color = data.c or 0
+
+    room.cameraOffsetX = data.cameraOffsetX or 0
+    room.cameraOffsetY = data.cameraOffsetY or 0
 
     room.entities = {}
     room.triggers = {}
@@ -149,6 +155,9 @@ function roomStruct.encode(room)
     res.width = room.width
     res.height = room.height
 
+    res.musicProgress = room.musicProgress
+    res.ambienceProgress = room.ambienceProgress
+
     res.musicLayer1 = room.musicLayer1
     res.musicLayer2 = room.musicLayer2
     res.musicLayer3 = room.musicLayer3
@@ -160,12 +169,17 @@ function roomStruct.encode(room)
     res.whisper = room.whisper
     res.disableDownTransition = room.disableDownTransition
 
+    res.delayAltMusicFade = room.delayAlternativeMusicFade
+
     res.music = room.music
     res.alt_music = room.musicAlternative
 
     res.windPattern = room.windPattern
 
     res.c = room.color
+
+    res.cameraOffsetX = room.cameraOffsetX
+    res.cameraOffsetY = room.cameraOffsetY
 
     for raw, meta in pairs(structTilesNames) do
         local key, struct = unpack(meta)
