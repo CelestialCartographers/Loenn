@@ -80,6 +80,20 @@ function utils.readAll(path, mode, internal)
     end
 end
 
+function utils.newImage(path, internal)
+    if internal then
+        return love.graphics.newImage(path)
+
+    else
+        local fileData, err = love.filesystem.newFileData(utils.readAll(path, "rb", internal), "placeholder.png")
+
+        if fileData then
+            local imageData = love.image.newImageData(fileData)
+            return love.graphics.newImage(imageData)
+        end
+    end
+end
+
 function utils.trim(s)
     return string.match(s, "^%s*(.*%S)") or ""
 end

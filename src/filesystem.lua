@@ -67,6 +67,33 @@ function filesystem.isDirectory(path)
     return attrs and attrs.mode == "directory"
 end
 
+function filesystem.mtime(path)
+    local attrs = lfs.attributes(path)
+
+    return attrs and attrs.modification or -1
+end
+
+-- TODO - Test
+function filesystem.copy(from, to)
+    local fromFh = io.open(from, "rb")
+
+    if not fromFh then
+        return false, "Target file not found"
+    end
+
+    local toFh = io.open(to, "wb")
+
+    if not toFh then
+        return false, "Couldn't create destination file"
+    end
+
+    toFh:write(fromFh:read("*a"))
+    toFh:close()
+    fromFh:close()
+
+    return true
+end
+
 -- Return thread if called with callback
 -- Otherwise block and return the selected file
 function filesystem.saveDialog(path, filter, callback)
