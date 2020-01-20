@@ -1,3 +1,5 @@
+-- Pure Lua binary file implementation
+
 local binfile = {}
 
 function binfile.twosCompliment(n, power)
@@ -78,6 +80,8 @@ function binfile.readFloat(fh)
 end
 
 function binfile.writeFloat(fh, n)
+    local b1, b2, b3, b4
+
     local val = n
     local sign = 0
 
@@ -97,14 +101,16 @@ function binfile.writeFloat(fh, n)
         exponent = exponent + 126
     end
 
-    binfile.writeByte(fh, math.floor(mantissa) % 256)
+    b1 = math.floor(mantissa) % 256
     val = math.floor(mantissa / 256)
-    binfile.writeByte(fh, math.floor(val) % 256)
+    b2 = math.floor(val) % 256
     val = math.floor(val / 256)
 
-    binfile.writeByte(fh, math.floor(exponent * 128 + val) % 256)
+    b3 = math.floor(exponent * 128 + val) % 256
     val = math.floor((exponent * 128 + val) / 256)
-    binfile.writeByte(fh, math.floor(sign * 128 + val) % 256)
+    b4 = math.floor(sign * 128 + val) % 256
+
+    binfile.writeBytes(fh, b1, b2, b3, b4)
 end
 
 function binfile.readVariableLength(fh)
