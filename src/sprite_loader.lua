@@ -63,7 +63,7 @@ end
 
 function spriteLoader.getCachedDataImage(dataFile)
     local storageDir = fileLocations.getStorageDir()
-    local path = utils.joinpath(storageDir, "Cache", dataFile .. ".png")
+    local path = utils.joinpath(storageDir, "Cache", "Data", dataFile .. ".png")
 
     if filesystem.isFile(path) then
         return utils.newImage(path, false)
@@ -167,7 +167,8 @@ end
 function spriteLoader.getCacheOrLoadSpriteAtlas(metaFn, atlasDir)
     local storageDir = fileLocations.getStorageDir()
     local storageCacheDir = utils.joinpath(storageDir, "Cache")
-    local configPath = utils.joinpath(storageDir, "cache.conf")
+    local storageCacheDataDir = utils.joinpath(storageCacheDir, "Data")
+    local configPath = utils.joinpath(storageDir, "Cache", "cache.conf")
     local metaPath = utils.joinpath(atlasDir, metaFn)
 
     local cacheConfig = config.readConfig(configPath)
@@ -178,9 +179,13 @@ function spriteLoader.getCacheOrLoadSpriteAtlas(metaFn, atlasDir)
             filesystem.mkdir(storageCacheDir)
         end
 
+        if not filesystem.isDirectory(storageCacheDataDir) then
+            filesystem.mkdir(storageCacheDataDir)
+        end
+
         if metaData then
             for _, dataName in ipairs(metaData.filenames) do
-                local filename = utils.joinpath(storageCacheDir, dataName .. ".png")
+                local filename = utils.joinpath(storageCacheDataDir, dataName .. ".png")
 
                 os.remove(filename)
             end
@@ -194,7 +199,7 @@ function spriteLoader.getCacheOrLoadSpriteAtlas(metaFn, atlasDir)
         }
 
         for _, imageMeta in ipairs(atlas._imageMeta) do
-            local filename = utils.joinpath(storageCacheDir, imageMeta.dataName) .. ".png"
+            local filename = utils.joinpath(storageCacheDataDir, imageMeta.dataName .. ".png")
 
             threadHandler.createStartWithCallback(imageCachingCode, function() end, filename, imageMeta.imageData)
             table.insert(metaData.filenames, imageMeta.dataName)
