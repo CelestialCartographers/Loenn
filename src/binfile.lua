@@ -17,13 +17,16 @@ function binfile.writeByte(fh, n)
     fh:write(string.char(n))
 end
 
+function binfile.writeBytes(fh, ...)
+    fh:write(string.char(...))
+end
+
 function binfile.readShort(fh)
     return binfile.readByte(fh) + binfile.readByte(fh) * 256
 end
 
 function binfile.writeShort(fh, n)
-    binfile.writeByte(fh, n % 256)
-    binfile.writeByte(fh, math.floor(n / 256) % 256)
+    binfile.writeBytes(fh, n % 256, math.floor(n / 256) % 256)
 end
 
 function binfile.readLong(fh)
@@ -31,10 +34,7 @@ function binfile.readLong(fh)
 end
 
 function binfile.writeLong(fh, n)
-    binfile.writeByte(fh, n % 256)
-    binfile.writeByte(fh, math.floor(n / 256) % 256)
-    binfile.writeByte(fh, math.floor(n / 256^2) % 256)
-    binfile.writeByte(fh, math.floor(n / 256^3) % 256)
+    binfile.writeBytes(fh, n % 256, math.floor(n / 256) % 256, math.floor(n / 256^2) % 256, math.floor(n / 256^3) % 256)
 end
 
 function binfile.readBool(fh)
@@ -154,16 +154,16 @@ end
 
 function binfile.readRunLengthEncoded(fh)
     local bytes = binfile.readShort(fh)
-    local res = ""
+    local res = {}
 
     for i = 1, bytes, 2 do
         local times = binfile.readByte(fh)
         local char = fh:read(1)
 
-        res ..= char:rep(times)
+        table.insert(res, char:rep(times))
     end
 
-    return res
+    return table.concat(res)
 end
 
 -- TODO - This is slow, consider doing it with FFI

@@ -1,20 +1,21 @@
 local utils = require("utils")
-local binfile = require("binfile")
 local fileLocations = require("file_locations")
 local tasks = require("task")
 local filesystem = require("filesystem")
 local config = require("config")
 local threadHandler = require("thread_handler")
+local binaryReader = require("binary_reader")
 
 local spriteLoader = {}
 
 -- TODO - See if this can be optimized
 function spriteLoader.loadDataImage(fn)
     local fh = utils.getFileHandle(fn, "rb")
+    local reader = binaryReader(fh)
 
-    local width = binfile.readLong(fh)
-    local height = binfile.readLong(fh)
-    local hasAlpha = binfile.readBool(fh)
+    local width = reader:readLong()
+    local height = reader:readLong()
+    local hasAlpha = reader:readBool()
 
     local image = love.image.newImageData(width, height)
 
@@ -24,14 +25,14 @@ function spriteLoader.loadDataImage(fn)
     for y = 0, height - 1 do
         for x = 0, width - 1 do
             if repeatsLeft == 0 then
-                local rep = binfile.readByte(fh)
+                local rep = reader:readByte()
                 repeatsLeft = rep - 1
 
                 if hasAlpha then
-                    local alpha = binfile.readByte(fh)
+                    local alpha = reader:readByte()
 
                     if alpha > 0 then
-                        b, g, r = binfile.readByte(fh) / 255, binfile.readByte(fh) / 255, binfile.readByte(fh) / 255
+                        b, g, r = reader:readByte() / 255, reader:readByte() / 255, reader:readByte() / 255
                         a = alpha / 255
 
                     else
@@ -39,7 +40,7 @@ function spriteLoader.loadDataImage(fn)
                     end
 
                 else
-                    b, g, r = binfile.readByte(fh) / 255, binfile.readByte(fh) / 255, binfile.readByte(fh) / 255
+                    b, g, r = reader:readByte() / 255, reader:readByte() / 255, reader:readByte() / 255
                     a = 1
                 end
 
@@ -72,13 +73,14 @@ end
 
 function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
     local fh = utils.getFileHandle(utils.joinpath(atlasDir, metaFn), "rb")
+    local reader = binaryReader(fh)
 
     -- Get rid of headers
-    binfile.readSignedLong(fh)
-    binfile.readString(fh)
-    binfile.readSignedLong(fh)
+    reader:readSignedLong()
+    reader:readString()
+    reader:readSignedLong()
 
-    local count = binfile.readShort(fh)
+    local count = reader:readShort()
 
     local res = {
         _imageMeta = {},
@@ -86,8 +88,8 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
     }
 
     for i = 1, count do
-        local dataFile = binfile.readString(fh)
-        local sprites = binfile.readSignedShort(fh)
+        local dataFile = reader:readString()
+        local sprites = reader:readSignedShort()
 
         local dataFilePath = utils.joinpath(atlasDir, dataFile .. ".data")
         local spritesImage, spritesImageData
@@ -112,20 +114,20 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
         })
 
         for j = 1, sprites do
-            local pathRaw = binfile.readString(fh)
+            local pathRaw = reader:readString()
             local path = pathRaw:gsub("\\", "/")
 
             local sprite = {
-                x = binfile.readSignedShort(fh),
-                y = binfile.readSignedShort(fh),
+                x = reader:readSignedShort(),
+                y = reader:readSignedShort(),
 
-                width = binfile.readSignedShort(fh),
-                height = binfile.readSignedShort(fh),
+                width = reader:readSignedShort(),
+                height = reader:readSignedShort(),
 
-                offsetX = binfile.readSignedShort(fh),
-                offsetY = binfile.readSignedShort(fh),
-                realWidth = binfile.readSignedShort(fh),
-                realHeight = binfile.readSignedShort(fh),
+                offsetX = reader:readSignedShort(),
+                offsetY = reader:readSignedShort(),
+                realWidth = reader:readSignedShort(),
+                realHeight = reader:readSignedShort(),
 
                 image = spritesImage,
                 filename = dataFilePath,
@@ -141,8 +143,6 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
             tasks.yield()
         end
     end
-
-    fh:close()
 
     tasks.update(res)
 
