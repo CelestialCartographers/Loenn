@@ -109,6 +109,7 @@ Lönn contains and uses code from the following projects:
   * [An ffi implementation](https://github.com/spacewander/luafilesystem) of [luafilesystem](https://github.com/keplerproject/luafilesystem)
   * [Selene](https://github.com/Vexatos/Selene)
   * [xml2lua](https://github.com/manoelcampos/Xml2Lua)
+  * [moonblob](https://github.com/megagrump/moonblob)
 
 Lönn also depends on the following projects:
   * [LÖVE](https://love2d.org/)
