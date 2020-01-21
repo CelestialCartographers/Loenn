@@ -1,3 +1,4 @@
+local blobReader = require("moonblob.blob_reader")
 local binfile = require("binfile")
 
 local binaryReader = {}
@@ -5,7 +6,7 @@ local binaryReader = {}
 binaryReader._MT = {}
 binaryReader._MT.__index = {}
 
--- Add reading methods from binfile
+-- Add reading methods from binfile, fallback for not implemented functions
 for name, func in pairs(binfile) do
     if name:match("^read") then
         binaryReader._MT.__index[name] = func
@@ -13,33 +14,39 @@ for name, func in pairs(binfile) do
 end
 
 function binaryReader._MT.__index:close()
-    -- Stub - Provided so it can be used in place of io.open file handle
-end
-
-function binaryReader._MT.__index:_updateBytes()
-    if self._bytesLeft <= 0 then
-        self._bytesLeft = self._bytesChunkSize
-        self._bytesStart = self._ptr
-        self._bytes = {string.byte(self._content, self._ptr, self._ptr + self._bytesChunkSize - 1)}
-    end
-end
-
--- Override readByte from binfile, this is faster
-function binaryReader._MT.__index:readByte()
-    self:_updateBytes()
-
-    self._ptr = self._ptr + 1
-    self._bytesLeft = self._bytesLeft - 1
-
-    return self._bytes[self._ptr - self._bytesStart]
+    self._reader:clear(0)
 end
 
 function binaryReader._MT.__index:read(n)
-    n = n or 1
-    self._ptr = self._ptr + n
-    self._bytesLeft = self._bytesLeft - n
+    return self._reader:raw(n or 1)
+end
 
-    return self._content:sub(self._ptr - n, self._ptr - 1)
+function binaryReader._MT.__index:readByte()
+    return self._reader:u8()
+end
+
+function binaryReader._MT.__index:readBool()
+    return self._reader:bool()
+end
+
+function binaryReader._MT.__index:readShort()
+    return self._reader:u16()
+end
+
+function binaryReader._MT.__index:readSignedShort()
+    return self._reader:s16()
+end
+
+function binaryReader._MT.__index:readLong()
+    return self._reader:u32()
+end
+
+function binaryReader._MT.__index:readSignedLong()
+    return self._reader:s32()
+end
+
+function binaryReader._MT.__index:readFloat()
+    return self._reader:f32()
 end
 
 function binaryReader.create(s)
@@ -58,11 +65,7 @@ function binaryReader.create(s)
         reader._content = s
     end
 
-    reader._ptr = 1
-    reader._bytes = nil
-    reader._bytesStart = nil
-    reader._bytesChunkSize = 1024
-    reader._bytesLeft = 0
+    reader._reader = blobReader(reader._content)
 
     return setmetatable(reader, binaryReader._MT)
 end
