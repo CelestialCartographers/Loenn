@@ -239,8 +239,7 @@ end
 function mapcoder.encodeFile(path, data, header)
     header = header or "CELESTE MAP"
 
-    local fh = utils.getFileHandle(path, "wb")
-    local writer = binaryWriter(fh, math.huge)
+    local writer = binaryWriter()
 
     local stringsSeen = countStrings(data)
     local lookupStrings = {}
@@ -267,6 +266,10 @@ function mapcoder.encodeFile(path, data, header)
 
     mapcoder.encodeTable(writer, data, lookupTable)
 
+    local fh = utils.getFileHandle(path, "wb")
+
+    fh:write(writer:getString())
+    fh:close()
     writer:close()
 
     coroutine.yield()

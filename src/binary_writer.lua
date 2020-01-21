@@ -13,10 +13,8 @@ for name, func in pairs(binfile) do
 end
 
 function binaryWriter._MT.__index:flush()
-    if #self._unwritten > 0 then
-        for _, part in ipairs(self._unwritten) do
-            self._fh:write(part)
-        end
+    if self._fh and #self._unwritten > 0 then
+        self._fh:write(table.concat(self._unwritten))
 
         self._unwritten = {}
     end
@@ -30,11 +28,15 @@ function binaryWriter._MT.__index:close()
     end
 end
 
+function binaryWriter._MT.__index:getString()
+    return table.concat(self._unwritten)
+end
+
 function binaryWriter._MT.__index:write(s)
     table.insert(self._unwritten, s)
     self._unwrittenBytes = self._unwrittenBytes + #s
 
-    if self._unwrittenBytes > self._unwrittenMaxSize then
+    if self._fh and self._unwrittenBytes > self._unwrittenMaxSize then
         self:flush()
     end
 end
@@ -43,10 +45,6 @@ function binaryWriter.create(fh, unwrittenMaxSize)
     local writer = {
         _type = "binary_writer"
     }
-
-    if not fh then
-        return
-    end
 
     writer._fh = fh
     writer._unwrittenMaxSize = unwrittenMaxSize or 4096
