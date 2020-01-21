@@ -16,16 +16,22 @@ end
 function binaryWriter._MT.__index:flush()
     if self._fh then
         self._fh:write(self._writer:tostring())
-        self._writer:clear()
     end
+
+    self._writer:clear()
 end
 
 function binaryWriter._MT.__index:close()
     if self._fh then
-        self._writer:clear(0)
         self._fh:write(self._writer:tostring())
         self._fh:close()
     end
+
+    self._writer:clear(0)
+end
+
+function binaryWriter._MT.__index:getString()
+    return self._writer:tostring()
 end
 
 function binaryWriter._MT.__index:write(s)
@@ -70,14 +76,10 @@ function binaryWriter._MT.__index:writeFloat(n)
     self._writer:f32(n)
 end
 
-function binaryWriter.create(fh, unwrittenMaxSize)
+function binaryWriter.create(fh)
     local writer = {
         _type = "binary_writer"
     }
-
-    if not fh then
-        return
-    end
 
     writer._fh = fh
     writer._writer = blobWriter()
