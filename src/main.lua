@@ -7,6 +7,13 @@ function love.load()
         package.cpath = package.cpath .. ";" .. love.filesystem.getSourceBaseDirectory() .. "/?.so"
     end
 
+    -- Keeping it here since it is an option, and seems to make a difference at some points
+    -- Attempt to expose to config option at some point
+    --[[
+    _G._selene = {}
+    _G._selene.notypecheck = true
+    ]]
+
     require("selene").load()
     require("selene/selene/wrappers/searcher/love2d/searcher").load()
 

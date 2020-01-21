@@ -1,3 +1,6 @@
+-- Fast Matrix implementation in Lua
+-- Most set/gets are inlined for performance reasons
+
 local matrix = {}
 
 local matrixMt = {}
@@ -9,25 +12,15 @@ function matrixMt.__index:get0Inbounds(x, y)
 end
 
 function matrixMt.__index:getInbounds(x, y)
-    return self:get0Inbounds(x - 1, y - 1)
+    return self[(x - 1) + (y - 1) * self._width + 1]
 end
 
 function matrixMt.__index:get0(x, y, default)
-    if x >= 0 and x < self._width and y >= 0 and y < self._height then
-        return self:get0Inbounds(x, y)
-
-    else
-        return default
-    end
+    return x >= 0 and x < self._width and y >= 0 and y < self._height and self[x + y * self._width + 1] or default
 end
 
 function matrixMt.__index:get(x, y, default)
-    if x >= 1 and x <= self._width and y >= 1 and y <= self._height then
-        return self:getInbounds(x, y)
-
-    else
-        return default
-    end
+    return x >= 1 and x <= self._width and y >= 1 and y <= self._height and self[(x - 1) + (y - 1) * self._width + 1] or default
 end
 
 
@@ -36,18 +29,18 @@ function matrixMt.__index:set0Inbounds(x, y, value)
 end
 
 function matrixMt.__index:setInbounds(x, y, value)
-    self:set0Inbounds(x - 1, y - 1, value)
+    self[(x - 1) + (y - 1) * self._width + 1] = value
 end
 
 function matrixMt.__index:set0(x, y, value)
     if x >= 0 and x < self._width and y >= 0 and y < self._height then
-        self:set0Inbounds(x, y, value)
+        self[x + y * self._width + 1] = value
     end
 end
 
 function matrixMt.__index:set(x, y, value)
     if x >= 1 and x <= self._width and y >= 0 and y <= self._height then
-        self:setInbounds(x, y, value)
+        self[(x - 1) + (y - 1) * self._width + 1] = value
     end
 end
 
@@ -65,6 +58,7 @@ function matrixMt.__index:size()
     return self._width, self._height
 end
 
+-- TODO - Test, inlining might have broken it
 function matrixMt.__index:getSlice(x1, y1, x2, y2, default)
     local res = matrix.filled(default, math.abs(x2 - x1) + 1, math.abs(y2 - y1) + 1)
 
@@ -73,7 +67,7 @@ function matrixMt.__index:getSlice(x1, y1, x2, y2, default)
 
     for x = startX, endX do
         for y = startY, endY do
-            res:setInbounds(x - startX + 1, y - startY + 1, self:get(x, y, default))
+            self[(x - startX) + (y - startY) * self._width + 1] = self:get(x, y, default)
         end
     end
 

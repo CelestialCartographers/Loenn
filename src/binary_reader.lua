@@ -17,7 +17,8 @@ function binaryReader._MT.__index:close()
 end
 
 function binaryReader._MT.__index:_updateBytes()
-    if not self._bytes or self._ptr >= self._bytesStart + self._bytesChunkSize then
+    if self._bytesLeft <= 0 then
+        self._bytesLeft = self._bytesChunkSize
         self._bytesStart = self._ptr
         self._bytes = {string.byte(self._content, self._ptr, self._ptr + self._bytesChunkSize - 1)}
     end
@@ -26,7 +27,9 @@ end
 -- Override readByte from binfile, this is faster
 function binaryReader._MT.__index:readByte()
     self:_updateBytes()
+
     self._ptr = self._ptr + 1
+    self._bytesLeft = self._bytesLeft - 1
 
     return self._bytes[self._ptr - self._bytesStart]
 end
@@ -34,6 +37,7 @@ end
 function binaryReader._MT.__index:read(n)
     n = n or 1
     self._ptr = self._ptr + n
+    self._bytesLeft = self._bytesLeft - n
 
     return self._content:sub(self._ptr - n, self._ptr - 1)
 end
@@ -57,7 +61,8 @@ function binaryReader.create(s)
     reader._ptr = 1
     reader._bytes = nil
     reader._bytesStart = nil
-    reader._bytesChunkSize = 55
+    reader._bytesChunkSize = 1024
+    reader._bytesLeft = 0
 
     return setmetatable(reader, binaryReader._MT)
 end

@@ -83,21 +83,21 @@ function tilesStruct.tileStringToMatrix(tiles, seperator, empty)
     empty = empty or "0"
     tiles = tiles:gsub("\r\n", "\n")
 
-    local lines = tiles:split("\n")
+    local lines = tiles:split("\n")()
 
     local cols = 0
-    local rows = lines:len
+    local rows = #lines
 
-    for i, line <- lines do
+    for i, line in ipairs(lines) do
         cols = math.max(cols, #line)
     end
 
     local res = matrix.filled(empty, cols, rows)
 
-    for y, line <- lines do
-        local chars = line:split(seperator)
+    for y, line in ipairs(lines) do
+        local chars = line:split(seperator)()
 
-        for x, char <- chars do
+        for x, char in ipairs(chars) do
             res:setInbounds(x, y, char)
         end
     end
@@ -115,7 +115,9 @@ function tilesStruct.resizeMatrix(tiles, width, height, default, offsetX, offset
     local offsetXNeg = math.min(offsetX or 0, 0)
     local offsetYNeg = math.min(offsetY or 0, 0)
 
-    if tilesWidth ~= width or tilesHeight ~= height or (offsetX ~= 0 and offsetY ~= 0) then
+    local hasOffset = offsetX ~= 0 and offsetY ~= 0
+
+    if tilesWidth ~= width or tilesHeight ~= height or hasOffset then
         local newTilesMatrix = matrix.filled(default, width, height)
 
         for x = 1, width do
