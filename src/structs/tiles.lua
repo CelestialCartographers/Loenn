@@ -32,14 +32,14 @@ local function getRelevantCols(matrix, empty)
     for y = 1, height do
         for x = width, 1, -1 do
             if matrix:getInbounds(x, y) ~= empty then
-                table.insert(relevantCols, x)
+                relevantCols[y] = x
 
                 break
             end
         end
 
         if #relevantCols ~= y then
-            table.insert(relevantCols, 0)
+            relevantCols[y] = 0
         end
     end
 
@@ -69,10 +69,10 @@ function tilesStruct.matrixToTileStringMinimized(matrix, seperator, empty)
         local row = {}
 
         for x = 1, relevantCols[y] do
-            table.insert(row, matrix:getInbounds(x, y))
+            row[x] = matrix:getInbounds(x, y)
         end
 
-        table.insert(lines, table.concat(row, seperator))
+        lines[y] = table.concat(row, seperator)
     end
 
     return table.concat(lines, "\n")

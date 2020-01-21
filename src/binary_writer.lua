@@ -39,7 +39,7 @@ function binaryWriter._MT.__index:write(s)
     end
 end
 
-function binaryWriter.create(fh)
+function binaryWriter.create(fh, unwrittenMaxSize)
     local writer = {
         _type = "binary_writer"
     }
@@ -49,7 +49,7 @@ function binaryWriter.create(fh)
     end
 
     writer._fh = fh
-    writer._unwrittenMaxSize = 4096
+    writer._unwrittenMaxSize = unwrittenMaxSize or 4096
     writer._unwrittenBytes = 0
     writer._unwritten = {}
 

@@ -96,7 +96,7 @@ function mapcoder.decodeFile(path, header)
     local lookup = {}
 
     for i = 1, lookupLength do
-        table.insert(lookup, reader:readString())
+        lookup[i] = reader:readString()
     end
 
     res = decodeElement(reader, lookup)
@@ -165,7 +165,7 @@ function mapcoder.encodeBoolean(writer, b, lookup)
 end
 
 local function findInLookup(lookup, s)
-    return lookup:index(look -> look == s)
+    return lookup[s]
 end
 
 function mapcoder.encodeString(writer, s, lookup)
@@ -236,15 +236,15 @@ function mapcoder.encodeValue(writer, value, lookup)
     encodingFunctions[type(value)](writer, value, lookup)
 end
 
--- TODO - Use reader so we don't corrupt the bin midway if we fail
 function mapcoder.encodeFile(path, data, header)
     header = header or "CELESTE MAP"
 
     local fh = utils.getFileHandle(path, "wb")
-    local writer = binaryWriter(fh)
+    local writer = binaryWriter(fh, math.huge)
 
     local stringsSeen = countStrings(data)
     local lookupStrings = {}
+    local lookupTable = {}
 
     for s, c in pairs(stringsSeen) do
         table.insert(lookupStrings, {s, c})
@@ -256,11 +256,16 @@ function mapcoder.encodeFile(path, data, header)
     writer:writeString(data._package or "")
     writer:writeShort(lookupStrings:len)
 
+    -- Write the lookup table to string
+    -- But also generate a faster lookup table for the encoding functions
     for i, lookup <- lookupStrings do
         writer:writeString(lookup)
+
+        lookupTable[i] = lookup
+        lookupTable[lookup] = i
     end
 
-    mapcoder.encodeTable(writer, data, lookupStrings)
+    mapcoder.encodeTable(writer, data, lookupTable)
 
     writer:close()
 
