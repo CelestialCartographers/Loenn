@@ -102,6 +102,8 @@ function mapcoder.decodeFile(path, header)
     res = decodeElement(reader, lookup)
     res._package = package
 
+    reader:close()
+
     coroutine.yield("update", res)
 
     return res

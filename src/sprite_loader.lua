@@ -55,6 +55,8 @@ function spriteLoader.loadDataImage(fn)
         tasks.yield()
     end
 
+    reader:close()
+
     local res = love.graphics.newImage(image)
 
     tasks.update(res, image)

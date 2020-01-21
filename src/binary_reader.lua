@@ -14,7 +14,7 @@ for name, func in pairs(binfile) do
 end
 
 function binaryReader._MT.__index:close()
-    self._reader:clear(0)
+    self._reader:reset("")
 end
 
 function binaryReader._MT.__index:read(n)
