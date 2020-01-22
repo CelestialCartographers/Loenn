@@ -111,7 +111,7 @@ local function countStrings(data, seen)
     seen = seen or {}
 
     local name = data.__name or ""
-    local children = data.__children or {}
+    local children = data.__children
 
     seen[name] = (seen[name] or 0) + 1
 
@@ -125,8 +125,10 @@ local function countStrings(data, seen)
         end
     end
 
-    for i, child in ipairs(children) do
-        countStrings(child, seen)
+    if children then
+        for i, child in ipairs(children) do
+            countStrings(child, seen)
+        end
     end
 
     return seen
@@ -246,21 +248,18 @@ function mapcoder.encodeFile(path, data, header)
     local lookupTable = {}
 
     for s, c in pairs(stringsSeen) do
-        table.insert(lookupStrings, {s, c})
+        table.insert(lookupStrings, s)
     end
-
-    lookupStrings = $(lookupStrings):sortby(v -> v[2]):reverse():map(v -> v[1])
 
     writer:writeString(header)
     writer:writeString(data._package or "")
-    writer:writeShort(lookupStrings:len)
+    writer:writeShort(#lookupStrings)
 
     -- Write the lookup table to string
     -- But also generate a faster lookup table for the encoding functions
-    for i, lookup <- lookupStrings do
+    for i, lookup in ipairs(lookupStrings) do
         writer:writeString(lookup)
 
-        lookupTable[i] = lookup
         lookupTable[lookup] = i
     end
 
