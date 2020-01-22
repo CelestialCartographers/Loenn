@@ -5,7 +5,7 @@ local sceneHandler = require("scene_handler")
 local tasks = require("task")
 local utils = require("utils")
 
-local hasProfile, profile = utils.tryrequire("profile")
+local hasProfile, profile = utils.tryrequire("profile", false)
 local origYield = coroutine.yield
 
 local debugUtils = {}
