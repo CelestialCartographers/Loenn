@@ -13,6 +13,7 @@
 
 # other
 /lib/*
+/src/profile/*
 /src/celesteResources/*
 /src/*.dll
 /src/*.so
