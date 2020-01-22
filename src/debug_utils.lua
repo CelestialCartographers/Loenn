@@ -2,6 +2,11 @@ local entities = require("entities")
 local celesteRender = require("celeste_render")
 local toolHandler = require("tool_handler")
 local sceneHandler = require("scene_handler")
+local tasks = require("task")
+local utils = require("utils")
+
+local hasProfile, profile = utils.tryrequire("profile")
+local origYield = coroutine.yield
 
 local debugUtils = {}
 
@@ -56,6 +61,69 @@ end
 
 function debugUtils.debug()
     debug.debug()
+end
+
+function debugUtils.disableYields()
+    coroutine.yield = function() end
+    tasks.yield = coroutine.yield
+end
+
+function debugUtils.enableYields()
+    coroutine.yield = origYield
+    tasks.yield = coroutine.yield
+end
+
+function debugUtils.profile(f, options, ...)
+    if not hasProfile then
+        return "Profile library not available"
+    end
+
+    options = options or {}
+
+    local yieldsAlreadyDisabled = coroutine.yield ~= origYield
+
+    if not yieldsAlreadyDisabled and (options.disableYields or options.disableYields == nil) then
+        debugUtils.disableYields()
+    end
+
+    profile.reset()
+    profile.start()
+
+    local res = f(...)
+
+    profile.stop()
+
+    if not yieldsAlreadyDisabled and (options.disableYields or options.disableYields == nil) then
+        debugUtils.enableYields()
+    end
+
+    local report = profile.report(options.rows or 50)
+
+    if options.filename then
+        local fh = io.open(options.filename, "wb")
+
+        if fh then
+            fh:write(report)
+            fh:close()
+        end
+    end
+
+    return report, res
+end
+
+function debugUtils.timeIt(f, options, ...)
+    options = options or {}
+
+    local start = love.timer.getTime()
+    local rounds = options.rounds or 1000 
+
+    for i = 1, rounds do
+        f(...)
+    end
+
+    local timeTaken = love.timer.getTime() - start
+
+    return timeTaken, timeTaken / rounds
 end
 
 return debugUtils
