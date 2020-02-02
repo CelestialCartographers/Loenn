@@ -8,6 +8,8 @@ local hasHttps, https = requireUtils.tryrequire("https")
 
 local filesystem = {}
 
+filesystem.supportWindowsInThreads = love.system.getOS() ~= "OS X"
+
 function filesystem.filename(path, sep)
     sep = sep or physfs.getDirSeparator()
 
@@ -32,7 +34,7 @@ end
 function filesystem.splitpath(s)
     local sep = physfs.getDirSeparator()
 
-    return string.split(s, sep)
+    return string.split(s, sep)()
 end
 
 function filesystem.fileExtension(path)
@@ -43,7 +45,10 @@ function filesystem.stripExtension(path)
     return path:sub(1, #path - #filesystem.fileExtension(path) - 1)
 end
 
-filesystem.mkdir = lfs.mkdir
+function filesystem.mkdir(path, mode)
+    return lfs.mkdir(path, mode or 755)
+end
+
 filesystem.chdir = lfs.chdir
 filesystem.dir = lfs.dir
 filesystem.rmdir = lfs.rmdir
@@ -62,24 +67,58 @@ function filesystem.isDirectory(path)
     return attrs and attrs.mode == "directory"
 end
 
+function filesystem.mtime(path)
+    local attrs = lfs.attributes(path)
+
+    return attrs and attrs.modification or -1
+end
+
+-- TODO - Test
+function filesystem.copy(from, to)
+    local fromFh = io.open(from, "rb")
+
+    if not fromFh then
+        return false, "Target file not found"
+    end
+
+    local toFh = io.open(to, "wb")
+
+    if not toFh then
+        return false, "Couldn't create destination file"
+    end
+
+    toFh:write(fromFh:read("*a"))
+    toFh:close()
+    fromFh:close()
+
+    return true
+end
+
 -- Return thread if called with callback
 -- Otherwise block and return the selected file
 function filesystem.saveDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
     if callback then
-        local code = [[
-            local args = {...}
-            local channelName, path, filter = unpack(args)
-            local channel = love.thread.getChannel(channelName)
+        if filesystem.supportWindowsInThreads then
+            local code = [[
+                local args = {...}
+                local channelName, path, filter = unpack(args)
+                local channel = love.thread.getChannel(channelName)
 
-            local nfd = require("nfd")
+                local nfd = require("nfd")
 
-            local res = nfd.save(filter, nil, path)
-            channel:push(res)
-        ]]
+                local res = nfd.save(filter, nil, path)
+                channel:push(res)
+            ]]
 
-        return threadHandler.createStartWithCallback(code, callback, path, filter)
+            return threadHandler.createStartWithCallback(code, callback, path, filter)
+
+        else
+            callback(nfd.save(filter, nil, path))
+
+            return false, false
+        end
 
     else
         return nfd.save(filter, nil, path)
@@ -92,18 +131,25 @@ function filesystem.openDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
     if callback then
-        local code = [[
-            local args = {...}
-            local channelName, path, filter = unpack(args)
-            local channel = love.thread.getChannel(channelName)
+        if filesystem.supportWindowsInThreads then
+            local code = [[
+                local args = {...}
+                local channelName, path, filter = unpack(args)
+                local channel = love.thread.getChannel(channelName)
 
-            local nfd = require("nfd")
+                local nfd = require("nfd")
 
-            local res = nfd.open(filter, nil, path)
-            channel:push(res)
-        ]]
+                local res = nfd.open(filter, nil, path)
+                channel:push(res)
+            ]]
 
-        return threadHandler.createStartWithCallback(code, callback, path, filter)
+            return threadHandler.createStartWithCallback(code, callback, path, filter)
+
+        else
+            callback(nfd.open(filter, nil, path))
+
+            return false, false
+        end
 
     else
         return nfd.open(filter, nil, path)

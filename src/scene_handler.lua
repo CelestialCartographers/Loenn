@@ -33,14 +33,13 @@ function sceneHandler.defaultWipe(total, remaining, draw)
 end
 
 function sceneHandler.sendEvent(event, ...)
-    local args = {...}
     local scene = sceneHandler.getCurrentScene()
 
     if not scene or not scene[event] then
         return false
     end
 
-    scene[event](scene, unpack(args))
+    scene[event](scene, ...)
 
     return true
 end

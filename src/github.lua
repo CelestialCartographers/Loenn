@@ -12,14 +12,14 @@ github._baseReleasesUrl = github._baseUrl .. "/repos/%s/%s/releases"
 
 local function getUrlJsonData(url, force)
     if not hasHttps then
-        return false, nil
+        return nil
     end
 
     if github._cache[url] then
         local lastFetch = github._cache[url].time
 
         if lastFetch + github._cacheTime >= os.time() and not force and github._cache[url].data then
-            return true, github._cache[url].data
+            return github._cache[url].data
         end
     end
 
@@ -37,10 +37,10 @@ local function getUrlJsonData(url, force)
             data = data
         }
 
-        return true, data
+        return data
     end
 
-    return false, nil
+    return nil
 end
 
 function github.getReleases(author, repo)

@@ -9,6 +9,26 @@ return {
     cameraZoomIn = "ctrl + plus",
     cameraZoomOut = "ctrl + minus",
 
+    -- Room Movement
+    roomMoveLeft = "alt + left",
+    roomMoveRight = "alt + right",
+    roomMoveUp = "alt + up",
+    roomMoveDown = "alt + down",
+    roomMoveLeftPrecise = "ctrl + alt + left",
+    roomMoveRightPrecise = "ctrl + alt + right",
+    roomMoveUpPrecise = "ctrl + alt + up",
+    roomMoveDownPrecise = "ctrl + alt + down",
+
+    -- Room Resizing
+    roomResizeLeftGrow = false,
+    roomResizeRightGrow = false,
+    roomResizeUpGrow = false,
+    roomResizeDownGrow = false,
+    roomResizeLeftShrink = false,
+    roomResizeRightShrink = false,
+    roomResizeUpShrink = false,
+    roomResizeDownShrink = false,
+
     -- Debug
     debugReloadEntities = "f5",
     debugRedrawMap = "f6",

@@ -6,13 +6,22 @@ local drawing = require("drawing")
 
 local startupScene = {}
 
-startupScene.name = "Startup"
-startupScene._dialogChannel, startupScene._dialogThread = nil
-startupScene._nextScene = "Loading"
-startupScene._message = [[
+local drawnOnce = false
+local startedDialog = false
+
+local messageThreadsSupported = [[
 Please select Celeste.exe in the dialog or drag the file into the window.
 If you drag Celeste.exe in you will to manually close the dialog.
 ]]
+
+local messageThreadsNotSupported = [[
+Please select Celeste.exe or Celeste.app in the dialog.
+]]
+
+startupScene.name = "Startup"
+startupScene._dialogChannel, startupScene._dialogThread = nil
+startupScene._nextScene = "Loading"
+startupScene._message = filesystem.supportWindowsInThreads and messageThreadsSupported or messageThreadsNotSupported
 
 -- Save the path to config and then change to the loading scene
 local function saveGotoLoading(path)
@@ -26,14 +35,16 @@ local function saveGotoLoading(path)
 end
 
 local function checkDialog(path)
-    if startupScene._dialogThread and path == false then
+    if not path then
         love.window.close()
 
         return
     end
 
-    if startup.verifyCelesteDir(path) then
-        saveGotoLoading(path)
+    local cleanPath = startup.cleanupPath(path)
+
+    if startup.verifyCelesteDir(cleanPath) then
+        saveGotoLoading(cleanPath)
 
     else
         startupScene._dialogChannel, startupScene._dialogThread = filesystem.openDialog(nil, nil, checkDialog)
@@ -41,31 +52,24 @@ local function checkDialog(path)
 end
 
 function startupScene:firstEnter()
-    if startup.requiresInit() then
-        local found, path = startup.findCelesteDirectory()
-
-        if found and startup.verifyCelesteDir(path) then
-            saveGotoLoading(path)
-
-        else
-            checkDialog(path)
-        end
-
-    else
+    if not startup.requiresInit() then
         sceneHandler.changeScene(startupScene._nextScene)
     end
 end
 
 function startupScene:filedropped(file)
-    if startup.verifyCelesteDir(file:getFilename()) then
-        saveGotoLoading(file:getFilename())
+    local cleanPath = startup.cleanupPath(file:getFilename())
+
+    if startup.verifyCelesteDir(cleanPath) then
+        saveGotoLoading(cleanPath)
     end
 end
 
 function startupScene:directorydropped(path)
-    if startup.verifyCelesteDir(path) then
-        startup.savePath(path)
-        saveGotoLoading(path)
+    local cleanPath = startup.cleanFilename(path)
+
+    if startup.verifyCelesteDir(cleanPath) then
+        saveGotoLoading(cleanPath)
     end
 end
 
@@ -75,6 +79,23 @@ function startupScene:draw()
     love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
     drawing.printCenteredText(startupScene._message, 0, 0, love.graphics.getWidth(), love.graphics.getHeight(), love.graphics.getFont(), 4)
     love.graphics.setColor(r, g, b, a)
+
+    drawnOnce = true
+end
+
+function startupScene:update(dt)
+    if drawnOnce and not startedDialog then
+        local found, path = startup.findCelesteDirectory()
+
+        if found and startup.verifyCelesteDir(path) then
+            saveGotoLoading(path)
+
+        else
+            checkDialog(path)
+        end
+
+        startedDialog = true
+    end
 end
 
 return startupScene

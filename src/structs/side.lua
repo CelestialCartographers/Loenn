@@ -91,12 +91,12 @@ function sideStruct.decodeTaskable(data, tasksTarget)
 
             for i, v in ipairs(data.__children or {}) do
                 local name = v.__name
-        
+
                 if not decoderBlacklist[name] then
                     tableify(v, side)
                 end
             end
-        
+
             tasks.update(side)
         end,
         nil,
@@ -126,18 +126,21 @@ function sideStruct.encodeTaskable(side, tasksTarget)
 
             tasks.waitFor(mapTask)
             local res = mapTask.result
-        
+
             for k, v in pairs(side) do
                 if not encoderBlacklist[k] then
                     table.insert(res.__children, binfileify(k, v))
                 end
             end
-        
+
             tasks.update(res)
         end,
         nil,
         tasksTarget
     )
+
+    tasks.waitFor(sideTask)
+    tasks.update(sideTask.result)
 end
 
 return sideStruct

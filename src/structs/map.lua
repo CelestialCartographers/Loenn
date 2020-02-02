@@ -46,7 +46,7 @@ function mapStruct.decode(data)
             tasks.yield()
         end
     end
-    
+
     tasks.update(map)
 
     return map

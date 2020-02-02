@@ -24,7 +24,9 @@ function fileLocations.getStorageDir()
         end
 
     elseif userOS == "OS X" then
-        -- TODO
+        local home = os.getenv("HOME")
+
+        return filesystem.joinpath(home, "Library", "Application Support", loennLinuxFolderName)
 
     elseif userOS == "Android" then
         -- TODO

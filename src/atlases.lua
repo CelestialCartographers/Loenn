@@ -6,11 +6,12 @@ local tasks = require("task")
 local atlases = {}
 
 local celesteAtlasFolder = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Graphics", "Atlases")
-local gameplayMeta = utils.joinpath(celesteAtlasFolder, "Gameplay.meta")
+local gameplayMeta = "Gameplay.meta"
 
+-- TODO - Add config option to disable caching?
 function atlases.startAtlasLoadingTask(atlasKey, metaFn, atlasDir)
     tasks.newTask(
-        (-> spriteLoader.loadSpriteAtlas(gameplayMeta, celesteAtlasFolder)),
+        (-> spriteLoader.getCacheOrLoadSpriteAtlas(metaFn, atlasDir)),
         function(task)
             atlases[atlasKey] = task.result
         end

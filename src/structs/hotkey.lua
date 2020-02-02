@@ -17,7 +17,18 @@ local hotkeyStruct = {}
 -- TODO - Validate that the key constant exists?
 -- Exact match means that ctrl + s will only be valid on ctrl + s, and not ctrl + alt + s and so on
 function hotkeyStruct.sanitize(activator, exactMatch)
+    local activatorType = type(activator)
+
+    if activatorType == "table" then
+        return activator
+    end
+
+    if not activator then
+        return false
+    end
+
     exactMatch = exactMatch == nil or exactMatch
+
     local parts = string.split(activator, "+")
     local activators = {}
 
@@ -48,6 +59,10 @@ function hotkeyStruct.sanitize(activator, exactMatch)
 end
 
 function hotkeyStruct.hotkeyActive(hotkey)
+    if hotkeyStruct.disabled(hotkey) then
+        return false
+    end
+
     for i, part <- hotkey.activator do
         if type(part) == "function" then
             if not part() then
@@ -65,7 +80,7 @@ function hotkeyStruct.hotkeyActive(hotkey)
 end
 
 function hotkeyStruct.callbackIfActive(hotkey)
-    if hotkeyStruct.hotkeyActive(hotkey) then
+    if hotkey:active() then
         hotkey()
     end
 end
@@ -80,6 +95,10 @@ function hotkeyStruct.callbackFirstActive(hotkeys)
     end
 
     return false, false
+end
+
+function hotkeyStruct.disabled(hotkey)
+    return not hotkey.activator or not hotkey.enabled
 end
 
 local hotkeyMt = {}
@@ -100,6 +119,7 @@ function hotkeyStruct.createHotkey(activator, callback)
 
     hotkey.callback = callback
     hotkey.activator = hotkeyStruct.sanitize(activator)
+    hotkey.enabled = true
 
     return setmetatable(hotkey, hotkeyMt)
 end

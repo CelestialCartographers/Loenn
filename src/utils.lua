@@ -23,6 +23,37 @@ function utils.point(x, y)
     return {x = x, y = y, width = 1, height = 1}
 end
 
+function utils.rectangleBounds(rectangles)
+    local tlx, tly = math.huge(), math.huge()
+    local brx, bry = -math.huge(), -math.huge()
+
+    for i, rect in ipairs(rectangles) do
+        tlx = math.min(tlx, rect.x)
+        tly = math.min(tly, rect.y)
+
+        brx = math.max(brx, rect.x + rect.width)
+        bry = math.max(bry, rect.y + rect.height)
+    end
+
+    return tlx, tly, brx, bry
+end
+
+function utils.coverRectangles(rectangles)
+    local tlx, tly, brx, bry = utils.rectangleBounds(rectangles)
+
+    return tlx, tly, brx - tlx, bry - tly
+end
+
+-- Does the bounds and covering manually, reduces table construction
+function utils.coverTriangle(x1, y1, x2, y2, x3, y3)
+    local tlx = math.min(x1, x2, x3)
+    local tly = math.min(y1, y2, y3)
+    local brx = math.max(x1, x2, x3)
+    local bry = math.max(y1, y2, y3)
+
+    return tlx, tly, brx - tlx, bry - tly
+end
+
 function utils.aabbCheck(r1, r2)
     return not (r2.x >= r1.x + r1.width or r2.x + r2.width <= r1.x or r2.y >= r1.y + r1.height or r2.y + r2.height <= r1.y)
 end
@@ -46,6 +77,20 @@ function utils.readAll(path, mode, internal)
         file:close()
 
         return res
+    end
+end
+
+function utils.newImage(path, internal)
+    if internal then
+        return love.graphics.newImage(path)
+
+    else
+        local fileData, err = love.filesystem.newFileData(utils.readAll(path, "rb", internal), "placeholder.png")
+
+        if fileData then
+            local imageData = love.image.newImageData(fileData)
+            return love.graphics.newImage(imageData)
+        end
     end
 end
 
@@ -100,6 +145,18 @@ function utils.group(t, by)
         res[key] = res[key] or {}
 
         table.insert(res[key], v)
+    end
+
+    return res
+end
+
+function utils.concat(...)
+    local res = {}
+
+    for i, t in ipairs({...}) do
+        for j, v in ipairs(t) do
+            table.insert(res, v)
+        end
     end
 
     return res

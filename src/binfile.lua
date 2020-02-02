@@ -1,3 +1,5 @@
+-- Pure Lua binary file implementation
+
 local binfile = {}
 
 function binfile.twosCompliment(n, power)
@@ -17,13 +19,16 @@ function binfile.writeByte(fh, n)
     fh:write(string.char(n))
 end
 
+function binfile.writeBytes(fh, ...)
+    fh:write(string.char(...))
+end
+
 function binfile.readShort(fh)
     return binfile.readByte(fh) + binfile.readByte(fh) * 256
 end
 
 function binfile.writeShort(fh, n)
-    binfile.writeByte(fh, n % 256)
-    binfile.writeByte(fh, math.floor(n / 256) % 256)
+    binfile.writeBytes(fh, n % 256, math.floor(n / 256) % 256)
 end
 
 function binfile.readLong(fh)
@@ -31,10 +36,7 @@ function binfile.readLong(fh)
 end
 
 function binfile.writeLong(fh, n)
-    binfile.writeByte(fh, n % 256)
-    binfile.writeByte(fh, math.floor(n / 256) % 256)
-    binfile.writeByte(fh, math.floor(n / 256^2) % 256)
-    binfile.writeByte(fh, math.floor(n / 256^3) % 256)
+    binfile.writeBytes(fh, n % 256, math.floor(n / 256) % 256, math.floor(n / 256^2) % 256, math.floor(n / 256^3) % 256)
 end
 
 function binfile.readBool(fh)
@@ -78,6 +80,8 @@ function binfile.readFloat(fh)
 end
 
 function binfile.writeFloat(fh, n)
+    local b1, b2, b3, b4
+
     local val = n
     local sign = 0
 
@@ -97,14 +101,16 @@ function binfile.writeFloat(fh, n)
         exponent = exponent + 126
     end
 
-    binfile.writeByte(fh, math.floor(mantissa) % 256)
+    b1 = math.floor(mantissa) % 256
     val = math.floor(mantissa / 256)
-    binfile.writeByte(fh, math.floor(val) % 256)
+    b2 = math.floor(val) % 256
     val = math.floor(val / 256)
 
-    binfile.writeByte(fh, math.floor(exponent * 128 + val) % 256)
+    b3 = math.floor(exponent * 128 + val) % 256
     val = math.floor((exponent * 128 + val) / 256)
-    binfile.writeByte(fh, math.floor(sign * 128 + val) % 256)
+    b4 = math.floor(sign * 128 + val) % 256
+
+    binfile.writeBytes(fh, b1, b2, b3, b4)
 end
 
 function binfile.readVariableLength(fh)
@@ -154,16 +160,16 @@ end
 
 function binfile.readRunLengthEncoded(fh)
     local bytes = binfile.readShort(fh)
-    local res = ""
+    local res = {}
 
     for i = 1, bytes, 2 do
         local times = binfile.readByte(fh)
         local char = fh:read(1)
 
-        res ..= char:rep(times)
+        table.insert(res, char:rep(times))
     end
 
-    return res
+    return table.concat(res)
 end
 
 -- TODO - This is slow, consider doing it with FFI

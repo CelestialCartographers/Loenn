@@ -61,6 +61,22 @@ function drawing.printCenteredText(text, x, y, width, height, font, fontSize, tr
     love.graphics.pop()
 end
 
+function drawing.getTrianglePoints(x, y, theta, height)
+    theta = theta - math.pi / 2
+
+    local px1 = x + height * math.cos(theta + math.pi / 4)
+    local py1 = y + height * math.sin(theta + math.pi / 4)
+
+    local px2 = x + height * math.cos(theta - math.pi / 4)
+    local py2 = y + height * math.sin(theta - math.pi / 4)
+
+    return x, y, px1, py1, px2, py2
+end
+
+function drawing.triangle(mode, x, y, theta, height)
+    love.graphics.polygon(mode, drawing.getTrianglePoints(x, y, theta, height))
+end
+
 function drawing.callKeepOriginalColor(func)
     local pr, pg, pb, pa = love.graphics.getColor()
 

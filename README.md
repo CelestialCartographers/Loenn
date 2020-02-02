@@ -8,7 +8,6 @@
 [![downloads](https://img.shields.io/github/downloads/CelestialCartographers/Loenn/total.svg)](https://github.com/CelestialCartographers/Loenn/releases)
 [![Latest Version](https://img.shields.io/github/tag/CelestialCartographers/Loenn.svg?label=version)][latest-release]
 [![License](https://img.shields.io/github/license/CelestialCartographers/loenn.svg)](LICENSE)
-[![saythanks](https://img.shields.io/badge/say-thanks-ff69b4.svg)](https://saythanks.io/to/Cruor)
 
 (we're in `#map_making` on the "Mt. Celeste Climbing Association" Discord server)
 
@@ -114,7 +113,6 @@ Lönn contains and uses code from the following projects:
 Lönn also depends on the following projects:
   * [LÖVE](https://love2d.org/)
   * [A fork](https://github.com/Vexatos/nativefiledialog/tree/master/lua) of [lua bindings](https://github.com/Alloyed/nativefiledialog/tree/master/lua) for [nativefiledialog](https://github.com/mlabbe/nativefiledialog)
-  * [love-nuklear](https://github.com/keharriso/love-nuklear)
   * [lua-https](https://bitbucket.org/bartbes/lua-https)
 
 Many thanks go to these projects.

@@ -55,6 +55,7 @@ function config.writeConfigData(filename, data, pretty)
                 fh:write(content)
                 fh:close()
 
+                os.remove(filename)
                 os.rename(tempFilename, filename)
                 os.remove(tempFilename)
 
@@ -110,9 +111,11 @@ function config.writeConfig(conf)
         local pretty = rawget(conf, "pretty")
         local data = rawget(conf, "data")
 
-        config.writeConfigData(filename, data, pretty)
+        local success = config.writeConfigData(filename, data, pretty)
 
         rawset(conf, "mtime", os.time())
+
+        return success
     end
 end
 

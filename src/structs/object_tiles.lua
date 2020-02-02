@@ -4,24 +4,22 @@ local tilesStruct = require("structs.tiles")
 local objectTilesStruct = {}
 
 function objectTilesStruct.resize(tiles, width, height, default)
-    local newTilesMatrix = tilesStruct.resizeMatrix(tiles, width, height, default or "-1")
+    return tilesStruct.resize(tiles, width, height, default or "-1")
+end
 
-    if newTilesMatrix then
-        return objectTilesStruct.fromMatrix(newTilesMatrix)
-    end
+function objectTilesStruct.fromMatrix(m, raw)
+    local tiles = {
+        _type = "object_tiles",
+        raw = raw
+    }
+
+    tiles.matrix = m
 
     return tiles
 end
 
-function objectTilesStruct.fromMatrix(m, raw)
-        local tiles = {
-            _type = "object_tiles",
-            raw = raw
-        }
-
-        tiles.matrix = m
-
-        return tiles
+function objectTilesStruct.directionalResize(tiles, side, amount, default)
+    return tilesStruct.directionalResize(tiles, side, amount, default or "-1")
 end
 
 function objectTilesStruct.decode(data)
