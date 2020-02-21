@@ -1,15 +1,17 @@
+-- Loading originX and originY, reason in entity struct
+
 local nodeStruct = require("structs.node")
 
 local triggerStruct = {}
 
 -- Special cases
-local ignoredAttrs = {
+local ignoredDecodingAttrs = {
     __children = true,
     __name = true,
     id = true,
-    originX = true,
-    originY = true,
+}
 
+local ignoredEncodingAttrs = {
     _name = true,
     _id = true,
     nodes = true,
@@ -27,7 +29,7 @@ function triggerStruct.decode(data)
     trigger._id = data.id
 
     for k, v in pairs(data) do
-        if not ignoredAttrs[k] then
+        if not ignoredDecodingAttrs[k] then
             trigger[k] = v
         end
     end
@@ -46,7 +48,7 @@ function triggerStruct.encode(trigger)
     res.id = trigger._id
 
     for k, v in pairs(trigger) do
-        if not ignoredAttrs[k] then
+        if not ignoredEncodingAttrs[k] then
             res[k] = v
         end
     end

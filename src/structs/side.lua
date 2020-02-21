@@ -31,13 +31,13 @@ local function tableify(data, t)
     end
 
     for i, child in ipairs(children) do
-        tableify(child, t)
+        tableify(child, t[name])
     end
 
     return t
 end
 
-local function binfileify(name, data, topLevel)
+local function binfileify(name, data)
     local res = {
         __name = name,
         __children = {}
