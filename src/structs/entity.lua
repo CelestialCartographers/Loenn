@@ -1,15 +1,19 @@
+-- Chosing to load originX and originY, even if the values are completely unused
+-- Noel confirms that it is left over from Ogmo editor, and most likely isn't used for any entities/triggers
+-- For now, Lönn (like Ahorn) will simply not include these values in newly placed entities
+
 local nodeStruct = require("structs.node")
 
 local entityStruct = {}
 
 -- Special cases
-local ignoredAttrs = {
+local ignoredDecodingAttrs = {
     __children = true,
     __name = true,
     id = true,
-    originX = true,
-    originY = true,
+}
 
+local ignoredEncodingAttrs = {
     _name = true,
     _id = true,
     nodes = true,
@@ -27,7 +31,7 @@ function entityStruct.decode(data)
     entity._id = data.id
 
     for k, v in pairs(data) do
-        if not ignoredAttrs[k] then
+        if not ignoredDecodingAttrs[k] then
             entity[k] = v
         end
     end
@@ -46,7 +50,7 @@ function entityStruct.encode(entity)
     res.id = entity._id
 
     for k, v in pairs(entity) do
-        if not ignoredAttrs[k] then
+        if not ignoredEncodingAttrs[k] then
             res[k] = v
         end
     end

@@ -1,5 +1,8 @@
 local colors = {}
 
+colors.tileFGMissingColor = {120 / 255, 81 / 255, 169 / 255}
+colors.tileBGMissingColor = {255 / 255, 195 / 255, 11 / 255}
+
 colors.entityMissingColor = {47 / 255, 114 / 255, 100 / 255, 0.75}
 colors.triggerColor = {47 / 255, 114 / 255, 100 / 255, 0.3}
 colors.triggerTextColor = {255 / 255, 255 / 255, 255 / 255}

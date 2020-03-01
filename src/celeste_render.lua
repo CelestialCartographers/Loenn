@@ -187,6 +187,25 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     return quadCache:get0(quadX, quadY)
 end
 
+local function drawInvalidTiles(batch, missingTiles, fg)
+    local color = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
+
+    local canvas = love.graphics.getCanvas()
+    local r, g, b, a = love.graphics.getColor()
+
+    love.graphics.setCanvas(batch._canvas)
+    love.graphics.setColor(color)
+
+    for _, missing in ipairs(missingTiles) do
+        local x, y = missing[1], missing[2]
+
+        love.graphics.rectangle("fill", x * 8, y * 8, 8, 8)
+    end
+
+    love.graphics.setCanvas(canvas)
+    love.graphics.setColor(r, g, b, a)
+end
+
 -- randomMatrix is for custom randomness, mostly to give the correct "slice" of the matrix when making fake tiles
 function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
     local tilesMatrix = tiles.matrix
@@ -211,30 +230,47 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
 
     local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, fg and "tilesFg" or "tilesBg")
 
+    local missingTiles = {}
+
     for x = 1, width do
         for y = 1, height do
             local rng = random:getInbounds(x, y)
             local tile = tilesMatrix:getInbounds(x, y)
 
             if tile ~= airTile then
-                -- TODO - Render overlay sprites
-                local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
-                local quadCount = #quads
+                if meta.paths[tile] then
+                    -- TODO - Render overlay sprites
+                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+                    local quadCount = #quads
 
-                if quadCount > 0 then
-                    local randQuad = quads[utils.mod1(rng, quadCount)]
-                    local texture = meta.paths[tile] or emptyTile
+                    if quadCount > 0 then
+                        local randQuad = quads[utils.mod1(rng, quadCount)]
+                        local texture = meta.paths[tile] or emptyTile
 
-                    local spriteMeta = atlases.gameplay[texture]
-                    local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
+                        local spriteMeta = atlases.gameplay[texture]
 
-                    batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+                        if spriteMeta then
+                            local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
+
+                            batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+
+                        else
+                            -- Missing texture, not found on disk
+                            table.insert(missingTiles, {x, y})
+                        end
+                    end
+
+                else
+                    -- Unknown tileset id
+                    table.insert(missingTiles, {x, y})
                 end
             end
         end
 
         tasks.yield()
     end
+
+    drawInvalidTiles(batch, missingTiles, fg)
 
     tasks.update(batch)
 
