@@ -112,7 +112,7 @@ function editorScene:firstEnter()
 
                 uie.scrollbox(
                     uie.list(
-                        uiu.map(uiu.listRange(2000, 1, -1), function(i)
+                        uiu.map(uiu.listRange(200, 1, -1), function(i)
                             return { text = string.format("%i%s", i, i % 7 == 0 and " (something)" or ""), data = i }
                         end)
                     ):with(uiu.hook{
