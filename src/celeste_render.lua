@@ -520,7 +520,7 @@ local depthBatchingFunctions = {
 -- Force all non finished room batch tasks to finish
 function celesteRender.forceRoomBatchRender(room, viewport)
     for i, data in ipairs(depthBatchingFunctions) do
-        local description, key, func, depth = unpack(data)
+        local description, key, func, depth = data[1], data[2], data[3], data[4]
         local result = func(room, room[key], viewport)
         local task = roomCache[room.name][key]
 
@@ -538,7 +538,7 @@ function celesteRender.getRoomBatches(room, viewport)
         local done = true
 
         for i, data in ipairs(depthBatchingFunctions) do
-            local description, key, func, depth = unpack(data)
+            local description, key, func, depth = data[1], data[2], data[3], data[4]
             local batches = func(room, room[key], viewport)
 
             if batches then

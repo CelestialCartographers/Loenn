@@ -319,14 +319,14 @@ function gridCanvasBatchMt.__index:updateDirtyRegions()
         love.graphics.setCanvas(self._canvas)
 
         for i, cell in ipairs(self._dirtyDrawCells) do
-            local x, y = unpack(cell)
-            local value = self._matrix:get(x, y, false)
+            local x, y = cell[1], cell[2]
+            local value = self._matrix:get(x, y)
 
             drawCanvasArea(self, x, y, unpack(value))
         end
 
         for i, cell in ipairs(self._dirtyScissorCells) do
-            local x, y, func = unpack(cell)
+            local x, y, func = cell[1], cell[2], cell[3]
             local value = self._matrix:get(x, y, false)
 
             if value then

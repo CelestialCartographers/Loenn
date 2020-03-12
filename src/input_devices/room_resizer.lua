@@ -68,7 +68,7 @@ local function draggingResizeTriangle(cursorX, cursorY, roomX, roomY, width, hei
     local cursor = utils.point(cursorX, cursorY)
 
     for i, point in ipairs(getTrianglePoints(roomX, roomY, width, height, viewport.scale)) do
-        local dx, dy, theta = unpack(point)
+        local dx, dy, theta = point[1], point[2], point[3]
         local rect = utils.rectangle(utils.coverTriangle(drawing.getTrianglePoints(dx, dy, theta, triangleHeight)))
 
         if utils.aabbCheck(cursor, rect) then
@@ -115,7 +115,7 @@ function roomResizer.draw()
             love.graphics.setColor(triangleColor)
 
             for i, point in ipairs(getTrianglePoints(x, y, width, height, viewport.scale)) do
-                local dx, dy, theta = unpack(point)
+                local dx, dy, theta = point[1], point[2], point[3]
 
                 drawing.triangle("fill", dx, dy, theta, triangleHeight)
             end
