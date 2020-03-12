@@ -1,6 +1,7 @@
 local atlases = require("atlases")
 local utils = require("utils")
 local drawing = require("drawing")
+local xnaColors = require("xna_colors")
 
 local drawableSpriteStruct = {}
 
@@ -46,13 +47,21 @@ local function setColor(target, color)
     local colorType = type(color)
 
     if colorType == "string" then
-        local success, r, g, b = utils.parseHexColor(color)
+        -- Check XNA colors, otherwise parse as hex color
+        if xnaColors[color] then
+            target.color = xnaColors[color]
 
-        if success then
-            target.color = {r, g, b}
+            return true
+
+        else
+            local success, r, g, b = utils.parseHexColor(color)
+
+            if success then
+                target.color = {r, g, b}
+            end
+
+            return success
         end
-
-        return success
 
     elseif colorType == "table" and (#color == 3 or #color == 4) then
         target.color = color

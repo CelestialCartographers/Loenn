@@ -1,5 +1,7 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
 
+local defaultSpinnerColor = "Blue"
+
 local spinner = {}
 
 function spinner.depth(room, entity)
@@ -7,7 +9,7 @@ function spinner.depth(room, entity)
 end
 
 function spinner.sprite(room, entity)
-    local color = entity.color or "Blue"
+    local color = entity.color or defaultSpinnerColor
     local dusty = entity.dusty
 
     if dusty then
@@ -20,9 +22,25 @@ function spinner.sprite(room, entity)
         }
 
     else
-        local texture = "danger/crystal/fg_" .. string.lower(color) .. "00"
+        -- Prevent color from spinner to tint the drawable sprite
+        local position = {
+            x = entity.x,
+            y = entity.y
+        }
 
-        return drawableSpriteStruct.spriteFromTexture(texture, entity)
+        local texture = "danger/crystal/fg_" .. string.lower(color) .. "00"
+        local sprite = drawableSpriteStruct.spriteFromTexture(texture, position)
+
+        -- Check if texture color exists, otherwise use default color
+        -- Needed because Rainbow and Core colors doesn't have textures
+        if sprite.meta then
+            return sprite
+
+        else
+            texture = "danger/crystal/fg_" .. string.lower(defaultSpinnerColor) .. "00"
+
+            return drawableSpriteStruct.spriteFromTexture(texture, position)
+        end
     end
 end
 
