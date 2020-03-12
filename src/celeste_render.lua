@@ -643,17 +643,17 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
                 love.graphics.rectangle("line", 0, 0, width, height)
             end)
 
-            -- No need to do anything if we can only see the room border
-            if roomVisibleWidth > 2 and roomVisibleHeight > 2 then
-                if redrawRoom then
-                    -- Invalidate the canvas, so it is updated properly when the selected room changes
-                    -- TODO - Move into code responsible for changing selected room?
+            if redrawRoom then
+                -- Invalidate the canvas, so it is updated properly when the selected room changes
+                -- TODO - Move into code responsible for changing selected room?
 
-                    celesteRender.invalidateRoomCache(room.name, "canvas")
-                    drawRoomFromBatches(room, viewport, selected)
+                celesteRender.invalidateRoomCache(room.name, "canvas")
+                drawRoomFromBatches(room, viewport, selected)
 
-                else
-                    if canvas then
+            else
+                if canvas then
+                    -- No need to draw the canvas if we can only see the border
+                    if roomVisibleWidth > 2 and roomVisibleHeight > 2 then
                         love.graphics.draw(canvas)
                     end
                 end

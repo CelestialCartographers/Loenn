@@ -35,16 +35,10 @@ function viewportHandler.getRoomVisibleSize(room, viewport)
 end
 
 function viewportHandler.fillerVisible(filler, viewport)
-    local actuallX = viewport.x / viewport.scale
-    local actuallY = viewport.y / viewport.scale
-
-    local actuallWidth = viewport.width / viewport.scale
-    local actuallHeight = viewport.height / viewport.scale
-
-    local cameraRect = {x = actuallX, y = actuallY, width = actuallWidth, height = actuallHeight}
-    local fillerRect = {x = filler.x * 8, y = filler.y * 8, width = filler.width * 8, height = filler.height * 8}
-
-    return utils.aabbCheck(cameraRect, fillerRect)
+    return utils.aabbCheckInline(
+        viewport.x / viewport.scale, viewport.y / viewport.scale, viewport.width / viewport.scale, viewport.height / viewport.scale,
+        filler.x * 8, filler.y * 8, filler.width * 8, filler.height * 8
+    )
 end
 
 function viewportHandler.getMousePosition()
