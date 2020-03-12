@@ -24,16 +24,14 @@ viewportHandler.viewport = viewport
 viewportHandler.device = viewportDevice
 
 function viewportHandler.roomVisible(room, viewport)
-    local actuallX = viewport.x / viewport.scale
-    local actuallY = viewport.y / viewport.scale
+    return utils.aabbCheckInline(
+        viewport.x / viewport.scale, viewport.y / viewport.scale, viewport.width / viewport.scale, viewport.height / viewport.scale,
+        room.x, room.y, room.width, room.height
+    )
+end
 
-    local actuallWidth = viewport.width / viewport.scale
-    local actuallHeight = viewport.height / viewport.scale
-
-    local cameraRect = {x = actuallX, y = actuallY, width = actuallWidth, height = actuallHeight}
-    local roomRect = {x = room.x, y = room.y, width = room.width, height = room.height}
-
-    return utils.aabbCheck(cameraRect, roomRect)
+function viewportHandler.getRoomVisibleSize(room, viewport)
+    return room.width * viewport.scale, room.height * viewport.scale
 end
 
 function viewportHandler.fillerVisible(filler, viewport)

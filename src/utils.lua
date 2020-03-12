@@ -58,6 +58,10 @@ function utils.aabbCheck(r1, r2)
     return not (r2.x >= r1.x + r1.width or r2.x + r2.width <= r1.x or r2.y >= r1.y + r1.height or r2.y + r2.height <= r1.y)
 end
 
+function utils.aabbCheckInline(x1, y1, w1, h1, x2, y2, w2, h2)
+    return not (x2 >= x1 + w1 or x2 + w2 <= x1 or y2 >= y1 + h1 or y2 + h2 <= y1)
+end
+
 function utils.getFileHandle(path, mode, internal)
     if internal then
         return love.filesystem.newFile(path, mode:gsub("b", ""))
