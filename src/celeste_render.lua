@@ -146,7 +146,7 @@ function celesteRender.getRoomBackgroundColor(room, selected)
         color = colors.roomBackgroundColors[roomColor + 1]
     end
 
-    local r, g, b = unpack(color)
+    local r, g, b = color[1], color[2], color[3]
     local a = selected and 1.0 or 0.3
 
     return {r, g, b, a}
@@ -616,41 +616,50 @@ local function getRoomCanvas(room, viewport, selected)
     return roomCache[room.name].canvas and roomCache[room.name].canvas.result
 end
 
-function celesteRender.drawRoom(room, viewport, selected)
-    local roomX = room.x or 0
-    local roomY = room.y or 0
-
-    local width = room.width or 40 * 8
-    local height = room.height or 23 * 8
-
-    local backgroundColor = celesteRender.getRoomBackgroundColor(room, selected)
-    local borderColor = celesteRender.getRoomBorderColor(room, selected)
-
+function celesteRender.drawRoom(room, viewport, selected, visible)
+    -- Getting the canvas starts background drawing tasks
+    -- This should start regardless of the room being visible or not
     local redrawRoom = selected or ALWAYS_REDRAW_UNSELECTED_ROOMS
     local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
-    viewportHandler.drawRelativeTo(roomX, roomY, function()
-        drawing.callKeepOriginalColor(function()
-            love.graphics.setColor(backgroundColor)
-            love.graphics.rectangle("fill", 0, 0, width, height)
+    if visible then
+        local roomX = room.x or 0
+        local roomY = room.y or 0
 
-            love.graphics.setColor(borderColor)
-            love.graphics.rectangle("line", 0, 0, width, height)
-        end)
+        local width = room.width or 40 * 8
+        local height = room.height or 23 * 8
 
-        if redrawRoom then
-            -- Invalidate the canvas, so it is updated properly when the selected room changes
-            -- TODO - Move into code responsible for changing selected room?
+        local roomVisibleWidth, roomVisibleHeight = viewportHandler.getRoomVisibleSize(room, viewport)
 
-            celesteRender.invalidateRoomCache(room.name, "canvas")
-            drawRoomFromBatches(room, viewport, selected)
+        local backgroundColor = celesteRender.getRoomBackgroundColor(room, selected)
+        local borderColor = celesteRender.getRoomBorderColor(room, selected)
 
-        else
-            if canvas then
-                love.graphics.draw(canvas)
+        viewportHandler.drawRelativeTo(roomX, roomY, function()
+            drawing.callKeepOriginalColor(function()
+                love.graphics.setColor(backgroundColor)
+                love.graphics.rectangle("fill", 0, 0, width, height)
+
+                love.graphics.setColor(borderColor)
+                love.graphics.rectangle("line", 0, 0, width, height)
+            end)
+
+            -- No need to do anything if we can only see the room border
+            if roomVisibleWidth > 2 and roomVisibleHeight > 2 then
+                if redrawRoom then
+                    -- Invalidate the canvas, so it is updated properly when the selected room changes
+                    -- TODO - Move into code responsible for changing selected room?
+
+                    celesteRender.invalidateRoomCache(room.name, "canvas")
+                    drawRoomFromBatches(room, viewport, selected)
+
+                else
+                    if canvas then
+                        love.graphics.draw(canvas)
+                    end
+                end
             end
-        end
-    end)
+        end)
+    end
 end
 
 function celesteRender.drawFiller(filler, viewport)
@@ -681,8 +690,10 @@ function celesteRender.drawMap(state)
             end
 
             for i, room in ipairs(map.rooms) do
-                if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or viewportHandler.roomVisible(room, viewport) then
-                    celesteRender.drawRoom(room, viewport, room == state.selectedRoom)
+                local roomVisible = viewportHandler.roomVisible(room, viewport)
+
+                if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or roomVisible then
+                    celesteRender.drawRoom(room, viewport, room == state.selectedRoom, roomVisible)
                 end
             end
         end
