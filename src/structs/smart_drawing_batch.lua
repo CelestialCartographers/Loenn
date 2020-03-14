@@ -1,5 +1,6 @@
 local utils = require("utils")
 local matrix = require("matrix")
+local drawing = require("drawing")
 
 local smartDrawingBatch = {}
 
@@ -7,54 +8,57 @@ local orderedDrawingBatchMt = {}
 orderedDrawingBatchMt.__index = {}
 
 local spriteBatchMode = "static"
+local spriteBatchSize = 1000
 
 -- TODO - Make tinting smarter? Batch based on color?
 function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
     local typ = utils.typeof(drawable)
 
-    if typ == "drawableSprite" then
+    if typ == "drawableRectangle" then
+        -- TODO - Support multiple sprites for outlined rectangles
+        self:addFromDrawable(drawable:getDrawableSprite())
+
+        -- These should count as drawableSprites for batching reasons
+        -- Otherwise a new batch would be created on every rectangle
+        typ = "drawableSprite"
+
+    elseif typ == "drawableSprite" then
         local image = drawable.meta and drawable.meta.image
 
         if image then
             local offsetX = drawable.offsetX or ((drawable.justificationX or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX)
             local offsetY = drawable.offsetY or ((drawable.justificationY or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY)
 
-            if drawable.color and type(drawable.color) == "table" then
-                -- Special case
-                local newDrawable = {_type = "drawableFunction"}
+            local colorChanged = not utils.sameColor(drawable.color, self._lastColor)
 
-                function newDrawable.func(drawable)
-                    drawable:draw()
-                end
-
-                newDrawable.depth = drawable.depth
-                newDrawable.args = {drawable}
-
-                typ = "drawableFunction"
-                drawable = newDrawable
-
-            else
-                if image ~= self._prevImage or self._prevTyp ~= "drawableSprite" then
-                    self._lastBatch = love.graphics.newSpriteBatch(image, 1000, spriteBatchMode)
-                    table.insert(self._drawables, self._lastBatch)
-                end
-
-                self._prevImage = image
-                self._lastBatch:add(drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
+            if image ~= self._lastImage or self._lastType ~= "drawableSprite" or colorChanged or not self._lastBatch then
+                self._lastBatch = love.graphics.newSpriteBatch(image, spriteBatchSize, spriteBatchMode)
+                self._imagesCurrentBatch = 0
+                table.insert(self._drawables, {self._lastBatch, drawable.color})
             end
+
+            self._lastImage = image
+            self._lastColor = drawable.color
+            self._imagesCurrentBatch += 1
+            self._lastBatch:add(drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
         end
+
+    elseif typ == "drawableFunction" then
+        -- Handles colors itself
+        table.insert(self._drawables, {drawable, nil})
     end
 
-    if typ == "drawableFunction" then
-        table.insert(self._drawables, drawable)
-    end
-
-    self._prevTyp = typ
+    self._lastType = typ
 end
 
 function orderedDrawingBatchMt.__index:draw()
-    for i, drawable in ipairs(self._drawables) do
+    local r, g, b, a = love.graphics.getColor()
+
+    for _, element in ipairs(self._drawables) do
+        local drawable, color = element[1], element[2] or {1.0, 1.0, 1.0, 1.0}
         local typ = utils.typeof(drawable)
+
+        love.graphics.setColor(color)
 
         if typ == "drawableFunction" then
             drawable.func(unpack(drawable.args))
@@ -63,12 +67,18 @@ function orderedDrawingBatchMt.__index:draw()
             love.graphics.draw(drawable, 0, 0)
         end
     end
+
+    love.graphics.setColor(r, g, b, a)
 end
 
 function orderedDrawingBatchMt.__index:clear()
     self._drawables = {}
+
+    self._imagesCurrentBatch = 0
     self._lastBatch = nil
     self._lastImage = nil
+    self._lastColor = nil
+    self._lastType = nil
 end
 
 function smartDrawingBatch.createOrderedBatch()
@@ -77,8 +87,12 @@ function smartDrawingBatch.createOrderedBatch()
     }
 
     res._drawables = {}
+
+    res._imagesCurrentBatch = 0
     res._lastBatch = nil
     res._lastImage = nil
+    res._lastColor = nil
+    res._lastType = nil
 
     return setmetatable(res, orderedDrawingBatchMt)
 end
@@ -93,7 +107,7 @@ function unorderedDrawingBatchMt.__index:add(meta, quad, x, y, r, sx, sy, jx, jy
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
-    self._lookup[image] = self._lookup[image] or love.graphics.newSpriteBatch(image, 1000, spriteBatchMode)
+    self._lookup[image] = self._lookup[image] or love.graphics.newSpriteBatch(image, spriteBatchSize, spriteBatchMode)
     self._lookup[image]:add(quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
 end
 

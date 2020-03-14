@@ -1,9 +1,12 @@
 local colors = require("colors")
-local drawing = require("drawing")
+local utils = require("utils")
 
 local missing = {}
 
-function missing.draw(room, entity)
+missing.mode = "fill"
+missing.color = colors.entityMissingColor
+
+function missing.rectangle(room, entity)
     local x = entity.x or 0
     local y = entity.y or 0
 
@@ -15,10 +18,7 @@ function missing.draw(room, entity)
     local drawWidth = math.max(width, 5)
     local drawHeight = math.max(height, 5)
 
-    drawing.callKeepOriginalColor(function()
-        love.graphics.setColor(colors.entityMissingColor)
-        love.graphics.rectangle("fill", drawX, drawY, drawWidth, drawHeight)
-    end)
+    return utils.rectangle(drawX, drawY, drawWidth, drawHeight)
 end
 
 return missing
