@@ -10,6 +10,7 @@ local entityHandler = require("entities")
 local smartDrawingBatch = require("structs.smart_drawing_batch")
 local drawableSprite = require("structs.drawable_sprite")
 local drawableFunction = require("structs.drawable_function")
+local drawableRectangle = require("structs.drawable_rectangle")
 local viewportHandler = require("viewport_handler")
 local matrix = require("matrix")
 
@@ -380,6 +381,7 @@ local function getOrCreateSmartBatch(batches, key)
     return batches[key]
 end
 
+-- TODO - Clean up, some of this logic should be in entities.lua or other helper file
 local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)
     local batches = {}
 
@@ -407,6 +409,13 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
                         end
                     end
                 end
+
+            elseif handler.rectangle then
+                local rectangle = handler.rectangle(room, entity, viewport)
+                local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)
+                local batch = getOrCreateSmartBatch(batches, defaultDepth)
+
+                batch:addFromDrawable(drawable)
             end
 
             if handler.draw then
@@ -461,7 +470,7 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
             local width = trigger.width or 16
             local height = trigger.height or 16
 
-            drawing.callKeepOriginalColor(function() 
+            drawing.callKeepOriginalColor(function()
                 love.graphics.setColor(colors.triggerColor)
 
                 love.graphics.rectangle("line", x, y, width, height)

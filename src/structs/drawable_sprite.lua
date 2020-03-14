@@ -1,7 +1,6 @@
 local atlases = require("atlases")
 local utils = require("utils")
 local drawing = require("drawing")
-local xnaColors = require("xna_colors")
 
 local drawableSpriteStruct = {}
 
@@ -44,32 +43,13 @@ function drawableSpriteMt.__index:setOffset(offsetX, offsetY)
 end
 
 local function setColor(target, color)
-    local colorType = type(color)
+    local tableColor = utils.getColor(color)
 
-    if colorType == "string" then
-        -- Check XNA colors, otherwise parse as hex color
-        if xnaColors[color] then
-            target.color = xnaColors[color]
-
-            return true
-
-        else
-            local success, r, g, b = utils.parseHexColor(color)
-
-            if success then
-                target.color = {r, g, b}
-            end
-
-            return success
-        end
-
-    elseif colorType == "table" and (#color == 3 or #color == 4) then
-        target.color = color
-
-        return true
+    if tableColor then
+        target.color = tableColor
     end
 
-    return false
+    return tableColor ~= nil
 end
 
 function drawableSpriteMt.__index:setColor(color)
@@ -105,11 +85,10 @@ function drawableSpriteMt.__index:drawRectangle(mode, color)
     mode = mode or "fill"
 
     if color then
-        local r, g, b, a = love.graphics.getColor()
-
-        love.graphics.setColor(color)
-        love.graphics.rectangle(mode, self:getRectangleRaw())
-        love.graphics.setColor(r, g, b, a)
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(color)
+            love.graphics.rectangle(mode, self:getRectangleRaw())
+        end)
 
     else
         love.graphics.rectangle(mode, self:getRectangleRaw())
@@ -131,11 +110,8 @@ function drawableSpriteMt.__index:draw()
     end
 end
 
-function drawableSpriteStruct.spriteFromTexture(texture, data)
+function drawableSpriteStruct.spriteFromMeta(meta, data)
     data = data or {}
-
-    local atlas = data.atlas or "gameplay"
-    local spriteMeta = atlases[atlas][texture]
 
     local drawableSprite = {
         _type = "drawableSprite"
@@ -144,22 +120,29 @@ function drawableSpriteStruct.spriteFromTexture(texture, data)
     drawableSprite.x = data.x or 0
     drawableSprite.y = data.y or 0
 
-    drawableSprite.justificationX = data.justificationX or 0.5
-    drawableSprite.justificationY = data.justificationY or 0.5
+    drawableSprite.justificationX = data.jx or data.justificationX or 0.5
+    drawableSprite.justificationY = data.jy or data.justificationY or 0.5
 
-    drawableSprite.scaleX = data.sx or 1
-    drawableSprite.scaleY = data.sy or 1
+    drawableSprite.scaleX = data.sx or data.scaleX or 1
+    drawableSprite.scaleY = data.sy or data.scaleY or 1
 
-    drawableSprite.rotation = data.r or 0
+    drawableSprite.rotation = data.r or data.rotation or 0
 
     drawableSprite.depth = data.depth
 
-    drawableSprite.meta = spriteMeta
-    drawableSprite.quad = spriteMeta and spriteMeta.quad or nil
+    drawableSprite.meta = meta
+    drawableSprite.quad = meta and meta.quad or nil
 
     setColor(drawableSprite, data.color)
 
     return setmetatable(drawableSprite, drawableSpriteMt)
+end
+
+function drawableSpriteStruct.spriteFromTexture(texture, data)
+    local atlas = data and data.atlas or "gameplay"
+    local spriteMeta = atlases[atlas][texture]
+
+    return drawableSpriteStruct.spriteFromMeta(spriteMeta, data)
 end
 
 return drawableSpriteStruct

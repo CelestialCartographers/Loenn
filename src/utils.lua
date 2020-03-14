@@ -1,6 +1,7 @@
 local serialize = require("serialize")
 local filesystem = require("filesystem")
 local requireUtils = require("require_utils")
+local xnaColors = require("xna_colors")
 
 local utils = {}
 
@@ -71,7 +72,6 @@ function utils.getFileHandle(path, mode, internal)
     end
 end
 
-
 function utils.readAll(path, mode, internal)
     local file = utils.getFileHandle(path, mode or "rb", internal)
 
@@ -128,6 +128,42 @@ function utils.parseHexColor(color)
     end
 
     return false, 0, 0, 0
+end
+
+-- Get color in various formats, return as table
+function utils.getColor(color)
+    local colorType = type(color)
+
+    if colorType == "string" then
+        -- Check XNA colors, otherwise parse as hex color
+        if xnaColors[color] then
+            return xnaColors[color]
+
+        else
+            local success, r, g, b = utils.parseHexColor(color)
+
+            if success then
+                return {r, g, b}
+            end
+
+            return success
+        end
+
+    elseif colorType == "table" and (#color == 3 or #color == 4) then
+        return color
+    end
+end
+
+function utils.sameColor(color1, color2)
+    if color1 == color2 then
+        return true
+    end
+
+    if color1 and color2 and color1[1] == color2[1] and color1[2] == color2[2] and color1[3] == color2[3] and color1[4] == color2[4] then
+        return true
+    end
+
+    return false
 end
 
 function utils.typeof(v)
