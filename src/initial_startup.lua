@@ -44,8 +44,8 @@ end
 function startup.requiresInit()
     local data = config.readConfig(settingsPath)
 
-    if data and data.celeste_dir then
-        return not startup.verifyCelesteDir(data.celeste_dir)
+    if data and data.celesteGameDirectory then
+        return not startup.verifyCelesteDir(data.celesteGameDirectory)
     end
 
     return true
@@ -100,7 +100,7 @@ function startup.savePath(path)
     path = startup.cleanupPath(path)
 
     local conf = config.readConfig(settingsPath) or {}
-    conf.celeste_dir = path
+    conf.celesteGameDirectory = path
 
     config.writeConfig(conf)
 end
