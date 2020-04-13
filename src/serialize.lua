@@ -101,19 +101,25 @@ function serialize.formatComment(comment, padding, useMultilineComments)
 end
 
 function serialize.getEntries(entries, sortKeys)
-    local entryKeys = {}
     local entryValues = {}
 
-    for k, v in pairs(entries) do
-        table.insert(entryKeys, k)
-    end
-
     if sortKeys then
-        table.sort(entryKeys)
-    end
+        local entryKeys = {}
 
-    for _, k in ipairs(entryKeys) do
-        table.insert(entryValues, entries[k])
+        for k, v in pairs(entries) do
+            table.insert(entryKeys, k)
+        end
+
+        table.sort(entryKeys)
+
+        for _, k in ipairs(entryKeys) do
+            table.insert(entryValues, entries[k])
+        end
+
+    else
+        for k, v in pairs(entries) do
+            table.insert(entryValues, v)
+        end
     end
 
     return entryValues
@@ -126,6 +132,8 @@ end
 -- * __comment Adds a comment for it self, overwrites __comments of parent
 function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, success)
     local entries = {}
+    local noKeyEntries = {}
+    local bracketedNumerEntries = {}
 
     seen = seen or {}
     depth = depth or 0
@@ -159,8 +167,6 @@ function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, succ
 
                 elseif keyType == "number" then
                     local useBrackets = serialize.alwaysUseBracketsOnNumericalGaps and numIndices > length or k > length
-
-                    print(k, length, useBrackets)
 
                     if useBrackets then
                         key = "[" .. tonumber(k) .. "]"
@@ -211,7 +217,6 @@ function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, succ
 
             local lines = {}
 
-            local sortKey = key ~= "" and key or tostring(k)
             local padding = pretty and string.rep(serialize.indent, depth + 1) or ""
             local keyAssign = #key > 0 and key .. serialize.equals or ""
             local comment = valueType == "table" and v.__comment or keyComments[k]
@@ -222,7 +227,18 @@ function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, succ
 
             table.insert(lines, padding .. keyAssign .. value)
 
-            entries[sortKey] = table.concat(lines, "\n")
+            -- Put entry in the correct category for sorting later
+            if key ~= "" then
+                if sortKeys and keyType == "number" then
+                    bracketedNumerEntries[k] = table.concat(lines, "\n")
+
+                else
+                    entries[key] = table.concat(lines, "\n")
+                end
+
+            else
+                noKeyEntries[k] = table.concat(lines, "\n")
+            end
         end
     end
 
@@ -231,8 +247,16 @@ function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, succ
     local lineSep = pretty and ",\n" or serialize.inlineValueSeparator
 
     local entryValues = serialize.getEntries(entries, sortKeys)
+    local bracketedNumberValues = serialize.getEntries(bracketedNumerEntries, sortKeys)
 
-    return success, "{" .. newline .. table.concat(entryValues, lineSep) .. newline .. closingPadding .. "}"
+    local noKeyConent = table.concat(noKeyEntries, lineSep)
+    local bracketNumberContent = table.concat(bracketedNumberValues, lineSep)
+    local keyValueContent = table.concat(entryValues, lineSep)
+
+    local noKeyToBracketedSep = #noKeyConent > 0 and lineSep or ""
+    local bracketToKeySep = #bracketNumberContent > 0 and lineSep or ""
+
+    return success, "{" .. newline .. noKeyConent .. noKeyToBracketedSep .. bracketNumberContent .. bracketToKeySep .. keyValueContent .. newline .. closingPadding .. "}"
 end
 
 function serialize.unserialize(s)
