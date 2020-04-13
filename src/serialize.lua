@@ -1,3 +1,6 @@
+-- TODO - Allow passing around settings table instead of using args?
+-- Makes it easier to have "profiles" for serializing
+
 local serialize = {}
 
 local keywords = {
@@ -10,17 +13,46 @@ local keywords = {
 }
 
 local variablePattern = "^[%a_][%w_]*$"
+local ignoredKeysPattern = "^__"
 
-function serialize.countKeys(t)
+-- Defaults for nil values
+-- Options for output style, any string values assumes it will still produce valid Lua
+serialize.pretty = true
+serialize.sortKeys = true
+serialize.useMultilineComments = false
+serialize.useMetaKeys = true
+serialize.alwaysUseBracketsOnNumericalGaps = true
+
+serialize.indent = "    "
+serialize.equals = " = "
+serialize.inlineValueSeparator = ", "
+serialize.commentSingleline = "-- "
+serialize.commentMultilineStart = "--[["
+serialize.commentMultilineStop = "--]]"
+
+local function isMetaKey(key, useMetaKeys)
+    return useMetaKeys and type(key) == "string" and key:match(ignoredKeysPattern)
+end
+
+function serialize.countKeys(t, useMetaKeys)
     local numerical = 0
     local total = 0
 
     for k, v in pairs(t) do
-        if type(k) == "number" then
-            numerical = numerical + 1
-        end
+        local keyType = type(k)
 
-        total = total + 1
+        if keyType == "number" then
+            numerical = numerical + 1
+            total = total + 1
+
+        elseif keyType == "string" then
+            if not isMetaKey(k, useMetaKeys) then
+                total = total + 1
+            end
+
+        else
+            total = total + 1
+        end
     end
 
     return total, numerical
@@ -36,92 +68,171 @@ function serialize.numericalLength(t)
     return index
 end
 
-function serialize.serialize(t, pretty, seen, depth, success)
-    local res = {}
+function serialize.formatComment(comment, padding, useMultilineComments)
+    local lines = {}
+    local commentLines = {}
+
+    useMultilineComments = (useMultilineComments == nil and serialize.useMultilineComments) or useMultilineComments
+
+    for line in comment:gsub("\r\n", "\n"):gmatch("[^\n]+") do
+        table.insert(commentLines, line)
+    end
+
+    if #commentLines == 1 then
+        return padding .. "-- " .. commentLines[1]
+
+    else
+        local commentPrefix = useMultilineComments and "" or serialize.commentSingleline
+
+        if useMultilineComments then
+            table.insert(lines, padding .. serialize.commentMultilineStart)
+        end
+
+        for _, line in ipairs(commentLines) do
+            table.insert(lines, padding .. commentPrefix .. line)
+        end
+
+        if useMultilineComments then
+            table.insert(lines, padding .. serialize.commentMultilineStop)
+        end
+
+        return table.concat(lines, "\n")
+    end
+end
+
+function serialize.getEntries(entries, sortKeys)
+    local entryKeys = {}
+    local entryValues = {}
+
+    for k, v in pairs(entries) do
+        table.insert(entryKeys, k)
+    end
+
+    if sortKeys then
+        table.sort(entryKeys)
+    end
+
+    for _, k in ipairs(entryKeys) do
+        table.insert(entryValues, entries[k])
+    end
+
+    return entryValues
+end
+
+-- Metakeys are extra information keys for output, prefixed with __
+-- These keys are not serialized when using `useMetaKeys`
+-- Metakeys are as follows:
+-- * __comments Adds comments to keys in the table
+-- * __comment Adds a comment for it self, overwrites __comments of parent
+function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, success)
+    local entries = {}
 
     seen = seen or {}
     depth = depth or 0
-    pretty = not not pretty
+    pretty = pretty == nil and serialize.pretty or pretty
+    sortKeys = sortKeys == nil and serialize.sortKeys or sortKeys
+    useMetaKeys = useMetaKeys == nil and serialize.useMetaKeys or useMetaKeys
     success = success == nil or success
 
-    local keyCount, numIndices = serialize.countKeys(t)
+    local keyCount, numIndices = serialize.countKeys(t, useMetaKeys)
     local length = serialize.numericalLength(t)
+
+    local keyComments = useMetaKeys and t and t.__comments or {}
 
     local count = 0
 
     for k, v in pairs(t) do
-        count = count + 1
+        local ignoredKey = isMetaKey(k, useMetaKeys)
 
-        local ktyp = type(k)
-        local vtyp = type(v)
+        if not ignoredKey then
+            local keyType = type(k)
+            local valueType = type(v)
 
-        local key = k
-        local value = v
+            local key = k
+            local value = v
 
-        if keywords[k] or not string.match(k, variablePattern) then
-            if ktyp == "string" then
-                key = "[" .. string.format("%q", k) .. "]"
+            count = count + 1
 
-            elseif ktyp == "number" then
-                if numIndices > length then
-                    key = "[" .. tonumber(k) .. "]"
+            if keywords[k] or not string.match(k, variablePattern) then
+                if keyType == "string" then
+                    key = "[" .. string.format("%q", k) .. "]"
 
-                else
-                    key = ""
+                elseif keyType == "number" then
+                    local useBrackets = serialize.alwaysUseBracketsOnNumericalGaps and numIndices > length or k > length
+
+                    print(k, length, useBrackets)
+
+                    if useBrackets then
+                        key = "[" .. tonumber(k) .. "]"
+
+                    else
+                        key = ""
+                    end
                 end
             end
-        end
 
-        if vtyp == "nil" then
-            value = "nil"
+            if valueType == "nil" then
+                value = "nil"
 
-        elseif vtyp == "boolean" then
-            value = value and "true" or "false"
+            elseif valueType == "boolean" then
+                value = value and "true" or "false"
 
-        elseif vtyp == "number" then
-            if value ~= value then
-                value = "0 / 0"
+            elseif valueType == "number" then
+                if value ~= value then
+                    value = "0 / 0"
 
-            elseif value == math.huge then
-                value = "math.huge"
+                elseif value == math.huge then
+                    value = "math.huge"
 
-            elseif value == -math.huge then
-                value = "-math.huge"
+                elseif value == -math.huge then
+                    value = "-math.huge"
+
+                else
+                    value = tostring(value)
+                end
+
+            elseif valueType == "table" then
+                if not seen[value] then
+                    seen[value] = true
+                    success, value = serialize.serialize(value, pretty, sortKeys, useMetaKeys, seen, depth + 1, success)
+
+                else
+                    value = tostring(value)
+                    success = false
+                end
+
+            elseif valueType == "string" then
+                value = string.format("%q", value):gsub("\\\n","\\n")
 
             else
                 value = tostring(value)
-            end
-
-        elseif vtyp == "table" then
-            if not seen[value] then
-                seen[value] = true
-                success, value = serialize.serialize(value, pretty, seen, depth + 1, success)
-
-            else
                 success = false
-                value = tostring(value)
             end
 
-        elseif vtyp == "string" then
-            value = string.format("%q", value):gsub("\\\n","\\n")
+            local lines = {}
 
-        else
-            value = tostring(value)
-            success = false
+            local sortKey = key ~= "" and key or tostring(k)
+            local padding = pretty and string.rep(serialize.indent, depth + 1) or ""
+            local keyAssign = #key > 0 and key .. serialize.equals or ""
+            local comment = valueType == "table" and v.__comment or keyComments[k]
+
+            if pretty and useMetaKeys and comment then
+                table.insert(lines, serialize.formatComment(comment, padding))
+            end
+
+            table.insert(lines, padding .. keyAssign .. value)
+
+            entries[sortKey] = table.concat(lines, "\n")
         end
-
-        local padding = pretty and string.rep("    ", depth + 1) or ""
-        local keyAssign = #key > 0 and key .. " = " or ""
-        local comma = count == keyCount and "" or ","
-
-        table.insert(res, padding .. keyAssign .. value .. comma)
     end
 
-    local closingPadding = pretty and string.rep("    ", depth) or ""
+    local closingPadding = pretty and string.rep(serialize.indent, depth) or ""
     local newline = pretty and "\n" or ""
-    local lineSep = pretty and "\n" or " "
+    local lineSep = pretty and ",\n" or serialize.inlineValueSeparator
 
-    return success, "{" .. newline .. table.concat(res, lineSep) .. newline .. closingPadding .. "}"
+    local entryValues = serialize.getEntries(entries, sortKeys)
+
+    return success, "{" .. newline .. table.concat(entryValues, lineSep) .. newline .. closingPadding .. "}"
 end
 
 function serialize.unserialize(s)
