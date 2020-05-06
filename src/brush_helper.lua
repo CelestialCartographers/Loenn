@@ -11,7 +11,6 @@ local brushHelper = {}
 -- A placement doesn't happen if the tile is the same as the brush, it is out of bounds or it is " "
 -- This version does not update the drawing, only set the data
 -- In the material, "0" is considered the tile air, while " " is considered "no change"
--- TODO - Test
 function brushHelper.placeTileRaw(room, x, y, material, layer)
     local tilesMatrix = room[layer].matrix
     local materialType = utils.typeof(material)
@@ -21,14 +20,15 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
         local materialWidth, materialHeight = material:size()
 
         for i = 1, materialWidth do
-            for j = i, materialHeight do
+            for j = 1, materialHeight do
                 local tx, ty = x + i - 1, y + j - 1
-                local target = tilesMatrix:get(tx, ty, " ")
                 local mat = material:getInbounds(i, j)
 
-                if target ~= mat and mat ~= " " then
+                -- Let tilesMatrix handle setting same tile
+                if mat ~= " " then
                     tilesMatrix:set(tx, ty, material:getInbounds(i, j))
-                    res = tilesMatrix:inbounds(tx, ty)
+
+                    res = res and tilesMatrix:inbounds(tx, ty)
                 end
             end
         end
@@ -36,9 +36,8 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
         return res
 
     else
-        local target = tilesMatrix:get(x, y, "0")
-
-        if target ~= material and material ~= " " then
+        -- Let tilesMatrix handle setting same tile
+        if material ~= " " then
             tilesMatrix:set(x, y, material)
 
             return tilesMatrix:inbounds(x, y)
@@ -47,9 +46,11 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
 end
 
 local function addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
-    if not addedUpdate:get(x, y, true) then
+    if not addedUpdate:get(x, y) then
         table.insert(needsUpdate, x)
         table.insert(needsUpdate, y)
+
+        addedUpdate:set(x, y, true)
     end
 end
 
@@ -111,31 +112,28 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         local materialWidth, materialHeight = material:size()
 
         for i = 1, materialWidth do
-            for j = i, materialHeight do
+            for j = 1, materialHeight do
                 local tx, ty = x + i - 1, y + j - 1
-                local target = tilesMatrix:get(tx, ty, " ")
                 local mat = material:getInbounds(i, j)
 
-                if target ~= mat and mat ~= " " then
+                -- Let tilesMatrix handle setting same tile
+                if mat ~= " " then
                     tilesMatrix:set(tx, ty, material:getInbounds(i, j))
 
-                    table.insert(needsUpdate, tx)
-                    table.insert(needsUpdate, ty)
-
-                    addMissingNeighbors(x, y, needsUpdate, addedUpdate)
+                    -- Add the current tile and nearby tiles for redraw
+                    addNeighborIfMissing(tx, ty, needsUpdate, addedUpdate)
+                    addMissingNeighbors(tx, ty, needsUpdate, addedUpdate)
                 end
             end
         end
 
     else
-        local target = tilesMatrix:get(x, y, "0")
-
-        if target ~= material and material ~= " " then
+        -- Let tilesMatrix handle setting same tile
+        if material ~= " " then
             tilesMatrix:set(x, y, material)
 
-            table.insert(needsUpdate, x)
-            table.insert(needsUpdate, y)
-
+            -- Add the current tile and nearby tiles for redraw
+            addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
             addMissingNeighbors(x, y, needsUpdate, addedUpdate)
         end
     end
@@ -167,8 +165,6 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
                     batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
                 end
             end
-
-            addedUpdate:setInbounds(x, y, true)
         end
 
         updateIndex += 2
