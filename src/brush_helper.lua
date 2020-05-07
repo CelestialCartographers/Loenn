@@ -7,7 +7,7 @@ local atlases = require("atlases")
 
 local brushHelper = {}
 
--- Returns true if the placement happened, false otherwise
+-- Returns true if a placement happened, false otherwise
 -- A placement doesn't happen if the tile is the same as the brush, it is out of bounds or it is " "
 -- This version does not update the drawing, only set the data
 -- In the material, "0" is considered the tile air, while " " is considered "no change"
@@ -22,13 +22,13 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
         for i = 1, materialWidth do
             for j = 1, materialHeight do
                 local tx, ty = x + i - 1, y + j - 1
+                local target = tilesMatrix:get(tx, ty, "0")
                 local mat = material:getInbounds(i, j)
 
-                -- Let tilesMatrix handle setting same tile
-                if mat ~= " " then
-                    tilesMatrix:set(tx, ty, material:getInbounds(i, j))
+                if mat ~= target and mat ~= " " then
+                    tilesMatrix:set(tx, ty, mat)
 
-                    res = res and tilesMatrix:inbounds(tx, ty)
+                    res = res or tilesMatrix:inbounds(tx, ty)
                 end
             end
         end
@@ -36,8 +36,9 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
         return res
 
     else
-        -- Let tilesMatrix handle setting same tile
-        if material ~= " " then
+        local target = tilesMatrix:get(x, y, "0")
+
+        if target ~= material and material ~= " " then
             tilesMatrix:set(x, y, material)
 
             return tilesMatrix:inbounds(x, y)
@@ -79,7 +80,7 @@ end
 -- needsUpdate set up as {x1, y1, x2, y2, ..., xn, yn} for performance reasons, less table creation than {{x1, y1}, ...}
 -- In the material, "0" is considered the tile air, while " " is considered "no change"
 -- Does not use placeTilesRaw for performance reasons, and because we explicitly need to track what changed
--- TODO - Verify that it works with matrix materials once tools are ready
+-- TODO - Check for rendering oddities with matrix brushes
 function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local fg = layer == "tilesFg"
 
@@ -114,11 +115,11 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         for i = 1, materialWidth do
             for j = 1, materialHeight do
                 local tx, ty = x + i - 1, y + j - 1
+                local target = tilesMatrix:get(tx, ty, "0")
                 local mat = material:getInbounds(i, j)
 
-                -- Let tilesMatrix handle setting same tile
-                if mat ~= " " then
-                    tilesMatrix:set(tx, ty, material:getInbounds(i, j))
+                if mat ~= target and mat ~= " " then
+                    tilesMatrix:set(tx, ty, mat)
 
                     -- Add the current tile and nearby tiles for redraw
                     addNeighborIfMissing(tx, ty, needsUpdate, addedUpdate)
@@ -128,8 +129,9 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         end
 
     else
-        -- Let tilesMatrix handle setting same tile
-        if material ~= " " then
+        local target = tilesMatrix:get(x, y, "0")
+
+        if target ~= material and material ~= " " then
             tilesMatrix:set(x, y, material)
 
             -- Add the current tile and nearby tiles for redraw
