@@ -9,6 +9,7 @@ local startupScene = {}
 local drawnOnce = false
 local startedDialog = false
 
+-- TODO - Move to language file
 local messageThreadsSupported = [[
 Please select Celeste.exe in the dialog or drag the file into the window.
 If you drag Celeste.exe in you will to manually close the dialog.

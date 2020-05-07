@@ -73,7 +73,7 @@ function startup.findSteamDirectory()
             filesystem.joinpath(os.getenv("HOME"), ".steam", "steam"),
         }
 
-        for i, path <- linuxSteamDirs do
+        for _, path in ipairs(linuxSteamDirs) do
             if filesystem.isDirectory(path) then
                 return path
             end
@@ -94,6 +94,8 @@ function startup.findCelesteDirectory()
             return true, celesteSteam
         end
     end
+
+    return false, ""
 end
 
 function startup.savePath(path)
