@@ -25,6 +25,18 @@ function editorScene:firstEnter()
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
 end
 
+
+
+-- when a map .bin is dropped load the map 
+function editorScene:filedropped(file)
+
+    local viewerState = require("loaded_state")
+
+    local mapFile = file:getFilename()
+    viewerState.loadFile(mapFile)
+
+end
+
 function editorScene:draw()
     if self.viewerState.map then
         self.celesteRender.drawMap(self.viewerState)
