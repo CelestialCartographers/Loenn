@@ -2,3 +2,6 @@
 	path = src/selene
 	url = https://github.com/Vexatos/Selene.git
 	branch = mathemagics-5.1
+[submodule "src/ui"]
+	path = src/ui
+	url = https://github.com/EverestAPI/OlympUI.git
