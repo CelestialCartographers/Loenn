@@ -102,7 +102,7 @@ function config.updateConfig(conf)
     end
 end
 
-function config.writeConfig(conf)
+function config.writeConfig(conf, force)
     local mtime = rawget(conf, "mtime") or 0
     local bufferTime = rawget(conf, "bufferTime") or -1
 

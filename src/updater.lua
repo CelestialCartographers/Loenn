@@ -13,7 +13,7 @@ function updater.canUpdate()
 end
 
 function updater.getAvailableUpdates()
-    local releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
+    local releases = github.getReleases(configs.updater.githubAuthor, configs.updater.githubRepository)
     local res = {}
 
     for i, release <- releases or {} do
@@ -26,7 +26,7 @@ function updater.getAvailableUpdates()
 end
 
 function updater.getRelevantRelease(target)
-    local releases = github.getReleases(configs.updater.github_author, configs.updater.github_repo)
+    local releases = github.getReleases(configs.updater.githubAuthor, configs.updater.githubRepository)
     local tagName = target or (releases and #releases > 0 and releases[1].tag_name)
 
     if tagName then

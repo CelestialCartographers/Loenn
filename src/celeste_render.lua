@@ -13,6 +13,7 @@ local drawableFunction = require("structs.drawable_function")
 local drawableRectangle = require("structs.drawable_rectangle")
 local viewportHandler = require("viewport_handler")
 local matrix = require("matrix")
+local configs = require("configs")
 
 local celesteRender = {}
 
@@ -35,8 +36,8 @@ local decalsBgDepth = 9000
 local triggersDepth = -math.huge
 
 local PRINT_BATCHING_DURATION = false
-local ALWAYS_REDRAW_UNSELECTED_ROOMS = false
-local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = true
+local ALWAYS_REDRAW_UNSELECTED_ROOMS = configs.editor.alwaysRedrawUnselectedRooms
+local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = configs.editor.prepareRoomRenderInBackground
 
 local roomCache = {}
 local roomRandomMatrixCache = {}

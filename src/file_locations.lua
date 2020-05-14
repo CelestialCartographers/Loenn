@@ -41,7 +41,7 @@ function fileLocations.getSettingsPath()
 end
 
 function fileLocations.getCelesteDir()
-    return config.readConfig(fileLocations.getSettingsPath()).celeste_dir
+    return config.readConfig(fileLocations.getSettingsPath()).celesteGameDirectory
 end
 
 return fileLocations
