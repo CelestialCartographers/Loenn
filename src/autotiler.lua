@@ -1,6 +1,7 @@
 local xml2lua = require("xml2lua.xml2lua")
 local utils = require("utils")
 local matrix = require("matrix")
+local bit = require("bit")
 
 local autotiler = {}
 
@@ -14,7 +15,8 @@ local function convertMaskString(s)
     for y, row <- rows do
         for x, v <- row:split(1) do
             local n = tonumber(v)
-            res:setInbounds(x, y, (n == 2 ? nil : n == 1))
+
+            res:set(x, y, (n == 2 ? nil : n == 1))
         end
     end
 
@@ -33,7 +35,7 @@ local function checkMask(adjacent, mask)
     return true
 end
 
-local function checkTile(value, target, ignore, air, wildcard)
+function autotiler.checkTile(value, target, ignore, air, wildcard)
     if ignore then
         return not (target == air or ignore[target] or (ignore[wildcard] and value ~= target))
     end
@@ -54,6 +56,11 @@ local function checkMaskFromTiles(mask, a, b, c, d, e, f, g, h, i)
         h ~= mask[8] and mask[8] ~= nil or
         i ~= mask[9] and mask[9] ~= nil
     )
+end
+
+-- Bitwise version of checkMaskFromTiles
+local function checkMaskFromTilesWithBitmask(tilemask, Bitmask, ignoremask, bxor, band)
+    return band(bxor(tilemask, Bitmask), ignoremask) == 0
 end
 
 local function getTile(tiles, x, y, emptyTile)
@@ -98,11 +105,45 @@ local function getMaskQuads(masks, adjacent)
     return false, nil, nil
 end
 
-local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wildcard)
-    if masks then
-        -- Getting upvalue
-        local checkTile = checkTile
+local function getAdjacencyBitmask(x, y, tiles, tile, ignore, air, wildcard, checkTile, lshift)
+    return
+        lshift(checkTile(tile, tiles:get(x - 1, y - 1, tile), ignore, air, wildcard) and 1 or 0, 7) +
+        lshift(checkTile(tile, tiles:get(x + 0, y - 1, tile), ignore, air, wildcard) and 1 or 0, 6) +
+        lshift(checkTile(tile, tiles:get(x + 1, y - 1, tile), ignore, air, wildcard) and 1 or 0, 5) +
+        lshift(checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard) and 1 or 0, 4) +
+        lshift(checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard) and 1 or 0, 3) +
+        lshift(checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard) and 1 or 0, 2) +
+        lshift(checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard) and 1 or 0, 1) +
+        lshift(checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard) and 1 or 0, 0)
+end
 
+local function maskToBitmask(mask, lshift)
+    return
+        lshift(mask[1] and 1 or 0, 7) +
+        lshift(mask[2] and 1 or 0, 6) +
+        lshift(mask[3] and 1 or 0, 5) +
+        lshift(mask[4] and 1 or 0, 4) +
+        lshift(mask[6] and 1 or 0, 3) +
+        lshift(mask[7] and 1 or 0, 2) +
+        lshift(mask[8] and 1 or 0, 1) +
+        (mask[9] and 1 or 0)
+end
+
+local function maskToIgnoreBitmask(mask, lshift)
+    return
+        lshift(mask[1]~= nil and 1 or 0, 7) +
+        lshift(mask[2]~= nil and 1 or 0, 6) +
+        lshift(mask[3]~= nil and 1 or 0, 5) +
+        lshift(mask[4]~= nil and 1 or 0, 4) +
+        lshift(mask[6]~= nil and 1 or 0, 3) +
+        lshift(mask[7]~= nil and 1 or 0, 2) +
+        lshift(mask[8]~= nil and 1 or 0, 1) +
+        (mask[9]~= nil and 1 or 0)
+end
+
+
+local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wildcard, checkTile)
+    if masks then
         local a, b, c = checkTile(tile, tiles:get(x - 1, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y - 1, tile), ignore, air, wildcard)
         local d, f = checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard)
         local g, h, i = checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard)
@@ -117,13 +158,43 @@ local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wild
     return false, nil, nil
 end
 
-function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+local function getMaskQuadsFromTilesWithBitmask(x, y, masks, tiles, tile, ignore, air, wildcard, checkTile, lshift, bxor, band)
+    if masks then
+        local adjacencyBitmask = getAdjacencyBitmask(x, y, tiles, tile, ignore, air, wildcard, checkTile, lshift)
+
+        for j, maskData in ipairs(masks) do
+            if checkMaskFromTilesWithBitmask(adjacencyBitmask, maskData.tilesMask, maskData.ignoresMask, bxor, band) then
+                return true, maskData.quads, maskData.sprites
+            end
+        end
+    end
+
+    return false, nil, nil
+end
+
+function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
     local tile = tiles:get(x, y)
 
     local masks = meta.masks[tile]
     local ignore = meta.ignores[tile]
 
-    local matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, airTile, wildcard)
+    local matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, airTile, wildcard, checkTile)
+
+    if matches then
+        return quads, sprites
+
+    else
+        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
+    end
+end
+
+function autotiler.getQuadsWithBitmask(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+    local tile = tiles:get(x, y)
+
+    local masks = meta.masks[tile]
+    local ignore = meta.ignores[tile]
+
+    local matches, quads, sprites = getMaskQuadsFromTilesWithBitmask(x, y, masks, tiles, tile, ignore, airTile, wildcard, checkTile, lshift, bxor, band)
 
     if matches then
         return quads, sprites
@@ -161,6 +232,8 @@ function autotiler.loadTilesetXML(fn)
     local padding = {}
     local center = {}
     local ignores = {}
+
+    local lshift = bit.lshift
 
     -- TODO - sort tilesets that copy others to the end?
     -- Is this needed?
@@ -201,10 +274,14 @@ function autotiler.loadTilesetXML(fn)
                 center[id] = convertTileString(tiles)
 
             else
+                local maskMatrix = convertMaskString(mask)
+
                 table.insert(currentMasks, {
-                    mask = convertMaskString(mask),
+                    mask = maskMatrix,
                     quads = convertTileString(tiles),
-                    sprites = sprites
+                    sprites = sprites,
+                    tilesMask = maskToBitmask(maskMatrix, lshift),
+                    ignoresMask = maskToIgnoreBitmask(maskMatrix, lshift)
                 })
             end
         end

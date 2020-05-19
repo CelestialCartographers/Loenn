@@ -14,6 +14,7 @@ local drawableRectangle = require("structs.drawable_rectangle")
 local viewportHandler = require("viewport_handler")
 local matrix = require("matrix")
 local configs = require("configs")
+local bit = require("bit")
 
 local celesteRender = {}
 
@@ -217,6 +218,10 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
     local cache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = meta
+    local checkTile = autotiler.checkTile
+    local lshift = bit.lshift
+    local bxor = bit.bxor
+    local band = bit.band
 
     local airTile = "0"
     local emptyTile = " "
@@ -242,7 +247,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
             if tile ~= airTile then
                 if meta.paths[tile] then
                     -- TODO - Render overlay sprites
-                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+                    local quads, sprites = autotiler.getQuadsWithBitmask(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
                     if quadCount > 0 then

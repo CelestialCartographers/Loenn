@@ -4,6 +4,7 @@ local matrix = require("matrix")
 local utils = require("utils")
 local autotiler = require("autotiler")
 local atlases = require("atlases")
+local bit = require("bit")
 
 local brushHelper = {}
 
@@ -92,6 +93,10 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local cache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
+    local checkTile = autotiler.checkTile
+    local lshift = bit.lshift
+    local bxor = bit.bxor
+    local band = bit.band
 
     local airTile = "0"
     local emptyTile = " "
@@ -153,8 +158,8 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
                 batch:set(x, y, false)
 
             else
-                -- TODO - Updated overlay sprites
-                local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+                -- TODO - Update overlay sprites
+                local quads, sprites = autotiler.getQuadsWithBitmask(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                 local quadCount = #quads
 
                 if quadCount > 0 then
