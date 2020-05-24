@@ -34,6 +34,12 @@ local function isMetaKey(key, useMetaKeys)
     return useMetaKeys and type(key) == "string" and key:match(ignoredKeysPattern)
 end
 
+local function insertIfNotEmpty(t, s)
+    if s and s ~= "" then
+        table.insert(t, s)
+    end
+end
+
 function serialize.countKeys(t, useMetaKeys)
     local numerical = 0
     local total = 0
@@ -249,14 +255,19 @@ function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, succ
     local entryValues = serialize.getEntries(entries, sortKeys)
     local bracketedNumberValues = serialize.getEntries(bracketedNumerEntries, sortKeys)
 
-    local noKeyConent = table.concat(noKeyEntries, lineSep)
+    local noKeyContent = table.concat(noKeyEntries, lineSep)
     local bracketNumberContent = table.concat(bracketedNumberValues, lineSep)
     local keyValueContent = table.concat(entryValues, lineSep)
 
-    local noKeyToBracketedSep = #noKeyConent > 0 and lineSep or ""
-    local bracketToKeySep = #bracketNumberContent > 0 and lineSep or ""
+    local parts = {}
 
-    return success, "{" .. newline .. noKeyConent .. noKeyToBracketedSep .. bracketNumberContent .. bracketToKeySep .. keyValueContent .. newline .. closingPadding .. "}"
+    insertIfNotEmpty(parts, noKeyContent)
+    insertIfNotEmpty(parts, bracketNumberContent)
+    insertIfNotEmpty(parts, keyValueContent)
+
+    local content = table.concat(parts, lineSep)
+
+    return success, "{" .. newline .. content.. newline .. closingPadding .. "}"
 end
 
 function serialize.unserialize(s)
