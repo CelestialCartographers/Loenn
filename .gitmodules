@@ -1,4 +1,4 @@
 [submodule "Selene"]
 	path = src/selene
 	url = https://github.com/Vexatos/Selene.git
-	branch = mathemagics-5.1
+	branch = lua5.1
