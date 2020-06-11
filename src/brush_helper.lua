@@ -110,7 +110,8 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local needsUpdate = {}
 
     local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, layer)
-    local batch = celesteRender.getRoomCache(room.name, layer).result
+    local roomCache = celesteRender.getRoomCache(room.name, layer)
+    local batch = roomCache and roomCache.result
 
     local materialType = utils.typeof(material)
 
