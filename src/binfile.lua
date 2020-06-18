@@ -134,6 +134,7 @@ function binfile.getVariableLength(fh, length)
 
     while length > 127 do
         table.insert(res, length % 128 + 128)
+
         length = math.floor(length / 128)
     end
 
@@ -143,7 +144,13 @@ function binfile.getVariableLength(fh, length)
 end
 
 function binfile.writeVariableLength(fh, length)
-    binfile.writeByteArray(fh, binfile.getVariableLength(fh, length))
+    while length > 127 do
+        binfile.writeByte(fh, length % 128 + 128)
+
+        length = math.floor(length / 128)
+    end
+
+    binfile.writeByte(fh, length)
 end
 
 function binfile.readString(fh)
