@@ -1,5 +1,11 @@
 -- Pure Lua binary file implementation
 
+local mathFloor = math.floor
+local mathLdexp = math.ldexp
+
+local stringByte = string.byte
+local stringChar = string.char
+
 local binfile = {}
 
 function binfile.twosCompliment(n, power)
@@ -12,31 +18,39 @@ function binfile.twosCompliment(n, power)
 end
 
 function binfile.readByte(fh)
-    return string.byte(fh:read(1))
+    return stringByte(fh:read(1))
 end
 
 function binfile.writeByte(fh, n)
-    fh:write(string.char(n))
+    fh:write(stringChar(n))
+end
+
+function binfile.readBytes(fh, n)
+    return stringByte(fh:read(n), 1, n)
 end
 
 function binfile.writeBytes(fh, ...)
-    fh:write(string.char(...))
+    fh:write(stringChar(...))
 end
 
 function binfile.readShort(fh)
-    return binfile.readByte(fh) + binfile.readByte(fh) * 256
+    local b1, b2 = binfile.readBytes(fh, 2)
+
+    return b1 + b2 * 256
 end
 
 function binfile.writeShort(fh, n)
-    binfile.writeBytes(fh, n % 256, math.floor(n / 256) % 256)
+    binfile.writeBytes(fh, n % 256, mathFloor(n / 256) % 256)
 end
 
 function binfile.readLong(fh)
-    return binfile.readByte(fh) + binfile.readByte(fh) * 256 + binfile.readByte(fh) * 256^2 + binfile.readByte(fh) * 256^3
+    local b1, b2, b3, b4 = binfile.readBytes(fh, 4)
+
+    return b1 + b2 * 256 + b3 * 65536 + b4 * 16777216
 end
 
 function binfile.writeLong(fh, n)
-    binfile.writeBytes(fh, n % 256, math.floor(n / 256) % 256, math.floor(n / 256^2) % 256, math.floor(n / 256^3) % 256)
+    binfile.writeBytes(fh, n % 256, mathFloor(n / 256) % 256, mathFloor(n / 65536) % 256, mathFloor(n / 16777216) % 256)
 end
 
 function binfile.readBool(fh)
@@ -64,9 +78,8 @@ function binfile.writeSignedLong(fh, n)
 end
 
 function binfile.readFloat(fh)
-    local b4, b3, b2, b1 = string.byte(fh:read(4), 1, 4)
-
-    local exponent = (b1 % 128) * 2 + math.floor(b2 / 128)
+    local b4, b3, b2, b1 = binfile.readBytes(fh, 4)
+    local exponent = (b1 % 128) * 2 + mathFloor(b2 / 128)
 
     if exponent == 0 then
         return 0.0
@@ -74,9 +87,9 @@ function binfile.readFloat(fh)
 
     local sign = (b1 > 127) and -1 or 1
     local mantissa = ((b2 % 128) * 256 + b3) * 256 + b4
-    mantissa = (math.ldexp(mantissa, -23) + 1) * sign
+    mantissa = (mathLdexp(mantissa, -23) + 1) * sign
 
-    return math.ldexp(mantissa, exponent - 127)
+    return mathLdexp(mantissa, exponent - 127)
 end
 
 function binfile.writeFloat(fh, n)
@@ -97,35 +110,37 @@ function binfile.writeFloat(fh, n)
         exponent = 0
 
     else
-        mantissa = (mantissa * 2 - 1) * math.ldexp(0.5, 24)
+        mantissa = (mantissa * 2 - 1) * mathLdexp(0.5, 24)
         exponent = exponent + 126
     end
 
-    b1 = math.floor(mantissa) % 256
-    val = math.floor(mantissa / 256)
-    b2 = math.floor(val) % 256
-    val = math.floor(val / 256)
+    b1 = mathFloor(mantissa) % 256
+    val = mathFloor(mantissa / 256)
+    b2 = mathFloor(val) % 256
+    val = mathFloor(val / 256)
 
-    b3 = math.floor(exponent * 128 + val) % 256
-    val = math.floor((exponent * 128 + val) / 256)
-    b4 = math.floor(sign * 128 + val) % 256
+    b3 = mathFloor(exponent * 128 + val) % 256
+    val = mathFloor((exponent * 128 + val) / 256)
+    b4 = mathFloor(sign * 128 + val) % 256
 
     binfile.writeBytes(fh, b1, b2, b3, b4)
 end
 
 function binfile.readVariableLength(fh)
     local res = 0
-    local count = 0
+    local multiplier = 1
 
     while true do
         local byte = binfile.readByte(fh)
 
-        res += byte % 128 * 2^(count * 7)
-        count += 1
+        if byte < 128 then
+            return res + byte * multiplier
 
-        if math.floor(byte / 128) == 0 then
-            return res
+        else
+            res = res + (byte - 128) * multiplier
         end
+
+        multiplier = multiplier * 128
     end
 end
 
@@ -135,7 +150,7 @@ function binfile.getVariableLength(fh, length)
     while length > 127 do
         table.insert(res, length % 128 + 128)
 
-        length = math.floor(length / 128)
+        length = mathFloor(length / 128)
     end
 
     table.insert(res, length)
@@ -147,7 +162,7 @@ function binfile.writeVariableLength(fh, length)
     while length > 127 do
         binfile.writeByte(fh, length % 128 + 128)
 
-        length = math.floor(length / 128)
+        length = mathFloor(length / 128)
     end
 
     binfile.writeByte(fh, length)
@@ -182,28 +197,30 @@ end
 -- TODO - This is slow, consider doing it with FFI
 function binfile.encodeRunLength(str)
     local res = {}
-    local value = $(str)
+    local value = str
 
     local count = 1
-    local current = value[1]
+    local current = stringByte(str, 1)
 
-    for index, char <- value do
+    for index = 1, #str do
+        local byte = stringByte(str, index)
+
         if index > 1 then
-            if char ~= current or count == 255 then
+            if byte ~= current or count == 255 then
                 table.insert(res, count)
-                table.insert(res, string.byte(current))
+                table.insert(res, stringByte(current))
 
                 count = 1
-                current = char
+                current = byte
 
             else
-                count += 1
+                count = count + 1
             end
         end
     end
 
     table.insert(res, count)
-    table.insert(res, string.byte(current))
+    table.insert(res, stringByte(current))
 
     return res
 end
@@ -216,7 +233,7 @@ function binfile.writeRunLengthEncoded(fh, value)
 end
 
 function binfile.writeByteArray(fh, t)
-    fh:write(string.char(unpack(t)))
+    fh:write(stringChar(unpack(t)))
 end
 
 return binfile

@@ -34,6 +34,15 @@ function binaryReader._MT.__index:readByte()
     return self._bytes[self._ptr - self._bytesStart]
 end
 
+-- Override readBytes from binfile, this is faster
+function binaryReader._MT.__index:readBytes(n)
+    n = n or 1
+    self._ptr = self._ptr + n
+    self._bytesLeft = self._bytesLeft - n
+
+    return self._content:byte(self._ptr - n, self._ptr - 1)
+end
+
 function binaryReader._MT.__index:read(n)
     n = n or 1
     self._ptr = self._ptr + n
