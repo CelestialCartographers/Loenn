@@ -5,6 +5,7 @@ local mathLdexp = math.ldexp
 
 local stringByte = string.byte
 local stringChar = string.char
+local stringSub = string.sub
 
 local binfile = {}
 
@@ -197,21 +198,20 @@ end
 -- TODO - This is slow, consider doing it with FFI
 function binfile.encodeRunLength(str)
     local res = {}
-    local value = str
 
     local count = 1
-    local current = stringByte(str, 1)
+    local current = stringSub(str, 1, 1)
 
     for index = 1, #str do
-        local byte = stringByte(str, index)
+        local char = stringSub(str, index, index)
 
         if index > 1 then
-            if byte ~= current or count == 255 then
-                table.insert(res, count)
-                table.insert(res, stringByte(current))
+            if char ~= current or count == 255 then
+                table.insert(res, stringChar(count))
+                table.insert(res, current)
 
                 count = 1
-                current = byte
+                current = char
 
             else
                 count = count + 1
@@ -219,17 +219,17 @@ function binfile.encodeRunLength(str)
         end
     end
 
-    table.insert(res, count)
-    table.insert(res, stringByte(current))
+    table.insert(res, stringChar(count))
+    table.insert(res, current)
 
-    return res
+    return table.concat(res)
 end
 
 function binfile.writeRunLengthEncoded(fh, value)
     local payload = binfile.encodeRunLength(value)
 
     binfile.writeShort(fh, #payload)
-    binfile.writeByteArray(fh, payload)
+    binfile.write(fh, payload)
 end
 
 function binfile.writeByteArray(fh, t)
