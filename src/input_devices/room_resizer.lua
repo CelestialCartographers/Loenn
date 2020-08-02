@@ -9,11 +9,12 @@ local configs = require("configs")
 local colors = require("colors")
 
 local roomStruct = require("structs.room")
+local fillerStruct = require("structs.filler")
 
 local dragging
 local draggingStartX
 local draggingStartY
-local roomPosition
+local itemPosition
 
 local actionButton = configs.editor.toolActionButton
 
@@ -98,14 +99,24 @@ local function getResizeDirections(side)
     return resizeHorizontal, resizeVertical
 end
 
+local function getItemStruct(itemType)
+    if itemType == "room" then
+        return roomStruct
+
+    elseif itemType == "filler" then
+        return fillerStruct
+    end
+end
+
 function roomResizer.draw()
-    local room = loadedState.getSelectedRoom()
+    local item, itemType = loadedState.getSelectedItem()
 
-    if room then
+    if itemType == "room" or itemType == "filler" then
         local viewport = viewportHandler.viewport
+        local itemStruct = getItemStruct(itemType)
 
-        local x, y = room.x, room.y
-        local width, height = room.width, room.height
+        local x, y = itemStruct.getPosition(item)
+        local width, height = itemStruct.getSize(item)
 
         love.graphics.push()
 
@@ -126,23 +137,26 @@ function roomResizer.draw()
 end
 
 function roomResizer.mousepressed(x, y, button, istouch, presses)
-    local room = loadedState.getSelectedRoom()
+    local item, itemType = loadedState.getSelectedItem()
 
-    if button == actionButton and room then
+    if button == actionButton and (itemType == "room" or itemType == "filler") then
         local viewport = viewportHandler.viewport
+        local itemStruct = getItemStruct(itemType)
 
-        local roomX, roomY = room.x, room.y
-        local width, height = room.width, room.height
+        local itemX, itemY = itemStruct.getPosition(item)
+        local width, height = itemStruct.getSize(item)
 
-        local cursorX, cursorY = viewportHandler.getRoomCoordindates(room, x, y)
+        local newItemPosition = {x = itemX, y = itemY}
+
+        local cursorX, cursorY = viewportHandler.getRoomCoordindates(newItemPosition, x, y)
         local tileX, tileY = viewportHandler.pixelToTileCoordinates(cursorX, cursorY)
-        local side = draggingResizeTriangle(cursorX * viewport.scale, cursorY * viewport.scale, roomX, roomY, width, height, viewport)
+        local side = draggingResizeTriangle(cursorX * viewport.scale, cursorY * viewport.scale, itemX, itemY, width, height, viewport)
 
         if side then
             dragging = side
             draggingStartX = tileX
             draggingStartY = tileY
-            roomPosition = {x = roomX, y = roomY}
+            itemPosition = newItemPosition
         end
     end
 
@@ -159,35 +173,41 @@ end
 
 -- TODO - Bug with resizing on Up/Down
 function roomResizer.mousemoved(x, y, dx, dy, istouch)
-    local room = loadedState.getSelectedRoom()
+    local item, itemType = loadedState.getSelectedItem()
 
-    if dragging and room then
+    if dragging and (itemType == "room" or itemType == "filler") then
+        local itemStruct = getItemStruct(itemType)
+
         local startX, startY = draggingStartX, draggingStartY
-        local tileX, tileY = viewportHandler.pixelToTileCoordinates(viewportHandler.getRoomCoordindates(roomPosition, x, y))
+        local tileX, tileY = viewportHandler.pixelToTileCoordinates(viewportHandler.getRoomCoordindates(itemPosition, x, y))
         local deltaX, deltaY = tileX - startX, tileY - startY
+
+        local width, height = itemStruct.getSize(item)
 
         if deltaX ~= 0 or deltaY ~= 0 then
             local resizeHorizontal, resizeVertical = getResizeDirections(dragging)
 
             deltaX, deltaY = fixDeltas(resizeHorizontal, resizeVertical, deltaX, deltaY)
 
-            local newWidth = room.width + deltaX * 8
-            local newHeight = room.height + deltaY * 8
+            local newWidth = width + deltaX * 8
+            local newHeight = height + deltaY * 8
 
-            if resizeHorizontal and deltaX ~= 0 and newWidth >= roomStruct.recommendedMinimumWidth then
-                roomStruct.directionalResize(room, resizeHorizontal, deltaX)
+            if resizeHorizontal and deltaX ~= 0 and newWidth >= itemStruct.recommendedMinimumWidth then
+                itemStruct.directionalResize(item, resizeHorizontal, deltaX)
             end
 
-            if resizeVertical and deltaY ~= 0 and newHeight >= roomStruct.recommendedMinimumHeight then
-                roomStruct.directionalResize(room, resizeVertical, deltaY)
+            if resizeVertical and deltaY ~= 0 and newHeight >= itemStruct.recommendedMinimumHeight then
+                itemStruct.directionalResize(item, resizeVertical, deltaY)
             end
 
             draggingStartX = tileX
             draggingStartY = tileY
 
-            -- TODO - Improve this, very expensive update
-            celesteRender.invalidateRoomCache(room)
-            celesteRender.forceRoomBatchRender(room, viewportHandler.viewport)
+            if itemType == "room" then
+                -- TODO - Improve this, very expensive update
+                celesteRender.invalidateRoomCache(item)
+                celesteRender.forceRoomBatchRender(item, viewportHandler.viewport)
+            end
         end
 
         return true

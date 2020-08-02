@@ -5,6 +5,7 @@ local celesteRender = require("celeste_render")
 local sceneHandler = require("scene_handler")
 local filesystem = require("filesystem")
 local fileLocations = require("file_locations")
+local utils = require("utils")
 
 local sideStruct = require("structs.side")
 
@@ -32,7 +33,8 @@ function state.loadFile(filename)
                         state.filename = filename
                         state.side = decodeTask.result
                         state.map = state.side.map
-                        state.selectedRoom = state.map and state.map.rooms[1]
+
+                        state.selectItem(state.map and state.map.rooms[1])
 
                         sceneHandler.changeScene("Editor")
                     end
@@ -74,12 +76,21 @@ function state.saveFile(filename)
     end
 end
 
-function state.selectRoom(room)
-    state.selectedRoom = room
+function state.selectItem(item)
+    state.selectedItem = item
+    state.selectedItemType = utils.typeof(item)
 end
 
 function state.getSelectedRoom()
-    return state.selectedRoom
+    return state.selectedItemType == "room" and state.selectedItem or false
+end
+
+function state.getSelectedFiller()
+    return state.selectedItemType == "filler" and state.selectedItem or false
+end
+
+function state.getSelectedItem()
+    return state.selectedItem, state.selectedItemType
 end
 
 function state.openMap()
@@ -106,8 +117,10 @@ end
 -- The currently loaded map
 state.map = nil
 
--- The currently selected room
-state.selectedRoom = nil
+-- The currently selected item (room or filler)
+state.selectedItem = nil
+state.selectedItemType = nil
+state.selectedRooms = {}
 
 -- The viewport for the map renderer
 state.viewport = viewportHandler.viewport

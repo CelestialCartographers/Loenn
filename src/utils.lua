@@ -210,9 +210,19 @@ function utils.pixelsToTiles(x, y)
 end
 
 function utils.getRoomAtCoords(x, y, map)
-    for i, room <- map.rooms do
+    for i, room in ipairs(map.rooms) do
         if x >= room.x and x <= room.x + room.width and y >= room.y and y <= room.y + room.height then
             return room
+        end
+    end
+
+    return false
+end
+
+function utils.getFillerAtCoords(x, y, map)
+    for i, filler in ipairs(map.fillers) do
+        if x >= filler.x * 8 and x <= filler.x * 8 + filler.width * 8 and y >= filler.y * 8 and y <= filler.y * 8 + filler.height * 8 then
+            return filler
         end
     end
 

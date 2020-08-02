@@ -10,7 +10,7 @@ tool.image = nil
 tool.layer = "entities"
 
 function tool.keypressed(key, scancode, isrepeat)
-    local room = state.selectedRoom
+    local room = state.getSelectedRoom()
 
     local ox = key == "a" and -8 or key == "d" and 8 or 0
     local oy = key == "w" and -8 or key == "s" and 8 or 0

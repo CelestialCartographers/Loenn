@@ -141,6 +141,14 @@ function roomStruct.directionalMove(room, side, amount, step)
     end
 end
 
+function roomStruct.getPosition(room)
+    return room.x, room.y
+end
+
+function roomStruct.getSize(room)
+    return room.width, room.height
+end
+
 function roomStruct.encode(room)
     local res = {}
 
