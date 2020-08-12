@@ -186,10 +186,9 @@ function binfile.readRunLengthEncoded(fh)
     local res = {}
 
     for i = 1, bytes, 2 do
-        local times = binfile.readByte(fh)
-        local char = fh:read(1)
+        local times, char = binfile.readBytes(fh, 2)
 
-        table.insert(res, char:rep(times))
+        table.insert(res, stringChar(char):rep(times))
     end
 
     return table.concat(res)
