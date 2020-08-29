@@ -202,7 +202,7 @@ local function drawInvalidTiles(batch, missingTiles, fg)
     for _, missing in ipairs(missingTiles) do
         local x, y = missing[1], missing[2]
 
-        love.graphics.rectangle("fill", x * 8, y * 8, 8, 8)
+        love.graphics.rectangle("fill", x * 8 - 8, y * 8 - 8, 8, 8)
     end
 
     love.graphics.setCanvas(canvas)
