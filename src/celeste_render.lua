@@ -698,17 +698,19 @@ function celesteRender.drawMap(state)
         local viewport = state.viewport
 
         if viewport.visible then
+            local selectedRoom = state.getSelectedRoom()
+
             for i, filler in ipairs(map.fillers) do
                 if viewportHandler.fillerVisible(filler, viewport) then
                     celesteRender.drawFiller(filler, viewport)
                 end
             end
 
-            for i, room in ipairs(map.rooms) do
+            for _, room in ipairs(map.rooms) do
                 local roomVisible = viewportHandler.roomVisible(room, viewport)
 
                 if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or roomVisible then
-                    celesteRender.drawRoom(room, viewport, room == state.selectedRoom, roomVisible)
+                    celesteRender.drawRoom(room, viewport, room == selectedRoom, roomVisible)
                 end
             end
         end
