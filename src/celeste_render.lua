@@ -202,7 +202,7 @@ local function drawInvalidTiles(batch, missingTiles, fg)
     for _, missing in ipairs(missingTiles) do
         local x, y = missing[1], missing[2]
 
-        love.graphics.rectangle("fill", x * 8, y * 8, 8, 8)
+        love.graphics.rectangle("fill", x * 8 - 8, y * 8 - 8, 8, 8)
     end
 
     love.graphics.setCanvas(canvas)
@@ -698,17 +698,19 @@ function celesteRender.drawMap(state)
         local viewport = state.viewport
 
         if viewport.visible then
+            local selectedRoom = state.getSelectedRoom()
+
             for i, filler in ipairs(map.fillers) do
                 if viewportHandler.fillerVisible(filler, viewport) then
                     celesteRender.drawFiller(filler, viewport)
                 end
             end
 
-            for i, room in ipairs(map.rooms) do
+            for _, room in ipairs(map.rooms) do
                 local roomVisible = viewportHandler.roomVisible(room, viewport)
 
                 if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or roomVisible then
-                    celesteRender.drawRoom(room, viewport, room == state.selectedRoom, roomVisible)
+                    celesteRender.drawRoom(room, viewport, room == selectedRoom, roomVisible)
                 end
             end
         end

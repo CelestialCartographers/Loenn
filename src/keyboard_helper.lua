@@ -19,9 +19,27 @@ end
 
 keyboard.nameToModifierFunction = {
     ctrl = keyboard.modifierControl,
+    control = keyboard.modifierControl,
+
     shift = keyboard.modifierShift,
+
     alt = keyboard.modifierAlt,
+
     gui = keyboard.modifierGUI,
+    commmand = keyboard.modifierGUI,
+    cmd = keyboard.modifierGUI,
+    windows = keyboard.modifierGUI,
+    winkey = keyboard.modifierGUI
 }
+
+function keyboard.modifierHeld(modifier)
+    local modifierFunction = keyboard.nameToModifierFunction[modifier]
+
+    if modifierFunction then
+        return modifierFunction()
+    end
+
+    return false
+end
 
 return keyboard

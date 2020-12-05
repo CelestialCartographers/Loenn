@@ -223,10 +223,13 @@ end
 
 function editorScene:draw()
     if self.viewerState.map then
+        local item, itemType = self.viewerState.getSelectedItem()
+        local itemName = item and itemType == "item" and string.format("item: %s", item.name) or string.format("Filler: %s %s", item.x, item.y)
+
         self.celesteRender.drawMap(self.viewerState)
 
         love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
-        love.graphics.printf("Room: " .. self.viewerState.selectedRoom.name, 20, 80, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
+        love.graphics.printf(itemName, 20, 80, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
     end
 
     self:propagateEvent("draw")

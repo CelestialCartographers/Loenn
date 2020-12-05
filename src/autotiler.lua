@@ -131,14 +131,14 @@ end
 
 local function maskToIgnoreBitmask(mask, lshift)
     return
-        lshift(mask[1]~= nil and 1 or 0, 7) +
-        lshift(mask[2]~= nil and 1 or 0, 6) +
-        lshift(mask[3]~= nil and 1 or 0, 5) +
-        lshift(mask[4]~= nil and 1 or 0, 4) +
-        lshift(mask[6]~= nil and 1 or 0, 3) +
-        lshift(mask[7]~= nil and 1 or 0, 2) +
-        lshift(mask[8]~= nil and 1 or 0, 1) +
-        (mask[9]~= nil and 1 or 0)
+        lshift(mask[1] ~= nil and 1 or 0, 7) +
+        lshift(mask[2] ~= nil and 1 or 0, 6) +
+        lshift(mask[3] ~= nil and 1 or 0, 5) +
+        lshift(mask[4] ~= nil and 1 or 0, 4) +
+        lshift(mask[6] ~= nil and 1 or 0, 3) +
+        lshift(mask[7] ~= nil and 1 or 0, 2) +
+        lshift(mask[8] ~= nil and 1 or 0, 1) +
+        (mask[9] ~= nil and 1 or 0)
 end
 
 

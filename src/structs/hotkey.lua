@@ -1,16 +1,11 @@
 local keyboardHelper = require("keyboard_helper")
 
-local specialActivators = {
-    ctrl = keyboardHelper.modifierControl,
-    shift = keyboardHelper.modifierShift,
-    alt = keyboardHelper.modifierAlt,
-    gui = keyboardHelper.modifierGUI,
-    command = keyboardHelper.modifierGUI,
-    winkey = keyboardHelper.modifierGUI,
-
+local specialKeyAliases = {
     plus = "+",
     minus = "-",
 }
+
+local modifierKeyFunctions = keyboardHelper.nameToModifierFunction
 
 local hotkeyStruct = {}
 
@@ -35,12 +30,17 @@ function hotkeyStruct.sanitize(activator, exactMatch)
     local usedModifiers = {}
 
     for i, part <- parts do
-        part = part:match("^%s*(.-)%s*$"):lower
+        part = part:match("^%s*(.-)%s*$"):lower()
 
-        if specialActivators[part] then
-            table.insert(activators, specialActivators[part])
+        if specialKeyAliases[part] then
+            table.insert(activators, specialKeyAliases[part])
 
-            usedModifiers[part] = true
+        elseif modifierKeyFunctions[part] then
+            local func = modifierKeyFunctions[part]
+
+            table.insert(activators, func)
+
+            usedModifiers[modifierKeyFunctions[part]] = true
 
         else
             table.insert(activators, part)
@@ -48,9 +48,12 @@ function hotkeyStruct.sanitize(activator, exactMatch)
     end
 
     if exactMatch then
-        for name, func <- keyboardHelper.nameToModifierFunction do
-            if not usedModifiers[name] then
-                table.insert(activators, function() return not specialActivators[name]() end)
+        for name, func in pairs(modifierKeyFunctions) do
+            if not usedModifiers[func] then
+                -- Make sure we don't add any aliases for the function either
+                usedModifiers[func] = true
+
+                table.insert(activators, function() return not func() end)
             end
         end
     end
@@ -63,7 +66,7 @@ function hotkeyStruct.hotkeyActive(hotkey)
         return false
     end
 
-    for i, part <- hotkey.activator do
+    for i, part in ipairs(hotkey.activator) do
         if type(part) == "function" then
             if not part() then
                 return false
@@ -86,7 +89,7 @@ function hotkeyStruct.callbackIfActive(hotkey)
 end
 
 function hotkeyStruct.callbackFirstActive(hotkeys)
-    for i, hotkey <- hotkeys do
+    for i, hotkey in ipairs(hotkeys) do
         if hotkey:active() then
             hotkey()
 

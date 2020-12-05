@@ -30,7 +30,7 @@ local previewMatrix = matrixLib.filled("0", 5, 5)
 local previewBatch = nil
 
 local function handleActionClick(x, y, force)
-    local room = state.selectedRoom
+    local room = state.getSelectedRoom()
 
     if room then
         local px, py = viewportHandler.getRoomCoordindates(room, x, y)
@@ -47,7 +47,7 @@ local function handleActionClick(x, y, force)
 end
 
 local function handleCloneClick(x, y)
-    local room = state.selectedRoom
+    local room = state.getSelectedRoom()
 
     if room then
         local px, py = viewportHandler.getRoomCoordindates(room, x, y)
@@ -77,7 +77,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
 end
 
 function tool.draw()
-    local room = state.selectedRoom
+    local room = state.getSelectedRoom()
 
     if room then
         local px, py = viewportHandler.getRoomCoordindates(room)

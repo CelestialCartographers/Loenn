@@ -30,11 +30,10 @@ function device.mouseclicked(x, y, button, istouch, presses)
 
         if button == actionButton then
             local mapX, mapY = viewport.getMapCoordinates(x, y)
+            local itemClicked = utils.getRoomAtCoords(mapX, mapY, state.map) or utils.getFillerAtCoords(mapX, mapY, state.map)
 
-            local roomClicked = utils.getRoomAtCoords(mapX, mapY, state.map)
-
-            if roomClicked and roomClicked ~= state.selectedRoom then
-                state.selectedRoom = roomClicked
+            if itemClicked and itemClicked ~= state.getSelectedItem() then
+                state.selectItem(itemClicked)
 
                 return true
             end

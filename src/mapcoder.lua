@@ -184,7 +184,7 @@ function mapcoder.encodeString(writer, s, lookup)
         if encodedLength < #s and encodedLength < 2^15 then
             writer:writeByte(7)
             writer:writeSignedShort(encodedLength)
-            writer:writeByteArray(encodedString)
+            writer:write(encodedString)
 
         else
             writer:writeByte(6)

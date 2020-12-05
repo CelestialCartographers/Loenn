@@ -5,7 +5,7 @@ local binaryWriter = {}
 binaryWriter._MT = {}
 binaryWriter._MT.__index = {}
 
--- Add reading methods from binfile
+-- Add writing methods from binfile
 for name, func in pairs(binfile) do
     if name:match("^write") then
         binaryWriter._MT.__index[name] = func
@@ -16,7 +16,7 @@ function binaryWriter._MT.__index:flush()
     if self._fh and #self._unwritten > 0 then
         self._fh:write(table.concat(self._unwritten))
 
-        self._unwritten = {}
+        self:clear()
     end
 end
 
@@ -38,6 +38,16 @@ function binaryWriter._MT.__index:write(s)
 
     if self._fh and self._unwrittenBytes > self._unwrittenMaxSize then
         self:flush()
+    end
+end
+
+function binaryWriter._MT.__index:clear()
+    local unwritten = self._unwritten
+
+    self._unwrittenBytes = 0
+
+    for i = 1, #unwritten do
+        unwritten[i] = nil
     end
 end
 
