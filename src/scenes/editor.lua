@@ -28,7 +28,7 @@ end
 function editorScene:draw()
     if self.viewerState.map then
         local item, itemType = self.viewerState.getSelectedItem()
-        local itemName = item and itemType == "item" and string.format("item: %s", item.name) or string.format("Filler: %s %s", item.x, item.y)
+        local itemName = item and itemType == "room" and string.format("Room: %s", item.name) or string.format("Filler: %s %s", item.x, item.y)
 
         self.celesteRender.drawMap(self.viewerState)
 
