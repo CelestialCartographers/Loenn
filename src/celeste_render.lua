@@ -422,9 +422,8 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
                 local batch = getOrCreateSmartBatch(batches, defaultDepth)
 
                 batch:addFromDrawable(drawable)
-            end
 
-            if handler.draw then
+            elseif handler.draw then
                 local batch = getOrCreateSmartBatch(batches, defaultDepth)
                 batch:addFromDrawable(drawableFunction.fromFunction(handler.draw, room, entity, viewport))
             end
