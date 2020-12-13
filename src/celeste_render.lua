@@ -630,6 +630,16 @@ local function getRoomCanvas(room, viewport, selected)
     return roomCache[room.name].canvas and roomCache[room.name].canvas.result
 end
 
+function celesteRender.drawRooms(rooms, viewport, selectedRoom)
+    for _, room in ipairs(rooms) do
+        local roomVisible = viewportHandler.roomVisible(room, viewport)
+
+        if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or roomVisible then
+            celesteRender.drawRoom(room, viewport, room == selectedRoom, roomVisible)
+        end
+    end
+end
+
 function celesteRender.drawRoom(room, viewport, selected, visible)
     -- Getting the canvas starts background drawing tasks
     -- This should start regardless of the room being visible or not
@@ -676,6 +686,21 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
     end
 end
 
+-- Set colors once for all fillers
+function celesteRender.drawFillers(fillers, viewport)
+    local pr, pb, pg, pa = love.graphics.getColor()
+
+    love.graphics.setColor(colors.fillerColor)
+
+    for i, filler in ipairs(fillers) do
+        if viewportHandler.fillerVisible(filler, viewport) then
+            celesteRender.drawFiller(filler, viewport)
+        end
+    end
+
+    love.graphics.setColor(pr, pb, pg, pa)
+end
+
 function celesteRender.drawFiller(filler, viewport)
     local x = filler.x * 8
     local y = filler.y * 8
@@ -684,10 +709,7 @@ function celesteRender.drawFiller(filler, viewport)
     local height = filler.height * 8
 
     viewportHandler.drawRelativeTo(x, y, function()
-        drawing.callKeepOriginalColor(function()
-            love.graphics.setColor(colors.fillerColor)
-            love.graphics.rectangle("fill", 0, 0, width, height)
-        end)
+        love.graphics.rectangle("fill", 0, 0, width, height)
     end)
 end
 
@@ -699,19 +721,8 @@ function celesteRender.drawMap(state)
         if viewport.visible then
             local selectedRoom = state.getSelectedRoom()
 
-            for i, filler in ipairs(map.fillers) do
-                if viewportHandler.fillerVisible(filler, viewport) then
-                    celesteRender.drawFiller(filler, viewport)
-                end
-            end
-
-            for _, room in ipairs(map.rooms) do
-                local roomVisible = viewportHandler.roomVisible(room, viewport)
-
-                if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or roomVisible then
-                    celesteRender.drawRoom(room, viewport, room == selectedRoom, roomVisible)
-                end
-            end
+            celesteRender.drawFillers(map.fillers, viewport)
+            celesteRender.drawRooms(map.rooms, viewport, selectedRoom)
         end
     end
 end
