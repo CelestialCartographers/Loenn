@@ -79,6 +79,10 @@ function love.visible(visible)
     sceneHandler.sendEvent("visible", visible)
 end
 
+function love.focus(focus)
+    sceneHandler.sendEvent("focus", focus)
+end
+
 function love.filedropped(file)
     sceneHandler.sendEvent("filedropped", file)
 end
