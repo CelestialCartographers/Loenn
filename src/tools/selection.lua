@@ -25,7 +25,11 @@ end
 
 local function getCursorPositionInRoom(x, y)
     local room = state.getSelectedRoom()
-    local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+    local px, py = nil, nil
+
+    if room then
+        px, py = viewportHandler.getRoomCoordindates(room, x, y)
+    end
 
     return px, py
 end
@@ -36,7 +40,9 @@ function tool.mousepressed(x, y, button, istouch, presses)
     if button == actionButton then
         local px, py = getCursorPositionInRoom(x, y)
 
-        selection = utils.rectangle(px, py, 0, 0)
+        if px and py then
+            selection = utils.rectangle(px, py, 0, 0)
+        end
     end
 end
 
@@ -60,7 +66,9 @@ function tool.mousedragged(startX, startY, button, dx, dy)
         local px, py = getCursorPositionInRoom(startX, startY)
         local viewport = viewportHandler.viewport
 
-        selection = utils.rectangle(px, py, dx / viewport.scale, dy / viewport.scale)
+        if px and py then
+            selection = utils.rectangle(px, py, dx / viewport.scale, dy / viewport.scale)
+        end
     end
 end
 
