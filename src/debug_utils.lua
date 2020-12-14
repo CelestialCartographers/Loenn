@@ -81,15 +81,22 @@ function debugUtils.profile(f, options, ...)
     options = options or {}
 
     local yieldsAlreadyDisabled = coroutine.yield ~= origYield
+    local rounds = options.rounds or 1
 
     if not yieldsAlreadyDisabled and (options.disableYields or options.disableYields == nil) then
         debugUtils.disableYields()
     end
 
+
+    local res
+
     profile.reset()
     profile.start()
 
-    local res = f(...)
+
+    for i = 1, rounds do
+        res = f(...)
+    end
 
     profile.stop()
 
