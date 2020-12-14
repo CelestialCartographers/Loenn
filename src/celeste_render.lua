@@ -84,17 +84,35 @@ function celesteRender.clearBatchingTasks()
     batchingTasks = {}
 end
 
+function celesteRender.releaseBatch(roomName, key)
+    if roomCache[roomName] and roomCache[roomName][key] and roomCache[roomName][key].result then
+        local target = roomCache[roomName][key].result
+
+        if target.release then
+            target:release()
+        end
+    end
+end
+
 function celesteRender.invalidateRoomCache(roomName, key)
     if roomName then
         if utils.typeof(roomName) == "room" then
             roomName = roomName.name
         end
 
-        if key and roomCache[roomName] then
-            roomCache[roomName][key] = nil
+        if roomCache[roomName] then
+            if key then
+                celesteRender.releaseBatch(roomName, key)
 
-        else
-            roomCache[roomName] = {}
+                roomCache[roomName][key] = nil
+
+            else
+                for name, task in pairs(roomCache[roomName]) do
+                    celesteRender.releaseBatch(roomName, name)
+                end
+
+                roomCache[roomName] = {}
+            end
         end
 
     else

@@ -81,6 +81,16 @@ function orderedDrawingBatchMt.__index:clear()
     self._lastType = nil
 end
 
+function orderedDrawingBatchMt.__index:release()
+    for _, element in ipairs(self._drawables) do
+        if utils.typeof(element) == "SpriteBatch" then
+            element:release()
+        end
+    end
+
+    return true
+end
+
 function smartDrawingBatch.createOrderedBatch()
     local res = {
         _type = "orderedDrawingBatch",
@@ -125,6 +135,14 @@ end
 
 function unorderedDrawingBatchMt.__index:clear()
     self._lookup = {}
+end
+
+function unorderedDrawingBatchMt.__index:release()
+    for _, batch in pairs(self._lookup) do
+        batch:release()
+    end
+
+    return true
 end
 
 -- Only works with textures
@@ -216,6 +234,11 @@ function matrixDrawingBatchMt.__index:draw()
     end
 
     self._canRender = true
+end
+
+function matrixDrawingBatchMt.__index:release()
+    -- TODO - Implement when needed
+    return false
 end
 
 -- Only works with textures
@@ -368,6 +391,10 @@ function gridCanvasBatchMt.__index:draw()
     self:updateDirtyRegions()
 
     love.graphics.draw(self._canvas, 0, 0)
+end
+
+function gridCanvasBatchMt.__index:release()
+    return self._canvas:release()
 end
 
 -- Works like the matrix drawing batch, but assumes that a "cell" can be replaced by painting over its space and then drawn again
