@@ -1,5 +1,6 @@
 local colors = {}
 
+-- Missing tileset colors
 colors.tileFGMissingColor = {120 / 255, 81 / 255, 169 / 255}
 colors.tileBGMissingColor = {255 / 255, 195 / 255, 11 / 255}
 
@@ -7,6 +8,7 @@ colors.entityMissingColor = {47 / 255, 114 / 255, 100 / 255, 0.75}
 colors.triggerColor = {47 / 255, 114 / 255, 100 / 255, 0.3}
 colors.triggerTextColor = {255 / 255, 255 / 255, 255 / 255}
 
+-- Room background colors
 colors.roomBorderColors = {
     {255 / 255, 255 / 255, 255 / 255},
     {246 / 255, 115 / 255, 94 / 255},
@@ -30,12 +32,20 @@ colors.roomBackgroundColors = {
 colors.roomBackgroundDefault = {50 / 255, 50 / 255, 50 / 255}
 colors.roomBorderDefault = {255 / 255, 255 / 255, 255 / 255}
 
+-- Color of filler objects
 colors.fillerColor = {68 / 255, 68 / 255, 68 / 255}
 
+-- Brush tool color
 colors.brushColor = {77 / 255, 77 / 255, 77 / 255, 204 / 255}
 
+-- Selection tool selection rectangle
+colors.selectionBorderColor = {0 / 255, 255 / 255, 77 / 255, 153 / 255}
+colors.selectionFillColor = {0 / 255, 255 / 255, 77 / 255, 102 / 255}
+
+-- Resize arrows device
 colors.resizeTriangleColor = {196 / 255, 196 / 255, 196 / 255}
 
+-- Default color
 colors.default = {255 / 255, 255 / 255, 255 / 255}
 
 return colors
