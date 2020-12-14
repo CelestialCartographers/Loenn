@@ -62,7 +62,7 @@ end
 
 function loadingScene:update(dt)
     self.currentTime = self.currentTime + dt
-    if self.currentTime >= self.duration then
+    while self.currentTime >= self.duration do
         self.currentTime = self.currentTime - self.duration
     end
 end
