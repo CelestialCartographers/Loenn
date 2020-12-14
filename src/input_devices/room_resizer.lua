@@ -16,8 +16,6 @@ local draggingStartX
 local draggingStartY
 local itemPosition
 
-local actionButton = configs.editor.toolActionButton
-
 local triangleColor = colors.resizeTriangleColor
 local triangleHeight = 16
 local triangleOffset = 20
@@ -138,6 +136,7 @@ end
 
 function roomResizer.mousepressed(x, y, button, istouch, presses)
     local item, itemType = loadedState.getSelectedItem()
+    local actionButton = configs.editor.toolActionButton
 
     if button == actionButton and (itemType == "room" or itemType == "filler") then
         local viewport = viewportHandler.viewport
@@ -157,10 +156,10 @@ function roomResizer.mousepressed(x, y, button, istouch, presses)
             draggingStartX = tileX
             draggingStartY = tileY
             itemPosition = newItemPosition
+
+            return true
         end
     end
-
-    return true
 end
 
 function roomResizer.mousereleased(x, y, button, istouch, presses)
@@ -212,8 +211,6 @@ function roomResizer.mousemoved(x, y, dx, dy, istouch)
 
         return true
     end
-
-    return false
 end
 
 function roomResizer.mouseclicked(x, y, button, istouch, presses)
@@ -221,6 +218,10 @@ function roomResizer.mouseclicked(x, y, button, istouch, presses)
 end
 
 function roomResizer.mousedragged(startX, startY, button, dx, dy)
+    return not not dragging
+end
+
+function roomResizer.mousedragmoved(dx, dy, button, istouch)
     return not not dragging
 end
 
