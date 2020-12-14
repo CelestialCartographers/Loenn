@@ -85,21 +85,24 @@ function tool.draw()
     local room = state.getSelectedRoom()
 
     if room and selection then
-        viewportHandler.drawRelativeTo(room.x, room.y, function()
-            drawing.callKeepOriginalColor(function()
-                local x, y = selection.x, selection.y
-                local width, height = selection.width, selection.height
+        -- Don't render if selection rectangle is too small, weird visuals
+        if math.abs(selection.width) > 1 and math.abs(selection.height) > 1 then
+            viewportHandler.drawRelativeTo(room.x, room.y, function()
+                drawing.callKeepOriginalColor(function()
+                    local x, y = selection.x, selection.y
+                    local width, height = selection.width, selection.height
 
-                local borderColor = colors.selectionBorderColor
-                local fillColor = colors.selectionFillColor
+                    local borderColor = colors.selectionBorderColor
+                    local fillColor = colors.selectionFillColor
 
-                love.graphics.setColor(fillColor)
-                love.graphics.rectangle("fill", x, y, width, height)
+                    love.graphics.setColor(fillColor)
+                    love.graphics.rectangle("fill", x, y, width, height)
 
-                love.graphics.setColor(borderColor)
-                love.graphics.rectangle("line", x, y, width, height)
+                    love.graphics.setColor(borderColor)
+                    love.graphics.rectangle("line", x, y, width, height)
+                end)
             end)
-        end)
+        end
     end
 end
 
