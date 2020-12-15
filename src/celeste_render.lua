@@ -405,7 +405,6 @@ local function getOrCreateSmartBatch(batches, key)
     return batches[key]
 end
 
--- TODO - Clean up, some of this logic should be in entities.lua or other helper file
 local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)
     local batches = {}
 
@@ -414,37 +413,11 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
         local handler = registeredEntities[name]
 
         if handler then
-            local defaultDepth = type(handler.depth) == "function" and handler.depth(room, entity, viewport) or handler.depth or 0
+            local defaultDepth = entityHandler.getDefaultDepth(name, handler, room, entity, viewport)
+            local drawable, depth = entityHandler.getDrawable(name, handler, room, entity, viewport)
+            local batch = getOrCreateSmartBatch(batches, utils.callIfFunction(depth, room, entity, viewport) or defaultDepth)
 
-            if handler.sprite then
-                local sprites = handler.sprite(room, entity, viewport)
-
-                if sprites then
-                    if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
-                        local batch = getOrCreateSmartBatch(batches, sprites.depth or defaultDepth)
-                        batch:addFromDrawable(sprites)
-
-                    else
-                        for j, sprite in ipairs(sprites) do
-                            if utils.typeof(sprite) == "drawableSprite" then
-                                local batch = getOrCreateSmartBatch(batches, sprite.depth or defaultDepth)
-                                batch:addFromDrawable(sprite)
-                            end
-                        end
-                    end
-                end
-
-            elseif handler.rectangle then
-                local rectangle = handler.rectangle(room, entity, viewport)
-                local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)
-                local batch = getOrCreateSmartBatch(batches, defaultDepth)
-
-                batch:addFromDrawable(drawable)
-
-            elseif handler.draw then
-                local batch = getOrCreateSmartBatch(batches, defaultDepth)
-                batch:addFromDrawable(drawableFunction.fromFunction(handler.draw, room, entity, viewport))
-            end
+            batch:addFromDrawable(drawable)
 
             if i % 25 == 0 then
                 tasks.yield()

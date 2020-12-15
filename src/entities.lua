@@ -1,6 +1,12 @@
 local utils = require("utils")
 local tasks = require("task")
 
+local drawableSprite = require("structs.drawable_sprite")
+local drawableFunction = require("structs.drawable_function")
+local drawableRectangle = require("structs.drawable_rectangle")
+
+local colors = require("colors")
+
 local entities = {}
 
 local missingEntity = require("defaults.viewer.entity")
@@ -43,6 +49,40 @@ function entities.loadInternalEntities(registerAt, path)
     end
 
     tasks.update(registerAt)
+end
+
+-- Returns default depth
+function entities.getDefaultDepth(name, handler, room, entity, viewport)
+    return utils.callIfFunction(handler.depth, room, entity, viewport) or 0
+end
+
+-- Returns drawable, depth
+function entities.getDrawable(name, handler, room, entity, viewport)
+    if handler.sprite then
+        local sprites = handler.sprite(room, entity, viewport)
+
+        if sprites then
+            if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
+                return sprites, sprites.depth
+
+            else
+                for j, sprite in ipairs(sprites) do
+                    if utils.typeof(sprite) == "drawableSprite" then
+                        return sprite, sprite.depth
+                    end
+                end
+            end
+        end
+
+    elseif handler.rectangle then
+        local rectangle = handler.rectangle(room, entity, viewport)
+        local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)
+
+        return drawable
+
+    elseif handler.draw then
+        return drawableFunction.fromFunction(handler.draw, room, entity, viewport)
+    end
 end
 
 entities.initDefaultRegistry()
