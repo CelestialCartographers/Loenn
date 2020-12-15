@@ -166,6 +166,14 @@ function utils.sameColor(color1, color2)
     return false
 end
 
+function utils.callIfFunction(f, ...)
+    if type(f) == "function" then
+        return f(...)
+    end
+
+    return f
+end
+
 function utils.typeof(v)
     local typ = type(v)
 
