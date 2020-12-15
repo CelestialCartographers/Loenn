@@ -1,6 +1,5 @@
 local entityHandler = require("entities")
-local entity = require "src.defaults.viewer.entity"
-local utils = require "src.giraffe.giraffe.utils"
+local utils = require("utils")
 
 local selections = {}
 
