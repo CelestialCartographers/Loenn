@@ -88,7 +88,7 @@ end
 -- Returns main entity selection rectangle, then table of node rectangles
 -- TODO - Implement nodes
 function entities.getSelection(room, entity)
-    local name = entity.name
+    local name = entity._name
     local handler = entities.registeredEntities[name]
 
     if handler.selection then
