@@ -85,6 +85,32 @@ function entities.getDrawable(name, handler, room, entity, viewport)
     end
 end
 
+-- Returns main entity selection rectangle, then table of node rectangles
+-- TODO - Implement nodes
+function entities.getSelection(room, entity)
+    local name = entity.name
+    local handler = entities.registeredEntities[name]
+
+    if handler.selection then
+        return handler.selection(room, entity)
+
+    elseif handler.rectangle then
+        return handler.rectangle(room, entity), nil
+
+    else
+        local drawable = entities.getDrawable(name, handler, room, entity)
+
+        if drawable.getRectangle then
+            return drawable:getRectangle(), nil
+        end
+    end
+end
+
+-- Returns all entities of room
+function entities.getRoomItems(room, layer)
+    return room.entities
+end
+
 entities.initDefaultRegistry()
 
 return entities

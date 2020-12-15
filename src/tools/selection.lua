@@ -3,6 +3,7 @@ local utils = require("utils")
 local configs = require("configs")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
+local selectionUtils = require("selections")
 local drawing = require("drawing")
 local colors = require("colors")
 
@@ -14,7 +15,10 @@ tool.image = nil
 
 tool.layer = "entities"
 
-local selection = nil
+local selectionRectangle = nil
+local selectionCompleted = false
+local selectionStartX, selectionStartY = nil ,nil
+local selectionPreviews = nil
 
 local function redrawTargetLayer(room)
     -- TODO - Redraw more efficiently
@@ -34,6 +38,29 @@ local function getCursorPositionInRoom(x, y)
     return px, py
 end
 
+local function selectionStarted(x, y)
+    selectionRectangle = utils.rectangle(x, y, 0, 0)
+
+    selectionCompleted = false
+
+    selectionStartX = x
+    selectionStartY = y
+end
+
+local function selectionChanged(x, y, width, height)
+    local room = state.getSelectedRoom()
+
+    -- Only update if needed
+    if x ~= selectionRectangle.x or y ~= selectionRectangle.y or width ~= selectionRectangle.width or height ~= selectionRectangle.height then
+        selectionRectangle = utils.rectangle(x, y, width, height)
+        selectionPreviews = selectionUtils.getSelectionsForRoomInRectangle(tool.layer, room, selectionRectangle)
+    end
+end
+
+local function selectionFinished()
+    selectionCompleted = true
+end
+
 function tool.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
@@ -41,33 +68,43 @@ function tool.mousepressed(x, y, button, istouch, presses)
         local px, py = getCursorPositionInRoom(x, y)
 
         if px and py then
-            selection = utils.rectangle(px, py, 0, 0)
+            selectionStarted(px, py)
         end
     end
 end
 
-function tool.mousedragmoved(dx, dy, button, istouch)
+function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
 
-    if button == actionButton then
-        local viewport = viewportHandler.viewport
-
-        if selection then
-            selection.width += dx / viewport.scale
-            selection.height += dy / viewport.scale
-        end
-    end
-end
-
-function tool.mousedragged(startX, startY, button, dx, dy)
-    local actionButton = configs.editor.toolActionButton
-
-    if button == actionButton then
-        local px, py = getCursorPositionInRoom(startX, startY)
-        local viewport = viewportHandler.viewport
+    if not selectionCompleted and love.mouse.isDown(actionButton) then
+        local px, py = getCursorPositionInRoom(x, y)
 
         if px and py then
-            selection = utils.rectangle(px, py, dx / viewport.scale, dy / viewport.scale)
+            local width, height = px - selectionStartX, py - selectionStartY
+
+            selectionChanged(selectionStartX, selectionStartY, width, height)
+        end
+    end
+end
+
+function tool.mousereleased(x, y, button, istouch, presses)
+    local actionButton = configs.editor.toolActionButton
+
+    if button == actionButton then
+        selectionFinished()
+    end
+end
+
+-- Special case
+function tool.mouseclicked(x, y, button, istouch, presses)
+    local actionButton = configs.editor.toolActionButton
+
+    if button == actionButton then
+        local px, py = getCursorPositionInRoom(x, y)
+
+        if px and py then
+            selectionChanged(px - 1, py - 1, 3, 3)
+            selectionFinished()
         end
     end
 end
@@ -76,29 +113,25 @@ end
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
 
-    local ox = key == "a" and -8 or key == "d" and 8 or 0
-    local oy = key == "w" and -8 or key == "s" and 8 or 0
-
-    if room and ox ~= 0 or oy ~= 0 then
-        for _, entity in ipairs(room.entities) do
-            entity.x += ox
-            entity.y += oy
-        end
-
-        redrawTargetLayer(room)
+    if key == "s" then
+        print(#(selectionPreviews or {}))
     end
 end
 
 function tool.draw()
     local room = state.getSelectedRoom()
 
-    if room and selection then
+    if not room then
+        return
+    end
+
+    if selectionRectangle then
         -- Don't render if selection rectangle is too small, weird visuals
-        if math.abs(selection.width) > 1 and math.abs(selection.height) > 1 then
+        if selectionRectangle.width > 1 and selectionRectangle.height > 1 then
             viewportHandler.drawRelativeTo(room.x, room.y, function()
                 drawing.callKeepOriginalColor(function()
-                    local x, y = selection.x, selection.y
-                    local width, height = selection.width, selection.height
+                    local x, y = selectionRectangle.x, selectionRectangle.y
+                    local width, height = selectionRectangle.width, selectionRectangle.height
 
                     local borderColor = colors.selectionBorderColor
                     local fillColor = colors.selectionFillColor
@@ -111,6 +144,28 @@ function tool.draw()
                 end)
             end)
         end
+    end
+
+    if selectionPreviews then
+        local preview = not selectionCompleted
+
+        local borderColor = preview and colors.selectionPreviewBorderColor or colors.selectionCompleteBorderColor
+        local fillColor = preview and colors.selectionPreviewFillColor or colors.selectionCompleteFillColor
+
+        viewportHandler.drawRelativeTo(room.x, room.y, function()
+            for _, rectangle in ipairs(selectionPreviews) do
+                drawing.callKeepOriginalColor(function()
+                    local x, y = rectangle.x, rectangle.y
+                    local width, height = rectangle.width, rectangle.height
+
+                    love.graphics.setColor(fillColor)
+                    love.graphics.rectangle("fill", x, y, width, height)
+
+                    love.graphics.setColor(borderColor)
+                    love.graphics.rectangle("line", x, y, width, height)
+                end)
+            end
+        end)
     end
 end
 

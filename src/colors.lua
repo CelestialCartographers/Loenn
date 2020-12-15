@@ -42,6 +42,14 @@ colors.brushColor = {77 / 255, 77 / 255, 77 / 255, 204 / 255}
 colors.selectionBorderColor = {0 / 255, 255 / 255, 77 / 255, 153 / 255}
 colors.selectionFillColor = {0 / 255, 255 / 255, 77 / 255, 102 / 255}
 
+-- Selection tool selection item preview
+colors.selectionPreviewBorderColor = {255 / 255, 255 / 255, 0 / 255, 153 / 255}
+colors.selectionPreviewFillColor = {255 / 255, 255 / 255, 0 / 255, 102 / 255}
+
+-- Selection tool selected item
+colors.selectionCompleteBorderColor = {255 / 255, 0 / 255, 255 / 255, 153 / 255}
+colors.selectionCompleteFillColor = {255 / 255, 0 / 255, 255 / 255, 102 / 255}
+
 -- Resize arrows device
 colors.resizeTriangleColor = {196 / 255, 196 / 255, 196 / 255}
 

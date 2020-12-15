@@ -3,6 +3,8 @@ local filesystem = require("filesystem")
 local requireUtils = require("require_utils")
 local xnaColors = require("xna_colors")
 
+local rectangles = require("structs/rectangle")
+
 local utils = {}
 
 utils.serialize = serialize.serialize
@@ -17,11 +19,11 @@ function utils.stripByteOrderMark(s)
 end
 
 function utils.rectangle(x, y, width, height)
-    return {x = x, y = y, width = width, height = height}
+    return rectangles.create(x, y, width, height)
 end
 
 function utils.point(x, y)
-    return {x = x, y = y, width = 1, height = 1}
+    return rectangles.create(x, y, 1, 1)
 end
 
 function utils.rectangleBounds(rectangles)
