@@ -79,7 +79,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     if not selectionCompleted and love.mouse.isDown(actionButton) then
         local px, py = getCursorPositionInRoom(x, y)
 
-        if px and py then
+        if px and py and selectionStartX and selectionStartY then
             local width, height = px - selectionStartX, py - selectionStartY
 
             selectionChanged(selectionStartX, selectionStartY, width, height)
