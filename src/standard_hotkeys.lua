@@ -56,7 +56,7 @@ for _, data in ipairs(rawHotkeys) do
     local activation, callback, description = data[1], data[2], data[3]
     local hotkey = hotkeyStruct.createHotkey(activation, callback)
 
-    table.insert(hotkeys, hotkeyStruct.createHotkey(activation, callback))
+    table.insert(hotkeys, hotkey)
 end
 
 return hotkeys
