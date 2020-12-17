@@ -84,5 +84,4 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
-
 return triggers

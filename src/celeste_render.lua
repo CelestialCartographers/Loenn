@@ -17,6 +17,7 @@ local bit = require("bit")
 
 local entityHandler = require("entities")
 local triggerHandler = require("triggers")
+local decalHandler = require("decals")
 
 local celesteRender = {}
 
@@ -327,29 +328,14 @@ function celesteRender.getTilesBgBatch(room, tiles, viewport)
     return getRoomTileBatch(room, tiles, false)
 end
 
-local function getDecalsBatch(decals)
+local function getDecalsBatchTaskFunc(decals, room, viewport)
     local batch = smartDrawingBatch.createOrderedBatch()
 
     for i, decal in ipairs(decals) do
         local texture = decal.texture
-        local meta = atlases.gameplay[texture]
+        local drawable = decalHandler.getDrawable(texture, nil, room, decal, viewport)
 
-        local x = decal.x or 0
-        local y = decal.y or 0
-
-        local scaleX = decal.scaleX or 1
-        local scaleY = decal.scaleY or 1
-
-        if meta then
-            local drawable = drawableSprite.spriteFromTexture(texture)
-
-            drawable:setScale(scaleX, scaleY)
-            drawable:setOffset(0, 0) -- No automagicall calculations
-            drawable:setPosition(
-                x - meta.offsetX * scaleX - math.floor(meta.realWidth / 2) * scaleX,
-                y - meta.offsetY * scaleY - math.floor(meta.realHeight / 2) * scaleY
-            )
-
+        if drawable then
             batch:addFromDrawable(drawable)
         end
 
@@ -363,12 +349,12 @@ local function getDecalsBatch(decals)
     return batch
 end
 
-local function getRoomDecalsBatch(room, decals, fg)
+local function getRoomDecalsBatch(room, decals, fg, viewport)
     local key = fg and "decalsFg" or "decalsBg"
 
     roomCache[room.name] = roomCache[room.name] or {}
     roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
-        (-> getDecalsBatch(decals)),
+        (-> getDecalsBatchTaskFunc(decals, room, viewport)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
         batchingTasks,
         {room = room}

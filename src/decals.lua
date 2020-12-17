@@ -1,6 +1,8 @@
 local atlases = require("atlases")
+local drawableSprite = require("structs.drawable_sprite")
+local utils = require("utils")
 
-local decalUtils = {}
+local decals = {}
 
 local decalsPrefix = "^decals/"
 local decalFrameSuffix = "%d*$"
@@ -19,7 +21,7 @@ local function keepFrame(name)
     return true
 end
 
-function decalUtils.getDecalNames(removeFrames)
+function decals.getDecalNames(removeFrames)
     removeFrames = removeFrames == nil or removeFrames
 
     local res = {}
@@ -35,4 +37,48 @@ function decalUtils.getDecalNames(removeFrames)
     return res
 end
 
-return decalUtils
+function decals.getDrawable(texture, handler, room, decal, viewport)
+    local meta = atlases.gameplay[texture]
+
+    local x = decal.x or 0
+    local y = decal.y or 0
+
+    local scaleX = decal.scaleX or 1
+    local scaleY = decal.scaleY or 1
+
+    if meta then
+        local drawable = drawableSprite.spriteFromTexture(texture, decal)
+
+        drawable:setScale(scaleX, scaleY)
+        drawable:setOffset(0, 0) -- No automagicall calculations
+        drawable:setPosition(
+            x - meta.offsetX * scaleX - math.floor(meta.realWidth / 2) * scaleX,
+            y - meta.offsetY * scaleY - math.floor(meta.realHeight / 2) * scaleY
+        )
+
+        return drawable
+    end
+end
+
+function decals.getSelection(room, decal)
+    local drawable = decals.getDrawable(decal.texture, nil, room, decal, nil)
+
+    return drawable:getRectangle()
+end
+
+function decals.moveSelection(room, layer, selection, x, y)
+    local decal = selection.item
+
+    decal.x += x
+    decal.y += y
+
+    selection.x += x
+    selection.y += y
+end
+
+-- Returns all entities of room
+function decals.getRoomItems(room, layer)
+    return layer == "decalsFg" and room.decalsFg or room.decalsBg
+end
+
+return decals
