@@ -65,8 +65,8 @@ function drawableSpriteMt.__index:getRectangleRaw()
     local realWidth = self.meta.realWidth
     local realHeight = self.meta.realHeight
 
-    local offsetX = self.meta.offsetX
-    local offsetY = self.meta.offsetY
+    local offsetX = self.offsetX or self.meta.offsetX
+    local offsetY = self.offsetY or self.meta.offsetY
 
     local drawX = math.floor(self.x - (realWidth * self.justificationX + offsetX) * self.scaleX)
     local drawY = math.floor(self.y - (realHeight * self.justificationY + offsetY) * self.scaleY)

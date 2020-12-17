@@ -50,7 +50,8 @@ function decals.getDrawable(texture, handler, room, decal, viewport)
         local drawable = drawableSprite.spriteFromTexture(texture, decal)
 
         drawable:setScale(scaleX, scaleY)
-        drawable:setOffset(0, 0) -- No automagicall calculations
+        drawable:setJustification(0, 0)
+        drawable:setOffset(0, 0)
         drawable:setPosition(
             x - meta.offsetX * scaleX - math.floor(meta.realWidth / 2) * scaleX,
             y - meta.offsetY * scaleY - math.floor(meta.realHeight / 2) * scaleY
