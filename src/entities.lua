@@ -134,6 +134,15 @@ function entities.moveSelection(room, layer, selection, x, y)
             end
         end
     end
+
+    -- Custom selection movement if needed after custom move
+    if handler.updateSelection then
+        handler.updateSelection(room, entity, node, selection, x, y)
+
+    else
+        selection.x += x
+        selection.y += y
+    end
 end
 
 -- Returns all entities of room

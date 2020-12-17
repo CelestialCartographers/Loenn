@@ -74,6 +74,9 @@ function triggers.moveSelection(room, layer, selection, x, y)
             nodes[node][2] += x
         end
     end
+
+    selection.x += x
+    selection.y += y
 end
 
 -- Returns all triggers of room

@@ -16,6 +16,12 @@ tool.name = "Selection"
 tool.image = nil
 
 tool.layer = "entities"
+tool.validLayers = {
+    "entities",
+    "triggers",
+    "decalsFg",
+    "decalsBg"
+}
 
 local selectionRectangle = nil
 local selectionCompleted = false
@@ -34,10 +40,6 @@ local function redrawTargetLayer(room)
     celesteRender.invalidateRoomCache(room, tool.layer)
     celesteRender.invalidateRoomCache(room, "complete")
     celesteRender.forceRoomBatchRender(room, state.viewport)
-end
-
-local function updateSelectionPreviews(room)
-    -- TODO - Implement
 end
 
 local function getCursorPositionInRoom(x, y)
@@ -151,7 +153,6 @@ local function handleitemMovementKeys(room, key, scancode, isrepeat)
                 itemMovement.moveSelection(tool.layer, room, item, offsetX, offsetY)
             end
 
-            updateSelectionPreviews(room)
             redrawTargetLayer(room)
 
             return true
