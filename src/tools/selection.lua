@@ -61,6 +61,63 @@ local function selectionFinished()
     selectionCompleted = true
 end
 
+local function drawSelectionArea(room)
+    if selectionRectangle then
+        -- Don't render if selection rectangle is too small, weird visuals
+        if selectionRectangle.width >= 1 and selectionRectangle.height >= 1 then
+            viewportHandler.drawRelativeTo(room.x, room.y, function()
+                drawing.callKeepOriginalColor(function()
+                    local x, y = selectionRectangle.x, selectionRectangle.y
+                    local width, height = selectionRectangle.width, selectionRectangle.height
+
+                    local borderColor = colors.selectionBorderColor
+                    local fillColor = colors.selectionFillColor
+
+                    love.graphics.setColor(fillColor)
+                    love.graphics.rectangle("fill", x, y, width, height)
+
+                    love.graphics.setColor(borderColor)
+                    love.graphics.rectangle("line", x, y, width, height)
+                end)
+            end)
+        end
+    end
+end
+
+local function drawSelectionPreviews(room)
+    if selectionPreviews then
+        local preview = not selectionCompleted
+
+        local borderColor = preview and colors.selectionPreviewBorderColor or colors.selectionCompleteBorderColor
+        local fillColor = preview and colors.selectionPreviewFillColor or colors.selectionCompleteFillColor
+
+        -- Draw all fills then borders
+        -- Greatly reduces amount of setColor calls
+        -- Potentially find a better solution?
+        viewportHandler.drawRelativeTo(room.x, room.y, function()
+            drawing.callKeepOriginalColor(function()
+                for _, rectangle in ipairs(selectionPreviews) do
+                    local x, y = rectangle.x, rectangle.y
+                    local width, height = rectangle.width, rectangle.height
+
+                    love.graphics.setColor(fillColor)
+                    love.graphics.rectangle("fill", x, y, width, height)
+                end
+            end)
+
+            drawing.callKeepOriginalColor(function()
+                for _, rectangle in ipairs(selectionPreviews) do
+                    local x, y = rectangle.x, rectangle.y
+                    local width, height = rectangle.width, rectangle.height
+
+                    love.graphics.setColor(borderColor)
+                    love.graphics.rectangle("line", x, y, width, height)
+                end
+            end)
+        end)
+    end
+end
+
 function tool.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
@@ -121,51 +178,9 @@ end
 function tool.draw()
     local room = state.getSelectedRoom()
 
-    if not room then
-        return
-    end
-
-    if selectionRectangle then
-        -- Don't render if selection rectangle is too small, weird visuals
-        if selectionRectangle.width > 1 and selectionRectangle.height > 1 then
-            viewportHandler.drawRelativeTo(room.x, room.y, function()
-                drawing.callKeepOriginalColor(function()
-                    local x, y = selectionRectangle.x, selectionRectangle.y
-                    local width, height = selectionRectangle.width, selectionRectangle.height
-
-                    local borderColor = colors.selectionBorderColor
-                    local fillColor = colors.selectionFillColor
-
-                    love.graphics.setColor(fillColor)
-                    love.graphics.rectangle("fill", x, y, width, height)
-
-                    love.graphics.setColor(borderColor)
-                    love.graphics.rectangle("line", x, y, width, height)
-                end)
-            end)
-        end
-    end
-
-    if selectionPreviews then
-        local preview = not selectionCompleted
-
-        local borderColor = preview and colors.selectionPreviewBorderColor or colors.selectionCompleteBorderColor
-        local fillColor = preview and colors.selectionPreviewFillColor or colors.selectionCompleteFillColor
-
-        viewportHandler.drawRelativeTo(room.x, room.y, function()
-            for _, rectangle in ipairs(selectionPreviews) do
-                drawing.callKeepOriginalColor(function()
-                    local x, y = rectangle.x, rectangle.y
-                    local width, height = rectangle.width, rectangle.height
-
-                    love.graphics.setColor(fillColor)
-                    love.graphics.rectangle("fill", x, y, width, height)
-
-                    love.graphics.setColor(borderColor)
-                    love.graphics.rectangle("line", x, y, width, height)
-                end)
-            end
-        end)
+    if room then
+        drawSelectionArea(room)
+        drawSelectionPreviews(room)
     end
 end
 
