@@ -1,18 +1,11 @@
-local entityHandler = require("entities")
+local layerHandlers = require("layer_handlers")
 local utils = require("utils")
 
 local selections = {}
 
-selections.layerHandlers = {
-    entities = entityHandler
-}
-
-selections.layerGetItems = {}
-
 function selections.getSelectionsForRoom(layer, room)
     local rectangles = {}
-
-    local handler = selections.layerHandlers[layer]
+    local handler = layerHandlers.getHandler(layer)
 
     if room and handler and handler.getSelection then
         local items = handler.getRoomItems and handler.getRoomItems(room, layer)

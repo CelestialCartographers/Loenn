@@ -6,6 +6,8 @@ local viewportHandler = require("viewport_handler")
 local selectionUtils = require("selections")
 local drawing = require("drawing")
 local colors = require("colors")
+local itemMovement = require("item_movement")
+local keyboardHelper = require("keyboard_helper")
 
 local tool = {}
 
@@ -20,11 +22,22 @@ local selectionCompleted = false
 local selectionStartX, selectionStartY = nil ,nil
 local selectionPreviews = nil
 
+local selectionMovementKeys = {
+    {"itemMoveLeft", -1, 0},
+    {"itemMoveRight", 1, 0},
+    {"itemMoveUp", 0, -1},
+    {"itemMoveDown", 0, 1},
+}
+
 local function redrawTargetLayer(room)
     -- TODO - Redraw more efficiently
     celesteRender.invalidateRoomCache(room, tool.layer)
     celesteRender.invalidateRoomCache(room, "complete")
     celesteRender.forceRoomBatchRender(room, state.viewport)
+end
+
+local function updateSelectionPreviews(room)
+    -- TODO - Implement
 end
 
 local function getCursorPositionInRoom(x, y)
@@ -119,6 +132,35 @@ local function drawSelectionPreviews(room)
     end
 end
 
+local function handleitemMovementKeys(room, key, scancode, isrepeat)
+    if not selectionPreviews then
+        return
+    end
+
+    for _, movementData in ipairs(selectionMovementKeys) do
+        local configKey, offsetX, offsetY = movementData[1], movementData[2], movementData[3]
+        local targetKey = configs.editor[configKey]
+
+        if not keyboardHelper.modifierHeld(configs.editor.precisionModifier) then
+            offsetX *= 8
+            offsetY *= 8
+        end
+
+        if targetKey == key then
+            for _, item in ipairs(selectionPreviews) do
+                itemMovement.moveSelection(tool.layer, room, item, offsetX, offsetY)
+            end
+
+            updateSelectionPreviews(room)
+            redrawTargetLayer(room)
+
+            return true
+        end
+    end
+
+    return false
+end
+
 function tool.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
@@ -167,13 +209,10 @@ function tool.mouseclicked(x, y, button, istouch, presses)
     end
 end
 
--- TODO - Implement, this is test code
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
 
-    if key == "s" then
-        print(#(selectionPreviews or {}))
-    end
+    handleitemMovementKeys(room, key, scancode, isrepeat)
 end
 
 function tool.draw()

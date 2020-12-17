@@ -106,6 +106,36 @@ function entities.getSelection(room, entity)
     end
 end
 
+function entities.moveSelection(room, layer, selection, x, y)
+    local entity, node = selection.item, selection.node
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    -- Notify movement
+    if handler.onMove then
+        handler.onMove(room, entity, node, x, y)
+    end
+
+    -- Custom entity movement
+    if handler.move then
+        handler.move(room, entity, node, x, y)
+
+    else
+        if node == 0 then
+            entity.x += x
+            entity.y += y
+
+        else
+            local nodes = entity.nodes
+
+            if nodes and node <= #nodes then
+                nodes[node][1] += x
+                nodes[node][2] += x
+            end
+        end
+    end
+end
+
 -- Returns all entities of room
 function entities.getRoomItems(room, layer)
     return room.entities
