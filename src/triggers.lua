@@ -39,28 +39,41 @@ function triggers.getDrawable(name, handler, room, trigger, viewport)
 end
 
 -- Returns main trigger selection rectangle, then table of node rectangles
--- TODO - Implement nodes
-function triggers.getSelection(room, entity)
-    local name = entity._name
-    local handler = triggers.registeredtriggers[name]
+function triggers.getSelection(room, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
 
-    if handler.selection then
-        return handler.selection(room, entity)
+    local mainRectangle = utils.rectangle(trigger.x, trigger.y, trigger.width, trigger.height)
+    local nodeRectangles = {}
 
-    elseif handler.rectangle then
-        return handler.rectangle(room, entity), nil
+    local nodes = trigger.nodes
 
-    else
-        local drawable = triggers.getDrawable(name, handler, room, entity)
+    if nodes then
+        for i, node in ipairs(nodes) do
+            local x, y = node[1], node[2]
 
-        if drawable.getRectangle then
-            return drawable:getRectangle(), nil
+            nodeRectangles[i] = utils.rectangle(x - 2, y - 2, 5, 5)
         end
     end
+
+    return mainRectangle, nodeRectangles
 end
 
 function triggers.moveSelection(room, layer, selection, x, y)
+    local trigger, node = selection.item, selection.node
 
+    if node == 0 then
+        trigger.x += x
+        trigger.y += y
+
+    else
+        local nodes = trigger.nodes
+
+        if nodes and node <= #nodes then
+            nodes[node][1] += x
+            nodes[node][2] += x
+        end
+    end
 end
 
 -- Returns all triggers of room
