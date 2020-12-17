@@ -6,7 +6,6 @@ local colors = require("colors")
 local tasks = require("task")
 local utils = require("utils")
 local atlases = require("atlases")
-local entityHandler = require("entities")
 local smartDrawingBatch = require("structs.smart_drawing_batch")
 local drawableSprite = require("structs.drawable_sprite")
 local drawableFunction = require("structs.drawable_function")
@@ -15,6 +14,9 @@ local viewportHandler = require("viewport_handler")
 local matrix = require("matrix")
 local configs = require("configs")
 local bit = require("bit")
+
+local entityHandler = require("entities")
+local triggerHandler = require("triggers")
 
 local celesteRender = {}
 
@@ -25,8 +27,6 @@ celesteRender.tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
 celesteRender.tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
 
 celesteRender.tilesSpriteMetaCache = {}
-
-local triggerFontSize = 1
 
 local tilesFgDepth = -10000
 local tilesBgDepth = 10000
@@ -454,33 +454,14 @@ end
 -- TODO - Make this saner in terms of setColor calls?
 -- This could just be one rendering function
 local function getTriggerBatchTaskFunc(room, triggers, viewport)
-    local font = love.graphics.getFont()
     local batch = smartDrawingBatch.createOrderedBatch()
 
     for i, trigger in ipairs(triggers) do
-        local func = function()
-            local name = trigger._name or ""
-            local displayName = utils.humanizeVariableName(name)
+        local name = trigger._name
+        local handler = triggerHandler.registeredTriggers[name]
+        local drawable, depth = triggerHandler.getDrawable(name, handler, room, trigger, viewport)
 
-            local x = trigger.x or 0
-            local y = trigger.y or 0
-
-            local width = trigger.width or 16
-            local height = trigger.height or 16
-
-            drawing.callKeepOriginalColor(function()
-                love.graphics.setColor(colors.triggerColor)
-
-                love.graphics.rectangle("line", x, y, width, height)
-                love.graphics.rectangle("fill", x, y, width, height)
-
-                love.graphics.setColor(colors.triggerTextColor)
-
-                drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
-            end)
-        end
-
-        batch:addFromDrawable(drawableFunction.fromFunction(func))
+        batch:addFromDrawable(drawable)
 
         if i % YIELD_RATE == 0 then
             tasks.yield()
