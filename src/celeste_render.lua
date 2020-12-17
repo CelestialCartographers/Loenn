@@ -36,6 +36,8 @@ local decalsBgDepth = 9000
 
 local triggersDepth = -math.huge
 
+-- TODO - Figure out good number
+local YIELD_RATE = 100
 local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = configs.editor.alwaysRedrawUnselectedRooms
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = configs.editor.prepareRoomRenderInBackground
@@ -351,7 +353,7 @@ local function getDecalsBatch(decals)
             batch:addFromDrawable(drawable)
         end
 
-        if i % 25 == 0 then
+        if i % YIELD_RATE == 0 then
             tasks.yield()
         end
     end
@@ -419,7 +421,7 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
 
             batch:addFromDrawable(drawable)
 
-            if i % 25 == 0 then
+            if i % YIELD_RATE == 0 then
                 tasks.yield()
             end
         end
@@ -480,7 +482,7 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
 
         batch:addFromDrawable(drawableFunction.fromFunction(func))
 
-        if i % 25 == 0 then
+        if i % YIELD_RATE == 0 then
             tasks.yield()
         end
     end
