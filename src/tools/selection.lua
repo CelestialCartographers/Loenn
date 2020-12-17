@@ -40,7 +40,7 @@ end
 
 local function selectionStarted(x, y)
     selectionRectangle = utils.rectangle(x, y, 0, 0)
-
+    selectionPreviews = nil
     selectionCompleted = false
 
     selectionStartX = x
@@ -58,6 +58,7 @@ local function selectionChanged(x, y, width, height)
 end
 
 local function selectionFinished()
+    selectionRectangle = false
     selectionCompleted = true
 end
 
