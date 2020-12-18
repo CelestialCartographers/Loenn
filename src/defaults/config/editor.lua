@@ -14,6 +14,8 @@ return {
     itemMoveUp = "up",
     itemMoveDown = "down",
 
+    itemDelete = "delete",
+
     -- Rendering
     prepareRoomRenderInBackground = true,
     alwaysRedrawUnselectedRooms = false,

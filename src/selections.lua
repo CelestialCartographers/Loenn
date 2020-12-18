@@ -3,7 +3,7 @@ local utils = require("utils")
 
 local selections = {}
 
-function selections.getSelectionsForRoom(layer, room)
+function selections.getSelectionsForRoom(room, layer)
     local rectangles = {}
     local handler = layerHandlers.getHandler(layer)
 
@@ -36,11 +36,11 @@ function selections.getSelectionsForRoom(layer, room)
     return rectangles
 end
 
-function selections.getSelectionsForRoomInRectangle(layer, room, rectangle)
+function selections.getSelectionsForRoomInRectangle(room, layer, rectangle)
     local selected = {}
 
     if room and rectangle then
-        local rectangles = selections.getSelectionsForRoom(layer, room)
+        local rectangles = selections.getSelectionsForRoom(room, layer)
 
         for _, selection in ipairs(rectangles) do
             if utils.aabbCheck(rectangle, selection) then

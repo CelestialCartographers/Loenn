@@ -71,12 +71,36 @@ function triggers.moveSelection(room, layer, selection, x, y)
 
         if nodes and node <= #nodes then
             nodes[node][1] += x
-            nodes[node][2] += x
+            nodes[node][2] += y
         end
     end
 
     selection.x += x
     selection.y += y
+end
+
+function triggers.deleteSelection(room, layer, selection)
+    local targets = triggers.getRoomItems(room, layer)
+    local target, node = selection.item, selection.node
+
+    for i, decal in ipairs(targets) do
+        if decal == target then
+            if node == 0 then
+                table.remove(targets, i)
+
+            else
+                local nodes = decal.nodes
+
+                if nodes then
+                    table.remove(nodes, node)
+                end
+            end
+
+            return true
+        end
+    end
+
+    return false
 end
 
 -- Returns all triggers of room

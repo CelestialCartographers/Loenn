@@ -130,19 +130,58 @@ function entities.moveSelection(room, layer, selection, x, y)
 
             if nodes and node <= #nodes then
                 nodes[node][1] += x
-                nodes[node][2] += x
+                nodes[node][2] += y
             end
         end
     end
 
     -- Custom selection movement if needed after custom move
     if handler.updateSelection then
-        handler.updateSelection(room, entity, node, selection, x, y)
+        handler.updateSelection(room, entity, node, selection, x, y, selection.width, selection.height)
 
     else
         selection.x += x
         selection.y += y
     end
+
+    return true
+end
+
+function entities.deleteSelection(room, layer, selection)
+    local targets = entities.getRoomItems(room, layer)
+    local target, node = selection.item, selection.node
+    local name = target._name
+    local handler = entities.registeredEntities[name]
+
+    for i, entity in ipairs(targets) do
+        if entity == target then
+            -- Notify deletion
+            if handler.onDelete then
+                handler.onDelete(room, entity, node)
+            end
+
+            -- Custom deletion
+            if handler.delete then
+                return handler.delete(room, entity, node)
+
+            else
+                if node == 0 then
+                    table.remove(targets, i)
+
+                else
+                    local nodes = entity.nodes
+
+                    if nodes then
+                        table.remove(nodes, node)
+                    end
+                end
+
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 -- Returns all entities of room

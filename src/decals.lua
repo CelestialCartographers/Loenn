@@ -77,7 +77,22 @@ function decals.moveSelection(room, layer, selection, x, y)
     selection.y += y
 end
 
--- Returns all entities of room
+function decals.deleteSelection(room, layer, selection)
+    local targets = decals.getRoomItems(room, layer)
+    local target = selection.item
+
+    for i, decal in ipairs(targets) do
+        if decal == target then
+            table.remove(targets, i)
+
+            return true
+        end
+    end
+
+    return false
+end
+
+-- Returns all decals of room
 function decals.getRoomItems(room, layer)
     return layer == "decalsFg" and room.decalsFg or room.decalsBg
 end

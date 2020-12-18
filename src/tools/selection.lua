@@ -6,7 +6,7 @@ local viewportHandler = require("viewport_handler")
 local selectionUtils = require("selections")
 local drawing = require("drawing")
 local colors = require("colors")
-local itemMovement = require("item_movement")
+local selectionItemUtils = require("selection_item_utils")
 local keyboardHelper = require("keyboard_helper")
 
 local tool = {}
@@ -68,7 +68,7 @@ local function selectionChanged(x, y, width, height)
     -- Only update if needed
     if x ~= selectionRectangle.x or y ~= selectionRectangle.y or width ~= selectionRectangle.width or height ~= selectionRectangle.height then
         selectionRectangle = utils.rectangle(x, y, width, height)
-        selectionPreviews = selectionUtils.getSelectionsForRoomInRectangle(tool.layer, room, selectionRectangle)
+        selectionPreviews = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
     end
 end
 
@@ -134,7 +134,7 @@ local function drawSelectionPreviews(room)
     end
 end
 
-local function handleitemMovementKeys(room, key, scancode, isrepeat)
+local function handleItemMovementKeys(room, key, scancode, isrepeat)
     if not selectionPreviews then
         return
     end
@@ -149,14 +149,52 @@ local function handleitemMovementKeys(room, key, scancode, isrepeat)
         end
 
         if targetKey == key then
+            local redraw = false
             for _, item in ipairs(selectionPreviews) do
-                itemMovement.moveSelection(tool.layer, room, item, offsetX, offsetY)
+                local moved = selectionItemUtils.moveSelection(room, tool.layer, item, offsetX, offsetY)
+
+                if moved then
+                    redraw = true
+                end
             end
 
-            redrawTargetLayer(room)
+            if redraw then
+                redrawTargetLayer(room)
+            end
 
             return true
         end
+    end
+
+    return false
+end
+
+local function handleItemDeletionKey(room, key, scancode, isrepeat)
+    if not selectionPreviews then
+        return
+    end
+
+    local targetKey = configs.editor.itemDelete
+
+    if targetKey == key then
+        local redraw = false
+
+        for i = #selectionPreviews, 1, -1 do
+            local item = selectionPreviews[i]
+            local deleted = selectionItemUtils.deleteSelection(room, tool.layer, item)
+
+            if deleted then
+                redraw = true
+
+                table.remove(selectionPreviews, i)
+            end
+        end
+
+        if redraw then
+            redrawTargetLayer(room)
+        end
+
+        return true
     end
 
     return false
@@ -213,7 +251,19 @@ end
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
 
-    handleitemMovementKeys(room, key, scancode, isrepeat)
+    -- Debug layer swaping
+    local index = tonumber(key)
+
+    if index then
+        if index >= 1 and index <= #tool.validLayers then
+            tool.layer = tool.validLayers[index]
+
+            print("Swapping layer to " .. tool.layer)
+        end
+    end
+
+    handleItemMovementKeys(room, key, scancode, isrepeat)
+    handleItemDeletionKey(room, key, scancode, isrepeat)
 end
 
 function tool.draw()
