@@ -75,6 +75,8 @@ function decals.moveSelection(room, layer, selection, x, y)
 
     selection.x += x
     selection.y += y
+
+    return true
 end
 
 function decals.deleteSelection(room, layer, selection)

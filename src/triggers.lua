@@ -77,6 +77,8 @@ function triggers.moveSelection(room, layer, selection, x, y)
 
     selection.x += x
     selection.y += y
+
+    return true
 end
 
 function triggers.deleteSelection(room, layer, selection)
