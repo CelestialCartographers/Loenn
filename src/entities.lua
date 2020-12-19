@@ -66,11 +66,7 @@ function entities.getDrawable(name, handler, room, entity, viewport)
                 return sprites, sprites.depth
 
             else
-                for j, sprite in ipairs(sprites) do
-                    if utils.typeof(sprite) == "drawableSprite" then
-                        return sprite, sprite.depth
-                    end
-                end
+                return sprites, nil
             end
         end
 

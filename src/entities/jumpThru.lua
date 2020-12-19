@@ -1,5 +1,6 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
 local drawing = require("drawing")
+local utils = require("utils")
 
 -- For future use I guess?
 local textures = {"wood", "dream", "temple", "templeB", "cliffside", "reflection", "core"}
@@ -66,6 +67,10 @@ function jumpthru.sprite(room, entity)
     end
 
     return sprites
+end
+
+function jumpthru.selection(room, entity)
+    return utils.rectangle(entity.x, entity.y, entity.width, 8)
 end
 
 return jumpthru
