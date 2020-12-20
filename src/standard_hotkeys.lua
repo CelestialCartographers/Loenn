@@ -8,7 +8,7 @@ local roomHotkeyUtils = require("room_hotkey_utils")
 local hotkeyStruct = require("structs.hotkey")
 
 -- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
--- TODO - Support hotswaping hotkey activators
+-- TODO - Support hotswapping hotkey activators
 local rawHotkeys = {
     {configs.hotkeys.redo, history.redo, "Redo last action"},
     {configs.hotkeys.undo, history.undo, "Undo last action"},

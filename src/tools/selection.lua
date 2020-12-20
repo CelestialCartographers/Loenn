@@ -251,7 +251,8 @@ end
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
 
-    -- Debug layer swaping
+    -- Debug layer swapping
+    -- TODO - Remove this later
     local index = tonumber(key)
 
     if index then

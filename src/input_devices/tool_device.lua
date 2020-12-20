@@ -4,8 +4,7 @@ local state = require("loaded_state")
 local viewport = require("viewport_handler")
 local utils = require("utils")
 local configs = require("configs")
-
-local actionButton = configs.editor.toolActionButton
+local keyboardHelper = require("keyboard_helper")
 
 local toolProxyMt = {
     __index = function(self, event)
@@ -27,6 +26,7 @@ local device = setmetatable({_enabled = true, _type = "device"}, toolProxyMt)
 function device.mouseclicked(x, y, button, istouch, presses)
     if state.map ~= nil then
         local currentTool = toolHandler.currentTool
+        local actionButton = configs.editor.toolActionButton
 
         if button == actionButton then
             local mapX, mapY = viewport.getMapCoordinates(x, y)
@@ -42,6 +42,34 @@ function device.mouseclicked(x, y, button, istouch, presses)
         if currentTool and currentTool.mouseclicked then
             currentTool.mouseclicked(x, y, button, istouch, presses)
         end
+    end
+end
+
+-- Debug tool swapping
+-- TODO - Remove this later
+function device.keypressed(key, scancode, isrepeat)
+    local index = tonumber(key)
+
+    if index and keyboardHelper.modifierControl() then
+        local i = 1
+
+        for k, v in pairs(toolHandler.tools) do
+            if i == index then
+                toolHandler.selectTool(k)
+
+                print("Selecting tool " .. k)
+
+                return true
+            end
+
+            i + =1
+        end
+    end
+
+    local currentTool = toolHandler.currentTool
+
+    if currentTool and currentTool.keypressed then
+        currentTool.keypressed(key, scancode, isrepeat)
     end
 end
 
