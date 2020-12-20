@@ -17,7 +17,7 @@ function placementUtils.getDrawable(layer, name, room, data)
     local handler = layerHandlers.getHandler(layer)
 
     if handler and handler.getDrawable then
-        return handler.getDrawable(name, {}, room, data, nil)
+        return handler.getDrawable(name, nil, room, data, nil)
     end
 
     return {}

@@ -182,6 +182,68 @@ function entities.deleteSelection(room, layer, selection)
     return false
 end
 
+local function guessPlacementType(name, handler, placement)
+    -- TODO - Implement
+
+    return "point"
+end
+
+local function addPlacement(res, name, handler, placement)
+    local placementType = placement.placementType or guessPlacementType(name, handler, placement)
+    local itemTemplate = {
+        _name = name,
+        _id = 0 --TODO
+    }
+
+    if placement.data then
+        for k, v in pairs(placement.data) do
+            itemTemplate[k] = v
+        end
+    end
+
+    itemTemplate.x = itemTemplate.x or 0
+    itemTemplate.y = itemTemplate.y or 0
+
+    table.insert(res, {
+        name = name,
+        displayName = placement.name,
+        layer = "entities",
+        placementType = placementType,
+        itemTemplate = itemTemplate
+    })
+end
+
+function entities.getPlacements(layer)
+    local res = {}
+
+    if entities.registeredEntities then
+        for name, handler in pairs(entities.registeredEntities) do
+            local placements = utils.callIfFunction(handler.placements)
+
+            if placements then
+                if #placements > 0 then
+                    for _, placement in ipairs(placements) do
+                        addPlacement(res, name, handler, placement)
+                    end
+
+                else
+                    addPlacement(res, name, handler, placements)
+                end
+            end
+        end
+    end
+
+    return res
+end
+
+function entities.placeItem(room, layer, item)
+    local items = entities.getRoomItems(room, layer)
+
+    table.insert(items, item)
+
+    return true
+end
+
 -- Returns all entities of room
 function entities.getRoomItems(room, layer)
     return room.entities

@@ -3,6 +3,9 @@ local drawableSpriteStruct = require("structs.drawable_sprite")
 local player = {}
 
 player.depth = 0
+player.placements = {
+    name = "Player"
+}
 
 local texture = "characters/player/sitDown00"
 
