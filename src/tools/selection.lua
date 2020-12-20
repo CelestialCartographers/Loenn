@@ -1,13 +1,13 @@
 local state = require("loaded_state")
 local utils = require("utils")
 local configs = require("configs")
-local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
 local selectionUtils = require("selections")
 local drawing = require("drawing")
 local colors = require("colors")
 local selectionItemUtils = require("selection_item_utils")
 local keyboardHelper = require("keyboard_helper")
+local toolUtils = require("tool_utils")
 
 local tool = {}
 
@@ -34,24 +34,6 @@ local selectionMovementKeys = {
     {"itemMoveUp", 0, -1},
     {"itemMoveDown", 0, 1},
 }
-
-local function redrawTargetLayer(room)
-    -- TODO - Redraw more efficiently
-    celesteRender.invalidateRoomCache(room, tool.layer)
-    celesteRender.invalidateRoomCache(room, "complete")
-    celesteRender.forceRoomBatchRender(room, state.viewport)
-end
-
-local function getCursorPositionInRoom(x, y)
-    local room = state.getSelectedRoom()
-    local px, py = nil, nil
-
-    if room then
-        px, py = viewportHandler.getRoomCoordindates(room, x, y)
-    end
-
-    return px, py
-end
 
 local function selectionStarted(x, y)
     selectionRectangle = utils.rectangle(x, y, 0, 0)
@@ -159,7 +141,7 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
             end
 
             if redraw then
-                redrawTargetLayer(room)
+                toolUtils.redrawTargetLayer(room, tool.layer)
             end
 
             return true
@@ -191,7 +173,7 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
         end
 
         if redraw then
-            redrawTargetLayer(room)
+            toolUtils.redrawTargetLayer(room, tool.layer)
         end
 
         return true
@@ -204,7 +186,7 @@ function tool.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
-        local px, py = getCursorPositionInRoom(x, y)
+        local px, py = toolUtils.getCursorPositionInRoom(x, y)
 
         if px and py then
             selectionStarted(px, py)
@@ -216,7 +198,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
 
     if not selectionCompleted and love.mouse.isDown(actionButton) then
-        local px, py = getCursorPositionInRoom(x, y)
+        local px, py = toolUtils.getCursorPositionInRoom(x, y)
 
         if px and py and selectionStartX and selectionStartY then
             local width, height = px - selectionStartX, py - selectionStartY
@@ -239,7 +221,7 @@ function tool.mouseclicked(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
-        local px, py = getCursorPositionInRoom(x, y)
+        local px, py = toolUtils.getCursorPositionInRoom(x, y)
 
         if px and py then
             selectionChanged(px - 1, py - 1, 3, 3)

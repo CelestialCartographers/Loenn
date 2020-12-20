@@ -58,6 +58,8 @@ end
 
 -- Returns drawable, depth
 function entities.getDrawable(name, handler, room, entity, viewport)
+    handler = handler or entities.registeredEntities[name]
+
     if handler.sprite then
         local sprites = handler.sprite(room, entity, viewport)
 

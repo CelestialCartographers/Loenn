@@ -94,6 +94,39 @@ function decals.deleteSelection(room, layer, selection)
     return false
 end
 
+function decals.getPlacements(layer)
+    local res = {}
+    local names = decals.getDecalNames()
+
+    for i, name in ipairs(names) do
+        res[i] = {
+            name = name,
+            displayName = name,
+            layer = layer,
+            placementType = "point",
+            itemTemplate = {
+                texture = name,
+
+                x = 0,
+                y = 0,
+
+                scaleX = 1,
+                scaleY = 1
+            }
+        }
+    end
+
+    return res
+end
+
+function decals.placeItem(room, layer, item)
+    local items = decals.getRoomItems(room, layer)
+
+    table.insert(items, item)
+
+    return true
+end
+
 -- Returns all decals of room
 function decals.getRoomItems(room, layer)
     return layer == "decalsFg" and room.decalsFg or room.decalsBg
