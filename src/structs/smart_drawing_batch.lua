@@ -287,7 +287,7 @@ local function clearCanvasArea(batch, x, y)
 end
 
 -- Assumes Canvas is set for performance reasons
-local function drawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
+local function drawCanvasArea(batch, x, y, meta, quad, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
     local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
@@ -297,15 +297,17 @@ end
 
 -- Assumes Canvas is set for performance reasons
 -- Doesn't clear scissor itself for performance reasons, clear manually after batch processing
-local function redrawCanvasArea(batch, x, y, meta, quad, drawX, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
-    local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
-    local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
-    local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
+local function redrawCanvasArea(batch, x, y, meta, quad, drawX, drawY, rot, sx, sy, jx, jy, ox, oy)
+    if meta then
+        local sectionX, sectionY, cellWidth, cellHeight = getSectionStart(batch, x, y)
+        local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
+        local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
-    love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
-    love.graphics.clear(0.0, 0.0, 0.0, 0.0)
+        love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
+        love.graphics.clear(0.0, 0.0, 0.0, 0.0)
 
-    love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+        love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+    end
 end
 
 local gridCanvasBatchMt = {}
