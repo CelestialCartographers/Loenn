@@ -61,7 +61,7 @@ function orderedDrawingBatchMt.__index:draw()
         love.graphics.setColor(color)
 
         if typ == "drawableFunction" then
-            drawable.func(unpack(drawable.args))
+            drawable:draw()
 
         else
             love.graphics.draw(drawable, 0, 0)

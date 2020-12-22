@@ -174,7 +174,32 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
 end
 
 local function updateLinePlacement(template, item, itemX, itemY)
-    -- TODO
+    local dragging = placementRectangle and not placementDragCompleted
+    local node = item.nodes[1] or {}
+
+    if not dragging then
+        if itemX ~= item.x or itemY ~= item.y then
+            item.x = itemX
+            item.y = itemY
+
+            node[1] = itemX + 8
+            node[2] = itemY + 8
+
+            return true
+        end
+
+    else
+        local stopX, stopY = getCursorGridPosition(placementCurrentX, placementCurrentY)
+
+        if stopX ~= node[1] or stopY ~= node[2] then
+            node[1] = stopX
+            node[2] = stopY
+
+            return true
+        end
+    end
+
+    return false
 end
 
 local placementUpdaters = {

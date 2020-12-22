@@ -34,4 +34,26 @@ function wire.draw(room, entity)
     love.graphics.setColor(pr, pg, pb, pa)
 end
 
+function wire.selection(room, entity)
+    local main = utils.rectangle(entity.x - 2, entity.y - 2, 5, 5)
+    local nodes = {}
+
+    if entity.nodes then
+        for i, node in ipairs(entity.nodes) do
+            nodes[i] = utils.rectangle(node[1] - 2, node[2] - 2, 5, 5)
+        end
+    end
+
+    return main, nodes
+end
+
+wire.placements = {
+    name = "Wire",
+    data = {
+        above = false,
+        color = "595866",
+        nodes = {{0, 0}}
+    }
+}
+
 return wire

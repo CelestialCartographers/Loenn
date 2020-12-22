@@ -7,6 +7,9 @@ function drawableFunction.fromFunction(func, ...)
 
     drawable.func = func
     drawable.args = {...}
+    drawable.draw = function(self)
+        self.func(unpack(self.args))
+    end
 
     return drawable
 end
