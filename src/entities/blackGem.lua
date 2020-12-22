@@ -4,7 +4,7 @@ local heart = {}
 
 heart.depth = -2000000
 heart.placements = {
-    "Crystal Heart"
+    name = "Crystal Heart"
 }
 
 local texture = "collectables/heartGem/0/00"

@@ -19,6 +19,17 @@ local quadCache = {}
 local jumpthru = {}
 
 jumpthru.depth = -9000
+jumpthru.placements = {}
+
+for i, texture in ipairs(textures) do
+    jumpthru.placements[i] = {
+        name = string.format("Jumpthru (%s)", utils.humanizeVariableName(texture)),
+        data = {
+            width = 8,
+            texture = texture
+        }
+    }
+end
 
 local function getQuad(sprite, texture, index)
     quadCache[texture] = quadCache[texture] or {}
