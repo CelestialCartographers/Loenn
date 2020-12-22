@@ -24,21 +24,93 @@ tool.validLayers = {
 local placementsAvailable = {}
 local placementTemplate = nil
 
-local placementOffsetX = 0
-local placementOffsetY = 0
+local placementCurrentX = 0
+local placementCurrentY = 0
+local placementDragStartX = 0
+local placementDragStartY = 0
+local placementRectangle = nil
+local placementDragCompleted = false
+
+local function getCurrentPlacementType()
+    local placementInfo = placementTemplate and placementTemplate.placement
+    local placementType = placementInfo and placementInfo.placementType
+
+    return placementType
+end
+
+local function getCursorGridPosition(x, y)
+    local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+
+    if precise then
+        return x, y
+
+    else
+        return math.floor((x + 4) / 8) * 8, math.floor((y + 4) / 8) * 8
+    end
+end
+
+local function dragStarted(x, y)
+    x, y = getCursorGridPosition(x, y)
+
+    placementRectangle = utils.rectangle(x, y, 0, 0)
+    placementDragCompleted = false
+
+    placementDragStartX = x
+    placementDragStartY = y
+end
+
+local function dragChanged(x, y, width, height)
+    x, y = getCursorGridPosition(x, y)
+    width, height = getCursorGridPosition(width, height)
+
+    -- Only update if needed
+    if x ~= placementRectangle.x or y ~= placementRectangle.y or width ~= placementRectangle.width or height ~= placementRectangle.height then
+        placementRectangle = utils.rectangle(x, y, width, height)
+    end
+end
+
+local function dragFinished()
+    local room = state.getSelectedRoom()
+    local placementType = getCurrentPlacementType()
+
+    if placementType == "rectangle" or placementType == "line" then
+        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+        toolUtils.redrawTargetLayer(room, tool.layer)
+    end
+
+    placementDragCompleted = true
+end
+
+local function mouseMoved(x, y)
+    placementCurrentX = x
+    placementCurrentY = y
+end
+
+local function placePointPlacement()
+    local room = state.getSelectedRoom()
+    local placementType = getCurrentPlacementType()
+
+    if placementType == "point" then
+        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+        toolUtils.redrawTargetLayer(room, tool.layer)
+    end
+end
 
 -- Temporary simple placement selection
 local placementIndex = 1
 
+-- TODO - Clean up
 local function getPlacementOffset()
     local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+    local placementType = getCurrentPlacementType()
 
-    if precise then
-        return placementOffsetX, placementOffsetY
-
-    else
-        return math.floor(placementOffsetX / 8) * 8, math.floor(placementOffsetY / 8) * 8
+    if placementType == "rectangle" or placementType == "line" then
+        if placementRectangle and not placementDragCompleted then
+            return placementRectangle.x, placementRectangle.y
+        end
     end
+
+    return getCursorGridPosition(placementCurrentX, placementCurrentY)
 end
 
 local function updatePlacementDrawable()
@@ -47,6 +119,83 @@ local function updatePlacementDrawable()
         local drawable = placementUtils.getDrawable(tool.layer, target, state.getSelectedRoom(), placementTemplate.item)
 
         placementTemplate.drawable = drawable
+    end
+end
+
+local function updatePointPlacement(template, item, itemX, itemY)
+    if itemX ~= item.x or itemY ~= item.y then
+        item.x = itemX
+        item.y = itemY
+
+        return true
+    end
+
+    return false
+end
+
+local function updateRectanglePlacement(template, item, itemX, itemY)
+    local needsUpdate = false
+    -- TODO - Use entity minimum
+    local dragging = placementRectangle and not placementDragCompleted
+    local itemWidth = math.max(dragging and placementRectangle.width or 8, 8)
+    local itemHeight = math.max(dragging and placementRectangle.height or 8, 8)
+
+    -- Always update when not dragging
+    if not dragging then
+        if itemX ~= item.x or itemY ~= item.y then
+            item.x = itemX
+            item.y = itemY
+
+            needsUpdate = true
+        end
+    end
+
+    -- When dragging only update the x position if we have width
+    if item.width then
+        if dragging and itemX ~= item.x or itemWidth ~= item.width then
+            item.x = itemX
+            item.width = itemWidth
+
+            needsUpdate = true
+        end
+    end
+
+    -- When dragging only update the y position if we have height
+    if item.height then
+        if not dragging and itemY ~= item.y or itemHeight ~= item.height then
+            item.y = itemY
+            item.height = itemHeight
+
+            needsUpdate = true
+        end
+    end
+
+    return needsUpdate
+end
+
+local function updateLinePlacement(template, item, itemX, itemY)
+    -- TODO
+end
+
+local placementUpdaters = {
+    point = updatePointPlacement,
+    rectangle = updateRectanglePlacement,
+    line = updateLinePlacement
+}
+
+local function updatePlacement()
+    if placementTemplate and placementTemplate.item then
+        local placementType = getCurrentPlacementType()
+        local placementUpdater = placementUpdaters[placementType]
+
+        local itemX, itemY = getPlacementOffset()
+        local item = placementTemplate.item
+
+        local needsUpdate = placementUpdater and placementUpdater(placementTemplate, item, itemX, itemY)
+
+        if needsUpdate then
+            updatePlacementDrawable()
+        end
     end
 end
 
@@ -69,9 +218,20 @@ local function selectPlacement(name, index)
 end
 
 local function drawPlacement(room)
-    if room and placementTemplate and placementTemplate.drawable and placementTemplate.drawable.draw then
+    if room and placementTemplate and placementTemplate.drawable and placementTemplate.drawable then
         viewportHandler.drawRelativeTo(room.x, room.y, function()
-            placementTemplate.drawable:draw()
+            if utils.typeof(placementTemplate.drawable) == "table" then
+                for _, drawable in ipairs(placementTemplate.drawable) do
+                    if drawable.draw then
+                        drawable:draw()
+                    end
+                end
+
+            else
+                if placementTemplate.drawable.draw then
+                    placementTemplate.drawable:draw()
+                end
+            end
         end)
     end
 end
@@ -85,27 +245,40 @@ function tool.layerSwapped(layer)
     end
 end
 
-function tool.mousemoved(x, y, dx, dy, istouch)
-    local px, py = toolUtils.getCursorPositionInRoom(x, y)
-
-    if px and py then
-        placementOffsetX = px
-        placementOffsetY = py
-    end
-end
-
 function tool.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
-    if placementTemplate and placementTemplate.item and button == actionButton then
-        local room = state.getSelectedRoom()
-        local copiedItem = utils.deepcopy(placementTemplate.item)
+    if button == actionButton then
+        local px, py = toolUtils.getCursorPositionInRoom(x, y)
 
-        local placed = placementUtils.placeItem(room, tool.layer, copiedItem)
-
-        if placed then
-            toolUtils.redrawTargetLayer(room, tool.layer)
+        if px and py then
+            dragStarted(px, py)
+            placePointPlacement()
         end
+    end
+end
+
+function tool.mousemoved(x, y, dx, dy, istouch)
+    local actionButton = configs.editor.toolActionButton
+    local px, py = toolUtils.getCursorPositionInRoom(x, y)
+
+    mouseMoved(px, py)
+
+    if not placementDragCompleted and love.mouse.isDown(actionButton) then
+
+        if px and py and placementDragStartX and placementDragStartY then
+            local width, height = px - placementDragStartX, py - placementDragStartY
+
+            dragChanged(placementDragStartX, placementDragStartY, width, height)
+        end
+    end
+end
+
+function tool.mousereleased(x, y, button, istouch, presses)
+    local actionButton = configs.editor.toolActionButton
+
+    if button == actionButton then
+        dragFinished()
     end
 end
 
@@ -135,16 +308,7 @@ function tool.keypressed(key, scancode, isrepeat)
 end
 
 function tool.update(dt)
-    if placementTemplate and placementTemplate.item then
-        local itemX, itemY = getPlacementOffset()
-
-        if itemX ~= placementTemplate.item.x or itemY ~= placementTemplate.item.y then
-            placementTemplate.item.x = itemX
-            placementTemplate.item.y = itemY
-
-            updatePlacementDrawable()
-        end
-    end
+    updatePlacement()
 end
 
 function tool.draw()

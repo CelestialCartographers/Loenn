@@ -182,8 +182,17 @@ function entities.deleteSelection(room, layer, selection)
     return false
 end
 
+-- TODO - Also check handler for functions
 local function guessPlacementType(name, handler, placement)
-    -- TODO - Implement
+    if placement and placement.data then
+        if placement.data.width or placement.data.height then
+            return "rectangle"
+        end
+
+        if placement.data.nodes then
+            return "line"
+        end
+    end
 
     return "point"
 end
