@@ -33,4 +33,24 @@ function placementUtils.placeItem(room, layer, item)
     return false
 end
 
+function placementUtils.canResize(room, layer, target)
+    local handler = layerHandlers.getHandler(layer)
+
+    if handler and handler.canResize then
+        return handler.canResize(room, layer, target)
+    end
+
+    return false, false
+end
+
+function placementUtils.minimumSize(room, layer, target)
+    local handler = layerHandlers.getHandler(layer)
+
+    if handler and handler.minimumSize then
+        return handler.minimumSize(room, layer, target)
+    end
+
+    return nil, nil
+end
+
 return placementUtils

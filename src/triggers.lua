@@ -110,4 +110,12 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
+function triggers.canReisze(room, layer, item)
+    return true, true
+end
+
+function triggers.minimumSize(room, layer, item)
+    return 8, 8
+end
+
 return triggers

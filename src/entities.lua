@@ -253,6 +253,27 @@ function entities.placeItem(room, layer, item)
     return true
 end
 
+function entities.canResize(room, layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler.canResize then
+        return handler.canResize(room, entity)
+
+    else
+        return entity.width ~= nil, entity.height ~= nil
+    end
+end
+
+function entities.minimumSize(room, layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler.minimumSize then
+        return handler.minimumSize(room, entity)
+    end
+end
+
 -- Returns all entities of room
 function entities.getRoomItems(room, layer)
     return room.entities

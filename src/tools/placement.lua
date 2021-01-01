@@ -135,10 +135,16 @@ end
 
 local function updateRectanglePlacement(template, item, itemX, itemY)
     local needsUpdate = false
-    -- TODO - Use entity minimum
     local dragging = placementRectangle and not placementDragCompleted
-    local itemWidth = math.max(dragging and placementRectangle.width or 8, 8)
-    local itemHeight = math.max(dragging and placementRectangle.height or 8, 8)
+
+    local room = state.getSelectedRoom()
+    local layer = tool.layer
+
+    local resizeWidth, resizeHeight = placementUtils.canResize(room, layer, item)
+    local minimumWidth, minimumHeight = placementUtils.minimumSize(room, layer, item)
+
+    local itemWidth = math.max(dragging and placementRectangle.width or 8, minimumWidth or 8)
+    local itemHeight = math.max(dragging and placementRectangle.height or 8, minimumHeight or 8)
 
     -- Always update when not dragging
     if not dragging then
@@ -151,7 +157,7 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
     end
 
     -- When dragging only update the x position if we have width
-    if item.width then
+    if resizeWidth and item.width then
         if dragging and itemX ~= item.x or itemWidth ~= item.width then
             item.x = itemX
             item.width = itemWidth
@@ -161,7 +167,7 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
     end
 
     -- When dragging only update the y position if we have height
-    if item.height then
+    if resizeHeight and item.height then
         if not dragging and itemY ~= item.y or itemHeight ~= item.height then
             item.y = itemY
             item.height = itemHeight
