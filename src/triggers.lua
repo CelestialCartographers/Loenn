@@ -84,15 +84,25 @@ end
 function triggers.deleteSelection(room, layer, selection)
     local targets = triggers.getRoomItems(room, layer)
     local target, node = selection.item, selection.node
+    local minimumNodes, maximumNodes = triggers.nodeLimits(room, layer, target)
 
-    for i, decal in ipairs(targets) do
-        if decal == target then
+    for i, trigger in ipairs(targets) do
+        if trigger == target then
+            local nodes = trigger.nodes
+
+            -- Delete trigger if deleting a node gives it too few nodes
+            -- Set node to 0 to move deletion target from node to trigger itself
+            if nodes and node > 0 then
+                local nodeCount = #nodes
+
+                if minimumNodes and minimumNodes ~= -1 and nodeCount - 1 < minimumNodes then
+                    node = 0
+                end
+            end
             if node == 0 then
                 table.remove(targets, i)
 
             else
-                local nodes = decal.nodes
-
                 if nodes then
                     table.remove(nodes, node)
                 end
@@ -110,12 +120,24 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
-function triggers.canReisze(room, layer, item)
+function triggers.canResize(room, layer, trigger)
     return true, true
 end
 
-function triggers.minimumSize(room, layer, item)
+function triggers.minimumSize(room, layer, trigger)
     return 8, 8
+end
+
+function triggers.nodeLimits(room, layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler.nodeLimits then
+        return handler.nodeLimits(room, trigger)
+
+    else
+        return 0, 0
+    end
 end
 
 return triggers

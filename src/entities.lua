@@ -150,9 +150,22 @@ function entities.deleteSelection(room, layer, selection)
     local target, node = selection.item, selection.node
     local name = target._name
     local handler = entities.registeredEntities[name]
+    local minimumNodes, maximumNodes = entities.nodeLimits(room, layer, target)
 
     for i, entity in ipairs(targets) do
         if entity == target then
+            local nodes = entity.nodes
+
+            -- Delete entity if deleting a node gives it too few nodes
+            -- Set node to 0 to move deletion target from node to entity itself
+            if nodes and node > 0 then
+                local nodeCount = #nodes
+
+                if minimumNodes and minimumNodes ~= -1 and nodeCount - 1 < minimumNodes then
+                    node = 0
+                end
+            end
+
             -- Notify deletion
             if handler.onDelete then
                 handler.onDelete(room, entity, node)
@@ -167,8 +180,6 @@ function entities.deleteSelection(room, layer, selection)
                     table.remove(targets, i)
 
                 else
-                    local nodes = entity.nodes
-
                     if nodes then
                         table.remove(nodes, node)
                     end
@@ -271,6 +282,18 @@ function entities.minimumSize(room, layer, entity)
 
     if handler.minimumSize then
         return handler.minimumSize(room, entity)
+    end
+end
+
+function entities.nodeLimits(room, layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler.nodeLimits then
+        return handler.nodeLimits(room, entity)
+
+    else
+        return 0, 0
     end
 end
 

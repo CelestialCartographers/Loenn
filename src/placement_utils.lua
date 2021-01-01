@@ -53,4 +53,14 @@ function placementUtils.minimumSize(room, layer, target)
     return nil, nil
 end
 
+function placementUtils.nodeLimits(room, layer, target)
+    local handler = layerHandlers.getHandler(layer)
+
+    if handler and handler.nodeLimits then
+        return handler.nodeLimits(room, layer, target)
+    end
+
+    return 0, 0
+end
+
 return placementUtils

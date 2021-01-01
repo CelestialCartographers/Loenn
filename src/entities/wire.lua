@@ -47,6 +47,10 @@ function wire.selection(room, entity)
     return main, nodes
 end
 
+function wire.nodeLimits(room, entity)
+    return 1, 1
+end
+
 wire.placements = {
     name = "Wire",
     data = {
