@@ -60,12 +60,14 @@ local function dragStarted(x, y)
 end
 
 local function dragChanged(x, y, width, height)
-    x, y = getCursorGridPosition(x, y)
-    width, height = getCursorGridPosition(width, height)
+    if placementRectangle then
+        x, y = getCursorGridPosition(x, y)
+        width, height = getCursorGridPosition(width, height)
 
-    -- Only update if needed
-    if x ~= placementRectangle.x or y ~= placementRectangle.y or width ~= placementRectangle.width or height ~= placementRectangle.height then
-        placementRectangle = utils.rectangle(x, y, width, height)
+        -- Only update if needed
+        if x ~= placementRectangle.x or y ~= placementRectangle.y or width ~= placementRectangle.width or height ~= placementRectangle.height then
+            placementRectangle = utils.rectangle(x, y, width, height)
+        end
     end
 end
 
