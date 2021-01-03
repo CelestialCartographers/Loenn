@@ -72,6 +72,12 @@ function entities.getDrawable(name, handler, room, entity, viewport)
             end
         end
 
+    elseif handler.texture then
+        local texture = utils.callIfFunction(handler.texture, room, entity)
+        local drawable = drawableSprite.spriteFromTexture(texture, entity)
+
+        return drawable
+
     elseif handler.rectangle then
         local rectangle = handler.rectangle(room, entity, viewport)
         local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)
