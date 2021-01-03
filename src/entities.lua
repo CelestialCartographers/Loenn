@@ -104,8 +104,19 @@ function entities.getSelection(room, entity)
     else
         local drawable = entities.getDrawable(name, handler, room, entity)
 
-        if drawable.getRectangle then
+        if #drawable == 0 and utils.typeof(drawable) == "drawableSprite" then
             return drawable:getRectangle(), nil
+
+        else
+            local rectangles = {}
+
+            for i, draw in ipairs(drawable) do
+                rectangles[i] = draw:getRectangle()
+            end
+
+            local x, y, width, height = utils.coverRectangles(rectangles)
+
+            return utils.rectangle(x, y, width, height), nil
         end
     end
 end

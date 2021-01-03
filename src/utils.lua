@@ -27,8 +27,8 @@ function utils.point(x, y)
 end
 
 function utils.rectangleBounds(rectangles)
-    local tlx, tly = math.huge(), math.huge()
-    local brx, bry = -math.huge(), -math.huge()
+    local tlx, tly = math.huge, math.huge
+    local brx, bry = -math.huge, -math.huge
 
     for i, rect in ipairs(rectangles) do
         tlx = math.min(tlx, rect.x)
