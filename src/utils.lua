@@ -2,6 +2,7 @@ local serialize = require("serialize")
 local filesystem = require("filesystem")
 local requireUtils = require("require_utils")
 local xnaColors = require("xna_colors")
+local bit = require("bit")
 
 local rectangles = require("structs/rectangle")
 
@@ -245,6 +246,10 @@ function utils.mod1(n, d)
     return m == 0 and d or m
 end
 
+function utils.logn(base, n)
+    return math.log(n) / math.log(base)
+end
+
 function utils.setRandomSeed(v)
     if type(v) == "number" then
         math.randomseed(v)
@@ -259,6 +264,16 @@ function utils.setRandomSeed(v)
 
         math.randomseed(s)
     end
+end
+
+function utils.getSimpleCoordinateSeed(x, y)
+    return math.abs(bit.lshift(x, math.ceil(utils.logn(2, math.abs(y) + 1)))) + math.abs(y)
+end
+
+function utils.setSimpleCoordinateSeed(x, y)
+    local seed = utils.getSimpleCoordinateSeed(x, y)
+
+    utils.setRandomSeed(seed)
 end
 
 function utils.deepcopy(v)
