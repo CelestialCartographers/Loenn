@@ -3,6 +3,8 @@ local drawableSpriteStruct = require("structs.drawable_sprite")
 
 local templeEye = {}
 
+templeEye.name = "templeEye"
+
 local function isBackground(room, entity)
     local x = entity.x or 0
     local y = entity.y or 0

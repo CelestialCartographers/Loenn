@@ -8,6 +8,8 @@ local bodyTexture = "scenery/car/body"
 local pavementTexture = "scenery/car/pavement"
 local wheelsTexture = "scenery/car/wheels"
 
+introCar.name = "introCar"
+
 function introCar.sprite(room, entity)
     local sprites = {}
     local hasRoadAndBarriers = entity.hasRoadAndBarriers

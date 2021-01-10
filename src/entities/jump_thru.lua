@@ -18,6 +18,7 @@ local quadCache = {}
 
 local jumpthru = {}
 
+jumpthru.name = "jumpThru"
 jumpthru.depth = -9000
 jumpthru.placements = {}
 

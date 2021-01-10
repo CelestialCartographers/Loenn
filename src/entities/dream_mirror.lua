@@ -2,6 +2,7 @@ local drawableSpriteStruct = require("structs.drawable_sprite")
 
 local dreamMirror = {}
 
+dreamMirror.name = "dreammirror"
 dreamMirror.placements = {
     name = "Dream Mirror"
 }
