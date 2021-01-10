@@ -177,6 +177,20 @@ function utils.callIfFunction(f, ...)
     return f
 end
 
+-- Call function with arguments
+-- Use sub values of first argument if it is a table and call function for each of those instead
+function utils.callIterateFirstIfTable(f, value, ...)
+    -- Make sure this is a table and not a "object"
+    if utils.typeof(value) == "table" and #value > 0 then
+        for _, subValue in ipairs(value) do
+            f(subValue, ...)
+        end
+
+    else
+        f(value, ...)
+    end
+end
+
 function utils.typeof(v)
     local typ = type(v)
 

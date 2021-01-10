@@ -22,18 +22,26 @@ function entities.initDefaultRegistry(t)
     entities.registeredEntities = setmetatable(t or {}, entityRegisteryMT)
 end
 
-function entities.registerEntity(fn, registerAt)
+local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
+    local name = handler.name or filenameNoExt
+
+    registerAt[name] = handler
+
+    if verbose then
+        print("! Registered entity '" .. name .. "' from '" .. filename .."'")
+    end
+end
+
+function entities.registerEntity(filename, registerAt, verbose)
+    verbose = verbose == nil and verbose or true
     registerAt = registerAt or entities.registeredEntities
 
-    local pathNoExt = utils.stripExtension(fn)
+    local pathNoExt = utils.stripExtension(filename)
     local filenameNoExt = utils.filename(pathNoExt, "/")
 
     local handler = utils.rerequire(pathNoExt)
-    local name = handler.name or filenameNoExt
 
-    print("! Registered entity '" .. name .. "' for '" .. name .."'")
-
-    registerAt[name] = handler
+    utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
 
 -- TODO - Santize user paths
