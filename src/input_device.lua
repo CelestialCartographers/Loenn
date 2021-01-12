@@ -8,9 +8,21 @@ local inputDeviceMt = {
     __index = function() return unhandledEvent end
 }
 
+local reverseIterationEvents = {
+    draw = true
+}
+
 function inputHandler.sendEvent(devices, event, ...)
     if event then
-        for i, device <- devices do
+        local reversed = reverseIterationEvents[event]
+        local deviceCount = #devices
+        local start = reversed and deviceCount or 1
+        local stop = reversed and 1 or deviceCount
+        local step = reversed and -1 or 1
+
+        for i = start, stop, step do
+            local device = devices[i]
+
             if device._enabled then
                 if event and device[event] then
                     local consumed = device[event](...)
