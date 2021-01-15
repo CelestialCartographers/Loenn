@@ -14,10 +14,12 @@ function editorScene:firstEnter()
 
     local viewportHandler = require("viewport_handler")
     local hotkeyHandler = require("hotkey_handler")
+    local userInterfaceDevice = require("ui.ui_device")
     local mapLoaderDevice = require("input_devices.map_loader")
     local roomResizeDevice = require("input_devices.room_resizer")
     local toolHandlerDevice = require("input_devices.tool_device")
 
+    inputDevice.newInputDevice(self.inputDevices, userInterfaceDevice)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
     inputDevice.newInputDevice(self.inputDevices, hotkeyHandler.createHotkeyDevice(standardHotkeys))
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)
