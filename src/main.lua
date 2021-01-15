@@ -1,5 +1,5 @@
 function love.load()
-    local path = "selene/selene/lib/?.lua;selene/selene/lib/?/init.lua;" .. love.filesystem.getRequirePath()
+    local path = "selene/selene/lib/?.lua;selene/selene/lib/?/init.lua;olympUI/?.lua;olympUI/?/init.lua;" .. love.filesystem.getRequirePath()
     love.filesystem.setRequirePath(path)
 
     -- The English language contains over 500,000 words and not a single one of them is suitable for describing just how much I want to purge macos from existence.
