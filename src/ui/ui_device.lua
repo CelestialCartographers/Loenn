@@ -7,19 +7,17 @@ local uiUtils = require("ui.utils")
 
 uiElements.__label.__default.style.font = love.graphics.newFont(16)
 
+
+local menubar = require("ui/menubar")
+local windows = require("ui/windows")
+
+windows.loadInternalWindows()
+
 local uiRoot = uiElements.column({
-    uiElements.topbar({
-        {"Test 1"},
-        {"Test 2"}
-    }),
-    uiElements.group({
-        uiElements.window("Hello, World!",
-            uiElements.column({
-                uiElements.label("Hello"),
-                uiElements.label("World!")
-            }):with({width = 200, height = 200})
-        ):with({x = 50, y = 50})
-    }):with(uiUtils.fillWidth):with(uiUtils.fillHeight(true))
+    menubar.getMenubar(),
+    uiElements.group(
+        windows.getLoadedWindows()
+    ):with(uiUtils.fillWidth):with(uiUtils.fillHeight(true))
 }):with({
     style = {
         bg = {bg = {}},
