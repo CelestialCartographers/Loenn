@@ -1,7 +1,7 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
-local filteredList = require("ui.widgets.filtered_list")
+local listWidgets = require("ui.widgets.lists")
 
 local state = require("loaded_state")
 
@@ -39,7 +39,7 @@ function roomList.getWindow()
     local search = ""
 
     local roomItems = getRoomItems()
-    local list = filteredList.getFilteredList(roomList.roomSelectedCallback, roomItems, search)
+    local list = listWidgets.getFilteredList(roomList.roomSelectedCallback, roomItems, search)
 
     return uiElements.window("Room List", list):with(uiUtils.fillHeight(false))
 end

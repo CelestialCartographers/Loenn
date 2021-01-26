@@ -2,7 +2,7 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
-local filteredList = {}
+local listWidgets = {}
 
 local function layoutWidthUpdate(orig, element)
     local parentWidth = element.parent.innerWidth
@@ -31,7 +31,7 @@ local function filterItems(items, search)
     return filtered
 end
 
-local function setSelection(list, target)
+function listWidgets.setSelection(list, target)
     -- Select first item as default, callback if it exists
     -- If target is defined attempt to select this instead of the first item
 
@@ -50,6 +50,9 @@ local function setSelection(list, target)
     end
 
     if list.selected and list.selected.data ~= previousSelection then
+        -- Set owner manually here for now
+        -- TODO - Test whether this is actually needed later
+        list.selected.owner = list
         list.selected:onClick(nil, nil, 1)
     end
 end
@@ -71,7 +74,7 @@ local function filterList(list, search)
     end
 
     ui.runLate(function()
-        setSelection(list, newSelection)
+        listWidgets.setSelection(list, newSelection)
     end)
 end
 
@@ -81,10 +84,9 @@ local function searchFieldChanged(element, new, old)
     filterList(list, new)
 end
 
-function filteredList.getFilteredList(callback, items, initialSearch, initialItem)
+function listWidgets.getFilteredList(callback, items, initialSearch, initialItem)
     items = items or {}
     initialSearch = initialSearch or ""
-    initialItem = initialItem or nil
 
     local filteredItems = filterItems(items, initialSearch)
 
@@ -95,7 +97,7 @@ function filteredList.getFilteredList(callback, items, initialSearch, initialIte
     })
 
     ui.runLate(function()
-        setSelection(list, initialItem)
+        listWidgets.setSelection(list, initialItem)
     end)
 
     local scrolledList = uiElements.scrollbox(list):with(uiUtils.hook({
@@ -115,4 +117,21 @@ function filteredList.getFilteredList(callback, items, initialSearch, initialIte
     return column, list, searchField
 end
 
-return filteredList
+function listWidgets.getList(callback, items, initialItem)
+    local list = uiElements.list(items, callback):with(uiUtils.hook({
+        layoutLateLazy = layoutWidthUpdate
+    }))
+
+    ui.runLate(function()
+        listWidgets.setSelection(list, initialItem)
+    end)
+
+    local scrolledList = uiElements.scrollbox(list):with(uiUtils.hook({
+        calcWidth = calculateWidth,
+        layoutLateLazy = layoutWidthUpdate
+    })):with(uiUtils.fillHeight(true))
+
+    return scrolledList
+end
+
+return listWidgets
