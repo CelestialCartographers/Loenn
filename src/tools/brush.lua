@@ -11,9 +11,6 @@ local brushHelper = require("brush_helper")
 local colors = require("colors")
 local drawing = require("drawing")
 
-local actionButton = configs.editor.toolActionButton
-local cloneButton = configs.editor.objectCloneButton
-
 local tool = {}
 
 tool._type = "tool"
@@ -21,6 +18,11 @@ tool.name = "Brush"
 tool.image = nil
 
 tool.layer = "tilesFg"
+tool.validLayers = {
+    "tilesFg",
+    "tilesBg"
+}
+
 tool.material = "a"
 
 local lastTileX, lastTileY = -1, -1
@@ -62,6 +64,9 @@ local function handleCloneClick(x, y)
 end
 
 function tool.mouseclicked(x, y, button, istouch, pressed)
+    local actionButton = configs.editor.toolActionButton
+    local cloneButton = configs.editor.objectCloneButton
+
     if button == actionButton then
         handleActionClick(x, y)
 
@@ -71,6 +76,8 @@ function tool.mouseclicked(x, y, button, istouch, pressed)
 end
 
 function tool.mousemoved(x, y, dx, dy, istouch)
+    local actionButton = configs.editor.toolActionButton
+
     if love.mouse.isDown(actionButton) then
         handleActionClick(x, y)
     end
