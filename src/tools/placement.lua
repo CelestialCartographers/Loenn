@@ -98,9 +98,6 @@ local function placePointPlacement()
     end
 end
 
--- Temporary simple placement selection
-local placementIndex = 1
-
 -- TODO - Clean up
 local function getPlacementOffset()
     local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
@@ -235,7 +232,6 @@ end
 local function selectPlacement(name, index)
     for i, placement in ipairs(placementsAvailable) do
         if i == index or placement.name == name then
-            placementIndex = i
             placementTemplate = {
                 item = utils.deepcopy(placement.itemTemplate),
                 placement = placement,
@@ -269,13 +265,21 @@ local function drawPlacement(room)
     end
 end
 
-function tool.layerSwapped(layer)
+function tool.setLayer(layer)
     if layer ~= tool.layer then
         placementsAvailable = placementUtils.getPlacements(layer)
         selectPlacement(nil, 1)
 
         tool.layer = layer
     end
+end
+
+function tool.setMaterial(material)
+    selectPlacement(material, nil)
+end
+
+function tool.getMaterials()
+    return placementsAvailable
 end
 
 function tool.mousepressed(x, y, button, istouch, presses)
@@ -317,27 +321,6 @@ end
 
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
-
-    -- Debug layer swapping
-    -- TODO - Remove this later
-    local index = tonumber(key)
-
-    if index then
-        if index >= 1 and index <= #tool.validLayers then
-            tool.layerSwapped(tool.validLayers[index])
-
-            print("Swapping layer to " .. tool.layer)
-        end
-    end
-
-    if key == "up" then
-        placementIndex = math.max(placementIndex - 1, 1)
-        selectPlacement(nil, placementIndex)
-
-    elseif key == "down" then
-        placementIndex = math.min(placementIndex + 1, #placementsAvailable)
-        selectPlacement(nil, placementIndex)
-    end
 end
 
 function tool.update(dt)

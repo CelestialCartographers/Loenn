@@ -18,8 +18,8 @@ function toolHandler.selectTool(name)
     return handler ~= nil
 end
 
-function toolHandler.loadTool(fn)
-    local pathNoExt = utils.stripExtension(fn)
+function toolHandler.loadTool(filename)
+    local pathNoExt = utils.stripExtension(filename)
     local filenameNoExt = utils.filename(pathNoExt, "/")
 
     local handler = utils.rerequire(pathNoExt)
@@ -34,6 +34,98 @@ function toolHandler.loadTool(fn)
     end
 
     return name
+end
+
+local function getHandler(name)
+    name = name or toolHandler.currentToolName
+
+    return toolHandler.tools[name]
+end
+
+function toolHandler.getMaterials(name)
+    local handler = getHandler(name)
+
+    if handler and handler.getMaterials then
+        return handler.getMaterials()
+    end
+
+    return {}
+end
+
+function toolHandler.setMaterial(material, name)
+    local handler = getHandler(name)
+
+    if handler then
+        local oldMaterial = toolHandler.getMaterial(name)
+
+        if handler.setMaterial then
+            return handler.setMaterial(material, oldMaterial)
+        end
+    end
+
+    return false
+end
+
+function toolHandler.getMaterial(name)
+    local handler = getHandler(name)
+
+    if handler then
+        if handler.getMaterial then
+            return handler.getMaterial()
+
+        else
+            return handler.material
+        end
+    end
+
+    return false
+end
+
+function toolHandler.getLayers(name)
+    local handler = getHandler(name)
+
+    if handler then
+        if toolHandler.getLayers then
+            return handler.getLayers()
+
+        else
+            return handler.validLayers
+        end
+    end
+
+    return {}
+end
+
+function toolHandler.setLayer(layer, name)
+    local handler = getHandler(name)
+
+    if handler then
+        local oldLayer = toolHandler.getLayer(name)
+
+        if handler.setLayer then
+            return handler.setLayer(layer, oldLayer)
+
+        elseif handler.layer then
+            handler.layer = layer
+        end
+    end
+
+    return false
+end
+
+function toolHandler.getLayer(name)
+    local handler = getHandler(name)
+
+    if handler then
+        if handler.getLayer then
+            return handler.getLayer()
+
+        else
+            return handler.layer
+        end
+    end
+
+    return false
 end
 
 function toolHandler.loadInternalTools(path)

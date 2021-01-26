@@ -45,27 +45,7 @@ function device.mouseclicked(x, y, button, istouch, presses)
     end
 end
 
--- Debug tool swapping
--- TODO - Remove this later
 function device.keypressed(key, scancode, isrepeat)
-    local index = tonumber(key)
-
-    if index and keyboardHelper.modifierControl() then
-        local i = 1
-
-        for k, v in pairs(toolHandler.tools) do
-            if i == index then
-                toolHandler.selectTool(k)
-
-                print("Selecting tool " .. k)
-
-                return true
-            end
-
-            i + =1
-        end
-    end
-
     local currentTool = toolHandler.currentTool
 
     if currentTool and currentTool.keypressed then
