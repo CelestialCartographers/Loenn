@@ -42,11 +42,11 @@ local function getHandler(name)
     return toolHandler.tools[name]
 end
 
-function toolHandler.getMaterials(name)
+function toolHandler.getMaterials(name, layer)
     local handler = getHandler(name)
 
     if handler and handler.getMaterials then
-        return handler.getMaterials()
+        return handler.getMaterials(layer)
     end
 
     return {}
@@ -85,7 +85,7 @@ function toolHandler.getLayers(name)
     local handler = getHandler(name)
 
     if handler then
-        if toolHandler.getLayers then
+        if handler.getLayers then
             return handler.getLayers()
 
         else
