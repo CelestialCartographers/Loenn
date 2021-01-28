@@ -31,7 +31,7 @@ local function filterItems(items, search)
     return filtered
 end
 
-function listWidgets.setSelection(list, target)
+function listWidgets.setSelection(list, target, preventCallback)
     -- Select first item as default, callback if it exists
     -- If target is defined attempt to select this instead of the first item
 
@@ -49,7 +49,7 @@ function listWidgets.setSelection(list, target)
         end
     end
 
-    if list.selected and list.selected.data ~= previousSelection then
+    if not preventCallback and list.selected and list.selected.data ~= previousSelection then
         -- Set owner manually here for now
         -- TODO - Test whether this is actually needed later
         list.selected.owner = list
@@ -57,15 +57,13 @@ function listWidgets.setSelection(list, target)
     end
 end
 
-local function filterList(list, search)
-    local unfilteredItems = list.unfilteredItems
+function listWidgets.updateItems(list, items, fromFilter)
     local previousSelection = list.selected and list.selected.data
     local newSelection = nil
-    local filteredItems = filterItems(unfilteredItems, search)
 
     list.children = {}
 
-    for _, item in ipairs(filteredItems) do
+    for _, item in ipairs(items) do
         if item.data == previousSelection then
             newSelection = item
         end
@@ -76,6 +74,17 @@ local function filterList(list, search)
     ui.runLate(function()
         listWidgets.setSelection(list, newSelection)
     end)
+
+    if not fromFilter then
+        list.unfilteredItems = items
+    end
+end
+
+local function filterList(list, search)
+    local unfilteredItems = list.unfilteredItems
+    local filteredItems = filterItems(unfilteredItems, search)
+
+    listWidgets.updateItems(list, filteredItems, true)
 end
 
 local function searchFieldChanged(element, new, old)
@@ -112,7 +121,7 @@ function listWidgets.getFilteredList(callback, items, initialSearch, initialItem
     local column = uiElements.column({
         searchField,
         scrolledList
-    }):with(uiUtils.fillHeight(true))
+    })
 
     return column, list, searchField
 end
@@ -129,9 +138,9 @@ function listWidgets.getList(callback, items, initialItem)
     local scrolledList = uiElements.scrollbox(list):with(uiUtils.hook({
         calcWidth = calculateWidth,
         layoutLateLazy = layoutWidthUpdate
-    })):with(uiUtils.fillHeight(true))
+    })):with(uiUtils.fillHeight(false))
 
-    return scrolledList
+    return scrolledList, list
 end
 
 return listWidgets

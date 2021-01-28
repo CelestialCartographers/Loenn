@@ -41,7 +41,7 @@ function roomList.getWindow()
     local roomItems = getRoomItems()
     local list = listWidgets.getFilteredList(roomList.roomSelectedCallback, roomItems, search)
 
-    return uiElements.window("Room List", list):with(uiUtils.fillHeight(false))
+    return uiElements.window("Room List", list:with(uiUtils.fillHeight(true))):with(uiUtils.fillHeight(false))
 end
 
 return roomList
