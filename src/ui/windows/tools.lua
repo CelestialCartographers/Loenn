@@ -11,24 +11,30 @@ toolWindow.layerList = false
 toolWindow.materialList = false
 
 -- TODO - Use lang file
-local function getMaterialItems(layer)
+-- TODO - Use display name for now, otherwise entity variations don't work
+-- In the future the "data" should be using a better identifier
+local function getMaterialItems(layer, sortItems)
     local materials = toolHandler.getMaterials(nil, layer)
     local materialItems = {}
 
     for _, material in ipairs(materials) do
         local materialText = material
-        local materialData = material
         local materialType = type(material)
 
         if materialType == "table" then
             materialText = material.displayName or material.name
-            materialData = material.name
         end
 
         table.insert(materialItems, uiElements.listItem({
             text = materialText,
-            data = materialData
+            data = materialText
         }))
+    end
+
+    if sortItems or sortItems == nil then
+        table.sort(materialItems, function(lhs, rhs)
+            return lhs.text < rhs.text
+        end)
     end
 
     return materialItems
