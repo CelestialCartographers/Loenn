@@ -42,7 +42,10 @@ function roomList.getWindow()
     local search = ""
 
     local roomItems = getRoomItems()
-    local list = listWidgets.getFilteredList(roomList.roomSelectedCallback, roomItems, search)
+    local listOptions = {
+        initialSearch = search
+    }
+    local list = listWidgets.getFilteredList(roomList.roomSelectedCallback, roomItems, listOptions)
     local window = uiElements.window("Room List", list:with(uiUtils.fillHeight(true))):with(uiUtils.fillHeight(false))
 
     widgetUtils.removeWindowTitlebar(window)

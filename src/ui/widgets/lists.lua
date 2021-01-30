@@ -61,7 +61,7 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
     end
 end
 
-function listWidgets.updateItems(list, items, fromFilter)
+function listWidgets.updateItems(list, items, fromFilter, callbackRequiresChange)
     local previousSelection = list.selected and list.selected.data
     local newSelection = nil
 
@@ -78,7 +78,7 @@ function listWidgets.updateItems(list, items, fromFilter)
     list.children = items
 
     ui.runLate(function()
-        listWidgets.setSelection(list, newSelection)
+        listWidgets.setSelection(list, newSelection, false, callbackRequiresChange)
     end)
 
     list:reflow()
@@ -102,10 +102,10 @@ local function searchFieldChanged(element, new, old)
     filterList(list, new)
 end
 
-function listWidgets.getFilteredList(callback, items, initialSearch, initialItem)
+function listWidgets.getFilteredList(callback, items, options)
     items = items or {}
-    initialSearch = initialSearch or ""
 
+    local initialSearch = options.initialSearch or ""
     local filteredItems = filterItems(items, initialSearch)
 
     local list = uiElements.list(filteredItems, callback):with(uiUtils.hook({
@@ -114,8 +114,10 @@ function listWidgets.getFilteredList(callback, items, initialSearch, initialItem
         unfilteredItems = items
     })
 
+    list.options = options or {}
+
     ui.runLate(function()
-        listWidgets.setSelection(list, initialItem)
+        listWidgets.setSelection(list, list.options.initialItem)
     end)
 
     local scrolledList = uiElements.scrollbox(list):with(uiUtils.hook({
@@ -135,13 +137,15 @@ function listWidgets.getFilteredList(callback, items, initialSearch, initialItem
     return column, list, searchField
 end
 
-function listWidgets.getList(callback, items, initialItem)
+function listWidgets.getList(callback, items, options)
     local list = uiElements.list(items, callback):with(uiUtils.hook({
         layoutLateLazy = layoutWidthUpdate
     }))
 
+    list.options = options or {}
+
     ui.runLate(function()
-        listWidgets.setSelection(list, initialItem)
+        listWidgets.setSelection(list, list.options.initialItem)
     end)
 
     local scrolledList = uiElements.scrollbox(list):with(uiUtils.hook({
