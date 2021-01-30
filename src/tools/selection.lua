@@ -12,7 +12,8 @@ local toolUtils = require("tool_utils")
 local tool = {}
 
 tool._type = "tool"
-tool.name = "Selection"
+tool.name = "selection"
+tool.group = "placement"
 tool.image = nil
 
 tool.layer = "entities"
