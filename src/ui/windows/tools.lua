@@ -71,7 +71,7 @@ local function layerCallback(list, layer)
 end
 
 -- TODO - Sort/group results
-local function getToolItems()
+local function getToolItems(sortItems)
     local tools = toolHandler.tools
     local toolItems = {}
 
@@ -80,6 +80,15 @@ local function getToolItems()
             text = name,
             data = name
         }))
+    end
+
+    if sortItems or sortItems == nil then
+        table.sort(toolItems, function(lhs, rhs)
+            local lhsGroup = tools[lhs.text].group or ""
+            local rhsGroup = tools[rhs.text].group or ""
+
+            return lhsGroup < rhsGroup or lhs.text < rhs.text
+        end)
     end
 
     return toolItems

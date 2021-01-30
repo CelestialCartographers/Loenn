@@ -31,7 +31,7 @@ local function filterItems(items, search)
     return filtered
 end
 
-function listWidgets.setSelection(list, target, preventCallback)
+function listWidgets.setSelection(list, target, preventCallback, callbackRequiresChange)
     -- Select first item as default, callback if it exists
     -- If target is defined attempt to select this instead of the first item
 
@@ -49,11 +49,15 @@ function listWidgets.setSelection(list, target, preventCallback)
         end
     end
 
-    if not preventCallback and list.selected and list.selected.data ~= previousSelection then
-        -- Set owner manually here for now
-        -- TODO - Test whether this is actually needed later
-        list.selected.owner = list
-        list.selected:onClick(nil, nil, 1)
+    if list.selected and not preventCallback then
+        local dataChanged = list.selected.data ~= previousSelection
+
+        if callbackRequiresChange and dataChanged or not callbackRequiresChange then
+            -- Set owner manually here for now
+            -- TODO - Test whether this is actually needed later
+            list.selected.owner = list
+            list.selected:onClick(nil, nil, 1)
+        end
     end
 end
 
@@ -89,7 +93,7 @@ local function filterList(list, search)
     local unfilteredItems = list.unfilteredItems
     local filteredItems = filterItems(unfilteredItems, search)
 
-    listWidgets.updateItems(list, filteredItems, true)
+    listWidgets.updateItems(list, filteredItems, true, true)
 end
 
 local function searchFieldChanged(element, new, old)
