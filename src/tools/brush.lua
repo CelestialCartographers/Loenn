@@ -10,6 +10,7 @@ local configs = require("configs")
 local brushHelper = require("brush_helper")
 local colors = require("colors")
 local drawing = require("drawing")
+local utils = require("utils")
 
 local tool = {}
 
@@ -24,6 +25,7 @@ tool.validLayers = {
 }
 
 tool.material = "a"
+tool.materialsLookup = {}
 
 local lastTileX, lastTileY = -1, -1
 local lastX, lastY = -1, -1
@@ -61,6 +63,65 @@ local function handleCloneClick(x, y)
             tool.material = material
         end
     end
+end
+
+local function cleanupMaterialPath(path)
+    -- Remove tileset/ from front and humanize
+
+    path = path:match("^tilesets/(.*)") or path
+
+    if tool.layer == "tilesBg" then
+        path = path:match("^bg(.*)") or path
+    end
+
+    return utils.humanizeVariableName(path)
+end
+
+local function updateMaterialLookup()
+    tool.materialsLookup = {}
+
+    local paths = brushHelper.getValidTiles(tool.layer)
+
+    for id, path in pairs(paths) do
+        local cleanPath = cleanupMaterialPath(path)
+
+        tool.materialsLookup[cleanPath] = id
+    end
+end
+
+function tool.getMaterials()
+    local paths = brushHelper.getValidTiles(tool.layer)
+    local placements = {}
+
+    for displayName, id in pairs(tool.materialsLookup) do
+        table.insert(placements, {
+            name = id,
+            displayName = displayName
+        })
+    end
+
+    return placements
+end
+
+function tool.setMaterial(material)
+    local paths = brushHelper.getValidTiles(tool.layer)
+
+    if paths[material] then
+        tool.material = material
+
+    else
+        local fromLookup = tool.materialsLookup[material]
+
+        if fromLookup then
+            tool.material = fromLookup
+        end
+    end
+end
+
+function tool.setLayer(layer)
+    tool.layer = layer
+
+    updateMaterialLookup()
 end
 
 function tool.mouseclicked(x, y, button, istouch, pressed)
