@@ -61,19 +61,24 @@ function listWidgets.updateItems(list, items, fromFilter)
     local previousSelection = list.selected and list.selected.data
     local newSelection = nil
 
-    list.children = {}
-
     for _, item in ipairs(items) do
         if item.data == previousSelection then
             newSelection = item
         end
 
-        list:addChild(item)
+        if fromFilter then
+            item:reflow()
+        end
     end
+
+    list.children = items
 
     ui.runLate(function()
         listWidgets.setSelection(list, newSelection)
     end)
+
+    list:reflow()
+    ui.root:recollect()
 
     if not fromFilter then
         list.unfilteredItems = items
