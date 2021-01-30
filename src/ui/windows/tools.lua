@@ -1,7 +1,11 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
+
+local widgetUtils = require("ui.widgets.utils")
 local listWidgets = require("ui.widgets.lists")
+local simpleDocks = require("ui.widgets.simple_docks")
+
 local toolHandler = require("tool_handler")
 
 local toolWindow = {}
@@ -108,7 +112,11 @@ function toolWindow.getWindow()
         scrolledMaterialList
     }):with(uiUtils.fillHeight(true))
 
-    return uiElements.window("Tools", row):with(uiUtils.fillHeight(false))
+    local window = uiElements.window("Tools", row):with(uiUtils.fillHeight(false))
+
+    widgetUtils.removeWindowTitlebar(window)
+
+    return simpleDocks.pinWidgetToEdge("right", window)
 end
 
 return toolWindow
