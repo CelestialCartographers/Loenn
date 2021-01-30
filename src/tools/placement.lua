@@ -231,7 +231,7 @@ end
 
 local function selectPlacement(name, index)
     for i, placement in ipairs(placementsAvailable) do
-        if i == index or placement.name == name then
+        if i == index or placement.displayName == name or placement.name == name then
             placementTemplate = {
                 item = utils.deepcopy(placement.itemTemplate),
                 placement = placement,

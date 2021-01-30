@@ -191,4 +191,10 @@ function brushHelper.getTile(room, x, y, layer)
     return tilesMatrix:get(x, y, "0")
 end
 
+function brushHelper.getValidTiles(layer)
+    local autoTiler = layer == "tilesFg" and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
+
+    return autoTiler.paths
+end
+
 return brushHelper
