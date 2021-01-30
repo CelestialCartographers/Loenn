@@ -10,7 +10,8 @@ local toolUtils = require("tool_utils")
 local tool = {}
 
 tool._type = "tool"
-tool.name = "Placement"
+tool.name = "placement"
+tool.group = "placement"
 tool.image = nil
 
 tool.layer = "entities"
@@ -21,7 +22,7 @@ tool.validLayers = {
     "decalsBg"
 }
 
-local placementsAvailable = {}
+local placementsAvailable = nil
 local placementTemplate = nil
 
 local placementCurrentX = 0
@@ -266,7 +267,7 @@ local function drawPlacement(room)
 end
 
 function tool.setLayer(layer)
-    if layer ~= tool.layer then
+    if layer ~= tool.layer or not placementsAvailable then
         placementsAvailable = placementUtils.getPlacements(layer)
         selectPlacement(nil, 1)
 

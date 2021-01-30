@@ -15,7 +15,8 @@ local utils = require("utils")
 local tool = {}
 
 tool._type = "tool"
-tool.name = "Brush"
+tool.name = "brush"
+tool.group = "brush"
 tool.image = nil
 
 tool.layer = "tilesFg"
