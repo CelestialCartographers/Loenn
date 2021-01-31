@@ -28,5 +28,6 @@ local uiRoot = uiElements.column({
 })
 
 ui.init(uiRoot, false)
+ui.features.eventProxies = true
 
 return ui

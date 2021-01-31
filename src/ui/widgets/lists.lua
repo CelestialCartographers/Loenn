@@ -35,6 +35,7 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
     -- Select first item as default, callback if it exists
     -- If target is defined attempt to select this instead of the first item
 
+    local selectedTarget = false
     local previousSelection = list.selected and list.selected.data
 
     list.selected = list.children[1]
@@ -43,6 +44,7 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
         for _, item in ipairs(list.children) do
             if item == target or item.data == target then
                 list.selected = item
+                selectedTarget = true
 
                 break
             end
@@ -59,6 +61,8 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
             list.selected:onClick(nil, nil, 1)
         end
     end
+
+    return selectedTarget
 end
 
 function listWidgets.updateItems(list, items, fromFilter, callbackRequiresChange)
@@ -102,6 +106,18 @@ local function searchFieldChanged(element, new, old)
     filterList(list, new)
 end
 
+function listWidgets.setFilterText(list, text, updateList)
+    local searchField = list.searchField
+
+    if searchField then
+        searchField:setText(text)
+
+        if updateList or updateList == nil then
+            filterList(list, text)
+        end
+    end
+end
+
 function listWidgets.getFilteredList(callback, items, options)
     items = items or {}
 
@@ -113,8 +129,6 @@ function listWidgets.getFilteredList(callback, items, options)
     })):with({
         unfilteredItems = items
     })
-
-    list.options = options or {}
 
     ui.runLate(function()
         listWidgets.setSelection(list, list.options.initialItem)
@@ -129,10 +143,25 @@ function listWidgets.getFilteredList(callback, items, options)
         list = list
     }):with(uiUtils.fillWidth)
 
-    local column = uiElements.column({
-        searchField,
-        scrolledList
-    })
+    list.options = options or {}
+    list.searchField = searchField
+
+    local columnItems
+
+    if options.searchFieldBelow then
+        columnItems = {
+            scrolledList,
+            searchField
+        }
+
+    else
+        columnItems = {
+            searchField,
+            scrolledList
+        }
+    end
+
+    local column = uiElements.column(columnItems)
 
     return column, list, searchField
 end
