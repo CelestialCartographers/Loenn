@@ -14,23 +14,6 @@ modHandler.pluginFolderNames = {
 
 modHandler.loadedMods = {}
 
--- Use Unix paths
-local function findRecursive(filenames, path)
-    for _, filename in ipairs(love.filesystem.getDirectoryItems(path)) do
-        local fullPath = path .. "/" .. filename
-        local fileInfo = love.filesystem.getInfo(fullPath)
-
-        if fileInfo and fileInfo.type == "file" then
-            if utils.fileExtension(filename) == "lua" then
-                table.insert(filenames, fullPath)
-            end
-
-        else
-            findRecursive(filenames, fullPath)
-        end
-    end
-end
-
 function modHandler.findPlugins(pluginType)
     local filenames = {}
 
@@ -42,7 +25,9 @@ function modHandler.findPlugins(pluginType)
                 pluginType
             ))
 
-            findRecursive(filenames, path)
+            utils.getFilenames(path, true, filenames, function(filename)
+                return utils.fileExtension(filename) == "lua"
+            end)
         end
     end
 
