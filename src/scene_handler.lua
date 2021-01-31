@@ -1,5 +1,6 @@
 local sceneStruct = require("structs.scene")
 local utils = require("utils")
+local configs = require("configs")
 
 local sceneHandler = {}
 
@@ -125,7 +126,9 @@ function sceneHandler.addSceneFromFilename(fn)
     local handler = utils.rerequire(pathNoExt)
     local name = handler.name or filenameNoExt
 
-    print("! Registered scene '" .. name .. "'")
+    if configs.debug.logPluginLoading then
+        print("! Registered scene '" .. name .. "'")
+    end
 
     sceneHandler.addScene(handler)
 end

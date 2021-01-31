@@ -1,6 +1,7 @@
 local utils = require("utils")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
+local configs = require("configs")
 
 local drawableSprite = require("structs.drawable_sprite")
 local drawableFunction = require("structs.drawable_function")
@@ -34,7 +35,8 @@ local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
 end
 
 function entities.registerEntity(filename, registerAt, verbose)
-    verbose = verbose == nil or verbose
+    -- Use verbose flag or default to logPluginLoading from config
+    verbose = verbose or verbose == nil and configs.debug.logPluginLoading
     registerAt = registerAt or entities.registeredEntities
 
     local pathNoExt = utils.stripExtension(filename)

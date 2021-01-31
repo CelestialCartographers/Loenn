@@ -1,5 +1,6 @@
 local utils = require("utils")
 local tasks = require("task")
+local configs = require("configs")
 
 local toolHandler = {}
 
@@ -25,7 +26,9 @@ function toolHandler.loadTool(filename)
     local handler = utils.rerequire(pathNoExt)
     local name = handler.name or filenameNoExt
 
-    print("! Loaded tool '" .. name ..  "'")
+    if configs.debug.logPluginLoading then
+        print("! Loaded tool '" .. name ..  "'")
+    end
 
     toolHandler.tools[name] = handler
 
