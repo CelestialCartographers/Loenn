@@ -48,6 +48,7 @@ function loadingScene:firstEnter()
             entities.loadExternalEntities()
 
             toolHandler.loadInternalTools()
+            toolHandler.loadExternalTools()
 
             atlases.loadCelesteAtlases()
 
