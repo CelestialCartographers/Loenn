@@ -83,6 +83,23 @@ function viewportHandler.zoomOut()
     viewport.y = (viewport.y - mouseY) / 2
 end
 
+function viewportHandler.moveToPosition(x, y, scale, centered)
+    if scale then
+        viewport.scale = scale
+    end
+
+    if centered then
+        local windowWidth, windowHeight = love.graphics.getDimensions()
+
+        viewport.x = x * viewport.scale - windowWidth / 2
+        viewport.y = y * viewport.scale - windowHeight / 2
+
+    else
+        viewport.x = x * viewport.scale
+        viewport.y = y * viewport.scale
+    end
+end
+
 function viewportHandler.enable()
     viewportHandler.device._enabled = true
 end
