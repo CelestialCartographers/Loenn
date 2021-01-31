@@ -33,12 +33,13 @@ function loadingScene:firstEnter()
     local atlases = require("atlases")
     local toolHandler = require("tool_handler")
 
+    local configs = require("configs")
     local mods = require("mods")
 
     local fileLocations = require("file_locations")
     local viewerState = require("loaded_state")
 
-    -- Load internal modules such as tools/entities/triggers etc
+    -- Load assets and entity, trigger, effect etc modules
     tasks.newTask(
         function()
             mods.mountMods()
@@ -47,10 +48,16 @@ function loadingScene:firstEnter()
             entities.loadExternalEntities()
 
             toolHandler.loadInternalTools()
+
+            atlases.loadCelesteAtlases()
+
+            -- This can take a while depending on the amount of installed mods
+            -- By default it is lazy loaded
+            if not configs.editor.lazyLoadExternalAtlases then
+                atlases.loadExternalAtlases()
+            end
         end
     )
-
-    atlases.initCelesteAtlasesTask()
 
     local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
     viewerState.loadFile(mapFile)

@@ -19,4 +19,7 @@ return {
     -- Rendering
     prepareRoomRenderInBackground = true,
     alwaysRedrawUnselectedRooms = false,
+
+    -- Loading
+    lazyLoadExternalAtlases = true
 }

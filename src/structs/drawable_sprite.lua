@@ -140,7 +140,7 @@ end
 
 function drawableSpriteStruct.spriteFromTexture(texture, data)
     local atlas = data and data.atlas or "gameplay"
-    local spriteMeta = atlases[atlas][texture]
+    local spriteMeta = atlases.getResource(texture, atlas)
 
     return drawableSpriteStruct.spriteFromMeta(spriteMeta, data)
 end
