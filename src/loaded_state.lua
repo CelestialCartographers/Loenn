@@ -43,7 +43,7 @@ function state.loadFile(filename)
             else
                 sceneHandler.changeScene("Editor")
 
-                -- TODO - Toast the user, failed to load
+                sceneHandler.sendEvent("editorMapLoadFailed")
             end
         end
     )
@@ -63,13 +63,13 @@ function state.saveFile(filename)
                                 state.filename = filename
 
                             else
-                                -- TODO - Toast the user, failed to save
+                                sceneHandler.sendEvent("editorMapSaveFailed")
                             end
                         end
                     )
 
                 else
-                    -- TODO - Toast the user, failed to save
+                    sceneHandler.sendEvent("editorMapSaveFailed")
                 end
             end
         )
@@ -79,6 +79,8 @@ end
 function state.selectItem(item)
     state.selectedItem = item
     state.selectedItemType = utils.typeof(item)
+
+    sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType)
 end
 
 function state.getSelectedRoom()
