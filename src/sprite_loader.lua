@@ -71,6 +71,41 @@ function spriteLoader.getCachedDataImage(dataFile)
     end
 end
 
+function spriteLoader.loadExternalSprite(filename)
+    local image = love.graphics.newImage(filename)
+    local imageWidth, imageHeight = image:getDimensions()
+
+    local meta = {
+        image = image,
+        width = imageWidth,
+        height = imageHeight,
+        filename = filename
+    }
+
+    local sprite = {
+        x = 0,
+        y = 0,
+
+        width = imageWidth,
+        height = imageHeight,
+
+        offsetX = 0,
+        offsetY = 0,
+        realWidth = imageWidth,
+        realHeight = imageHeight,
+
+        image = image,
+        meta = meta,
+        filename = filename,
+
+        loadedAt = os.time()
+    }
+
+    sprite.quad = love.graphics.newQuad(0, 0, imageWidth, imageHeight, imageWidth, imageHeight)
+
+    return sprite
+end
+
 function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
     local fh = utils.getFileHandle(utils.joinpath(atlasDir, metaFn), "rb")
     local reader = binaryReader(fh)
@@ -102,7 +137,7 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
             spritesImage, spritesImageData = spriteLoader.loadDataImage(dataFilePath)
         end
 
-        local spritesWidth, spritesHeight = spritesImage:getDimensions
+        local spritesWidth, spritesHeight = spritesImage:getDimensions()
 
         table.insert(res._imageMeta, {
             image = spritesImage,

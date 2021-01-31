@@ -55,6 +55,44 @@ filesystem.rmdir = lfs.rmdir
 
 filesystem.remove = os.remove
 
+-- Use Unix paths
+local function findRecursive(filenames, path, recursive, predicate, useYields)
+    useYields = useYields or useYields == nil
+
+    for i, filename in ipairs(love.filesystem.getDirectoryItems(path)) do
+        local fullPath = path .. "/" .. filename
+        local fileInfo = love.filesystem.getInfo(fullPath)
+
+        if useYields and i % 25 == 0 then
+            coroutine.yield()
+        end
+
+        if fileInfo and fileInfo.type == "file" then
+            if predicate then
+                if predicate(filename) then
+                    table.insert(filenames, fullPath)
+                end
+
+            else
+                table.insert(filenames, fullPath)
+            end
+
+        else
+            if recursive or recursive == nil then
+                findRecursive(filenames, fullPath, recursive, predicate, useYields)
+            end
+        end
+    end
+end
+
+function filesystem.getFilenames(path, recursive, filenames, predicate, useYields)
+    filenames = filenames or {}
+
+    findRecursive(filenames, path, recursive, predicate, useYields)
+
+    return filenames
+end
+
 function filesystem.isFile(path)
     local attrs = lfs.attributes(path)
 
