@@ -33,13 +33,19 @@ function loadingScene:firstEnter()
     local atlases = require("atlases")
     local toolHandler = require("tool_handler")
 
+    local mods = require("mods")
+
     local fileLocations = require("file_locations")
     local viewerState = require("loaded_state")
 
     -- Load internal modules such as tools/entities/triggers etc
     tasks.newTask(
         function()
+            mods.mountMods()
+
             entities.loadInternalEntities()
+            entities.loadExternalEntities()
+
             toolHandler.loadInternalTools()
         end
     )

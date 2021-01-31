@@ -1,5 +1,6 @@
 local utils = require("utils")
-local tasks = require("task")
+local pluginLoader = require("plugin_loader")
+local modHandler = require("mods")
 
 local drawableSprite = require("structs.drawable_sprite")
 local drawableFunction = require("structs.drawable_function")
@@ -33,7 +34,7 @@ local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
 end
 
 function entities.registerEntity(filename, registerAt, verbose)
-    verbose = verbose == nil and verbose or true
+    verbose = verbose == nil or verbose
     registerAt = registerAt or entities.registeredEntities
 
     local pathNoExt = utils.stripExtension(filename)
@@ -44,19 +45,18 @@ function entities.registerEntity(filename, registerAt, verbose)
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
 
--- TODO - Santize user paths
-function entities.loadInternalEntities(registerAt, path)
-    registerAt = registerAt or entities.registeredEntities
-    path = path or "entities"
+function entities.loadEntities(path, registerAt)
+    pluginLoader.loadPlugins(path, registerAt, entities.registerEntity)
+end
 
-    for i, file <- love.filesystem.getDirectoryItems(path) do
-        -- Always use Linux paths here
-        entities.registerEntity(utils.joinpath(path, file):gsub("\\", "/"), registerAt)
+function entities.loadInternalEntities(registerAt)
+    return entities.loadEntities("entities", registerAt)
+end
 
-        tasks.yield()
-    end
+function entities.loadExternalEntities(registerAt)
+    local filenames = modHandler.findPlugins("entities")
 
-    tasks.update(registerAt)
+    return entities.loadEntities(filenames, registerAt)
 end
 
 -- Returns default depth

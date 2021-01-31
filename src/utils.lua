@@ -120,6 +120,10 @@ function utils.humanizeVariableName(name)
     return res
 end
 
+function utils.convertToUnixPath(path)
+    return path:gsub("\\", "/")
+end
+
 function utils.parseHexColor(color)
     color := match("^#?([0-9a-fA-F]+)$")
 
