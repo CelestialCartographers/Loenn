@@ -1,6 +1,8 @@
 local sceneStruct = require("structs.scene")
 local utils = require("utils")
 local configs = require("configs")
+local pluginLoader = require("plugin_loader")
+local modHandler = require("mods")
 
 local sceneHandler = {}
 
@@ -25,9 +27,9 @@ end
 function sceneHandler.defaultWipe(total, remaining, draw)
    love.graphics.stencil(sceneHandler.defaultStencil, "replace")
    love.graphics.setStencilTest("equal", 1)
- 
+
    local res = draw()
- 
+
    love.graphics.setStencilTest()
 
    return res
@@ -133,14 +135,16 @@ function sceneHandler.addSceneFromFilename(fn)
     sceneHandler.addScene(handler)
 end
 
--- TODO - Santize user paths
 function sceneHandler.loadInternalScenes(path)
     path = path or "scenes"
 
-    for i, file <- love.filesystem.getDirectoryItems(path) do
-        -- Always use Linux paths here
-        sceneHandler.addSceneFromFilename(utils.joinpath(path, file):gsub("\\", "/"))
-    end
+    pluginLoader.loadPlugins(path, nil, sceneHandler.addSceneFromFilename, false)
+end
+
+function sceneHandler.loadExternalScenes()
+    local filenames = modHandler.findPlugins("scenes")
+
+    pluginLoader.loadPlugins(filenames, nil, sceneHandler.addSceneFromFilename)
 end
 
 return sceneHandler

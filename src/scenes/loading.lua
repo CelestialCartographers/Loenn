@@ -29,9 +29,11 @@ end
 function loadingScene:firstEnter()
     local tasks = require("task")
 
-    local entities = require("entities")
-    local atlases = require("atlases")
+    local sceneHandler = require("scene_handler")
     local toolHandler = require("tool_handler")
+    local entities = require("entities")
+
+    local atlases = require("atlases")
 
     local configs = require("configs")
     local mods = require("mods")
@@ -43,6 +45,9 @@ function loadingScene:firstEnter()
     tasks.newTask(
         function()
             mods.mountMods()
+
+            -- Internal scenes are already loaded, how else would we be here
+            sceneHandler.loadExternalScenes()
 
             entities.loadInternalEntities()
             entities.loadExternalEntities()

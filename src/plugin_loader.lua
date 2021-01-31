@@ -4,7 +4,9 @@ local tasks = require("task")
 local pluginLoader = {}
 
 -- Path can either be a path to list items from or a list of prefound filenames
-function pluginLoader.loadPlugins(path, registerAt, loadFunction)
+function pluginLoader.loadPlugins(path, registerAt, loadFunction, shouldYield)
+    shouldYield = shouldYield or shouldYield == nil
+
     local filenames = path
 
     if type(path) == "string" then
@@ -19,10 +21,15 @@ function pluginLoader.loadPlugins(path, registerAt, loadFunction)
 
     for _, filename in ipairs(filenames) do
         loadFunction(filename, registerAt)
-        tasks.yield()
+
+        if shouldYield then
+            tasks.yield()
+        end
     end
 
-    tasks.update(registerAt)
+    if shouldYield then
+        tasks.update(registerAt)
+    end
 end
 
 return pluginLoader
