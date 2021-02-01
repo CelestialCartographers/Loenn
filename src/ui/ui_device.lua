@@ -8,26 +8,15 @@ local uiUtils = require("ui.utils")
 uiElements.__label.__default.style.font = love.graphics.newFont(16)
 
 
-local menubar = require("ui/menubar")
 local windows = require("ui/windows")
+local uiRoot = require("ui/ui_root")
 
 windows.loadInternalWindows()
+windows.loadExternalWindows()
 
-local uiRoot = uiElements.column({
-    menubar.getMenubar(),
-    uiElements.group(
-        windows.getLoadedWindows()
-    ):with(uiUtils.fillWidth):with(uiUtils.fillHeight(true))
-}):with({
-    style = {
-        bg = {bg = {}},
-        padding = 0,
-        spacing = 0,
-        radius = 0
-    }
-})
+local uiRootElement = uiRoot.getRootElement(windows.getLoadedWindows())
 
-ui.init(uiRoot, false)
+ui.init(uiRootElement, false)
 ui.features.eventProxies = true
 
 return ui
