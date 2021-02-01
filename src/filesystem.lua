@@ -37,6 +37,17 @@ function filesystem.splitpath(s)
     return string.split(s, sep)()
 end
 
+function filesystem.samePath(path1, path2)
+    local userOS = love.system.getOS()
+
+    if userOS == "Windows" then
+        return path1:lower() == path2:lower()
+
+    else
+        return path1 == path2
+    end
+end
+
 function filesystem.fileExtension(path)
     return path:match("[^.]+$")
 end

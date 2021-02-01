@@ -34,6 +34,8 @@ function state.loadFile(filename)
                         state.side = decodeTask.result
                         state.map = state.side.map
 
+                        celesteRender.loadCustomTilesetAutotiler(state)
+
                         state.selectItem(state.map and state.map.rooms[1])
 
                         sceneHandler.changeScene("Editor")

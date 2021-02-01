@@ -47,6 +47,21 @@ function modHandler.mountable(path)
     return false
 end
 
+function modHandler.getFilenameModName(filename)
+    local celesteDir = fileLocations.getCelesteDir()
+    local parts = utils.splitpath(filename)
+
+    for i = #parts, 1, -1 do
+        local testPath = utils.joinpath(unpack(parts, 1, i))
+
+        if utils.samePath(testPath, celesteDir) then
+            -- Go back up two steps to get mod name, this checks for Celeste root
+
+            return parts[i + 2]
+        end
+    end
+end
+
 function modHandler.mountMod(path, force)
     local loaded = modHandler.loadedMods[path]
 

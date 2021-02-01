@@ -1,5 +1,7 @@
 local utils = require("utils")
-local tasks = require("task")
+local configs = require("configs")
+local pluginLoader = require("plugin_loader")
+local modHandler = require("mods")
 
 local toolHandler = {}
 
@@ -25,7 +27,9 @@ function toolHandler.loadTool(filename)
     local handler = utils.rerequire(pathNoExt)
     local name = handler.name or filenameNoExt
 
-    print("! Loaded tool '" .. name ..  "'")
+    if configs.debug.logPluginLoading then
+        print("! Loaded tool '" .. name ..  "'")
+    end
 
     toolHandler.tools[name] = handler
 
@@ -131,14 +135,13 @@ end
 function toolHandler.loadInternalTools(path)
     path = path or "tools"
 
-    for i, file <- love.filesystem.getDirectoryItems(path) do
-        -- Always use Linux paths here
-        toolHandler.loadTool(utils.joinpath(path, file):gsub("\\", "/"))
+    pluginLoader.loadPlugins(path, nil, toolHandler.loadTool)
+end
 
-        tasks.yield()
-    end
+function toolHandler.loadExternalTools()
+    local filenames = modHandler.findPlugins("tools")
 
-    tasks.update(toolHandler.tools)
+    pluginLoader.loadPlugins(filenames, nil, toolHandler.loadTool)
 end
 
 return toolHandler

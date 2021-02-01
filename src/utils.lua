@@ -75,7 +75,7 @@ function utils.getFileHandle(path, mode, internal)
     end
 end
 
-function utils.readAll(path, mode, internal)
+local function readAll(path, mode, internal)
     local file = utils.getFileHandle(path, mode or "rb", internal)
 
     if file then
@@ -84,6 +84,16 @@ function utils.readAll(path, mode, internal)
         file:close()
 
         return res
+    end
+end
+
+function utils.readAll(path, mode, internal)
+    -- Try both if not specified
+    if internal == nil then
+        return readAll(path, mode, true) or readAll(path, mode, false)
+
+    else
+        return readAll(path, mode, internal)
     end
 end
 
