@@ -47,8 +47,9 @@ menubar.menubar = {
             {"Scenes", debugUtils.reloadScenes},
             {"Tools", debugUtils.reloadTools},
             {"Entities", debugUtils.reloadEntities},
-            {"Triggers"},
+            {"Triggers", debugUtils.reloadTriggers},
             {"Effects"},
+            {"User Interface", function() debugUtils.reloadUI() end}, -- debugUtils.reloadUI might change, call in function
             {"Language Files"}
         }},
         {"Redraw Map", debugUtils.redrawMap},
