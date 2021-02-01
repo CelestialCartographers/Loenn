@@ -135,6 +135,18 @@ function sceneHandler.addSceneFromFilename(fn)
     sceneHandler.addScene(handler)
 end
 
+function sceneHandler.clearLoadedScenes()
+    local scene = sceneHandler.getCurrentScene()
+
+    if scene then
+        scene:exit()
+        scene._firstEnter = nil
+    end
+
+    sceneHandler.currentScene = nil
+    sceneHandler.scenes = {}
+end
+
 function sceneHandler.loadInternalScenes(path)
     path = path or "scenes"
 

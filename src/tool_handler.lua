@@ -40,6 +40,12 @@ function toolHandler.loadTool(filename)
     return name
 end
 
+function toolHandler.unloadTools()
+    toolHandler.currentTool = nil
+    toolHandler.currentToolName = nil
+    toolHandler.tools = {}
+end
+
 local function getHandler(name)
     name = name or toolHandler.currentToolName
 
