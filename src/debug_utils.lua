@@ -1,4 +1,5 @@
 local entities = require("entities")
+local triggers = require("triggers")
 local celesteRender = require("celeste_render")
 local toolHandler = require("tool_handler")
 local sceneHandler = require("scene_handler")
@@ -17,6 +18,15 @@ function debugUtils.reloadEntities()
 
     entities.loadInternalEntities()
     entities.loadExternalEntities()
+end
+
+function debugUtils.reloadTriggers()
+    print("! Reloading triggers")
+
+    triggers.initDefaultRegistry()
+
+    triggers.loadInternalTriggers()
+    triggers.loadExternalTriggers()
 end
 
 function debugUtils.reloadTools()
@@ -60,6 +70,7 @@ function debugUtils.reloadEverything()
     print("! Reloading everything")
 
     debugUtils.reloadEntities()
+    debugUtils.reloadTriggers()
     debugUtils.reloadTools()
     debugUtils.reloadScenes()
     debugUtils.redrawMap()

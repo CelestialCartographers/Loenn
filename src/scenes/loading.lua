@@ -32,6 +32,7 @@ function loadingScene:firstEnter()
     local sceneHandler = require("scene_handler")
     local toolHandler = require("tool_handler")
     local entities = require("entities")
+    local triggers = require("triggers")
 
     local atlases = require("atlases")
 
@@ -51,6 +52,9 @@ function loadingScene:firstEnter()
 
             entities.loadInternalEntities()
             entities.loadExternalEntities()
+
+            triggers.loadInternalTriggers()
+            triggers.loadExternalTriggers()
 
             toolHandler.loadInternalTools()
             toolHandler.loadExternalTools()

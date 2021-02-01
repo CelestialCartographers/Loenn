@@ -235,7 +235,7 @@ local function guessPlacementType(name, handler, placement)
     return "point"
 end
 
-local function addPlacement(res, name, handler, placement)
+local function addPlacement(placement, res, name, handler)
     local placementType = placement.placementType or guessPlacementType(name, handler, placement)
     local itemTemplate = {
         _name = name,
@@ -268,14 +268,7 @@ function entities.getPlacements(layer)
             local placements = utils.callIfFunction(handler.placements)
 
             if placements then
-                if #placements > 0 then
-                    for _, placement in ipairs(placements) do
-                        addPlacement(res, name, handler, placement)
-                    end
-
-                else
-                    addPlacement(res, name, handler, placements)
-                end
+                utils.callIterateFirstIfTable(addPlacement, placements, res, name, handler)
             end
         end
     end
