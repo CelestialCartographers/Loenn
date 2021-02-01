@@ -1,4 +1,8 @@
 local utils = require("utils")
+local pluginLoader = require("plugin_loader")
+local modHandler = require("mods")
+local configs = require("configs")
+
 local drawing = require("drawing")
 local drawableFunction = require("structs.drawable_function")
 
@@ -9,8 +13,49 @@ local triggerFontSize = 1
 
 local triggers = {}
 
--- TODO - Add trigger registration
-triggers.registeredTriggers = {}
+triggers.registeredTriggers = nil
+
+-- Sets the registry to the given table (or empty one)
+function triggers.initDefaultRegistry(t)
+    triggers.registeredTriggers = t or {}
+end
+
+local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
+    local name = handler.name or filenameNoExt
+
+    registerAt[name] = handler
+
+    if verbose then
+        print("! Registered trigger '" .. name .. "' from '" .. filename .."'")
+    end
+end
+
+function triggers.registerTrigger(filename, registerAt, verbose)
+    -- Use verbose flag or default to logPluginLoading from config
+    verbose = verbose or verbose == nil and configs.debug.logPluginLoading
+    registerAt = registerAt or triggers.registeredTriggers
+
+    local pathNoExt = utils.stripExtension(filename)
+    local filenameNoExt = utils.filename(pathNoExt, "/")
+
+    local handler = utils.rerequire(pathNoExt)
+
+    utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
+end
+
+function triggers.loadtriggers(path, registerAt)
+    pluginLoader.loadPlugins(path, registerAt, triggers.registerTrigger)
+end
+
+function triggers.loadInternalTriggers(registerAt)
+    return triggers.loadtriggers("triggers", registerAt)
+end
+
+function triggers.loadExternalTriggers(registerAt)
+    local filenames = modHandler.findPlugins("triggers")
+
+    return triggers.loadtriggers(filenames, registerAt)
+end
 
 -- Returns drawable, depth
 function triggers.getDrawable(name, handler, room, trigger, viewport)
@@ -120,6 +165,58 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
+local function addPlacement(placement, res, name, handler)
+    local placementType = "rectangle"
+    local itemTemplate = {
+        _name = name,
+        _id = 0 --TODO
+    }
+
+    if placement.data then
+        for k, v in pairs(placement.data) do
+            itemTemplate[k] = v
+        end
+    end
+
+    itemTemplate.x = itemTemplate.x or 0
+    itemTemplate.y = itemTemplate.y or 0
+
+    itemTemplate.width = itemTemplate.width or 16
+    itemTemplate.height = itemTemplate.height or 16
+
+    table.insert(res, {
+        name = name,
+        displayName = placement.name,
+        layer = "triggers",
+        placementType = placementType,
+        itemTemplate = itemTemplate
+    })
+end
+
+function triggers.getPlacements(layer)
+    local res = {}
+
+    if triggers.registeredTriggers then
+        for name, handler in pairs(triggers.registeredTriggers) do
+            local placements = utils.callIfFunction(handler.placements)
+
+            if placements then
+                utils.callIterateFirstIfTable(addPlacement, placements, res, name, handler)
+            end
+        end
+    end
+
+    return res
+end
+
+function triggers.placeItem(room, layer, item)
+    local items = triggers.getRoomItems(room, layer)
+
+    table.insert(items, item)
+
+    return true
+end
+
 function triggers.canResize(room, layer, trigger)
     return true, true
 end
@@ -139,5 +236,7 @@ function triggers.nodeLimits(room, layer, trigger)
         return 0, 0
     end
 end
+
+triggers.initDefaultRegistry()
 
 return triggers

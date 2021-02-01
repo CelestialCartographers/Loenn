@@ -1,4 +1,5 @@
 local entities = require("entities")
+local triggers = require("triggers")
 local celesteRender = require("celeste_render")
 local toolHandler = require("tool_handler")
 local sceneHandler = require("scene_handler")
@@ -10,21 +11,31 @@ local origYield = coroutine.yield
 
 local debugUtils = {}
 
--- TODO - Reload external entities when supported in entities.lua
 function debugUtils.reloadEntities()
     print("! Reloading entities")
 
     entities.initDefaultRegistry()
+
     entities.loadInternalEntities()
+    entities.loadExternalEntities()
+end
+
+function debugUtils.reloadTriggers()
+    print("! Reloading triggers")
+
+    triggers.initDefaultRegistry()
+
+    triggers.loadInternalTriggers()
+    triggers.loadExternalTriggers()
 end
 
 function debugUtils.reloadTools()
     print("! Reloading tools")
 
-    toolHandler.currentTool = nil
-    toolHandler.currentToolName = nil
+    toolHandler.unloadTools()
 
     toolHandler.loadInternalTools()
+    toolHandler.loadExternalTools()
 end
 
 function debugUtils.reloadScenes()
@@ -32,14 +43,19 @@ function debugUtils.reloadScenes()
 
     local scene = sceneHandler.getCurrentScene()
 
+    sceneHandler.clearLoadedScenes()
+
     sceneHandler.loadInternalScenes()
+    sceneHandler.loadExternalScenes()
 
     if scene then
-        sceneHandler.currentScene = nil
-        scene:exit()
-        scene._firstEnter = nil
         sceneHandler.changeScene(scene.name)
     end
+end
+
+function debugUtils.reloadUI()
+    -- Unimplemented
+    -- UI branch can choose to change this function
 end
 
 function debugUtils.redrawMap()
@@ -54,9 +70,11 @@ function debugUtils.reloadEverything()
     print("! Reloading everything")
 
     debugUtils.reloadEntities()
+    debugUtils.reloadTriggers()
     debugUtils.reloadTools()
     debugUtils.reloadScenes()
     debugUtils.redrawMap()
+    debugUtils.reloadUI()
 end
 
 function debugUtils.debug()

@@ -8,10 +8,27 @@ local atlases = {}
 local celesteAtlasRelativePath = utils.joinpath("Content", "Graphics", "Atlases")
 local gameplayMeta = "Gameplay.meta"
 
+local function addAtlasMetatable(name)
+    local atlas = atlases[name] or {}
+    local atlasMt = {
+        __index = function(self, key)
+            return atlases.getResource(key, name)
+        end
+    }
+
+    atlases[name] = setmetatable(atlas, atlasMt)
+end
+
+function atlases.loadCelesteAtlas(name, meta, path)
+    atlases[name] = spriteLoader.getCacheOrLoadSpriteAtlas(meta, path)
+
+    addAtlasMetatable(name)
+end
+
 function atlases.loadCelesteAtlases()
     local celesteAtlasPath = utils.joinpath(fileLocations.getCelesteDir(), celesteAtlasRelativePath)
 
-    atlases["gameplay"] = spriteLoader.getCacheOrLoadSpriteAtlas(gameplayMeta, celesteAtlasPath)
+    atlases.loadCelesteAtlas("gameplay", gameplayMeta, celesteAtlasPath)
 end
 
 -- Remove everything until after the atlas name
@@ -50,17 +67,21 @@ function atlases.getResource(resource, name)
     name = name or "gameplay"
 
     if not atlases[name] then
-        atlases[name] = {}
+        atlases.createAtlas(name)
     end
 
-    if not atlases[name][resource] then
+    local targetResource = rawget(atlases[name], resource)
+
+    if not targetResource then
         local filename = modHandler.commonModContent .. "/Graphics/Atlases/" .. name .. "/" .. resource .. ".png"
         local sprite = spriteLoader.loadExternalSprite(filename)
 
         atlases[name][resource] = sprite
+
+        return sprite
     end
 
-    return atlases[name][resource]
+    return targetResource
 end
 
 function atlases.loadExternalAtlases()

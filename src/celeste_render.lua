@@ -235,7 +235,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     local quadX, quadY = quad[1], quad[2]
 
     if not quadCache:get0(quadX, quadY) then
-        local spriteMeta = atlases.getResource(texture, "gameplay")
+        local spriteMeta = atlases.gameplay[texture]
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions()
         local res = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
@@ -310,7 +310,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
                         local randQuad = quads[utils.mod1(rng, quadCount)]
                         local texture = meta.paths[tile] or emptyTile
 
-                        local spriteMeta = atlases.getResource(texture, "gameplay")
+                        local spriteMeta = atlases.gameplay[texture]
 
                         if spriteMeta then
                             local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)

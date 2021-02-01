@@ -40,7 +40,7 @@ function decals.getDecalNames(removeFrames)
 end
 
 function decals.getDrawable(texture, handler, room, decal, viewport)
-    local meta = atlases.getResource(texture, "gameplay")
+    local meta = atlases.gameplay[texture]
 
     local x = decal.x or 0
     local y = decal.y or 0
