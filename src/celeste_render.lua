@@ -1,5 +1,4 @@
 local autotiler = require("autotiler")
-local spriteLoader = require("sprite_loader")
 local drawing = require("drawing")
 local fileLocations = require("file_locations")
 local colors = require("colors")
@@ -7,13 +6,11 @@ local tasks = require("task")
 local utils = require("utils")
 local atlases = require("atlases")
 local smartDrawingBatch = require("structs.smart_drawing_batch")
-local drawableSprite = require("structs.drawable_sprite")
-local drawableFunction = require("structs.drawable_function")
-local drawableRectangle = require("structs.drawable_rectangle")
 local viewportHandler = require("viewport_handler")
 local matrix = require("matrix")
 local configs = require("configs")
 local bit = require("bit")
+local modHandler = require("mods")
 
 local entityHandler = require("entities")
 local triggerHandler = require("triggers")
@@ -24,8 +21,11 @@ local celesteRender = {}
 local tilesetFileFg = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Graphics", "ForegroundTiles.xml")
 local tilesetFileBg = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Graphics", "BackgroundTiles.xml")
 
-celesteRender.tilesMetaFg = autotiler.loadTilesetXML(tilesetFileFg)
-celesteRender.tilesMetaBg = autotiler.loadTilesetXML(tilesetFileBg)
+celesteRender.tilesMetaFgVanilla = autotiler.loadTilesetXML(tilesetFileFg)
+celesteRender.tilesMetaBgVanilla = autotiler.loadTilesetXML(tilesetFileBg)
+
+celesteRender.tilesMetaFg = celesteRender.tilesMetaFgVanilla
+celesteRender.tilesMetaBg = celesteRender.tilesMetaBgVanilla
 
 celesteRender.tilesSpriteMetaCache = {}
 
@@ -47,6 +47,42 @@ local roomCache = {}
 local roomRandomMatrixCache = {}
 
 local batchingTasks = {}
+
+local function loadCustomAutotiler(filename)
+    if filename then
+        local commonFilename = modHandler.commonModContent .. "/" .. filename
+        local loaded, tilesMeta = pcall(autotiler.loadTilesetXML, commonFilename)
+
+        return loaded, tilesMeta
+    end
+end
+
+function celesteRender.loadCustomTilesetAutotiler(state)
+    celesteRender.tilesMetaFg = celesteRender.tilesMetaFgVanilla
+    celesteRender.tilesMetaBg = celesteRender.tilesMetaBgVanilla
+
+    if state and state.side and state.side.meta then
+        local pathFg = state.side.meta.ForegroundTiles
+        local pathBg = state.side.meta.BackgroundTiles
+
+        local loadedFg, tilesMetaFg = loadCustomAutotiler(pathFg)
+        local loadedBg, tilesMetaBg = loadCustomAutotiler(pathBg)
+
+        if loadedFg then
+            celesteRender.tilesMetaFg = tilesMetaFg
+
+        else
+            print("Loading custom foreground tile XML failed: ", tilesMetaFg)
+        end
+
+        if loadedBg then
+            celesteRender.tilesMetaBg = tilesMetaBg
+
+        else
+            print("Loading custom background tile XML failed: ", tilesMetaBg)
+        end
+    end
+end
 
 function celesteRender.sortBatchingTasks(state, tasks)
     local visibleTasks = {}
@@ -199,7 +235,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     local quadX, quadY = quad[1], quad[2]
 
     if not quadCache:get0(quadX, quadY) then
-        local spriteMeta = atlases.gameplay[texture]
+        local spriteMeta = atlases.getResource(texture, "gameplay")
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions()
         local res = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
@@ -235,7 +271,6 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
     local tilesMatrix = tiles.matrix
 
     -- Getting upvalues
-    local gameplayAtlas = atlases.gameplay
     local cache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = meta
@@ -275,7 +310,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
                         local randQuad = quads[utils.mod1(rng, quadCount)]
                         local texture = meta.paths[tile] or emptyTile
 
-                        local spriteMeta = atlases.gameplay[texture]
+                        local spriteMeta = atlases.getResource(texture, "gameplay")
 
                         if spriteMeta then
                             local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)

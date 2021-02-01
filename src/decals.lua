@@ -21,6 +21,8 @@ local function keepFrame(name)
     return true
 end
 
+-- TODO - Support custom decals here
+-- Might not be in atlases.gameplay because of lazy loading
 function decals.getDecalNames(removeFrames)
     removeFrames = removeFrames == nil or removeFrames
 
@@ -38,7 +40,7 @@ function decals.getDecalNames(removeFrames)
 end
 
 function decals.getDrawable(texture, handler, room, decal, viewport)
-    local meta = atlases.gameplay[texture]
+    local meta = atlases.getResource(texture, "gameplay")
 
     local x = decal.x or 0
     local y = decal.y or 0
