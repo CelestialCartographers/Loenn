@@ -57,8 +57,6 @@ local function placeItemWithHistory(room)
         placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
     end, room, tool.layer, "Placement")
 
-    print(snapshot)
-
     history.addSnapshot(snapshot)
 end
 
