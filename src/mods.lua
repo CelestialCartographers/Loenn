@@ -14,7 +14,7 @@ modHandler.pluginFolderNames = {
 
 modHandler.loadedMods = {}
 
-function modHandler.findPlugins(pluginType)
+function modHandler.findFiletype(startFolder, filetype)
     local filenames = {}
 
     for _, folderName in ipairs(modHandler.pluginFolderNames) do
@@ -22,16 +22,26 @@ function modHandler.findPlugins(pluginType)
             local path = utils.convertToUnixPath(utils.joinpath(
                 string.format(modHandler.specificModContent, modFolderName),
                 folderName,
-                pluginType
+                startFolder
             ))
 
             utils.getFilenames(path, true, filenames, function(filename)
-                return utils.fileExtension(filename) == "lua"
+                return utils.fileExtension(filename) == filetype
             end)
         end
     end
 
     return filenames
+end
+
+function modHandler.findPlugins(pluginType)
+    return modHandler.findFiletype(pluginType, "lua")
+end
+
+function modHandler.findLanguageFiles(startPath)
+    startPath = startPath or "lang"
+
+    return modHandler.findFiletype(startPath, "lang")
 end
 
 function modHandler.mountable(path)

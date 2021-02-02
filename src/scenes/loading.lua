@@ -1,5 +1,6 @@
 local fonts = require("fonts")
 local utils = require("utils")
+local languageRegistry = require("language_registry")
 
 local loadingScene = {}
 
@@ -42,6 +43,11 @@ function loadingScene:firstEnter()
     local fileLocations = require("file_locations")
     local viewerState = require("loaded_state")
 
+    -- Load internal language first
+    -- External language files aren't needed during loading
+    languageRegistry.loadInternalFiles()
+    languageRegistry.setLanguage(configs.general.language)
+
     -- Load assets and entity, trigger, effect etc modules
     tasks.newTask(
         function()
@@ -58,6 +64,8 @@ function loadingScene:firstEnter()
 
             toolHandler.loadInternalTools()
             toolHandler.loadExternalTools()
+
+            languageRegistry.loadExternalFiles()
 
             atlases.loadCelesteAtlases()
 
