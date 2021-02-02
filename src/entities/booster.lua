@@ -3,13 +3,13 @@ local booster = {}
 booster.depth = -8500
 booster.placements = {
     {
-        name = "Booster (Green)",
+        name = "green",
         data = {
             red = false
         }
     },
     {
-        name = "Booster (Red)",
+        name = "red",
         data = {
             red = true
         }

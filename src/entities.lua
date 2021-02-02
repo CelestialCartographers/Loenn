@@ -3,6 +3,8 @@ local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
 
+local languageRegistry = require("language_registry")
+
 local drawableSprite = require("structs.drawable_sprite")
 local drawableFunction = require("structs.drawable_function")
 local drawableRectangle = require("structs.drawable_rectangle")
@@ -154,8 +156,10 @@ function entities.moveSelection(room, layer, selection, x, y)
             local nodes = entity.nodes
 
             if nodes and node <= #nodes then
-                nodes[node][1] += x
-                nodes[node][2] += y
+                local target = nodes[node]
+
+                target.x += x
+                target.y += y
             end
         end
     end
@@ -235,8 +239,15 @@ local function guessPlacementType(name, handler, placement)
     return "point"
 end
 
-local function addPlacement(placement, res, name, handler)
+local function addPlacement(placement, res, name, handler, language)
     local placementType = placement.placementType or guessPlacementType(name, handler, placement)
+    local displayName = placement.name
+    local displayNameLanguage = language.entities[name].placements[placement.name]
+
+    if displayNameLanguage._exists then
+        displayName = tostring(displayNameLanguage)
+    end
+
     local itemTemplate = {
         _name = name,
         _id = 0 --TODO
@@ -253,7 +264,7 @@ local function addPlacement(placement, res, name, handler)
 
     table.insert(res, {
         name = name,
-        displayName = placement.name,
+        displayName = displayName,
         layer = "entities",
         placementType = placementType,
         itemTemplate = itemTemplate
@@ -262,13 +273,14 @@ end
 
 function entities.getPlacements(layer)
     local res = {}
+    local language = languageRegistry.getLanguage()
 
     if entities.registeredEntities then
         for name, handler in pairs(entities.registeredEntities) do
             local placements = utils.callIfFunction(handler.placements)
 
             if placements then
-                utils.callIterateFirstIfTable(addPlacement, placements, res, name, handler)
+                utils.callIterateFirstIfTable(addPlacement, placements, res, name, handler, language)
             end
         end
     end

@@ -10,7 +10,7 @@ door.placements = {}
 
 for i, texture in ipairs(textures) do
     door.placements[i] = {
-        name = string.format("Door (%s)", utils.humanizeVariableName(texture)),
+        name = texture,
         data = {
             ["type"] = texture
         }

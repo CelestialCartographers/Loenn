@@ -54,11 +54,11 @@ function wire.nodeLimits(room, entity)
 end
 
 wire.placements = {
-    name = "Wire",
+    name = "wire",
     data = {
         above = false,
         color = "595866",
-        nodes = {{0, 0}}
+        nodes = {{x = 0, y = 0}}
     }
 }
 

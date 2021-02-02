@@ -12,7 +12,7 @@ local colors = {
 
 flutterbird.depth = -9999
 flutterbird.placements = {
-    name = "Flutterbird"
+    name = "normal"
 }
 
 local texture = "scenery/flutterbird/idle00"

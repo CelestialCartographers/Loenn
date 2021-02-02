@@ -5,14 +5,14 @@ local cloud = {}
 cloud.depth = 0
 cloud.placements = {
     {
-        name = "Cloud (Normal)",
+        name = "normal",
         data = {
             fragile = false,
             small = false
         }
     },
     {
-        name = "Cloud (Fragile)",
+        name = "fragile",
         data = {
             fragile = true,
             small = false

@@ -6,8 +6,22 @@ local commentPrefix = "^#"
 local assignment = "="
 local separator = "."
 
+local nil_lang = {
+    _exists = false
+}
+
+setmetatable(nil_lang, {
+    __tostring = (l -> "%unknown%"),
+    __index = function(l, i)
+        return nil_lang
+    end
+})
+
 local lang_mt = {
-    __tostring = (l -> l._value)
+    __tostring = (l -> l._value),
+    __index = function(l, i)
+        return nil_lang[i]
+    end
 }
 
 function lang.parse(str, languageData)
@@ -20,7 +34,7 @@ function lang.parse(str, languageData)
             if #key > 0 and #value > 0 then
                 local target = res
                 for _, part <- key:split(separator, nil, false) do
-                    target[part] = target[part] or setmetatable({}, lang_mt)
+                    target[part] = rawget(target, part) or setmetatable({_exists = true}, lang_mt)
                     target = target[part]
                 end
 

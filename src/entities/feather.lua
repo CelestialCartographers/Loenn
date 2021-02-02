@@ -5,7 +5,7 @@ local feather = {}
 feather.name = "infiniteStar"
 feather.depth = 0
 feather.placements = {
-    name = "Feather"
+    name = "normal"
 }
 
 function feather.draw(room, entity, viewport)

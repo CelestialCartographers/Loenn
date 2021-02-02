@@ -24,7 +24,7 @@ jumpthru.placements = {}
 
 for i, texture in ipairs(textures) do
     jumpthru.placements[i] = {
-        name = string.format("Jumpthru (%s)", utils.humanizeVariableName(texture)),
+        name = texture,
         data = {
             width = 8,
             texture = texture
