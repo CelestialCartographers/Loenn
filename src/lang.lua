@@ -28,7 +28,7 @@ function lang.parse(str, languageData)
             if #key > 0 and #value > 0 then
                 local target = res
                 for _, part <- key:split(separator, nil, false) do
-                    target[part] = target[part] or setmetatable({}, lang_mt)
+                    target[part] = rawget(target, part) or setmetatable({}, lang_mt)
                     target = target[part]
                 end
 
