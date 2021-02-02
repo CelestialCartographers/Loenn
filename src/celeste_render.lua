@@ -49,7 +49,7 @@ local roomRandomMatrixCache = {}
 local batchingTasks = {}
 
 local function loadCustomAutotiler(filename)
-    if filename then
+    if filename and filename ~= ""  then
         local commonFilename = modHandler.commonModContent .. "/" .. filename
         local loaded, tilesMeta = pcall(autotiler.loadTilesetXML, commonFilename)
 
@@ -72,14 +72,18 @@ function celesteRender.loadCustomTilesetAutotiler(state)
             celesteRender.tilesMetaFg = tilesMetaFg
 
         else
-            print("Loading custom foreground tile XML failed: ", tilesMetaFg)
+            if tilesMetaFg then
+                print("Loading custom foreground tile XML failed: ", tilesMetaFg)
+            end
         end
 
         if loadedBg then
             celesteRender.tilesMetaBg = tilesMetaBg
 
         else
-            print("Loading custom background tile XML failed: ", tilesMetaBg)
+            if tilesMetaBg then
+                print("Loading custom background tile XML failed: ", tilesMetaBg)
+            end
         end
     end
 end
