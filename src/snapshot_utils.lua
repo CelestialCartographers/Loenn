@@ -40,11 +40,11 @@ function snapshotUtils.roomLayerSnapshot(callback, room, layer, description)
     local targetItems = handler.getRoomItems(room, layer)
     local targetsBefore = utils.deepcopy(targetItems)
 
-    callback()
+    local res = {callback()}
 
     local targetsAfter = utils.deepcopy(targetItems)
 
-    return getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter)
+    return getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter), unpack(res)
 end
 
 return snapshotUtils
