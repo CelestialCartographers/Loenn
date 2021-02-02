@@ -4,7 +4,7 @@ local bonfire = {}
 
 bonfire.depth = -5
 bonfire.placements = {
-    name = "Bonfire"
+    name = "bonfire"
 }
 
 local function getTexture(entity)

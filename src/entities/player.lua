@@ -4,7 +4,7 @@ local player = {}
 
 player.depth = 0
 player.placements = {
-    name = "Player"
+    name = "player"
 }
 
 local texture = "characters/player/sitDown00"

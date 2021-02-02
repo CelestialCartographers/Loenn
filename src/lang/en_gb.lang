@@ -6,7 +6,7 @@
 scenes.loading.loading=Loading
 
 
-# -- Entities -- 
+# -- Entities --
 # entities.entityName.placements.*
 # entities.entityName.tooltips.*
 
@@ -14,11 +14,50 @@ scenes.loading.loading=Loading
 entities.refill.placements.one_dash=Refill
 entities.refill.placements.two_dashes=Refill (Two Dashes)
 
+# Bonfire
+entities.bonfire.placements.bonfire=Bonfire
+
+# Booster
+entities.booster.placements.green=Booster (Green)
+entities.booster.placements.red=Booster (Red)
+
+# Cloud
+entities.cloud.placements.normal=Cloud
+entities.cloud.placements.fragile=Cloud (Fragile)
+
+# Door
+entities.door.placements.wood=Door (Wood)
+entities.door.placements.metal=Door (Metal)
+
+# Dream Mirror
+entities.dreammirror.placements.normal=Dream Mirror
+
+# Feather
+entities.infiniteStar.placements.normal=Feather
+
+# Flutterbird
+entities.flutterbird.placements.normal=Flutterbird
+
+# Jumpthru
+entities.jumpThru.placements.wood=Jump Through (Wood)
+entities.jumpThru.placements.dream=Jump Through (Dream)
+entities.jumpThru.placements.temple=Jump Through (Temple)
+entities.jumpThru.placements.templeB=Jump Through (Temple B)
+entities.jumpThru.placements.cliffside=Jump Through (Cliffside)
+entities.jumpThru.placements.reflection=Jump Through (Reflection)
+entities.jumpThru.placements.core=Jump Through (Core)
+
+# Player
+entities.player.placements.player=Player
+
+# Wire
+entities.wire.placements.wire=Wire
+
 
 # -- Triggers --
 # triggers.triggerName.placements.*
 # triggers.triggerName.tooltips.*
 
-# Refill
+# No Refill
 triggers.noRefillTrigger.placements.enable_refills=Refills (Enable)
 triggers.noRefillTrigger.placements.disable_refills=Refills (Disable)
