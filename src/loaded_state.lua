@@ -6,6 +6,7 @@ local sceneHandler = require("scene_handler")
 local filesystem = require("filesystem")
 local fileLocations = require("file_locations")
 local utils = require("utils")
+local history = require("history")
 
 local sideStruct = require("structs.side")
 
@@ -35,6 +36,8 @@ function state.loadFile(filename)
                         state.map = state.side.map
 
                         celesteRender.loadCustomTilesetAutotiler(state)
+
+                        history.reset()
 
                         state.selectItem(state.map and state.map.rooms[1])
 
@@ -114,6 +117,17 @@ function state.saveCurrentMap()
 
         else
             state.saveAsCurrentMap()
+        end
+    end
+end
+
+function state.getRoomByName(name)
+    local rooms = state.map and state.map.rooms or {}
+    local nameWithLvl = "lvl_" .. name
+
+    for _,room in ipairs(rooms) do
+        if room.name == name or room.name == nameWithLvl then
+            return room
         end
     end
 end

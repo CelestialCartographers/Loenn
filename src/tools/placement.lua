@@ -6,6 +6,8 @@ local keyboardHelper = require("keyboard_helper")
 local configs = require("configs")
 local utils = require("utils")
 local toolUtils = require("tool_utils")
+local history = require("history")
+local snapshot = require("structs.snapshot")
 
 local tool = {}
 
@@ -50,6 +52,47 @@ local function getCursorGridPosition(x, y)
     end
 end
 
+local function addSnapshot(room, description, itemsBefore, itemsAfter)
+    local function forward(data)
+        local targetRoom = state.getRoomByName(data.room)
+
+        if targetRoom then
+            targetRoom[data.layer] = utils.deepcopy(itemsAfter)
+
+            toolUtils.redrawTargetLayer(targetRoom, data.layer)
+        end
+    end
+
+    local function backward(data)
+        local targetRoom = state.getRoomByName(data.room)
+
+        if targetRoom then
+            targetRoom[data.layer] = utils.deepcopy(itemsBefore)
+
+            toolUtils.redrawTargetLayer(targetRoom, data.layer)
+        end
+    end
+
+    local data = {
+        room = room.name,
+        layer = tool.layer
+    }
+
+    history.addSnapshot(snapshot.create(description, data, backward, forward))
+end
+
+local function placeItemWithHistory(room)
+    local handler = layerHandlers.getHandler(tool.layer)
+    local targetItems = handler.getRoomItems(room, tool.layer)
+    local targetsBefore = utils.deepcopy(targetItems)
+
+    placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+
+    local targetsAfter = utils.deepcopy(targetItems)
+
+    addSnapshot(room, "Placement", targetsBefore, targetsAfter)
+end
+
 local function dragStarted(x, y)
     x, y = getCursorGridPosition(x, y)
 
@@ -77,7 +120,7 @@ local function dragFinished()
     local placementType = getCurrentPlacementType()
 
     if placementType == "rectangle" or placementType == "line" then
-        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+        placeItemWithHistory(room)
         toolUtils.redrawTargetLayer(room, tool.layer)
     end
 
@@ -94,7 +137,7 @@ local function placePointPlacement()
     local placementType = getCurrentPlacementType()
 
     if placementType == "point" then
-        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+        placeItemWithHistory(room)
         toolUtils.redrawTargetLayer(room, tool.layer)
     end
 end
