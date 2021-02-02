@@ -188,8 +188,8 @@ local function updateLinePlacement(template, item, itemX, itemY)
             item.x = itemX
             item.y = itemY
 
-            node[1] = itemX + 8
-            node[2] = itemY + 8
+            node.x = itemX + 8
+            node.y = itemY + 8
 
             return true
         end
@@ -197,9 +197,9 @@ local function updateLinePlacement(template, item, itemX, itemY)
     else
         local stopX, stopY = getCursorGridPosition(placementCurrentX, placementCurrentY)
 
-        if stopX ~= node[1] or stopY ~= node[2] then
-            node[1] = stopX
-            node[2] = stopY
+        if stopX ~= node.x or stopY ~= node.y then
+            node.x = stopX
+            node.y = stopY
 
             return true
         end

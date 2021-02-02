@@ -19,8 +19,10 @@ function wire.draw(room, entity)
         end
     end
 
+    local firstNode = entity.nodes[1]
+
     local start = {entity.x, entity.y}
-    local stop = entity.nodes[1]
+    local stop = {firstNode.x, firstNode.y}
     local control = {
         (start[1] + stop[1]) / 2,
         (start[2] + stop[2]) / 2 + 24
@@ -40,7 +42,7 @@ function wire.selection(room, entity)
 
     if entity.nodes then
         for i, node in ipairs(entity.nodes) do
-            nodes[i] = utils.rectangle(node[1] - 2, node[2] - 2, 5, 5)
+            nodes[i] = utils.rectangle(node.x - 2, node.y - 2, 5, 5)
         end
     end
 
