@@ -61,3 +61,8 @@ entities.wire.placements.wire=Wire
 # No Refill
 triggers.noRefillTrigger.placements.enable_refills=Refills (Enable)
 triggers.noRefillTrigger.placements.disable_refills=Refills (Disable)
+
+
+# -- Mod Information --
+# mods.modName.*
+mods.everest.name=Everest
