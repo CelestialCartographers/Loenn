@@ -10,12 +10,16 @@ local nil_lang = {}
 
 setmetatable(nil_lang, {
     __tostring = (l -> "%unknown%"),
-    __index = (l, i -> nil_lang)
+    __index = function(l, i)
+        return nil_lang
+    end
 })
 
 local lang_mt = {
     __tostring = (l -> l._value),
-    __index = (l, i -> nil_lang[i])
+    __index = function(l, i)
+        return nil_lang[i]
+    end
 }
 
 function lang.parse(str, languageData)
