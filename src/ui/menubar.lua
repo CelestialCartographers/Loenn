@@ -50,7 +50,7 @@ menubar.menubar = {
             {"Triggers", debugUtils.reloadTriggers},
             {"Effects"},
             {"User Interface", function() debugUtils.reloadUI() end}, -- debugUtils.reloadUI might change, call in function
-            {"Language Files"}
+            {"Language Files", debugUtils.reloadLanguageFiles}
         }},
         {"Redraw Map", debugUtils.redrawMap},
         {"Test Console", debugUtils.debug}
