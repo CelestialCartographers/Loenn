@@ -166,7 +166,7 @@ triggers.respawnTargetTrigger.placements.respawn_target=Respawn Target
 triggers.rumbleTrigger.placements.rumble=Rumble
 
 # Spawn Facing
-triggers.spawnFacingTrigger.placements.alt_music=Spawn Facing
+triggers.spawnFacingTrigger.placements.spawn_facing=Spawn Facing
 
 # Stop Boost
 triggers.stopBoostTrigger.placements.stop_boost=Stop Boost

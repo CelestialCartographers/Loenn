@@ -4,7 +4,7 @@ local spawnFacing = {}
 
 spawnFacing.name = "spawnFacingTrigger"
 spawnFacing.placements = {
-    name = "alt_music",
+    name = "spawn_facing",
     data = {
         facing = "Right"
     }
