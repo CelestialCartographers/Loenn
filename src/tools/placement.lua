@@ -7,7 +7,7 @@ local configs = require("configs")
 local utils = require("utils")
 local toolUtils = require("tool_utils")
 local history = require("history")
-local snapshot = require("structs.snapshot")
+local snapshotUtils = require("snapshot_utils")
 
 local tool = {}
 
@@ -52,45 +52,14 @@ local function getCursorGridPosition(x, y)
     end
 end
 
-local function addSnapshot(room, description, itemsBefore, itemsAfter)
-    local function forward(data)
-        local targetRoom = state.getRoomByName(data.room)
-
-        if targetRoom then
-            targetRoom[data.layer] = utils.deepcopy(itemsAfter)
-
-            toolUtils.redrawTargetLayer(targetRoom, data.layer)
-        end
-    end
-
-    local function backward(data)
-        local targetRoom = state.getRoomByName(data.room)
-
-        if targetRoom then
-            targetRoom[data.layer] = utils.deepcopy(itemsBefore)
-
-            toolUtils.redrawTargetLayer(targetRoom, data.layer)
-        end
-    end
-
-    local data = {
-        room = room.name,
-        layer = tool.layer
-    }
-
-    history.addSnapshot(snapshot.create(description, data, backward, forward))
-end
-
 local function placeItemWithHistory(room)
-    local handler = layerHandlers.getHandler(tool.layer)
-    local targetItems = handler.getRoomItems(room, tool.layer)
-    local targetsBefore = utils.deepcopy(targetItems)
+    local snapshot = snapshotUtils.roomLayerSnapshot(function()
+        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+    end, room, tool.layer, "Placement")
 
-    placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+    print(snapshot)
 
-    local targetsAfter = utils.deepcopy(targetItems)
-
-    addSnapshot(room, "Placement", targetsBefore, targetsAfter)
+    history.addSnapshot(snapshot)
 end
 
 local function dragStarted(x, y)
