@@ -1,13 +1,23 @@
--- TODO - Implement redo/undo
+local timeline = require("structs.timeline")
 
 local history = {}
 
+history.timeline = timeline.create()
+
+function history.reset()
+    history.timeline = timeline.create()
+end
+
 function history.undo()
-    print("UNDO")
+    history.timeline:backward()
 end
 
 function history.redo()
-    print("REDO")
+    history.timeline:forward()
+end
+
+function history.addSnapshot(snapshot)
+    history.timeline:addSnapshot(snapshot)
 end
 
 return history

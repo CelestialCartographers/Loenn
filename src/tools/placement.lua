@@ -6,6 +6,8 @@ local keyboardHelper = require("keyboard_helper")
 local configs = require("configs")
 local utils = require("utils")
 local toolUtils = require("tool_utils")
+local history = require("history")
+local snapshotUtils = require("snapshot_utils")
 
 local tool = {}
 
@@ -50,6 +52,16 @@ local function getCursorGridPosition(x, y)
     end
 end
 
+local function placeItemWithHistory(room)
+    local snapshot = snapshotUtils.roomLayerSnapshot(function()
+        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+    end, room, tool.layer, "Placement")
+
+    print(snapshot)
+
+    history.addSnapshot(snapshot)
+end
+
 local function dragStarted(x, y)
     x, y = getCursorGridPosition(x, y)
 
@@ -77,7 +89,7 @@ local function dragFinished()
     local placementType = getCurrentPlacementType()
 
     if placementType == "rectangle" or placementType == "line" then
-        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+        placeItemWithHistory(room)
         toolUtils.redrawTargetLayer(room, tool.layer)
     end
 
@@ -94,7 +106,7 @@ local function placePointPlacement()
     local placementType = getCurrentPlacementType()
 
     if placementType == "point" then
-        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+        placeItemWithHistory(room)
         toolUtils.redrawTargetLayer(room, tool.layer)
     end
 end
