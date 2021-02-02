@@ -58,9 +58,125 @@ entities.wire.placements.wire=Wire
 # triggers.triggerName.placements.*
 # triggers.triggerName.tooltips.*
 
+# Alt Music
+triggers.altMusicTrigger.placements.alt_music=Alt Music
+
+# Ambience Param
+triggers.ambienceParamTrigger.placements.ambience_param=Ambience Param
+
+# Bird Path
+triggers.birdPathTrigger.placements.bird_path=Bird Path
+
+# Black Hole Strength
+triggers.blackholeStrength.placements.black_hole_strength=Black Hole Strength
+
+# Bloom Fade
+triggers.bloomFadeTrigger.placements.bloom_fade=Bloom Fade
+
+# Camera Advance Target
+triggers.cameraAdvanceTargetTrigger.placements.camera_advance_target=Camera Advance Target
+
+# Camera Offset
+triggers.cameraOffsetTrigger.placements.camera_offset=Camera Offset
+
+# Camera Target
+triggers.cameraTargetTrigger.placements.camera_target=Camera Target
+
+# Change Respawn
+triggers.changeRespawnTrigger.placements.change_respawn=Change Respawn
+
+# Checkpoint Blocker
+triggers.checkpointBlockerTrigger.placements.checkpoint_blocker=Checkpoint Blocker
+
+# Credits
+triggers.creditsTrigger.placements.credits=Credits
+
+# Detach Followers
+triggers.detachFollowersTrigger.placements.detach_followers=Detach Followers
+
+# Event
+triggers.eventTrigger.placements.event=Event
+
+# Activate Space Jams (Everest)
+triggers.everest/activateDreamBlocksTrigger.placements.activate_dream_blocks=Activate Space Jams
+
+# Change Inventory (Everest)
+triggers.everest/changeInventoryTrigger.placements.change_inventory=Change Inventory
+
+# Complete Area (Everest)
+triggers.everest/completeAreaTrigger.placements.complete_area=Complete Area
+
+# Core Mode (Everest)
+triggers.everest/coreModeTrigger.placements.core_mode=Core Mode
+
+# Crystal Shatter (Everest)
+triggers.everest/crystalShatterTrigger.placements.crystal_shatter=Crystal Shatter
+
+# Custom Bird Tutorial (Everest)
+triggers.everest/customBirdTutorialTrigger.placements.custom_bird_tutorial=Custom Bird Tutorial
+
+# Dialog Cutscene (Everest)
+triggers.everest/dialogTrigger.placements.dialog=Dialog Cutscene
+
+# Flag (Everest)
+triggers.everest/flagTrigger.placements.flag=Flag
+
+# Lava Blocker (Everest)
+triggers.everest/lavaBlockerTrigger.placements.lava_blocker=Lava Blocker
+
+# Music Layer (Everest)
+triggers.everest/musicLayerTrigger.placements.music_layer=Music Layer
+
+# Smooth Camera Offset (Everest)
+triggers.everest/smoothCameraOffsetTrigger.placements.smooth_camera=Smooth Camera Offset
+
+# Golden Berry Collection
+triggers.goldenBerryCollectTrigger.placements.golden_berry_collection=Golden Berry Collection
+
+# Light Fade
+triggers.lightFadeTrigger.placements.light_fade=Light Fade
+
+# Lookout Blocker
+triggers.lookoutBlocker.placements.lookout_blocker=Lookout Blocker
+
+# Mini Textbox
+triggers.minitextboxTrigger.placements.mini_text_box=Mini Textbox
+
+# Moon Glitch Background
+triggers.moonGlitchBackgroundTrigger.placements.moon_glitch_background=Moon Glitch Background
+
+# Music
+triggers.musicFadeTrigger.placements.music_fade=Music
+
+# Music Fade
+triggers.musicTrigger.placements.music=Music Fade
+
 # No Refill
 triggers.noRefillTrigger.placements.enable_refills=Refills (Enable)
 triggers.noRefillTrigger.placements.disable_refills=Refills (Disable)
+
+# Oshiro
+triggers.oshiroTrigger.placements.oshiro_spawn=Oshiro (Spawn)
+triggers.oshiroTrigger.placements.oshiro_leave=Oshiro (Leave)
+
+# Respawn Target
+triggers.respawnTargetTrigger.placements.respawn_target=Respawn Target
+
+# Rumble
+triggers.rumbleTrigger.placements.rumble=Rumble
+
+# Spawn Facing
+triggers.spawnFacingTrigger.placements.spawn_facing=Spawn Facing
+
+# Stop Boost
+triggers.stopBoostTrigger.placements.stop_boost=Stop Boost
+
+# Snowballs
+triggers.windAttackTrigger.placements.wind_attack=Snowballs
+
+# Wind Pattern
+triggers.windTrigger.placements.wind=Wind Pattern
+
 
 
 # -- Mod Information --

@@ -8,6 +8,8 @@ local colors = require("colors")
 local selectionItemUtils = require("selection_item_utils")
 local keyboardHelper = require("keyboard_helper")
 local toolUtils = require("tool_utils")
+local history = require("history")
+local snapshotUtils = require("snapshot_utils")
 
 local tool = {}
 
@@ -133,15 +135,19 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
 
         if targetKey == key then
             local redraw = false
-            for _, item in ipairs(selectionPreviews) do
-                local moved = selectionItemUtils.moveSelection(room, tool.layer, item, offsetX, offsetY)
 
-                if moved then
-                    redraw = true
+            local snapshot = snapshotUtils.roomLayerSnapshot(function()
+                for _, item in ipairs(selectionPreviews) do
+                    local moved = selectionItemUtils.moveSelection(room, tool.layer, item, offsetX, offsetY)
+
+                    if moved then
+                        redraw = true
+                    end
                 end
-            end
+            end, room, tool.layer, "Selection Moved")
 
             if redraw then
+                history.addSnapshot(snapshot)
                 toolUtils.redrawTargetLayer(room, tool.layer)
             end
 
@@ -162,18 +168,21 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
     if targetKey == key then
         local redraw = false
 
-        for i = #selectionPreviews, 1, -1 do
-            local item = selectionPreviews[i]
-            local deleted = selectionItemUtils.deleteSelection(room, tool.layer, item)
+        local snapshot = snapshotUtils.roomLayerSnapshot(function()
+            for i = #selectionPreviews, 1, -1 do
+                local item = selectionPreviews[i]
+                local deleted = selectionItemUtils.deleteSelection(room, tool.layer, item)
 
-            if deleted then
-                redraw = true
+                if deleted then
+                    redraw = true
 
-                table.remove(selectionPreviews, i)
+                    table.remove(selectionPreviews, i)
+                end
             end
-        end
+        end, room, tool.layer, "Selection Deleted")
 
         if redraw then
+            history.addSnapshot(snapshot)
             toolUtils.redrawTargetLayer(room, tool.layer)
         end
 
