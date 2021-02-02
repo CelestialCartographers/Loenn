@@ -11,6 +11,8 @@ local brushHelper = require("brush_helper")
 local colors = require("colors")
 local drawing = require("drawing")
 local utils = require("utils")
+local snapshotUtils = require("snapshot_utils")
+local history = require("history")
 
 local tool = {}
 
@@ -34,6 +36,9 @@ local lastX, lastY = -1, -1
 local previewMatrix = matrixLib.filled("0", 5, 5)
 local previewBatch = nil
 
+local snapshotValue = nil
+local snapshotHasChanged = false
+
 local function handleActionClick(x, y, force)
     local room = state.getSelectedRoom()
 
@@ -45,6 +50,7 @@ local function handleActionClick(x, y, force)
             brushHelper.placeTile(room, tx + 1, ty + 1, tool.material, tool.layer)
 
             lastTileX, lastTileY = tx + 1, ty + 1
+            snapshotHasChanged = true
         end
 
         lastX, lastY = x, y
@@ -60,7 +66,7 @@ local function handleCloneClick(x, y)
 
         local material = brushHelper.getTile(room, tx + 1, ty + 1, tool.layer)
 
-        if material then
+        if material ~= tool.material then
             tool.material = material
         end
     end
@@ -87,6 +93,28 @@ local function updateMaterialLookup()
         local cleanPath = cleanupMaterialPath(path)
 
         tool.materialsLookup[cleanPath] = id
+    end
+end
+
+-- TODO - Move into common util once we have more brushlike tools
+local function getTileSnapshotValue()
+    local room = state.getSelectedRoom()
+
+    return utils.deepcopy(room[tool.layer].matrix)
+end
+
+local function startTileSnapshot()
+    snapshotValue = getTileSnapshotValue()
+    snapshotHasChanged = false
+end
+
+local function stopTileSnapshot()
+    if snapshotHasChanged then
+        local room = state.getSelectedRoom()
+        local afterSnapshotValue = getTileSnapshotValue()
+        local snapshot = snapshotUtils.roomTilesSnapshot(room, tool.layer, "Brush", snapshotValue, afterSnapshotValue)
+
+        history.addSnapshot(snapshot)
     end
 end
 
@@ -145,6 +173,22 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     end
 end
 
+function tool.mousepressed(x, y, button, istouch, pressed)
+    local actionButton = configs.editor.toolActionButton
+
+    if button == actionButton then
+        startTileSnapshot()
+    end
+end
+
+function tool.mousereleased(x, y, button)
+    local actionButton = configs.editor.toolActionButton
+
+    if button == actionButton then
+        stopTileSnapshot()
+    end
+end
+
 function tool.draw()
     local room = state.getSelectedRoom()
 
@@ -164,6 +208,5 @@ function tool.draw()
         end)
     end
 end
-
 
 return tool
