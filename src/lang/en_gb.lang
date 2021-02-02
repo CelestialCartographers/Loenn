@@ -1,6 +1,24 @@
 # Lönn Language File
 # Comments start with '#'
 
-# Scenes
+# -- Scenes --
 # scenes.sceneName.*
 scenes.loading.loading=Loading
+
+
+# -- Entities -- 
+# entities.entityName.placements.*
+# entities.entityName.tooltips.*
+
+# Refill
+entities.refill.placements.one_dash=Refill
+entities.refill.placements.two_dashes=Refill (Two Dashes)
+
+
+# -- Triggers --
+# triggers.triggerName.placements.*
+# triggers.triggerName.tooltips.*
+
+# Refill
+triggers.noRefillTrigger.placements.enable_refills=Refills (Enable)
+triggers.noRefillTrigger.placements.disable_refills=Refills (Disable)

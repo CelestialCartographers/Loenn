@@ -3,6 +3,8 @@ local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
 
+local languageRegistry = require("language_registry")
+
 local drawing = require("drawing")
 local drawableFunction = require("structs.drawable_function")
 
@@ -165,8 +167,15 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
-local function addPlacement(placement, res, name, handler)
+local function addPlacement(placement, res, name, handler, language)
     local placementType = "rectangle"
+    local displayName = placement.name
+    local displayNameLanguage = language.triggers[name].placements[placement.name]
+
+    if displayNameLanguage._exists then
+        displayName = tostring(displayNameLanguage)
+    end
+
     local itemTemplate = {
         _name = name,
         _id = 0 --TODO
@@ -186,7 +195,7 @@ local function addPlacement(placement, res, name, handler)
 
     table.insert(res, {
         name = name,
-        displayName = placement.name,
+        displayName = displayName,
         layer = "triggers",
         placementType = placementType,
         itemTemplate = itemTemplate
@@ -195,13 +204,14 @@ end
 
 function triggers.getPlacements(layer)
     local res = {}
+    local language = languageRegistry.getLanguage()
 
     if triggers.registeredTriggers then
         for name, handler in pairs(triggers.registeredTriggers) do
             local placements = utils.callIfFunction(handler.placements)
 
             if placements then
-                utils.callIterateFirstIfTable(addPlacement, placements, res, name, handler)
+                utils.callIterateFirstIfTable(addPlacement, placements, res, name, handler, language)
             end
         end
     end

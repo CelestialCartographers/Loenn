@@ -3,13 +3,13 @@ local refill = {}
 refill.depth = -100
 refill.placements = {
     {
-        name = "Refill",
+        name = "one_dash",
         data = {
             twoDash = false
         }
     },
     {
-        name = "Refill (Two Dashes)",
+        name = "two_dashes",
         data = {
             twoDash = true
         }

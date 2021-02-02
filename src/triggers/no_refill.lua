@@ -3,13 +3,13 @@ local noRefill = {}
 noRefill.name = "noRefillTrigger"
 noRefill.placements = {
     {
-        name = "No Refill (Disabled)",
+        name = "disable_refills",
         data = {
             state = true
         }
     },
     {
-        name = "No Refill (Enabled)",
+        name = "enable_refills",
         data = {
             state = false
         }
