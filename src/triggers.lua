@@ -95,7 +95,7 @@ function triggers.getSelection(room, trigger)
 
     if nodes then
         for i, node in ipairs(nodes) do
-            local x, y = node[1], node[2]
+            local x, y = node.x, node.y
 
             nodeRectangles[i] = utils.rectangle(x - 2, y - 2, 5, 5)
         end

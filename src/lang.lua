@@ -10,8 +10,8 @@ local lang_mt = {
     __tostring = (l -> l._value)
 }
 
-function lang.parse(str)
-    local res = {}
+function lang.parse(str, languageData)
+    local res = languageData or {}
 
     for _, line <- str:gsub("\r\n", "\n"):split("\n", nil, false) do
         if #line:match("^%s*(.*)%s*$") > 0 and not line:find(commentPrefix) then
@@ -29,9 +29,13 @@ function lang.parse(str)
         end
     end
 
-    return setmetatable(res, lang_mt)
+    return languageData and res or setmetatable(res, lang_mt)
 end
 
-lang.loadFile = (file, internal -> lang.parse(utils.readAll(file, "rb", internal)))
+function lang.loadFile(filename, languageData, internal)
+    local content = utils.readAll(filename, "rb", internal)
+
+    return lang.parse(content, languageData)
+end
 
 return lang

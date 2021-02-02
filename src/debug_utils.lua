@@ -3,6 +3,7 @@ local triggers = require("triggers")
 local celesteRender = require("celeste_render")
 local toolHandler = require("tool_handler")
 local sceneHandler = require("scene_handler")
+local languageRegistry = require("language_registry")
 local tasks = require("task")
 local utils = require("utils")
 
@@ -51,6 +52,15 @@ function debugUtils.reloadScenes()
     if scene then
         sceneHandler.changeScene(scene.name)
     end
+end
+
+function debugUtils.reloadLanguageFiles()
+    print("! Reloading language files")
+
+    languageRegistry.unloadFiles()
+
+    languageRegistry.loadInternalFiles()
+    languageRegistry.loadExternalFiles()
 end
 
 function debugUtils.reloadUI()

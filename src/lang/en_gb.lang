@@ -1,0 +1,6 @@
+# Lönn Language File
+# Comments start with '#'
+
+# Scenes
+# scenes.sceneName.*
+scenes.loading.loading=Loading

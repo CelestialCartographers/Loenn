@@ -1,9 +1,18 @@
 local fonts = require("fonts")
 local utils = require("utils")
+local languageRegistry = require("language_registry")
 
 local loadingScene = {}
 
 loadingScene.name = "Loading"
+
+function loadingScene:setText(text)
+    self.text = tostring(text)
+    self.alignment = "left"
+    self.textScale = fonts.fontScale * 2
+    self.textOffsetX = (fonts.font:getWidth(self.text .. "..") * self.textScale) / 2
+    self.textOffsetY = self.quadSize / 2
+end
 
 function loadingScene:loaded()
     self.spriteSheet = love.graphics.newImage("assets/loading-256.png")
@@ -18,12 +27,6 @@ function loadingScene:loaded()
 
     self.duration = 1
     self.currentTime = 0
-
-    self.text = "Loading"
-    self.alignment = "left"
-    self.textScale = fonts.fontScale * 2
-    self.textOffsetX = (fonts.font:getWidth(self.text .. "..") * self.textScale) / 2
-    self.textOffsetY = self.quadSize / 2
 end
 
 function loadingScene:firstEnter()
@@ -42,6 +45,15 @@ function loadingScene:firstEnter()
     local fileLocations = require("file_locations")
     local viewerState = require("loaded_state")
 
+    -- Load internal language first
+    -- External language files aren't needed during loading
+    languageRegistry.loadInternalFiles()
+    languageRegistry.setLanguage(configs.general.language)
+
+    local language = languageRegistry.getLanguage()
+
+    self:setText(language.scenes.loading.loading)
+
     -- Load assets and entity, trigger, effect etc modules
     tasks.newTask(
         function()
@@ -59,6 +71,8 @@ function loadingScene:firstEnter()
             toolHandler.loadInternalTools()
             toolHandler.loadExternalTools()
 
+            languageRegistry.loadExternalFiles()
+
             atlases.loadCelesteAtlases()
 
             -- This can take a while depending on the amount of installed mods
@@ -74,13 +88,16 @@ function loadingScene:firstEnter()
 end
 
 function loadingScene:draw()
-    local windowWidth, windowHeight = love.graphics.getWidth(), love.graphics.getHeight()
+    -- Scenes metatable will make this seem like a function, make sure its actually set
+    if type(self.text) == "string" then
+        local windowWidth, windowHeight = love.graphics.getWidth(), love.graphics.getHeight()
 
-    local currentQuad = utils.mod1(math.floor(self.currentTime / self.duration * #self.quads) + 1, #self.quads)
-    local dots = string.rep(".", currentQuad - 1)
+        local currentQuad = utils.mod1(math.floor(self.currentTime / self.duration * #self.quads) + 1, #self.quads)
+        local dots = string.rep(".", currentQuad - 1)
 
-    love.graphics.printf(self.text .. dots, windowWidth / 2 - self.textOffsetX, windowHeight / 2 + self.textOffsetY, windowWidth, self.alignment, 0, self.textScale)
-    love.graphics.draw(self.spriteSheet, self.quads[currentQuad], (windowWidth - self.quadSize) / 2, (windowHeight - self.quadSize) / 2, 0, 1)
+        love.graphics.printf(self.text .. dots, windowWidth / 2 - self.textOffsetX, windowHeight / 2 + self.textOffsetY, windowWidth, self.alignment, 0, self.textScale)
+        love.graphics.draw(self.spriteSheet, self.quads[currentQuad], (windowWidth - self.quadSize) / 2, (windowHeight - self.quadSize) / 2, 0, 1)
+    end
 end
 
 function loadingScene:update(dt)

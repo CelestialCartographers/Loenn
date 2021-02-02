@@ -20,8 +20,8 @@ function nodeStruct.decode(data)
             _type = "node"
         }
 
-        res[1] = data.x
-        res[2] = data.y
+        res.x = data.x
+        res.y = data.y
 
         return res
     end
@@ -32,8 +32,8 @@ function nodeStruct.encode(node)
 
     res.__name = "node"
 
-    res.x = node[1]
-    res.y = node[2]
+    res.x = node.x
+    res.y = node.y
 
     return res
 end
