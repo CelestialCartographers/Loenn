@@ -83,6 +83,7 @@ function debugUtils.reloadEverything()
     debugUtils.reloadTriggers()
     debugUtils.reloadTools()
     debugUtils.reloadScenes()
+    debugUtils.reloadLanguageFiles()
     debugUtils.redrawMap()
     debugUtils.reloadUI()
 end

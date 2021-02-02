@@ -241,6 +241,7 @@ end
 
 local function addPlacement(placement, res, name, handler, language)
     local placementType = placement.placementType or guessPlacementType(name, handler, placement)
+    local modPrefix = modHandler.getEntityModPrefix(name)
     local displayName = placement.name
     local displayNameLanguage = language.entities[name].placements[placement.name]
 
@@ -248,9 +249,17 @@ local function addPlacement(placement, res, name, handler, language)
         displayName = tostring(displayNameLanguage)
     end
 
+    if modPrefix then
+        local modPrefixLanguage = language.mods[modPrefix].name
+
+        if modPrefixLanguage._exists then
+            displayName = string.format("%s (%s)", displayName, tostring(modPrefixLanguage))
+        end
+    end
+
     local itemTemplate = {
         _name = name,
-        _id = 0 --TODO
+        _id = 0
     }
 
     if placement.data then

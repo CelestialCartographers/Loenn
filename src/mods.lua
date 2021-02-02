@@ -72,6 +72,11 @@ function modHandler.getFilenameModName(filename)
     end
 end
 
+-- Assumes entity names are "modName/entityName"
+function modHandler.getEntityModPrefix(name)
+    return name:match("^(.-)/")
+end
+
 function modHandler.mountMod(path, force)
     local loaded = modHandler.loadedMods[path]
 
