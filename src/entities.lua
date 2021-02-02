@@ -156,8 +156,10 @@ function entities.moveSelection(room, layer, selection, x, y)
             local nodes = entity.nodes
 
             if nodes and node <= #nodes then
-                nodes[node][1] += x
-                nodes[node][2] += y
+                local target = nodes[node]
+
+                target.x += x
+                target.y += y
             end
         end
     end

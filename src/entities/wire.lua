@@ -58,7 +58,7 @@ wire.placements = {
     data = {
         above = false,
         color = "595866",
-        nodes = {{0, 0}}
+        nodes = {{x = 0, y = 0}}
     }
 }
 

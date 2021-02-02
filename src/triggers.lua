@@ -117,8 +117,10 @@ function triggers.moveSelection(room, layer, selection, x, y)
         local nodes = trigger.nodes
 
         if nodes and node <= #nodes then
-            nodes[node][1] += x
-            nodes[node][2] += y
+            local target = nodes[node]
+
+            target.x += x
+            target.y += y
         end
     end
 
