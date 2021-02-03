@@ -14,14 +14,13 @@ toolWindow.toolList = false
 toolWindow.layerList = false
 toolWindow.materialList = false
 
--- TODO - Use lang file
 -- TODO - Use display name for now, otherwise entity variations don't work
 -- In the future the "data" should be using a better identifier
 local function getMaterialItems(layer, sortItems)
     local materials = toolHandler.getMaterials(nil, layer)
     local materialItems = {}
 
-    for _, material in ipairs(materials) do
+    for _, material in ipairs(materials or {}) do
         local materialText = material
         local materialType = type(material)
 
@@ -48,6 +47,10 @@ local function materialCallback(list, material)
     toolHandler.setMaterial(material)
 end
 
+local function toolMaterialChangedCallback(self, tool, layer, material)
+    -- TODO - Should this update list visually?
+end
+
 local function getLayerItems(toolName)
     local layers = toolHandler.getLayers(toolName)
     local layerItems = {}
@@ -64,7 +67,9 @@ end
 
 local function layerCallback(list, layer)
     toolHandler.setLayer(layer)
+end
 
+local function toolLayerChangedCallback(self, tool, layer)
     local materialItems = getMaterialItems(layer)
 
     listWidgets.updateItems(toolWindow.materialList, materialItems)
@@ -96,8 +101,10 @@ end
 
 local function toolCallback(list, toolName)
     toolHandler.selectTool(toolName)
+end
 
-    local layerItems = getLayerItems(toolName)
+local function toolChangedCallback(self, tool)
+    local layerItems = getLayerItems(tool.name)
 
     listWidgets.updateItems(toolWindow.layerList, layerItems)
 end
@@ -122,6 +129,12 @@ function toolWindow.getWindow()
     }):with(uiUtils.fillHeight(true))
 
     local window = uiElements.window("Tools", row):with(uiUtils.fillHeight(false))
+
+    window:with({
+        editorToolChanged = toolChangedCallback,
+        editorToolLayerChanged = toolLayerChangedCallback,
+        editorToolMaterialChanged = toolMaterialChangedCallback,
+    })
 
     widgetUtils.removeWindowTitlebar(window)
 
