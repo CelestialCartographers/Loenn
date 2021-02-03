@@ -321,12 +321,12 @@ end
 
 function tool.setLayer(layer)
     if layer ~= tool.layer or not placementsAvailable then
-        toolUtils.sendLayerEvent(tool, layer)
-
+        tool.layer = layer
         placementsAvailable = placementUtils.getPlacements(layer)
+
         selectPlacement(nil, 1)
 
-        tool.layer = layer
+        toolUtils.sendLayerEvent(tool, layer)
     end
 end
 
