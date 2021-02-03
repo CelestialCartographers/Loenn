@@ -2,6 +2,7 @@ local drawableSpriteStruct = require("structs.drawable_sprite")
 
 local bonfire = {}
 
+bonfire.name = "bonfire"
 bonfire.depth = -5
 bonfire.placements = {
     name = "bonfire"

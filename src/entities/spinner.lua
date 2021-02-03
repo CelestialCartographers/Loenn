@@ -4,6 +4,8 @@ local defaultSpinnerColor = "Blue"
 
 local spinner = {}
 
+spinner.name = "spinner"
+
 function spinner.depth(room, entity)
     return entity.dusty and -50 or -8500
 end

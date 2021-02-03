@@ -2,6 +2,7 @@ local drawableSpriteStruct = require("structs.drawable_sprite")
 
 local player = {}
 
+player.name = "player"
 player.depth = 0
 player.placements = {
     name = "player"

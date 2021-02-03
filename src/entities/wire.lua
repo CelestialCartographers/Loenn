@@ -3,6 +3,8 @@ local utils = require("utils")
 
 local wire = {}
 
+wire.name = "wire"
+
 function wire.depth(room, entity)
     return entity.above and -8500 or 2000
 end
@@ -57,8 +59,7 @@ wire.placements = {
     name = "wire",
     data = {
         above = false,
-        color = "595866",
-        nodes = {{x = 0, y = 0}}
+        color = "595866"
     }
 }
 

@@ -2,6 +2,7 @@ local utils = require("utils")
 local configs = require("configs")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
+local toolUtils = require("tool_utils")
 
 local toolHandler = {}
 
@@ -12,9 +13,11 @@ toolHandler.currentToolName = nil
 function toolHandler.selectTool(name)
     local handler = toolHandler.tools[name]
 
-    if handler then
+    if handler and toolHandler.currentTool ~= handler then
         toolHandler.currentTool = handler
         toolHandler.currentToolName = name
+
+        toolUtils.sendToolEvent(handler)
     end
 
     return handler ~= nil
@@ -117,6 +120,8 @@ function toolHandler.setLayer(layer, name)
 
         elseif handler.layer then
             handler.layer = layer
+
+            toolUtils.sendLayerEvent(toolHandler.currentTool, layer)
         end
     end
 

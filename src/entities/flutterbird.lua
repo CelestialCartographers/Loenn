@@ -10,6 +10,7 @@ local colors = {
     "93BAFF"
 }
 
+flutterbird.name = "flutterbird"
 flutterbird.depth = -9999
 flutterbird.placements = {
     name = "normal"

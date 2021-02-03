@@ -1,5 +1,6 @@
 local refill = {}
 
+refill.name = "refill"
 refill.depth = -100
 refill.placements = {
     {

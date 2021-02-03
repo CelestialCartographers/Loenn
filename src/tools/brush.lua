@@ -13,6 +13,7 @@ local drawing = require("drawing")
 local utils = require("utils")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
+local toolUtils = require("tool_utils")
 
 local tool = {}
 
@@ -134,22 +135,26 @@ end
 
 function tool.setMaterial(material)
     local paths = brushHelper.getValidTiles(tool.layer)
+    local target = nil
 
     if paths[material] then
-        tool.material = material
+        target = material
 
     else
-        local fromLookup = tool.materialsLookup[material]
+        target = tool.materialsLookup[material]
+    end
 
-        if fromLookup then
-            tool.material = fromLookup
-        end
+    if target and target ~= tool.material then
+        tool.material = target
+
+        toolUtils.sendMaterialEvent(tool, tool.layer, target)
     end
 end
 
 function tool.setLayer(layer)
     tool.layer = layer
 
+    toolUtils.sendLayerEvent(tool, layer)
     updateMaterialLookup()
 end
 
