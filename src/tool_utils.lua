@@ -1,6 +1,7 @@
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
 local celesteRender = require("celeste_render")
+local sceneHandler = require("scene_handler")
 
 local toolUtils = {}
 
@@ -28,6 +29,18 @@ function toolUtils.redrawTargetLayer(room, layer)
 
     celesteRender.invalidateRoomCache(room, "complete")
     celesteRender.forceRoomBatchRender(room, state.viewport)
+end
+
+function toolUtils.sendToolEvent(tool)
+    sceneHandler.sendEvent("editorToolChanged", tool)
+end
+
+function toolUtils.sendLayerEvent(tool, layer)
+    sceneHandler.sendEvent("editorToolLayerChanged", tool, layer)
+end
+
+function toolUtils.sendMaterialEvent(tool, layer, material)
+    sceneHandler.sendEvent("editorToolMaterialChanged", tool, layer, material)
 end
 
 return toolUtils

@@ -291,6 +291,8 @@ local function selectPlacement(name, index)
             updatePlacementNodes()
             updatePlacementDrawable()
 
+            toolUtils.sendMaterialEvent(tool, tool.layer, placement.displayName)
+
             return true
         end
     end
@@ -319,6 +321,8 @@ end
 
 function tool.setLayer(layer)
     if layer ~= tool.layer or not placementsAvailable then
+        toolUtils.sendLayerEvent(tool, layer)
+
         placementsAvailable = placementUtils.getPlacements(layer)
         selectPlacement(nil, 1)
 
