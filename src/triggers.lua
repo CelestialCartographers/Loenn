@@ -250,7 +250,7 @@ function triggers.nodeLimits(room, layer, trigger)
     local name = trigger._name
     local handler = triggers.registeredTriggers[name]
 
-    if handler.nodeLimits then
+    if handler and handler.nodeLimits then
         return handler.nodeLimits(room, trigger)
 
     else
