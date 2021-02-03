@@ -224,7 +224,6 @@ function entities.deleteSelection(room, layer, selection)
     return false
 end
 
--- TODO - Also check handler for functions
 local function guessPlacementType(name, handler, placement)
     if placement and placement.data then
         if placement.data.width or placement.data.height then
@@ -234,6 +233,13 @@ local function guessPlacementType(name, handler, placement)
         if placement.data.nodes then
             return "line"
         end
+    end
+
+    local fakeEntity = {_name = name}
+    local minimumNodes, maximumNodes = entities.nodeLimits(nil, nil, fakeEntity)
+
+    if minimumNodes == 1 and maximumNodes == 1 then
+        return "line"
     end
 
     return "point"

@@ -224,6 +224,45 @@ local placementUpdaters = {
     line = updateLinePlacement
 }
 
+local function updatePlacementNodes()
+    local room = state.room
+
+    local item = placementTemplate.item
+    local placementType = getCurrentPlacementType()
+    local minimumNodes, maximumNodes = placementUtils.nodeLimits(room, tool.layer, item)
+
+    if minimumNodes > 0 then
+        -- Add nodes until placement has minimum amount of nodes
+        if not item.nodes then
+            item.nodes = {}
+        end
+
+        while #item.nodes < minimumNodes do
+            local widthOffset = item.width or 0
+            local nodeOffset = (#item.nodes + 1) * 16
+
+            local node = {
+                x = item.x + widthOffset + nodeOffset,
+                y = item.y
+            }
+
+            table.insert(item.nodes, node)
+        end
+
+        -- Update node positions for point and rectangle placements
+        if placementType ~= "line" then
+            for i, node in ipairs(item.nodes) do
+                local widthOffset = item.width or 0
+                local heightOffset = (item.height or 0) / 2
+                local nodeOffsetX = #item.nodes * 16
+
+                node.x = item.x + widthOffset + nodeOffsetX
+                node.y = item.y + heightOffset
+            end
+        end
+    end
+end
+
 local function updatePlacement()
     if placementTemplate and placementTemplate.item then
         local placementType = getCurrentPlacementType()
@@ -235,6 +274,7 @@ local function updatePlacement()
         local needsUpdate = placementUpdater and placementUpdater(placementTemplate, item, itemX, itemY)
 
         if needsUpdate then
+            updatePlacementNodes()
             updatePlacementDrawable()
         end
     end
@@ -248,6 +288,7 @@ local function selectPlacement(name, index)
                 placement = placement,
             }
 
+            updatePlacementNodes()
             updatePlacementDrawable()
 
             return true
@@ -258,7 +299,7 @@ local function selectPlacement(name, index)
 end
 
 local function drawPlacement(room)
-    if room and placementTemplate and placementTemplate.drawable and placementTemplate.drawable then
+    if room and placementTemplate and placementTemplate.drawable then
         viewportHandler.drawRelativeTo(room.x, room.y, function()
             if utils.typeof(placementTemplate.drawable) == "table" then
                 for _, drawable in ipairs(placementTemplate.drawable) do
