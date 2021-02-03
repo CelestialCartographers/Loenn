@@ -336,7 +336,7 @@ function entities.nodeLimits(room, layer, entity)
     local name = entity._name
     local handler = entities.registeredEntities[name]
 
-    if handler.nodeLimits then
+    if handler and handler.nodeLimits then
         return handler.nodeLimits(room, entity)
 
     else

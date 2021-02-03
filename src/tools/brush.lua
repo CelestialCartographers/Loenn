@@ -154,8 +154,8 @@ end
 function tool.setLayer(layer)
     tool.layer = layer
 
-    toolUtils.sendLayerEvent(tool, layer)
     updateMaterialLookup()
+    toolUtils.sendLayerEvent(tool, layer)
 end
 
 function tool.mouseclicked(x, y, button, istouch, pressed)
