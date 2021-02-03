@@ -35,22 +35,11 @@ local function getRoomItems()
     return roomItems
 end
 
-local function getRoomByName(name)
-    local rooms = state.map and state.map.rooms or {}
-    local nameWithLvl = "lvl_" .. name
-
-    for _,room in ipairs(rooms) do
-        if room.name == name or room.name == nameWithLvl then
-            return room
-        end
-    end
-end
-
 function roomList.roomSelectedCallback(element, item)
     local currentRoom = state.getSelectedRoom()
 
     if not currentRoom or cleanRoomName(currentRoom.name) ~= item then
-        local newRoom = getRoomByName(item)
+        local newRoom = state.getRoomByName(item)
 
         if newRoom then
             -- TODO - Allow user to specify zoom after room selection in config
