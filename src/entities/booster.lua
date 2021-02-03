@@ -1,5 +1,6 @@
 local booster = {}
 
+booster.name = "booster"
 booster.depth = -8500
 booster.placements = {
     {

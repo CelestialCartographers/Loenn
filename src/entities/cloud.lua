@@ -2,6 +2,7 @@ local drawableSpriteStruct = require("structs.drawable_sprite")
 
 local cloud = {}
 
+cloud.name = "cloud"
 cloud.depth = 0
 cloud.placements = {
     {

@@ -5,6 +5,7 @@ local door = {}
 
 local textures = {"wood", "metal"}
 
+door.name = "door"
 door.depth = 8998
 door.placements = {}
 
