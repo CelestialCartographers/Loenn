@@ -69,6 +69,8 @@ local function handleCloneClick(x, y)
 
         if material ~= tool.material then
             tool.material = material
+
+            toolUtils.sendMaterialEvent(tool, tool.layer, material)
         end
     end
 end
