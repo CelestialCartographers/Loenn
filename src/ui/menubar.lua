@@ -44,6 +44,7 @@ menubar.menubar = {
     }},
     {"Debug", {
         {"Reload", {
+            {"Everything", debugUtils.reloadEverything},
             {"Scenes", debugUtils.reloadScenes},
             {"Tools", debugUtils.reloadTools},
             {"Entities", debugUtils.reloadEntities},
