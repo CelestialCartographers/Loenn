@@ -69,7 +69,15 @@ function listWidgets.updateItems(list, items, fromFilter, callbackRequiresChange
     local previousSelection = list.selected and list.selected.data
     local newSelection = nil
 
-    for _, item in ipairs(items) do
+    local processedItems = items
+
+    if not fromFilter and list.searchField then
+        local search = list.searchField:getText() or ""
+
+        processedItems = filterItems(items, search)
+    end
+
+    for _, item in ipairs(processedItems) do
         if item.data == previousSelection then
             newSelection = item
         end
@@ -79,7 +87,7 @@ function listWidgets.updateItems(list, items, fromFilter, callbackRequiresChange
         end
     end
 
-    list.children = items
+    list.children = processedItems
 
     ui.runLate(function()
         listWidgets.setSelection(list, newSelection, false, callbackRequiresChange)
@@ -101,9 +109,7 @@ local function filterList(list, search)
 end
 
 local function searchFieldChanged(element, new, old)
-    local list = element.list
-
-    filterList(list, new)
+    filterList(element.list, new)
 end
 
 function listWidgets.setFilterText(list, text, updateList)
@@ -118,7 +124,30 @@ function listWidgets.setFilterText(list, text, updateList)
     end
 end
 
-function listWidgets.getFilteredList(callback, items, options)
+local function getColumnForList(searchField, scrolledList, mode)
+    local columnItems
+
+    if mode == "below" then
+        columnItems = {
+            scrolledList,
+            searchField:with(uiUtils.bottombound)
+        }
+
+    elseif mode == "above" then
+        columnItems = {
+            searchField,
+            scrolledList
+        }
+
+    else
+        columnItems = {scrolledList}
+    end
+
+    return uiElements.column(columnItems):with(uiUtils.fillHeight(false))
+end
+
+function listWidgets.getList(callback, items, options)
+    options = options or {}
     items = items or {}
 
     local initialSearch = options.initialSearch or ""
@@ -143,46 +172,15 @@ function listWidgets.getFilteredList(callback, items, options)
         list = list
     }):with(uiUtils.fillWidth)
 
-    list.options = options or {}
+    list.options = options
     list.searchField = searchField
 
-    local columnItems
+    local column = getColumnForList(searchField, scrolledList, options.searchBarLocation)
 
-    if options.searchFieldBelow then
-        columnItems = {
-            scrolledList,
-            searchField
-        }
-
-    else
-        columnItems = {
-            searchField,
-            scrolledList
-        }
-    end
-
-    local column = uiElements.column(columnItems)
+    column.style.bg = {}
+    column.style.padding = 0
 
     return column, list, searchField
-end
-
-function listWidgets.getList(callback, items, options)
-    local list = uiElements.list(items, callback):with(uiUtils.hook({
-        layoutLateLazy = layoutWidthUpdate
-    }))
-
-    list.options = options or {}
-
-    ui.runLate(function()
-        listWidgets.setSelection(list, list.options.initialItem)
-    end)
-
-    local scrolledList = uiElements.scrollbox(list):with(uiUtils.hook({
-        calcWidth = calculateWidth,
-        layoutLateLazy = layoutWidthUpdate
-    })):with(uiUtils.fillHeight(false))
-
-    return scrolledList, list
 end
 
 return listWidgets

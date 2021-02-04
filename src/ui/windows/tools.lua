@@ -110,11 +110,15 @@ local function toolChangedCallback(self, tool)
 end
 
 function toolWindow.getWindow()
+    local materialListOptions = {
+        searchBarLocation = "below"
+    }
+
     local toolItems = getToolItems()
     local layerItems = getLayerItems()
     local materialItems = getMaterialItems()
 
-    local scrolledMaterialList, materialList = listWidgets.getList(materialCallback, materialItems)
+    local scrolledMaterialList, materialList = listWidgets.getList(materialCallback, materialItems, materialListOptions)
     local scrolledLayerList, layerList = listWidgets.getList(layerCallback, layerItems)
     local scrolledToolList, toolList = listWidgets.getList(toolCallback, toolItems)
 

@@ -68,9 +68,10 @@ function roomList.getWindow()
 
     local roomItems = getRoomItems()
     local listOptions = {
-        initialSearch = search
+        initialSearch = search,
+        searchBarLocation = "below"
     }
-    local column, list = listWidgets.getFilteredList(roomList.roomSelectedCallback, roomItems, listOptions)
+    local column, list = listWidgets.getList(roomList.roomSelectedCallback, roomItems, listOptions)
     local window = uiElements.window("Room List", column:with(uiUtils.fillHeight(true))):with(uiUtils.fillHeight(false))
 
     window:with({
