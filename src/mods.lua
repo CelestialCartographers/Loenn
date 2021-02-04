@@ -9,7 +9,8 @@ modHandler.specificModContent = "$%s$"
 modHandler.pluginFolderNames = {
     fileLocations.loennSimpleFolderName,
     fileLocations.loennWindowsFolderName,
-    fileLocations.loennLinuxFolderName
+    fileLocations.loennLinuxFolderName,
+    fileLocations.loennZipFolderName
 }
 
 modHandler.loadedMods = {}
@@ -82,7 +83,8 @@ function modHandler.mountMod(path, force)
 
     if not loaded or force then
         if modHandler.mountable(path) then
-            local modFolderName = utils.filename(path)
+            -- Replace "." in ".zip" to prevent require from getting confused
+            local modFolderName = utils.filename(path):gsub("%.", "_")
             local specificMountPoint = string.format(modHandler.specificModContent, modFolderName) .. "/"
 
             -- Append `/.` to trick physfs to mount the same path twice
