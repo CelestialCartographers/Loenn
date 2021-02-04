@@ -7,7 +7,9 @@ local uiRoot = require("ui/ui_root")
 
 local windows = {}
 
-windows.loadedWindows = {}
+windows.windows = {}
+windows.windowHandlers = {}
+windows.positions = {}
 
 function windows.registerWindow(filename, verbose)
     verbose = verbose or verbose == nil and configs.debug.logPluginLoading
@@ -18,15 +20,34 @@ function windows.registerWindow(filename, verbose)
     local window = utils.rerequire(pathNoExt)
     local name = window.name or filenameNoExt
 
-    windows.loadedWindows[filenameNoExt] = window
+    windows.windowHandlers[filenameNoExt] = window
 
     if verbose then
         print("! Registered window '" .. name .. "' from '" .. filename .."'")
     end
 end
 
+function windows.storeWindowPositions()
+    for name, window in pairs(windows.windows) do
+        windows.positions[name] = {
+            window.x,
+            window.y
+        }
+    end
+end
+
+function windows.restoreWindowPositions()
+    for name, window in pairs(windows.windows) do
+        if windows.positions[name] then
+            window.x, window.y = unpack(windows.positions[name])
+        end
+    end
+
+    windows.positions = {}
+end
+
 function windows.unloadWindows()
-    windows.loadedWindows = {}
+    windows.windowHandlers = {}
 end
 
 function windows.loadWindows(path)
@@ -44,30 +65,33 @@ function windows.loadExternalWindows(registerAt)
 end
 
 function windows.getLoadedWindows()
-    local res = {}
+    windows.windows = {}
 
-    for name, window in pairs(windows.loadedWindows) do
+    for name, window in pairs(windows.windowHandlers) do
         if window.getWindow then
-            table.insert(res, window.getWindow())
+            windows.windows[name] = window.getWindow()
 
         else
-            table.insert(res, window)
+            windows.windows[name] = window
         end
     end
 
-    return res
+    return table.values(windows.windows)
 end
 
 -- Add Debug UI reload function
 function debugUtils.reloadUI()
     print("! Reloading windows")
 
+    windows.storeWindowPositions()
     windows.unloadWindows()
 
     windows.loadInternalWindows()
     windows.loadExternalWindows()
 
     uiRoot.updateWindows(windows.getLoadedWindows())
+
+    windows.restoreWindowPositions()
 end
 
 return windows
