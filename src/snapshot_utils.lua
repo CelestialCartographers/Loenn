@@ -77,4 +77,22 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
     return snapshot.create(description, data, backward, forward)
 end
 
+function snapshotUtils.multiSnapshot(description, snapshots)
+    local function forward(data)
+        for _, snap in ipairs(snapshots) do
+            snap.forward(snap.data)
+        end
+    end
+
+    local function backward(data)
+        for _, snap in ipairs(snapshots) do
+            snap.backward(snap.data)
+        end
+    end
+
+    local data = {}
+
+    return snapshot.create(description, data, backward, forward)
+end
+
 return snapshotUtils
