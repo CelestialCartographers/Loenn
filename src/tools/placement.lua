@@ -125,7 +125,7 @@ end
 
 local function updatePlacementDrawable()
     if placementTemplate then
-        local target = placementTemplate.placement.name
+        local target = placementTemplate.item._name or placementTemplate.item.texture
         local drawable = placementUtils.getDrawable(tool.layer, target, state.getSelectedRoom(), placementTemplate.item)
 
         placementTemplate.drawable = drawable
