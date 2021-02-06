@@ -172,6 +172,7 @@ end
 local function addPlacement(placement, res, name, handler, language)
     local placementType = "rectangle"
     local modPrefix = modHandler.getEntityModPrefix(name)
+    local simpleName = string.format("%s#%s", name, placement.name)
     local displayName = placement.name
     local displayNameLanguage = language.triggers[name].placements[placement.name]
 
@@ -183,7 +184,7 @@ local function addPlacement(placement, res, name, handler, language)
         local modPrefixLanguage = language.mods[modPrefix].name
 
         if modPrefixLanguage._exists then
-            displayName = string.format("%s (%s)", displayName, tostring(modPrefixLanguage))
+            displayName = string.format("%s (%s)", displayName, modPrefixLanguage)
         end
     end
 
@@ -205,7 +206,7 @@ local function addPlacement(placement, res, name, handler, language)
     itemTemplate.height = itemTemplate.height or 16
 
     table.insert(res, {
-        name = name,
+        name = simpleName,
         displayName = displayName,
         layer = "triggers",
         placementType = placementType,

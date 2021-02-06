@@ -248,6 +248,7 @@ end
 local function addPlacement(placement, res, name, handler, language)
     local placementType = placement.placementType or guessPlacementType(name, handler, placement)
     local modPrefix = modHandler.getEntityModPrefix(name)
+    local simpleName = string.format("%s#%s", name, placement.name)
     local displayName = placement.name
     local displayNameLanguage = language.entities[name].placements[placement.name]
 
@@ -259,7 +260,7 @@ local function addPlacement(placement, res, name, handler, language)
         local modPrefixLanguage = language.mods[modPrefix].name
 
         if modPrefixLanguage._exists then
-            displayName = string.format("%s (%s)", displayName, tostring(modPrefixLanguage))
+            displayName = string.format("%s (%s)", displayName, modPrefixLanguage)
         end
     end
 
@@ -278,7 +279,7 @@ local function addPlacement(placement, res, name, handler, language)
     itemTemplate.y = itemTemplate.y or 0
 
     table.insert(res, {
-        name = name,
+        name = simpleName,
         displayName = displayName,
         layer = "entities",
         placementType = placementType,

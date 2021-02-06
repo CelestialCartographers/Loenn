@@ -38,6 +38,10 @@ local selectionMovementKeys = {
     {"itemMoveDown", 0, 1},
 }
 
+function tool.unselect()
+    selectionPreviews = nil
+end
+
 local function selectionStarted(x, y)
     selectionRectangle = utils.rectangle(x, y, 0, 0)
     selectionPreviews = nil
@@ -119,6 +123,47 @@ local function drawSelectionPreviews(room)
     end
 end
 
+local function moveItems(room, layer, previews, offsetX, offsetY)
+    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
+        local redraw = false
+        local selectionsBefore = utils.deepcopy(selectionPreviews)
+
+        for _, item in ipairs(previews) do
+            local moved = selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
+
+            if moved then
+                redraw = true
+            end
+        end
+
+        return redraw, selectionsBefore
+    end, room, layer, "Selection Moved")
+
+    return snapshot, redraw
+end
+
+local function deleteItems(room, layer, previews)
+    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
+        local redraw = false
+        local selectionsBefore = utils.deepcopy(selectionPreviews)
+
+        for i = #previews, 1, -1 do
+            local item = previews[i]
+            local deleted = selectionItemUtils.deleteSelection(room, layer, item)
+
+            if deleted then
+                redraw = true
+
+                table.remove(selectionPreviews, i)
+            end
+        end
+
+        return redraw, selectionsBefore
+    end, room, layer, "Selection Deleted")
+
+    return snapshot, redraw
+end
+
 local function handleItemMovementKeys(room, key, scancode, isrepeat)
     if not selectionPreviews then
         return
@@ -134,17 +179,7 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
         end
 
         if targetKey == key then
-            local redraw = false
-
-            local snapshot = snapshotUtils.roomLayerSnapshot(function()
-                for _, item in ipairs(selectionPreviews) do
-                    local moved = selectionItemUtils.moveSelection(room, tool.layer, item, offsetX, offsetY)
-
-                    if moved then
-                        redraw = true
-                    end
-                end
-            end, room, tool.layer, "Selection Moved")
+            local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, offsetX, offsetY)
 
             if redraw then
                 history.addSnapshot(snapshot)
@@ -166,20 +201,7 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
     local targetKey = configs.editor.itemDelete
 
     if targetKey == key then
-        local redraw = false
-
-        local snapshot = snapshotUtils.roomLayerSnapshot(function()
-            for i = #selectionPreviews, 1, -1 do
-                local item = selectionPreviews[i]
-                local deleted = selectionItemUtils.deleteSelection(room, tool.layer, item)
-
-                if deleted then
-                    redraw = true
-
-                    table.remove(selectionPreviews, i)
-                end
-            end
-        end, room, tool.layer, "Selection Deleted")
+        local snapshot, redraw = deleteItems(room, tool.layer, selectionPreviews)
 
         if redraw then
             history.addSnapshot(snapshot)
