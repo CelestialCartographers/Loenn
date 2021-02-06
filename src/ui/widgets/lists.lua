@@ -42,7 +42,7 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
 
     if target then
         for _, item in ipairs(list.children) do
-            if item == target or item.data == target then
+            if item == target or item.data == target or item.text == target then
                 list.selected = item
                 selectedTarget = true
 

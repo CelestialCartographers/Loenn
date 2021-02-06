@@ -20,7 +20,7 @@ local function getMaterialItems(layer, sortItems)
     local materials = toolHandler.getMaterials(nil, layer)
     local materialItems = {}
 
-    for _, material in ipairs(materials or {}) do
+    for i, material in ipairs(materials or {}) do
         local materialText = material
         local materialType = type(material)
 
@@ -30,7 +30,7 @@ local function getMaterialItems(layer, sortItems)
 
         table.insert(materialItems, uiElements.listItem({
             text = materialText,
-            data = materialText
+            data = i
         }))
     end
 
@@ -48,7 +48,7 @@ local function materialCallback(list, material)
 end
 
 local function toolMaterialChangedCallback(self, tool, layer, material)
-    -- TODO - Should this update list visually?
+    listWidgets.setSelection(toolWindow.materialList, material, true)
 end
 
 local function getLayerItems(toolName)
@@ -72,6 +72,7 @@ end
 local function toolLayerChangedCallback(self, tool, layer)
     local materialItems = getMaterialItems(layer)
 
+    listWidgets.setSelection(toolWindow.toolList, layer, true)
     listWidgets.updateItems(toolWindow.materialList, materialItems)
 end
 
@@ -106,6 +107,7 @@ end
 local function toolChangedCallback(self, tool)
     local layerItems = getLayerItems(tool.name)
 
+    listWidgets.setSelection(toolWindow.toolList, tool.name, true)
     listWidgets.updateItems(toolWindow.layerList, layerItems)
 end
 
