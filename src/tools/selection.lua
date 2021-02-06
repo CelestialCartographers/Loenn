@@ -10,6 +10,8 @@ local keyboardHelper = require("keyboard_helper")
 local toolUtils = require("tool_utils")
 local history = require("history")
 local snapshotUtils = require("snapshot_utils")
+local hotkeyStruct = require("structs.hotkey")
+local layerHandlers = require("layer_handlers")
 
 local tool = {}
 
@@ -30,6 +32,8 @@ local selectionRectangle = nil
 local selectionCompleted = false
 local selectionStartX, selectionStartY = nil ,nil
 local selectionPreviews = nil
+
+local copyPreviews = nil
 
 local selectionMovementKeys = {
     {"itemMoveLeft", -1, 0},
@@ -164,6 +168,55 @@ local function deleteItems(room, layer, previews)
     return snapshot, redraw
 end
 
+local function getPreviewsCorners(previews)
+    local tlx, tly = math.huge, math.huge
+    local brx, bry = -math.huge, -math.huge
+
+    for _, preview in ipairs(previews or selectionPreviews) do
+        tlx = math.min(tlx, preview.x)
+        tly = math.min(tly, preview.y)
+
+        brx = math.max(brx, preview.x + preview.width)
+        bry = math.max(bry, preview.y + preview.height)
+    end
+
+    return tlx, tly, brx, bry
+end
+
+local function pasteItems(room, layer, previews)
+    local pasteCentered = configs.editor.pasteCentered
+    local snapshot = snapshotUtils.roomLayerSnapshot(function()
+        local handler = layerHandlers.getHandler(layer)
+
+        if handler and handler.getRoomItems then
+            local items = handler.getRoomItems(room, layer)
+            local cursorX, cursorY = toolUtils.getCursorPositionInRoom(viewportHandler.getMousePosition())
+
+            local tlx, tly, brx, bry = getPreviewsCorners(previews)
+            local width, height = brx - tlx, bry - tly
+            local widthOffset = pasteCentered and width / 2 or 0
+            local heightOffset = pasteCentered and height / 2 or 0
+
+            for _, preview in ipairs(previews) do
+                -- TODO - Assign id if needed
+
+                local item = preview.item
+
+                item.x = cursorX + item.x - tlx - widthOffset
+                item.y = cursorY + item.y - tly - heightOffset
+                preview.x = cursorX + preview.x - tlx - widthOffset
+                preview.y = cursorY + preview.y - tly - heightOffset
+
+                table.insert(items, item)
+            end
+
+            selectionPreviews = previews
+        end
+    end, room, layer, "Selection Pasted")
+
+    return snapshot
+end
+
 local function handleItemMovementKeys(room, key, scancode, isrepeat)
     if not selectionPreviews then
         return
@@ -214,14 +267,92 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
     return false
 end
 
+local function copyCommon(cut)
+    local room = state.getSelectedRoom()
+    local useClipboard = configs.editor.copyUsesClipboard
+
+    if not room or #selectionPreviews == 0 then
+        return false
+    end
+
+    copyPreviews = utils.deepcopy(selectionPreviews)
+
+    if cut then
+        local snapshot, redraw = deleteItems(room, tool.layer, selectionPreviews)
+
+        if redraw then
+            history.addSnapshot(snapshot)
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
+    end
+
+    if useClipboard then
+        local success, text = utils.serialize(copyPreviews)
+
+        if success then
+            love.system.setClipboardText(text)
+        end
+    end
+
+    return true
+end
+
+-- Attempt to prevent arbitrary code execution
+local function validateClipboard(text)
+    if not text or text:sub(1, 1) ~= "{" or text:sub(-1, -1) ~= "}" then
+        return false
+    end
+
+    return true
+end
+
+local function copyItemsHotkey()
+    copyCommon(false)
+end
+
+local function cutItemsHotkey()
+    copyCommon(true)
+end
+
+local function pasteItemsHotkey()
+    local useClipboard = configs.editor.copyUsesClipboard
+    local newPreviews = utils.deepcopy(copyPreviews)
+
+    if useClipboard then
+        local clipboard = love.system.getClipboardText()
+
+        if validateClipboard(clipboard) then
+            local success, fromClipboard = utils.unserialize(clipboard)
+
+            if success then
+                newPreviews = fromClipboard
+            end
+        end
+    end
+
+    if newPreviews and #newPreviews > 0 then
+        local room = state.getSelectedRoom()
+        local snapshot = pasteItems(room, tool.layer, newPreviews)
+
+        history.addSnapshot(snapshot)
+        toolUtils.redrawTargetLayer(room, tool.layer)
+    end
+end
+
+local toolHotkeys = {
+    hotkeyStruct.createHotkey(configs.hotkeys.itemsCopy, copyItemsHotkey),
+    hotkeyStruct.createHotkey(configs.hotkeys.itemsPaste, pasteItemsHotkey),
+    hotkeyStruct.createHotkey(configs.hotkeys.itemsCut, cutItemsHotkey)
+}
+
 function tool.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
-        local px, py = toolUtils.getCursorPositionInRoom(x, y)
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-        if px and py then
-            selectionStarted(px, py)
+        if cursorX and cursorY then
+            selectionStarted(cursorX, cursorY)
         end
     end
 end
@@ -230,10 +361,10 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
 
     if not selectionCompleted and love.mouse.isDown(actionButton) then
-        local px, py = toolUtils.getCursorPositionInRoom(x, y)
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-        if px and py and selectionStartX and selectionStartY then
-            local width, height = px - selectionStartX, py - selectionStartY
+        if cursorX and cursorY and selectionStartX and selectionStartY then
+            local width, height = cursorX - selectionStartX, cursorY - selectionStartY
 
             selectionChanged(selectionStartX, selectionStartY, width, height)
         end
@@ -253,10 +384,10 @@ function tool.mouseclicked(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
-        local px, py = toolUtils.getCursorPositionInRoom(x, y)
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-        if px and py then
-            selectionChanged(px - 1, py - 1, 3, 3)
+        if cursorX and cursorY then
+            selectionChanged(cursorX - 1, cursorY - 1, 3, 3)
             selectionFinished()
         end
     end
@@ -264,6 +395,10 @@ end
 
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
+
+    if not isrepeat then
+        hotkeyStruct.callbackFirstActive(toolHotkeys)
+    end
 
     handleItemMovementKeys(room, key, scancode, isrepeat)
     handleItemDeletionKey(room, key, scancode, isrepeat)

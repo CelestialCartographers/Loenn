@@ -4,6 +4,9 @@ return {
     canvasMoveButton = 2,
     objectCloneButton = 3,
 
+    copyUsesClipboard = true,
+    pasteCentered = true,
+
     -- Modifier Keys
     selectionAddModifier = "shift",
     precisionModifier = "ctrl",
