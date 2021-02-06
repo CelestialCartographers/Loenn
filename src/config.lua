@@ -27,7 +27,14 @@ function config.readConfigData(filename)
 
     if fh then
         local content = fh:read("*a")
-        res = utils.unserialize(content)
+        local success, parsed = utils.unserialize(content)
+
+        if success then
+            res = parsed
+
+        else
+            -- TODO - Handle gracefully
+        end
 
         fh:close()
     end

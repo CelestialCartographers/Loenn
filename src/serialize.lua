@@ -270,10 +270,14 @@ function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, succ
     return success, "{" .. newline .. content.. newline .. closingPadding .. "}"
 end
 
-function serialize.unserialize(s)
+function serialize.unserialize(s, safe)
     local func = assert(loadstring("return " .. s))
 
-    return func()
+    if safe ~= false then
+        setfenv(func, {})
+    end
+
+    return pcall(func)
 end
 
 return serialize
