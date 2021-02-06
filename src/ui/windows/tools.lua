@@ -22,15 +22,17 @@ local function getMaterialItems(layer, sortItems)
 
     for i, material in ipairs(materials or {}) do
         local materialText = material
+        local materialData = material
         local materialType = type(material)
 
         if materialType == "table" then
             materialText = material.displayName or material.name
+            materialData = material.name
         end
 
         table.insert(materialItems, uiElements.listItem({
             text = materialText,
-            data = i
+            data = materialData
         }))
     end
 
