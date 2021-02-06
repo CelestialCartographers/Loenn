@@ -38,6 +38,10 @@ local selectionMovementKeys = {
     {"itemMoveDown", 0, 1},
 }
 
+function tool.unselect()
+    selectionPreviews = nil
+end
+
 local function selectionStarted(x, y)
     selectionRectangle = utils.rectangle(x, y, 0, 0)
     selectionPreviews = nil

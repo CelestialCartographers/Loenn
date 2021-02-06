@@ -14,6 +14,10 @@ function toolHandler.selectTool(name)
     local handler = toolHandler.tools[name]
 
     if handler and toolHandler.currentTool ~= handler then
+        if toolHandler.currentTool and toolHandler.currentTool.unselect then
+            toolHandler.currentTool.unselect(name)
+        end
+
         toolHandler.currentTool = handler
         toolHandler.currentToolName = name
 
