@@ -19,6 +19,11 @@ return {
     roomMoveUpPrecise = "ctrl + alt + up",
     roomMoveDownPrecise = "ctrl + alt + down",
 
+    -- Copy / Paste
+    itemsCopy = "ctrl + c",
+    itemsCut = "ctrl + x",
+    itemsPaste = "ctrl + v",
+
     -- Room Resizing
     roomResizeLeftGrow = false,
     roomResizeRightGrow = false,
