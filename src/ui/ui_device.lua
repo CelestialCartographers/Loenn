@@ -7,6 +7,7 @@ local uiUtils = require("ui.utils")
 
 uiElements.__label.__default.style.font = love.graphics.newFont(16)
 
+uiUtils.dataRoots["ui"] = "olympUI/ui/data"
 
 local windows = require("ui/windows")
 local uiRoot = require("ui/ui_root")

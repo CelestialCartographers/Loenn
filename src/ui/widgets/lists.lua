@@ -4,17 +4,6 @@ local uiUtils = require("ui.utils")
 
 local listWidgets = {}
 
-local function layoutWidthUpdate(orig, element)
-    local parentWidth = element.parent.innerWidth
-
-    if element.width < parentWidth then
-        element.width = parentWidth
-        element.innerWidth = parentWidth - element.style.padding * 2
-    end
-
-    orig(element)
-end
-
 local function calculateWidth(orig, element)
     return element.inner.width
 end
@@ -153,10 +142,9 @@ function listWidgets.getList(callback, items, options)
     local initialSearch = options.initialSearch or ""
     local filteredItems = filterItems(items, initialSearch)
 
-    local list = uiElements.list(filteredItems, callback):with(uiUtils.hook({
-        layoutLateLazy = layoutWidthUpdate
-    })):with({
-        unfilteredItems = items
+    local list = uiElements.list(filteredItems, callback):with({
+        unfilteredItems = items,
+        minWidth = options.minimumWidth or 128
     })
 
     ui.runLate(function()
@@ -164,8 +152,7 @@ function listWidgets.getList(callback, items, options)
     end)
 
     local scrolledList = uiElements.scrollbox(list):with(uiUtils.hook({
-        calcWidth = calculateWidth,
-        layoutLateLazy = layoutWidthUpdate
+        calcWidth = calculateWidth
     })):with(uiUtils.fillHeight(true))
 
     local searchField = uiElements.field(initialSearch, searchFieldChanged):with({
