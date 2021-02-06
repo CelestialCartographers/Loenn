@@ -331,7 +331,12 @@ function tool.setLayer(layer)
 end
 
 function tool.setMaterial(material)
-    selectPlacement(material, nil)
+    if type(material) == "number" then
+        selectPlacement(nil, material)
+
+    else
+        selectPlacement(material, nil)
+    end
 end
 
 function tool.getMaterials()
