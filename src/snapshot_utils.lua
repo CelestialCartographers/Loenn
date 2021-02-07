@@ -4,6 +4,8 @@ local toolUtils = require("tool_utils")
 local state = require("loaded_state")
 local snapshot = require("structs.snapshot")
 local matrix = require("matrix")
+local celesteRender = require("celeste_render")
+local viewportHandler = require("viewport_handler")
 
 local snapshotUtils = {}
 
@@ -72,6 +74,43 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         room = room.name,
         width = tilesBefore._width,
         height = tilesBefore._height
+    }
+
+    return snapshot.create(description, data, backward, forward)
+end
+
+local function applyRoomChanges(data, target)
+    local map = state.map
+    local targetRoom = state.getRoomByName(data.room)
+
+    -- Overwrite if exists, otherwise add
+    if targetRoom then
+        table.clear(targetRoom)
+
+        for k, v in pairs(target) do
+            targetRoom[k] = utils.deepcopy(v)
+        end
+
+    else
+        -- TODO - Get deletion index and insert at correct spot
+        table.insert(map.rooms, utils.deepcopy(target))
+    end
+
+    celesteRender.invalidateRoomCache(targetRoom or target)
+    celesteRender.forceRoomBatchRender(targetRoom or target, viewportHandler.viewport)
+end
+
+function snapshotUtils.roomSnapshot(room, description, before, after)
+    local function forward(data)
+        applyRoomChanges(data, after)
+    end
+
+    local function backward(data)
+        applyRoomChanges(data, before)
+    end
+
+    local data = {
+        room = room.name
     }
 
     return snapshot.create(description, data, backward, forward)

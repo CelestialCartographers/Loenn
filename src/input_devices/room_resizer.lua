@@ -7,6 +7,8 @@ local drawing = require("drawing")
 local utils = require("utils")
 local configs = require("configs")
 local colors = require("colors")
+local snapshotUtils = require("snapshot_utils")
+local history = require("history")
 
 local roomStruct = require("structs.room")
 local fillerStruct = require("structs.filler")
@@ -16,6 +18,9 @@ local draggingPreview
 local draggingStartX
 local draggingStartY
 local itemPosition
+local madeChanges
+local itemBeforeMove
+local targetType
 
 local triangleColor = colors.resizeTriangleColor
 local triangleHeight = 16
@@ -164,6 +169,9 @@ function roomResizer.mousepressed(x, y, button, istouch, presses)
     if button == actionButton and (itemType == "room" or itemType == "filler") then
         if draggingPreview then
             dragging = draggingPreview
+            madeChanges = false
+            itemBeforeMove = utils.deepcopy(item)
+            targetType = itemType
         end
     end
 end
@@ -174,9 +182,24 @@ function roomResizer.mousereleased(x, y, button, istouch, presses)
     draggingPreview = false
     dragging = false
 
+    if madeChanges then
+        local item, itemType = loadedState.getSelectedItem()
+        local itemAfterMove = utils.deepcopy(item)
+
+        if itemType == "room" then
+            local snapshot = snapshotUtils.roomSnapshot(item, "Room resize", itemBeforeMove, itemAfterMove)
+
+            history.addSnapshot(snapshot)
+
+        elseif itemType == "filler" then
+            -- TODO - Implement
+        end
+    end
+
     return consume
 end
 
+-- TODO - Make sure visual changes actually happened before setting madeChanges and redrawing
 function roomResizer.mousemoved(x, y, dx, dy, istouch)
     local item, itemType = loadedState.getSelectedItem()
 
@@ -201,10 +224,14 @@ function roomResizer.mousemoved(x, y, dx, dy, istouch)
                 local newHeight = height + deltaY * 8
 
                 if resizeHorizontal and deltaX ~= 0 and newWidth >= itemStruct.recommendedMinimumWidth then
+                    madeChanges = true
+
                     itemStruct.directionalResize(item, resizeHorizontal, deltaX)
                 end
 
                 if resizeVertical and deltaY ~= 0 and newHeight >= itemStruct.recommendedMinimumHeight then
+                    madeChanges = true
+
                     itemStruct.directionalResize(item, resizeVertical, deltaY)
                 end
 

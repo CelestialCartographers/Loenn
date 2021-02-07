@@ -125,9 +125,9 @@ function state.getRoomByName(name)
     local rooms = state.map and state.map.rooms or {}
     local nameWithLvl = "lvl_" .. name
 
-    for _,room in ipairs(rooms) do
+    for i, room in ipairs(rooms) do
         if room.name == name or room.name == nameWithLvl then
-            return room
+            return room, i
         end
     end
 end
