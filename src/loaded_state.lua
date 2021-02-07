@@ -81,11 +81,28 @@ function state.saveFile(filename)
     end
 end
 
-function state.selectItem(item)
-    state.selectedItem = item
-    state.selectedItemType = utils.typeof(item)
+function state.selectItem(item, add)
+    if add then
+        if state.selectedItemType ~= "table" then
+            state.selectedItem = {
+                [state.selectedItem] = state.selectedItemType
+            }
 
-    sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType)
+            state.selectedItemType = "table"
+        end
+
+        if not state.selectedItem[item] then
+            state.selectedItem[item] = utils.typeof(item)
+
+            sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType, add)
+        end
+
+    else
+        state.selectedItem = item
+        state.selectedItemType = utils.typeof(item)
+
+        sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType, add)
+    end
 end
 
 function state.getSelectedRoom()
