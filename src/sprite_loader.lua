@@ -209,7 +209,7 @@ function spriteLoader.getCacheOrLoadSpriteAtlas(metaFn, atlasDir)
     local cacheConfig = config.readConfig(configPath)
     local metaData = cacheConfig[metaFn]
 
-    if not metaData or filesystem.mtime(metaPath) > metaData.mtime then
+    if not metaData or filesystem.mtime(metaPath) ~= metaData.mtime then
         if not filesystem.isDirectory(storageCacheDir) then
             filesystem.mkdir(storageCacheDir)
         end
