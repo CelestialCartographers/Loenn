@@ -80,10 +80,8 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
 end
 
 local function applyRoomChanges(data, target)
-    local map = state.map
     local targetRoom = state.getRoomByName(data.room)
 
-    -- Overwrite if exists, otherwise add
     if targetRoom then
         table.clear(targetRoom)
 
@@ -91,13 +89,9 @@ local function applyRoomChanges(data, target)
             targetRoom[k] = utils.deepcopy(v)
         end
 
-    else
-        -- TODO - Get deletion index and insert at correct spot
-        table.insert(map.rooms, utils.deepcopy(target))
+        celesteRender.invalidateRoomCache(targetRoom)
+        celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
     end
-
-    celesteRender.invalidateRoomCache(targetRoom or target)
-    celesteRender.forceRoomBatchRender(targetRoom or target, viewportHandler.viewport)
 end
 
 function snapshotUtils.roomSnapshot(room, description, before, after)
@@ -111,6 +105,33 @@ function snapshotUtils.roomSnapshot(room, description, before, after)
 
     local data = {
         room = room.name
+    }
+
+    return snapshot.create(description, data, backward, forward)
+end
+
+local function applyFillerChanges(data, target)
+    local filler = data.filler
+    if filler then
+        filler.x = target.x
+        filler.y = target.y
+
+        filler.width = target.width
+        filler.height = target.height
+    end
+end
+
+function snapshotUtils.fillerSnapshot(filler, description, before, after)
+    local function forward(data)
+        applyFillerChanges(data, after)
+    end
+
+    local function backward(data)
+        applyFillerChanges(data, before)
+    end
+
+    local data = {
+        filler = filler
     }
 
     return snapshot.create(description, data, backward, forward)

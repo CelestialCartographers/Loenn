@@ -192,14 +192,17 @@ function roomResizer.mousereleased(x, y, button, istouch, presses)
             history.addSnapshot(snapshot)
 
         elseif itemType == "filler" then
-            -- TODO - Implement
+            local snapshot = snapshotUtils.fillerSnapshot(item, "Filler resize", itemBeforeMove, itemAfterMove)
+
+            history.addSnapshot(snapshot)
         end
+
+        madeChanges = false
     end
 
     return consume
 end
 
--- TODO - Make sure visual changes actually happened before setting madeChanges and redrawing
 function roomResizer.mousemoved(x, y, dx, dy, istouch)
     local item, itemType = loadedState.getSelectedItem()
 
