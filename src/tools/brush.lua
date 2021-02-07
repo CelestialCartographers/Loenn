@@ -103,7 +103,9 @@ end
 local function getTileSnapshotValue()
     local room = state.getSelectedRoom()
 
-    return utils.deepcopy(room[tool.layer].matrix)
+    if room then
+        return utils.deepcopy(room[tool.layer].matrix)
+    end
 end
 
 local function startTileSnapshot()
@@ -112,12 +114,15 @@ local function startTileSnapshot()
 end
 
 local function stopTileSnapshot()
-    if snapshotHasChanged then
+    if snapshotValue and snapshotHasChanged then
         local room = state.getSelectedRoom()
         local afterSnapshotValue = getTileSnapshotValue()
-        local snapshot = snapshotUtils.roomTilesSnapshot(room, tool.layer, "Brush", snapshotValue, afterSnapshotValue)
 
-        history.addSnapshot(snapshot)
+        if afterSnapshotValue then
+            local snapshot = snapshotUtils.roomTilesSnapshot(room, tool.layer, "Brush", snapshotValue, afterSnapshotValue)
+
+            history.addSnapshot(snapshot)
+        end
     end
 end
 
