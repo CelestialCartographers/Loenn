@@ -17,6 +17,7 @@ function selections.getSelectionsForRoom(room, layer)
                 if main then
                     main.item = item
                     main.node = 0
+                    main.layer = layer
 
                     table.insert(rectangles, main)
                 end
@@ -25,6 +26,7 @@ function selections.getSelectionsForRoom(room, layer)
                     for j, node in ipairs(nodes) do
                         node.item = item
                         node.node = j
+                        node.layer = layer
 
                         table.insert(rectangles, node)
                     end
