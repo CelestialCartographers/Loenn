@@ -15,14 +15,12 @@ local ignoredEncodingAttrs = {
     _name = true,
     _id = true,
     nodes = true,
-    _raw = true,
     _type = true
 }
 
 function triggerStruct.decode(data)
     local trigger = {
         _type = "trigger",
-        _raw = data
     }
 
     trigger._name = data.__name

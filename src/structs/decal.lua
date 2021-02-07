@@ -12,8 +12,7 @@ end
 
 function decalStruct.decode(data)
     local decal = {
-        _type = "decal",
-        _raw = data
+        _type = "decal"
     }
 
     decal.texture = decalStruct.decodeDecalTexture(data.texture or "")

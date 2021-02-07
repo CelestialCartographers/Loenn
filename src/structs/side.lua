@@ -12,7 +12,6 @@ local decoderBlacklist = {
 
 local encoderBlacklist = {
     map = true,
-    _raw = true,
     _type = true
 }
 
@@ -61,8 +60,7 @@ end
 
 function sideStruct.decode(data)
     local side = {
-        _type = "side",
-        _raw = data
+        _type = "side"
     }
 
     for i, v in ipairs(data.__children or {}) do

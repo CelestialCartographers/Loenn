@@ -6,8 +6,7 @@ local applyStruct = {}
 
 function applyStruct.decode(data)
     local res = {
-        _type = "apply",
-        _raw = data
+        _type = "apply"
     }
 
     for k, v in pairs(data) do

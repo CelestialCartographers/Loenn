@@ -24,8 +24,7 @@ roomStruct.recommendedMinimumHeight = 184
 
 function roomStruct.decode(data)
     local room = {
-        _type = "room",
-        _raw = data
+        _type = "room"
     }
 
     room.name = data.name
