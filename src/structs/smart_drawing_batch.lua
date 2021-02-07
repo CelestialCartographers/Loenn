@@ -390,13 +390,21 @@ function gridCanvasBatchMt.__index:updateDirtyRegions()
 end
 
 function gridCanvasBatchMt.__index:draw()
-    self:updateDirtyRegions()
+    if self._canvas then
+        self:updateDirtyRegions()
 
-    love.graphics.draw(self._canvas, 0, 0)
+        love.graphics.draw(self._canvas, 0, 0)
+    end
 end
 
 function gridCanvasBatchMt.__index:release()
-    return self._canvas:release()
+    local released = self._canvas:release()
+
+    if released then
+        self._canvas = nil
+    end
+
+    return released
 end
 
 -- Works like the matrix drawing batch, but assumes that a "cell" can be replaced by painting over its space and then drawn again
