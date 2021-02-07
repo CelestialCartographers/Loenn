@@ -2,8 +2,7 @@ local effectStruct = {}
 
 function effectStruct.decode(data)
     local res = {
-        _type = "effect",
-        _raw = data
+        _type = "effect"
     }
 
     res._name = data.__name -- Keep types consistent, store effect name in _name instead

@@ -5,8 +5,7 @@ fillerStruct.recommendedMinimumHeight = 8
 
 function fillerStruct.decode(data)
     local filler = {
-        _type = "filler",
-        _raw = data
+        _type = "filler"
     }
 
     filler.x = data.x or 0

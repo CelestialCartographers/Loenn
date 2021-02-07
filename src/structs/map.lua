@@ -7,8 +7,7 @@ local mapStruct = {}
 
 function mapStruct.decode(data)
     local map = {
-        _type = "map",
-        _raw = data
+        _type = "map"
     }
 
     map.package = data._package

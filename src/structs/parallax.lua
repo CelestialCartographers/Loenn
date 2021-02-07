@@ -2,8 +2,7 @@ local parallaxStruct = {}
 
 function parallaxStruct.decode(data)
     local res = {
-        _type = "parallax",
-        _raw = data
+        _type = "parallax"
     }
 
     for k, v in pairs(data or {}) do

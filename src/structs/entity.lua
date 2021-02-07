@@ -17,14 +17,12 @@ local ignoredEncodingAttrs = {
     _name = true,
     _id = true,
     nodes = true,
-    _raw = true,
     _type = true
 }
 
 function entityStruct.decode(data)
     local entity = {
-        _type = "entity",
-        _raw = data
+        _type = "entity"
     }
 
     entity._name = data.__name
