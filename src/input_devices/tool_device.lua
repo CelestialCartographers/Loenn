@@ -27,13 +27,16 @@ function device.mouseclicked(x, y, button, istouch, presses)
     if state.map ~= nil then
         local currentTool = toolHandler.currentTool
         local actionButton = configs.editor.toolActionButton
+        local addModifier = configs.editor.selectionAddModifier
 
         if button == actionButton then
             local mapX, mapY = viewport.getMapCoordinates(x, y)
             local itemClicked = utils.getRoomAtCoords(mapX, mapY, state.map) or utils.getFillerAtCoords(mapX, mapY, state.map)
+            local addModifierHeld = keyboardHelper.modifierHeld(addModifier)
+            local currentItem = state.getSelectedItem()
 
-            if itemClicked and itemClicked ~= state.getSelectedItem() then
-                state.selectItem(itemClicked)
+            if itemClicked and itemClicked ~= currentItem then
+                state.selectItem(itemClicked, addModifierHeld)
 
                 return true
             end

@@ -304,9 +304,13 @@ function utils.setSimpleCoordinateSeed(x, y)
     utils.setRandomSeed(seed)
 end
 
-function utils.deepcopy(v)
+function utils.deepcopy(v, copyMetatables)
     if type(v) == "table" then
         local res = {}
+
+        if copyMetatables ~= false then
+            setmetatable(res, getmetatable(v))
+        end
 
         for key, value <- v do
             res[key] = utils.deepcopy(value)

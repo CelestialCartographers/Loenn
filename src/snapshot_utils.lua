@@ -4,6 +4,8 @@ local toolUtils = require("tool_utils")
 local state = require("loaded_state")
 local snapshot = require("structs.snapshot")
 local matrix = require("matrix")
+local celesteRender = require("celeste_render")
+local viewportHandler = require("viewport_handler")
 
 local snapshotUtils = {}
 
@@ -72,6 +74,64 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         room = room.name,
         width = tilesBefore._width,
         height = tilesBefore._height
+    }
+
+    return snapshot.create(description, data, backward, forward)
+end
+
+local function applyRoomChanges(data, target)
+    local targetRoom = state.getRoomByName(data.room)
+
+    if targetRoom then
+        table.clear(targetRoom)
+
+        for k, v in pairs(target) do
+            targetRoom[k] = utils.deepcopy(v)
+        end
+
+        celesteRender.invalidateRoomCache(targetRoom)
+        celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
+    end
+end
+
+function snapshotUtils.roomSnapshot(room, description, before, after)
+    local function forward(data)
+        applyRoomChanges(data, after)
+    end
+
+    local function backward(data)
+        applyRoomChanges(data, before)
+    end
+
+    local data = {
+        room = room.name
+    }
+
+    return snapshot.create(description, data, backward, forward)
+end
+
+local function applyFillerChanges(data, target)
+    local filler = data.filler
+    if filler then
+        filler.x = target.x
+        filler.y = target.y
+
+        filler.width = target.width
+        filler.height = target.height
+    end
+end
+
+function snapshotUtils.fillerSnapshot(filler, description, before, after)
+    local function forward(data)
+        applyFillerChanges(data, after)
+    end
+
+    local function backward(data)
+        applyFillerChanges(data, before)
+    end
+
+    local data = {
+        filler = filler
     }
 
     return snapshot.create(description, data, backward, forward)

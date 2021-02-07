@@ -183,38 +183,52 @@ local function getPreviewsCorners(previews)
     return tlx, tly, brx, bry
 end
 
+-- TODO - Improve decal logic, currently can't copy paste between bg <-> fg
 local function pasteItems(room, layer, previews)
     local pasteCentered = configs.editor.pasteCentered
-    local snapshot = snapshotUtils.roomLayerSnapshot(function()
-        local handler = layerHandlers.getHandler(layer)
+    local snapshot, usedLayers = snapshotUtils.roomLayerSnapshot(function()
+        local layerItems = {}
 
-        if handler and handler.getRoomItems then
-            local items = handler.getRoomItems(room, layer)
-            local cursorX, cursorY = toolUtils.getCursorPositionInRoom(viewportHandler.getMousePosition())
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(viewportHandler.getMousePosition())
 
-            local tlx, tly, brx, bry = getPreviewsCorners(previews)
-            local width, height = brx - tlx, bry - tly
-            local widthOffset = pasteCentered and width / 2 or 0
-            local heightOffset = pasteCentered and height / 2 or 0
+        local tlx, tly, brx, bry = getPreviewsCorners(previews)
+        local width, height = brx - tlx, bry - tly
+        local widthOffset = pasteCentered and width / 2 or 0
+        local heightOffset = pasteCentered and height / 2 or 0
 
-            for _, preview in ipairs(previews) do
-                -- TODO - Assign id if needed
+        for _, preview in ipairs(previews) do
+            -- TODO - Assign id if needed
 
-                local item = preview.item
+            local item = preview.item
+            local targetLayer = preview.layer
 
-                item.x = cursorX + item.x - tlx - widthOffset
-                item.y = cursorY + item.y - tly - heightOffset
-                preview.x = cursorX + preview.x - tlx - widthOffset
-                preview.y = cursorY + preview.y - tly - heightOffset
+            item.x = cursorX + item.x - tlx - widthOffset
+            item.y = cursorY + item.y - tly - heightOffset
+            preview.x = cursorX + preview.x - tlx - widthOffset
+            preview.y = cursorY + preview.y - tly - heightOffset
 
-                table.insert(items, item)
+            local targetItems = layerItems[targetLayer]
+
+            if not targetItems then
+                local handler = layerHandlers.getHandler(targetLayer)
+
+                if handler and handler.getRoomItems then
+                    targetItems = handler.getRoomItems(room, targetLayer)
+                    layerItems[targetLayer] = targetItems
+                end
             end
 
-            selectionPreviews = previews
+            if targetItems then
+                table.insert(targetItems, item)
+            end
         end
+
+        selectionPreviews = previews
+
+        return table.keys(layerItems)
     end, room, layer, "Selection Pasted")
 
-    return snapshot
+    return snapshot, usedLayers
 end
 
 local function handleItemMovementKeys(room, key, scancode, isrepeat)
@@ -332,10 +346,14 @@ local function pasteItemsHotkey()
 
     if newPreviews and #newPreviews > 0 then
         local room = state.getSelectedRoom()
-        local snapshot = pasteItems(room, tool.layer, newPreviews)
+        local snapshot, usedLayers = pasteItems(room, tool.layer, newPreviews)
 
         history.addSnapshot(snapshot)
         toolUtils.redrawTargetLayer(room, tool.layer)
+
+        for _, layer in ipairs(usedLayers) do
+            toolUtils.redrawTargetLayer(room, layer)
+        end
     end
 end
 
