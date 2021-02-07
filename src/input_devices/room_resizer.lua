@@ -12,6 +12,7 @@ local roomStruct = require("structs.room")
 local fillerStruct = require("structs.filler")
 
 local dragging
+local draggingPreview
 local draggingStartX
 local draggingStartY
 local itemPosition
@@ -42,6 +43,18 @@ local widthHeightMultipliers = {
     {0.0, 1.0},
     {0.0, 0.5},
     {0.0, 0.0}
+}
+
+-- Starting at top, going clockwise
+local resizeCursorNames = {
+    "sizens",
+    "sizenesw",
+    "sizewe",
+    "sizenwse",
+    "sizens",
+    "sizenesw",
+    "sizewe",
+    "sizenwse"
 }
 
 local function getTrianglePoints(x, y, width, height, scale)
@@ -97,6 +110,16 @@ local function getResizeDirections(side)
     return resizeHorizontal, resizeVertical
 end
 
+local function updateCursor()
+    local cursor = "arrow"
+
+    if draggingPreview then
+        cursor = resizeCursorNames[draggingPreview]
+    end
+
+    love.mouse.setCursor(love.mouse.getSystemCursor(cursor))
+end
+
 local function getItemStruct(itemType)
     if itemType == "room" then
         return roomStruct
@@ -139,25 +162,8 @@ function roomResizer.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton and (itemType == "room" or itemType == "filler") then
-        local viewport = viewportHandler.viewport
-        local itemStruct = getItemStruct(itemType)
-
-        local itemX, itemY = itemStruct.getPosition(item)
-        local width, height = itemStruct.getSize(item)
-
-        local newItemPosition = {x = itemX, y = itemY}
-
-        local cursorX, cursorY = viewportHandler.getRoomCoordindates(newItemPosition, x, y)
-        local tileX, tileY = viewportHandler.pixelToTileCoordinates(cursorX, cursorY)
-        local side = draggingResizeTriangle(cursorX * viewport.scale, cursorY * viewport.scale, itemX, itemY, width, height, viewport)
-
-        if side then
-            dragging = side
-            draggingStartX = tileX
-            draggingStartY = tileY
-            itemPosition = newItemPosition
-
-            return true
+        if draggingPreview then
+            dragging = draggingPreview
         end
     end
 end
@@ -165,52 +171,70 @@ end
 function roomResizer.mousereleased(x, y, button, istouch, presses)
     local consume = not not dragging
 
+    draggingPreview = false
     dragging = false
 
     return consume
 end
 
--- TODO - Bug with resizing on Up/Down
 function roomResizer.mousemoved(x, y, dx, dy, istouch)
     local item, itemType = loadedState.getSelectedItem()
 
-    if dragging and (itemType == "room" or itemType == "filler") then
+    if itemType == "room" or itemType == "filler" then
         local itemStruct = getItemStruct(itemType)
+        local viewport = viewportHandler.viewport
 
-        local startX, startY = draggingStartX, draggingStartY
-        local tileX, tileY = viewportHandler.pixelToTileCoordinates(viewportHandler.getRoomCoordindates(itemPosition, x, y))
-        local deltaX, deltaY = tileX - startX, tileY - startY
-
+        local itemX, itemY = itemStruct.getPosition(item)
         local width, height = itemStruct.getSize(item)
 
-        if deltaX ~= 0 or deltaY ~= 0 then
-            local resizeHorizontal, resizeVertical = getResizeDirections(dragging)
+        if dragging then
+            local startX, startY = draggingStartX, draggingStartY
+            local tileX, tileY = viewportHandler.pixelToTileCoordinates(viewportHandler.getRoomCoordindates(itemPosition, x, y))
+            local deltaX, deltaY = tileX - startX, tileY - startY
 
-            deltaX, deltaY = fixDeltas(resizeHorizontal, resizeVertical, deltaX, deltaY)
+            if deltaX ~= 0 or deltaY ~= 0 then
+                local resizeHorizontal, resizeVertical = getResizeDirections(dragging)
 
-            local newWidth = width + deltaX * 8
-            local newHeight = height + deltaY * 8
+                deltaX, deltaY = fixDeltas(resizeHorizontal, resizeVertical, deltaX, deltaY)
 
-            if resizeHorizontal and deltaX ~= 0 and newWidth >= itemStruct.recommendedMinimumWidth then
-                itemStruct.directionalResize(item, resizeHorizontal, deltaX)
+                local newWidth = width + deltaX * 8
+                local newHeight = height + deltaY * 8
+
+                if resizeHorizontal and deltaX ~= 0 and newWidth >= itemStruct.recommendedMinimumWidth then
+                    itemStruct.directionalResize(item, resizeHorizontal, deltaX)
+                end
+
+                if resizeVertical and deltaY ~= 0 and newHeight >= itemStruct.recommendedMinimumHeight then
+                    itemStruct.directionalResize(item, resizeVertical, deltaY)
+                end
+
+                draggingStartX = tileX
+                draggingStartY = tileY
+
+                if itemType == "room" then
+                    -- TODO - Improve this, very expensive update
+                    celesteRender.invalidateRoomCache(item)
+                    celesteRender.forceRoomBatchRender(item, viewportHandler.viewport)
+                end
             end
 
-            if resizeVertical and deltaY ~= 0 and newHeight >= itemStruct.recommendedMinimumHeight then
-                itemStruct.directionalResize(item, resizeVertical, deltaY)
-            end
+            return true
 
+        else
+            local newItemPosition = {x = itemX, y = itemY}
+            local cursorX, cursorY = viewportHandler.getRoomCoordindates(newItemPosition, x, y)
+
+            local tileX, tileY = viewportHandler.pixelToTileCoordinates(cursorX, cursorY)
+            local side = draggingResizeTriangle(cursorX * viewport.scale, cursorY * viewport.scale, itemX, itemY, width, height, viewport)
+
+            draggingPreview = side
             draggingStartX = tileX
             draggingStartY = tileY
-
-            if itemType == "room" then
-                -- TODO - Improve this, very expensive update
-                celesteRender.invalidateRoomCache(item)
-                celesteRender.forceRoomBatchRender(item, viewportHandler.viewport)
-            end
+            itemPosition = newItemPosition
         end
-
-        return true
     end
+
+    updateCursor()
 end
 
 function roomResizer.mouseclicked(x, y, button, istouch, presses)
