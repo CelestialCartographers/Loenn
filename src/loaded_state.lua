@@ -12,10 +12,14 @@ local sideStruct = require("structs.side")
 
 local state = {}
 
--- TODO - Check for changes and warn users when we aren't just a map viewer
--- TODO - Make and use a tasked version of sideStruct decode
 function state.loadFile(filename)
     if not filename then
+        return
+    end
+
+    if history.madeChanges then
+        sceneHandler.sendEvent("editorLoadWithChanges", state.filename, filename)
+
         return
     end
 
@@ -66,6 +70,7 @@ function state.saveFile(filename)
                         function(binTask)
                             if binTask.done and binTask.success then
                                 state.filename = filename
+                                history.madeChanges = false
 
                             else
                                 sceneHandler.sendEvent("editorMapSaveFailed")

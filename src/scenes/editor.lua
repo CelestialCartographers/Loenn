@@ -18,6 +18,7 @@ function editorScene:firstEnter()
     local mapLoaderDevice = require("input_devices.map_loader")
     local roomResizeDevice = require("input_devices.room_resizer")
     local toolHandlerDevice = require("input_devices.tool_device")
+    local quitHandlerDevice = require("input_devices.prevent_quit")
 
     inputDevice.newInputDevice(self.inputDevices, userInterfaceDevice)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
@@ -25,6 +26,7 @@ function editorScene:firstEnter()
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)
     inputDevice.newInputDevice(self.inputDevices, roomResizeDevice)
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
+    inputDevice.newInputDevice(self.inputDevices, quitHandlerDevice)
 end
 
 function editorScene:draw()

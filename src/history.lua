@@ -2,9 +2,13 @@ local timeline = require("structs.timeline")
 
 local history = {}
 
+history.madeChanges = false
+history.lastChange = 0
 history.timeline = timeline.create()
 
 function history.reset()
+    history.madeChanges = false
+    history.lastChanged = 0
     history.timeline = timeline.create()
 end
 
@@ -17,6 +21,9 @@ function history.redo()
 end
 
 function history.addSnapshot(snapshot)
+    history.madeChanges = true
+    history.lastChange = os.time()
+
     history.timeline:addSnapshot(snapshot)
 end
 

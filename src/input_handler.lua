@@ -91,4 +91,10 @@ function love.directorydropped(path)
     sceneHandler.sendEvent("directorydropped", path)
 end
 
+function love.quit()
+    local handled, preventQuit = sceneHandler.sendEvent("quit")
+
+    return preventQuit
+end
+
 return inputHandler
