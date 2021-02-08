@@ -210,7 +210,7 @@ function tool.draw()
 
         local hudText = string.format("Cursor: %s, %s (%s, %s)", tx + 1, ty + 1, px, py)
 
-        love.graphics.printf(hudText, 20, 120, viewportHandler.viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
+        love.graphics.printf(hudText, 20, 100, viewportHandler.viewport.width, "left", 0, fonts.fontScale, fonts.fontScale)
 
         viewportHandler.drawRelativeTo(room.x, room.y, function()
             drawing.callKeepOriginalColor(function()
