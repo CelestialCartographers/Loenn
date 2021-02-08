@@ -34,6 +34,7 @@ colors.roomBorderDefault = {255 / 255, 255 / 255, 255 / 255}
 
 -- Color of filler objects
 colors.fillerColor = {68 / 255, 68 / 255, 68 / 255}
+colors.fillerSelectedColor = {78 / 255, 108 / 255, 78 / 255}
 
 -- Brush tool color
 colors.brushColor = {77 / 255, 77 / 255, 77 / 255, 204 / 255}

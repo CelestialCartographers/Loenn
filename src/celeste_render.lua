@@ -642,12 +642,17 @@ local function getRoomCanvas(room, viewport, selected)
     return roomCache[room.name].canvas and roomCache[room.name].canvas.result
 end
 
-function celesteRender.drawRooms(rooms, viewport, selectedRoom)
+function celesteRender.drawRooms(rooms, viewport, selectedItem, selectedItemType)
     for _, room in ipairs(rooms) do
         local roomVisible = viewportHandler.roomVisible(room, viewport)
+        local selected = room == selectedItem, selectedItemType
+
+        if selectedItemType == "table" then
+            selected = selectedItem[room]
+        end
 
         if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or roomVisible then
-            celesteRender.drawRoom(room, viewport, room == selectedRoom, roomVisible)
+            celesteRender.drawRoom(room, viewport, selected, roomVisible)
         end
     end
 end
@@ -698,15 +703,32 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
     end
 end
 
--- Set colors once for all fillers
-function celesteRender.drawFillers(fillers, viewport)
+-- Iterate over twice
+-- Batch draw all selected and unselected fillers
+function celesteRender.drawFillers(fillers, viewport, selectedItem, selectedItemType)
     local pr, pb, pg, pa = love.graphics.getColor()
 
+    local multipleSelections = selectedItemType == "table"
+
+    -- Unselected fillers
     love.graphics.setColor(colors.fillerColor)
 
     for i, filler in ipairs(fillers) do
-        if viewportHandler.fillerVisible(filler, viewport) then
-            celesteRender.drawFiller(filler, viewport)
+        if not (multipleSelections and selectedItem[filler] or selectedItem == filler) then
+            if viewportHandler.fillerVisible(filler, viewport) then
+                celesteRender.drawFiller(filler, viewport)
+            end
+        end
+    end
+
+    -- Selected fillers
+    love.graphics.setColor(colors.fillerSelectedColor)
+
+    for i, filler in ipairs(fillers) do
+        if multipleSelections and selectedItem[filler] or selectedItem == filler then
+            if viewportHandler.fillerVisible(filler, viewport) then
+                celesteRender.drawFiller(filler, viewport)
+            end
         end
     end
 
@@ -731,10 +753,10 @@ function celesteRender.drawMap(state)
         local viewport = state.viewport
 
         if viewport.visible then
-            local selectedRoom = state.getSelectedRoom()
+            local selectedItem, selectedItemType = state.getSelectedItem()
 
-            celesteRender.drawFillers(map.fillers, viewport)
-            celesteRender.drawRooms(map.rooms, viewport, selectedRoom)
+            celesteRender.drawFillers(map.fillers, viewport, selectedItem, selectedItemType)
+            celesteRender.drawRooms(map.rooms, viewport, selectedItem, selectedItemType)
         end
     end
 end
