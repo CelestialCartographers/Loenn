@@ -1,4 +1,5 @@
 local timeline = require("structs.timeline")
+local configs = require("configs")
 
 local history = {}
 
@@ -9,7 +10,7 @@ history.timeline = timeline.create()
 function history.reset()
     history.madeChanges = false
     history.lastChanged = 0
-    history.timeline = timeline.create()
+    history.timeline = timeline.create(configs.editor.historyEntryLimit)
 end
 
 function history.undo()
