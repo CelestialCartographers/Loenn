@@ -56,6 +56,18 @@ entities.wire.placements.wire=Wire
 # Crystal Heart
 entities.blackgem.placements.crystal_heart=Crystal Heart
 
+# Strawberry
+entities.strawberry.placements.normal=Strawberry
+entities.strawberry.placements.normal_winged=Strawberry (Winged)
+entities.strawberry.placements.moon=Moonberry
+
+# Golden Strawberry
+entities.goldenBerry.placements.golden=Golden Strawberry
+entities.goldenBerry.placements.golden_winged=Golden Strawberry (Winged)
+
+# Golden Strawberry (No Dash)
+entities.memorialTextController.placements.golden_no_dash=Golden Strawberry (No Dash)
+
 
 # -- Triggers --
 # triggers.triggerName.placements.*
