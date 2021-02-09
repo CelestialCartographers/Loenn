@@ -4,7 +4,7 @@ heart.name = "blackgem"
 heart.depth = -2000000
 heart.texture = "collectables/heartGem/0/00"
 heart.placements = {
-    name = "Crystal Heart"
+    name = "crystal_heart"
 }
 
 return heart

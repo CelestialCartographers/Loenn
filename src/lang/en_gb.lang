@@ -53,6 +53,9 @@ entities.player.placements.player=Player
 # Wire
 entities.wire.placements.wire=Wire
 
+# Crystal Heart
+entities.blackgem.placements.crystal_heart=Crystal Heart
+
 
 # -- Triggers --
 # triggers.triggerName.placements.*
