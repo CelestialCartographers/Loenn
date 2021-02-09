@@ -8,6 +8,7 @@ return {
     -- Camera
     cameraZoomIn = "ctrl + plus",
     cameraZoomOut = "ctrl + minus",
+	cameraHome = "home",
     toggleFullscreen = "f11",
 
     -- Room Movement
