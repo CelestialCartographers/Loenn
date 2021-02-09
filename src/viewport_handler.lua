@@ -83,6 +83,11 @@ function viewportHandler.zoomOut()
     viewport.y = (viewport.y - mouseY) / 2
 end
 
+function viewportHandler.toggleFullscreen()
+	local fullscreen, fstype = love.window.getFullscreen()
+	love.window.setFullscreen(not fullscreen, fstype)
+end
+
 function viewportHandler.moveToPosition(x, y, scale, centered)
     if scale then
         viewport.scale = scale
