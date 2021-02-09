@@ -87,19 +87,29 @@ function drawableSpriteMt.__index:getRectangleRaw()
     local drawWidth = width * math.abs(scaleX)
     local drawHeight = height * math.abs(scaleY)
 
-    -- TODO - Test this in more cases
     -- Assume only 90 degree angles
+    -- Using counter clockwise rotation matrix since the Y axis is mirrored
     if rotation and rotation ~= 0 then
-        local drawOffsetX = x - drawX
-        local drawOffsetY = y - drawY
+        local drawOffsetX = drawX - x
+        local drawOffsetY = drawY - y
 
         local drawOffsetXRotated = drawOffsetX * math.cos(rotation) - drawOffsetY * math.sin(rotation)
         local drawOffsetYRotated = drawOffsetX * math.sin(rotation) + drawOffsetY * math.cos(rotation)
         local widthRotated = drawWidth * math.cos(rotation) - drawHeight * math.sin(rotation)
         local heightRotated = drawWidth * math.sin(rotation) + drawHeight * math.cos(rotation)
 
-        drawX = drawX + drawOffsetX - widthRotated * (1 - justificationX) - drawOffsetXRotated * justificationX
-        drawY = drawY + drawOffsetY - heightRotated * (1 - justificationY) - drawOffsetYRotated * justificationY
+        drawX = x + drawOffsetXRotated
+        drawY = y + drawOffsetYRotated
+
+        if widthRotated < 0 then
+            drawX += widthRotated
+            widthRotated = -widthRotated
+        end
+
+        if heightRotated < 0 then
+            drawY += heightRotated
+            heightRotated = -heightRotated
+        end
 
         drawWidth = widthRotated
         drawHeight = heightRotated
