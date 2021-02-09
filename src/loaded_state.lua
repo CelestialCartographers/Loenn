@@ -46,6 +46,8 @@ function state.loadFile(filename)
                         state.selectItem(state.map and state.map.rooms[1])
 
                         sceneHandler.changeScene("Editor")
+
+                        sceneHandler.sendEvent("editorMapLoaded")
                     end
                 )
 
@@ -71,6 +73,8 @@ function state.saveFile(filename)
                             if binTask.done and binTask.success then
                                 state.filename = filename
                                 history.madeChanges = false
+
+                                sceneHandler.sendEvent("editorMapSaved")
 
                             else
                                 sceneHandler.sendEvent("editorMapSaveFailed")
