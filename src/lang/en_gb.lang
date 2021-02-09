@@ -68,6 +68,11 @@ entities.goldenBerry.placements.golden_winged=Golden Strawberry (Winged)
 # Golden Strawberry (No Dash)
 entities.memorialTextController.placements.golden_no_dash=Golden Strawberry (No Dash)
 
+# Springs
+entities.spring.placements.up=Spring (Up)
+entities.wallSpringLeft.placements.right=Spring (Right)
+entities.wallSpringRight.placements.left=Spring (Left)
+
 
 # -- Triggers --
 # triggers.triggerName.placements.*
