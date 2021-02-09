@@ -55,10 +55,18 @@ function timeline._MT.__index:addSnapshot(snapshot)
 
     table.insert(self.snapshots, snapshot)
 
+    if self.limit and self.limit > 0 then
+        while #self.snapshots > self.limit do
+            table.remove(self.snapshots, 1)
+
+            self.index -= 1
+        end
+    end
+
     return true
 end
 
-function timeline.create()
+function timeline.create(snapshotLimit)
     local res = {
         _type = "timeline"
     }
@@ -66,6 +74,7 @@ function timeline.create()
     res.snapshots = {}
     res.index = 0
     res.skip = false
+    res.limit = snapshotLimit
 
     return setmetatable(res, timeline._MT)
 end

@@ -42,9 +42,7 @@ function sceneHandler.sendEvent(event, ...)
         return false
     end
 
-    scene[event](scene, ...)
-
-    return true
+    return true, scene[event](scene, ...)
 end
 
 function sceneHandler.draw()

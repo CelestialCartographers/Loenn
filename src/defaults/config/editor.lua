@@ -24,5 +24,8 @@ return {
     alwaysRedrawUnselectedRooms = false,
 
     -- Loading
-    lazyLoadExternalAtlases = true
+    lazyLoadExternalAtlases = true,
+
+    -- History
+    historyEntryLimit = false
 }
