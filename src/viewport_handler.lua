@@ -83,6 +83,10 @@ function viewportHandler.zoomOut()
     viewport.y = (viewport.y - mouseY) / 2
 end
 
+function viewportHandler.resetZoom()
+    viewport.scale = 1
+end
+
 function viewportHandler.home()
 	viewport.scale = 1
 	viewport.x = 0

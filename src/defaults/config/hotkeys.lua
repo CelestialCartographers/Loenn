@@ -8,6 +8,7 @@ return {
     -- Camera
     cameraZoomIn = "ctrl + plus",
     cameraZoomOut = "ctrl + minus",
+	cameraResetZoom = "ctrl + 0",
 	cameraHome = "home",
     toggleFullscreen = "f11",
 
