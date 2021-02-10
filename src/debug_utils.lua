@@ -61,6 +61,8 @@ function debugUtils.reloadLanguageFiles()
 
     languageRegistry.loadInternalFiles()
     languageRegistry.loadExternalFiles()
+
+    languageRegistry.setLanguage(languageRegistry.currentLanguageName)
 end
 
 function debugUtils.reloadUI()
