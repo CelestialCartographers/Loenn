@@ -7,6 +7,8 @@ local drawableSprite = require("structs.drawable_sprite")
 
 local drawableRectangle = {}
 
+-- TODO - Consider finding this on the Celeste Gameplay atlas if possible
+-- Better batching
 drawableRectangle.tintingPixelFilename = "assets/1x1-tinting-pixel.png"
 drawableRectangle.tintingPixel = love.graphics.newImage(drawableRectangle.tintingPixelFilename)
 drawableRectangle.fakeTintingPixelImageMeta = {
@@ -55,7 +57,7 @@ function drawableRectangleMt.__index:getRectangleRaw()
 end
 
 function drawableRectangleMt.__index:getRectangle()
-    return utils.rectangle(self:getRectangle())
+    return utils.rectangle(self:getRectangleRaw())
 end
 
 function drawableRectangleMt.__index:drawRectangle(mode, color)
@@ -79,7 +81,12 @@ function drawableRectangleMt.__index:getDrawableSprite()
         return getDrawableSpriteForRectangle(self.x, self.y, self.width, self.height, self.color)
 
     elseif self.mode == "line" then
-        -- TODO - Implement
+        return {
+            getDrawableSpriteForRectangle(self.x, self.y, self.width, 1, self.color),
+            getDrawableSpriteForRectangle(self.x, self.y + self.height - 1, self.width, 1, self.color),
+            getDrawableSpriteForRectangle(self.x, self.y, 1, self.height, self.color),
+            getDrawableSpriteForRectangle(self.x + self.width - 1, self.y, 1, self.height, self.color)
+        }
     end
 end
 

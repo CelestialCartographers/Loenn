@@ -90,20 +90,39 @@ function entities.getDrawable(name, handler, room, entity, viewport)
 
         return drawable
 
-    elseif handler.rectangle then
-        local rectangle = handler.rectangle(room, entity, viewport)
-        local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)
-
-        return drawable
-
     elseif handler.draw then
         return drawableFunction.fromFunction(handler.draw, room, entity, viewport)
+
+    elseif handler.rectangle or entity.width and entity.height then
+        local rectangle
+
+        if handler.rectangle then
+            rectangle = handler.rectangle(room, entity, viewport)
+
+        else
+            rectangle = utils.rectangle(entity.x, entity.y, entity.width, entity.height)
+        end
+
+        -- If both fillColor and borderColor is specified then make a rectangle with these
+        if handler.fillColor and handler.borderColor then
+            local drawableFill = drawableRectangle.fromRectangle("fill", handler.fillColor, rectangle):getDrawableSprite()
+            local drawableBorder = drawableRectangle.fromRectangle("line", handler.borderColor, rectangle):getDrawableSprite()
+
+            table.insert(drawableBorder, 1, drawableFill)
+
+            return drawableBorder
+
+        else
+            local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)
+
+            return drawable
+        end
     end
 end
 
 -- Returns main entity selection rectangle, then table of node rectangles
 -- TODO - Implement nodes
-function entities.getSelection(room, entity)
+function entities.getSelection(room, entity, viewport)
     local name = entity._name
     local handler = entities.registeredEntities[name]
 
@@ -116,14 +135,23 @@ function entities.getSelection(room, entity)
     else
         local drawable = entities.getDrawable(name, handler, room, entity)
 
-        if #drawable == 0 and utils.typeof(drawable) == "drawableSprite" then
+        if #drawable == 0 and drawable.getRectangle then
             return drawable:getRectangle(), nil
 
         else
+            -- TODO - Inline coverRectangles?
+            -- Check if this is expensive enough in larger rooms
+
             local rectangles = {}
 
             for i, draw in ipairs(drawable) do
-                rectangles[i] = draw:getRectangle()
+                if draw.getRectangle then
+                    rectangles[i] = draw:getRectangle()
+
+                    if draw.ignoreRest then
+                        break
+                    end
+                end
             end
 
             local x, y, width, height = utils.coverRectangles(rectangles)
