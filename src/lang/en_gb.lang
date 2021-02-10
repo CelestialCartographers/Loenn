@@ -104,6 +104,9 @@ entities.spikesLeft.placements.left_tentacles=Spikes (Left, Tentacles)
 # Resort Lantern
 entities.resortLantern.placements.lantern=Resort Lantern
 
+# Dream Block
+entities.dreamBlock.placements.dream_block=Space Jamzz
+
 
 # -- Triggers --
 # triggers.triggerName.placements.*
