@@ -73,6 +73,34 @@ entities.spring.placements.up=Spring (Up)
 entities.wallSpringLeft.placements.right=Spring (Right)
 entities.wallSpringRight.placements.left=Spring (Left)
 
+# Spikes Up
+entities.spikesUp.placements.up_default=Spikes (Up, Default)
+entities.spikesUp.placements.up_outline=Spikes (Up, Outline)
+entities.spikesUp.placements.up_cliffside=Spikes (Up, Cliffside)
+entities.spikesUp.placements.up_reflection=Spikes (Up, Reflection)
+entities.spikesUp.placements.up_tentacles=Spikes (Up, Tentacles)
+
+# Spikes Right
+entities.spikesRight.placements.right_default=Spikes (Right, Default)
+entities.spikesRight.placements.right_outline=Spikes (Right, Outline)
+entities.spikesRight.placements.right_cliffside=Spikes (Right, Cliffside)
+entities.spikesRight.placements.right_reflection=Spikes (Right, Reflection)
+entities.spikesRight.placements.right_tentacles=Spikes (Right, Tentacles)
+
+# Spikes Down
+entities.spikesDown.placements.down_default=Spikes (Down, Default)
+entities.spikesDown.placements.down_outline=Spikes (Down, Outline)
+entities.spikesDown.placements.down_cliffside=Spikes (Down, Cliffside)
+entities.spikesDown.placements.down_reflection=Spikes (Down, Reflection)
+entities.spikesDown.placements.down_tentacles=Spikes (Down, Tentacles)
+
+# Spikes Left
+entities.spikesLeft.placements.left_default=Spikes (Left, Default)
+entities.spikesLeft.placements.left_outline=Spikes (Left, Outline)
+entities.spikesLeft.placements.left_cliffside=Spikes (Left, Cliffside)
+entities.spikesLeft.placements.left_reflection=Spikes (Left, Reflection)
+entities.spikesLeft.placements.left_tentacles=Spikes (Left, Tentacles)
+
 
 # -- Triggers --
 # triggers.triggerName.placements.*
