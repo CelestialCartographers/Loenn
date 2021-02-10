@@ -56,9 +56,11 @@ function drawableSpriteMt.__index:setColor(color)
     return setColor(self, color)
 end
 
--- TODO - Handle rotation
 -- TODO - Verify that scales are correct
 function drawableSpriteMt.__index:getRectangleRaw()
+    local x = self.x
+    local y = self.y
+
     local width = self.meta.width
     local height = self.meta.height
 
@@ -68,13 +70,52 @@ function drawableSpriteMt.__index:getRectangleRaw()
     local offsetX = self.offsetX or self.meta.offsetX
     local offsetY = self.offsetY or self.meta.offsetY
 
-    local drawX = math.floor(self.x - (realWidth * self.justificationX + offsetX) * self.scaleX)
-    local drawY = math.floor(self.y - (realHeight * self.justificationY + offsetY) * self.scaleY)
+    local justificationX = self.justificationX
+    local justificationY = self.justificationY
 
-    drawX += (self.scaleX < 0 and width * self.scaleX or 0)
-    drawY += (self.scaleY < 0 and height * self.scaleY or 0)
+    local rotation = self.rotation
 
-    return drawX, drawY, width * math.abs(self.scaleX), height * math.abs(self.scaleY)
+    local scaleX = self.scaleX
+    local scaleY = self.scaleY
+
+    local drawX = math.floor(x - (realWidth * justificationX + offsetX) * scaleX)
+    local drawY = math.floor(y - (realHeight * justificationY + offsetY) * scaleY)
+
+    drawX += (scaleX < 0 and width * scaleX or 0)
+    drawY += (scaleY < 0 and height * scaleY or 0)
+
+    local drawWidth = width * math.abs(scaleX)
+    local drawHeight = height * math.abs(scaleY)
+
+    -- Assume only 90 degree angles
+    -- Using counter clockwise rotation matrix since the Y axis is mirrored
+    if rotation and rotation ~= 0 then
+        local drawOffsetX = drawX - x
+        local drawOffsetY = drawY - y
+
+        local drawOffsetXRotated = drawOffsetX * math.cos(rotation) - drawOffsetY * math.sin(rotation)
+        local drawOffsetYRotated = drawOffsetX * math.sin(rotation) + drawOffsetY * math.cos(rotation)
+        local widthRotated = drawWidth * math.cos(rotation) - drawHeight * math.sin(rotation)
+        local heightRotated = drawWidth * math.sin(rotation) + drawHeight * math.cos(rotation)
+
+        drawX = x + drawOffsetXRotated
+        drawY = y + drawOffsetYRotated
+
+        if widthRotated < 0 then
+            drawX += widthRotated
+            widthRotated = -widthRotated
+        end
+
+        if heightRotated < 0 then
+            drawY += heightRotated
+            heightRotated = -heightRotated
+        end
+
+        drawWidth = widthRotated
+        drawHeight = heightRotated
+    end
+
+    return drawX, drawY, drawWidth, drawHeight
 end
 
 function drawableSpriteMt.__index:getRectangle()
