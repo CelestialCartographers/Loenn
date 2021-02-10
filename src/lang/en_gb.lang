@@ -101,6 +101,9 @@ entities.spikesLeft.placements.left_cliffside=Spikes (Left, Cliffside)
 entities.spikesLeft.placements.left_reflection=Spikes (Left, Reflection)
 entities.spikesLeft.placements.left_tentacles=Spikes (Left, Tentacles)
 
+# Resort Lantern
+entities.resortLantern.placements.lantern=Resort Lantern
+
 
 # -- Triggers --
 # triggers.triggerName.placements.*
