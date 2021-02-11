@@ -30,11 +30,18 @@ function drawing.getSimpleCurve(start, stop, control, resolution)
     return res
 end
 
-function drawing.getRelativeQuad(spriteMeta, x, y, width, height)
+function drawing.getRelativeQuad(spriteMeta, x, y, width, height, overflow)
     local image = spriteMeta.image
-    local qx, qy, qw, qh = spriteMeta.quad:getViewport
+    local imageWidth, imageHeight = image:getDimensions()
+    local quadX, quadY, quadWidth, quadHeight = spriteMeta.quad:getViewport
 
-    return love.graphics.newQuad(qx + x, qy + y, width, height, image:getDimensions)
+    -- Make sure the width/height doesn't go outside the original quad
+    if overflow ~= false then
+        width = math.min(width, quadWidth - x)
+        height = math.min(height, quadHeight - y)
+    end
+
+    return love.graphics.newQuad(quadX + x, quadY + y, width, height, imageWidth, imageHeight)
 end
 
 -- TODO - Vertical offset is wrong based on scale?
