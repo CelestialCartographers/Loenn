@@ -151,6 +151,46 @@ function drawableSpriteMt.__index:draw()
     end
 end
 
+function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, overflow)
+    local imageMeta = self.meta
+
+    if imageMeta then
+        local quadTable
+
+        if type(x) == "table" then
+            quadTable = x
+            x, y, width, height = x[1], x[2], x[3], x[4]
+
+        else
+            quadTable = {x, y, width, height}
+        end
+
+        if not imageMeta.quadCache then
+            imageMeta.quadCache = {}
+        end
+
+        -- Get value with false as default, then change it to the quad
+        -- Otherwise we are just creating the quad every single request
+        local quadCache = imageMeta.quadCache
+        local value = utils.getPath(quadCache, quadTable, false, true)
+
+        if value then
+            return value
+
+        else
+            local quad = drawing.getRelativeQuad(imageMeta, x, y, width, height, overflow)
+
+            quadCache[x][y][width][height] = quad
+
+            return quad
+        end
+    end
+end
+
+function drawableSpriteMt.__index:useRelativeQuad(x, y, width, height, overflow)
+    self.quad = self:getRelativeQuad(x, y, width, height, overflow)
+end
+
 function drawableSpriteStruct.spriteFromMeta(meta, data)
     data = data or {}
 

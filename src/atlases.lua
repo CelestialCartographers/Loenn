@@ -25,6 +25,10 @@ function atlases.loadCelesteAtlas(name, meta, path)
     addAtlasMetatable(name)
 end
 
+function atlases.createAtlas(name)
+    addAtlasMetatable(name)
+end
+
 function atlases.loadCelesteAtlases()
     local celesteAtlasPath = utils.joinpath(fileLocations.getCelesteDir(), celesteAtlasRelativePath)
 

@@ -28,7 +28,6 @@ end
 
 function languageRegistry.unloadFiles()
     languageRegistry.languages = {}
-    languageRegistry.currentLanguageName = "en_gb"
 end
 
 function languageRegistry.loadInternalFiles()

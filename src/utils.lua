@@ -241,6 +241,36 @@ function utils.concat(...)
     return res
 end
 
+function utils.getPath(data, path, default, createIfMissing)
+    local target = data
+
+    for i, key in ipairs(path) do
+        local lastKey = i == #path
+        local newTarget = target[key]
+
+        if newTarget then
+            target = newTarget
+
+        else
+            if createIfMissing then
+                if not lastKey then
+                    target[key] = {}
+                    target = target[key]
+
+                else
+                    target[key] = default
+                    target = default
+                end
+
+            else
+                return default
+            end
+        end
+    end
+
+    return target
+end
+
 utils.countKeys = serialize.countKeys
 
 -- Return the 1 index based tile indices for the coordinates
