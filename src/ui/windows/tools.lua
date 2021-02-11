@@ -50,6 +50,7 @@ local function materialCallback(list, material)
 end
 
 local function toolMaterialChangedCallback(self, tool, layer, material)
+    listWidgets.setSelection(toolWindow.layerList, layer, true)
     listWidgets.setSelection(toolWindow.materialList, material, true)
 end
 
@@ -74,7 +75,7 @@ end
 local function toolLayerChangedCallback(self, tool, layer)
     local materialItems = getMaterialItems(layer)
 
-    listWidgets.setSelection(toolWindow.toolList, layer, true)
+    listWidgets.setSelection(toolWindow.layerList, layer, true)
     listWidgets.updateItems(toolWindow.materialList, materialItems)
 end
 
