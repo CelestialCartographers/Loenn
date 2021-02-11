@@ -54,7 +54,7 @@ entities.player.placements.player=Player
 entities.wire.placements.wire=Wire
 
 # Crystal Heart
-entities.blackgem.placements.crystal_heart=Crystal Heart
+entities.blackGem.placements.crystal_heart=Crystal Heart
 
 # Strawberry
 entities.strawberry.placements.normal=Strawberry
@@ -105,7 +105,10 @@ entities.spikesLeft.placements.left_tentacles=Spikes (Left, Tentacles)
 entities.resortLantern.placements.lantern=Resort Lantern
 
 # Dream Block
-entities.dreamBlock.placements.dream_block=Space Jamzz
+entities.dreamBlock.placements.dream_block=Space Jam
+
+# Floating Debris
+entities.floatingDebris.placements.floating_debris=Floating Debris
 
 
 # -- Triggers --
