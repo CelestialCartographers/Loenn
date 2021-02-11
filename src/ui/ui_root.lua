@@ -2,25 +2,56 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
-local menubar = require("ui/menubar")
+local menubar = require("ui.menubar")
+local notifications = require("ui.notification")
 
 local uiRoot = {}
 
-local rootElement = nil
-local windowGroup = nil
+local rootElement
+local mainColumn
+local windowGroup
 
 function uiRoot.updateWindows(windows)
-    if not rootElement then
+    if not windowGroup then
         windowGroup = uiElements.group(
             windows
         ):with(uiUtils.fillWidth):with(uiUtils.fillHeight(true))
 
-        rootElement = uiElements.column({
+    else
+        windowGroup.children = windows
+
+        windowGroup:reflow()
+    end
+
+    if not mainColumn then
+        mainColumn = uiElements.column({
             menubar.getMenubar(),
             windowGroup
         }):with({
             style = {
-                bg = {bg = {}},
+                bg = {},
+                padding = 0,
+                spacing = 0,
+                radius = 0
+            }
+        }):with(uiUtils.fill)
+
+    else
+        mainColumn.children = {
+            menubar.getMenubar(),
+            windowGroup
+        }
+
+        mainColumn:reflow()
+    end
+
+    if not rootElement then
+        rootElement = uiElements.group({
+            mainColumn,
+            notifications.getPopupWindow()
+        }):with({
+            style = {
+                bg = {},
                 padding = 0,
                 spacing = 0,
                 radius = 0
@@ -28,7 +59,9 @@ function uiRoot.updateWindows(windows)
         })
 
     else
-        windowGroup.children = windows
+        rootElement.children[1] = mainColumn
+
+        rootElement:reflow()
     end
 end
 
