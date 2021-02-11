@@ -63,6 +63,15 @@ function roomList.editorMapTargetChanged(list)
     end
 end
 
+function roomList.editorMapLoaded(list)
+    return function()
+        local roomItems = getRoomItems()
+
+        listWidgets.setSelection(list, 1)
+        listWidgets.updateItems(list, roomItems)
+    end
+end
+
 function roomList.getWindow()
     local search = ""
 
@@ -75,7 +84,8 @@ function roomList.getWindow()
     local window = uiElements.window("Room List", column:with(uiUtils.fillHeight(true))):with(uiUtils.fillHeight(false))
 
     window:with({
-        editorMapTargetChanged = roomList.editorMapTargetChanged(list)
+        editorMapTargetChanged = roomList.editorMapTargetChanged(list),
+        editorMapLoaded = roomList.editorMapLoaded(list)
     })
 
     widgetUtils.removeWindowTitlebar(window)
