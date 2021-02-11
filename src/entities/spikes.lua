@@ -115,9 +115,9 @@ local function getNormalSpikeSprites(entity, direction, variant, step)
     return getSpikeSpritesFromTexture(entity, direction, variant, texture, step or 8)
 end
 
--- Spikes with rated sprites
+-- Spikes with rotated sprites
 local function getTentacleSprites(entity, direction, variant, step)
-    local texture= "danger/tentacles00"
+    local texture = "danger/tentacles00"
 
     return getSpikeSpritesFromTexture(entity, direction, variant, texture, step or 16)
 end
