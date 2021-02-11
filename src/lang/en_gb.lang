@@ -110,6 +110,9 @@ entities.dreamBlock.placements.dream_block=Space Jam
 # Floating Debris
 entities.floatingDebris.placements.floating_debris=Floating Debris
 
+# Hanging Lamp
+entities.hanginglamp.placements.hanging_lamp=Hanging Lamp
+
 
 # -- Triggers --
 # triggers.triggerName.placements.*
