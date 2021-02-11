@@ -123,7 +123,7 @@ local function getTentacleSprites(entity, direction, variant, step)
 end
 
 local function getSpikeSprites(entity, direction)
-    local variant = entity.type or "trigger"
+    local variant = entity.type or "default"
 
     if variant == "tentacles" then
         return getTentacleSprites(entity, direction, variant, 16)
