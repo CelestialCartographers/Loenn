@@ -47,14 +47,14 @@ function state.loadFile(filename)
 
                         sceneHandler.changeScene("Editor")
 
-                        sceneHandler.sendEvent("editorMapLoaded")
+                        sceneHandler.sendEvent("editorMapLoaded", filename)
                     end
                 )
 
             else
                 sceneHandler.changeScene("Editor")
 
-                sceneHandler.sendEvent("editorMapLoadFailed")
+                sceneHandler.sendEvent("editorMapLoadFailed", filename)
             end
         end
     )
@@ -74,16 +74,16 @@ function state.saveFile(filename)
                                 state.filename = filename
                                 history.madeChanges = false
 
-                                sceneHandler.sendEvent("editorMapSaved")
+                                sceneHandler.sendEvent("editorMapSaved", filename)
 
                             else
-                                sceneHandler.sendEvent("editorMapSaveFailed")
+                                sceneHandler.sendEvent("editorMapSaveFailed", filename)
                             end
                         end
                     )
 
                 else
-                    sceneHandler.sendEvent("editorMapSaveFailed")
+                    sceneHandler.sendEvent("editorMapSaveFailed", filename)
                 end
             end
         )
