@@ -1,7 +1,7 @@
 -- TODO - Change notification start point and direction? Allow notifications from multiple locations?
--- TODO - Support image argument
 -- TODO - "Rich labels", some minimal markup support
--- TODO - Add close button in notification panel
+-- TODO - Add close button in notification panel? Click to close?
+-- TODO - Lazy layout update the notifcation back off screen, visual odities if window is resized
 
 local ui = require("ui")
 local uiElements = require("ui.elements")
@@ -9,99 +9,161 @@ local uiUtils = require("ui.utils")
 
 local notificationPopup = {}
 
-local notificationWindow
-local notificationLabel = uiElements.label("")
-local notificationQueue = {}
+local activeNotification
+local notificationWindows = {}
+local notificationGroup = uiElements.group(notificationWindows)
 
 local popupStartDuration = 0.4
 local popupStopDuration = 0.4
 
-local function lerpWindowPosition(fromX, fromY, toX, toY, percent)
-    local newX, newY = fromX + (toX - fromX) * percent, fromY + (toY - fromY) * percent
+local function createPopupWindow(popup)
+    local widgets = {
+        uiElements.label(popup.message)
+    }
 
-    if notificationWindow.x ~= newX or notificationWindow.y ~= newY then
-        notificationWindow.x = fromX + (toX - fromX) * percent
-        notificationWindow.y = fromY + (toY - fromY) * percent
+    if popup.image then
+        local image = uiElements.image(popup.image, popup.quad)
 
-        notificationWindow.parent:reflow()
+        table.insert(widgets, 1, image)
+    end
+
+    local row = uiElements.row(widgets)
+
+    row.style.bg = {}
+    row.style.padding = 0
+
+    local panel = uiElements.panel({row}):hook({
+        update = notificationPopup.update
+    }):with({
+        updateHidden = true,
+        interactive = 2,
+
+        x = -1024,
+        y = -1024,
+
+        popup = popup,
+        padding = 16
+    })
+
+    table.insert(notificationWindows, panel)
+    notificationGroup:reflow()
+    ui.root:recollect()
+
+    return panel
+end
+
+local function removePopupWindow(window)
+    for i, target in ipairs(notificationWindows) do
+        if target == window then
+            table.remove(notificationWindows, i)
+            notificationGroup:reflow()
+            ui.root:recollect()
+            window:removeSelf()
+
+            return
+        end
+    end
+end
+
+local function lerpWindowPosition(window, fromX, fromY, toX, toY, percent, threshold)
+    threshold = threshold or 4
+
+    local currentX, currentY = window.x, window.y
+    local newX, newY = math.floor(fromX + (toX - fromX) * percent), math.floor(fromY + (toY - fromY) * percent)
+
+    if math.abs(currentX - newX) > threshold or math.abs(currentY - newY) > threshold then
+        window.x = newX
+        window.y = newY
+
+        window.parent:reflow()
         ui.root:recollect(false, true)
     end
 end
 
-function notificationPopup.popup(message, image, duration)
+local popupStates = {
+    "starting",
+    "waiting",
+    "stopping"
+}
+
+function notificationPopup.notify(message, duration, image, quad)
     local popup = {
         message = message,
         image = image,
-        visibleDuration = duration or 3,
+        quad = quad,
+        durations = {
+            popupStartDuration,
+            duration or 3,
+            popupStopDuration
+        },
         timeAcc = 0,
-        state = "starting"
+        lerpPercent = 0,
+        state = "starting",
+        stateIndex = 1
     }
 
-    table.insert(notificationQueue, popup)
+    return createPopupWindow(popup)
 end
 
 function notificationPopup.update(orig, self, dt)
     orig(dt)
 
-    local popup = notificationQueue[1]
+    if not activeNotification then
+        activeNotification = self
+    end
 
-    if popup then
+    if activeNotification ~= self then
+        return
+    end
+
+    local popup = self.popup
+
+    if popup and not popup.done then
+        local stateDuration = popup.durations[popup.stateIndex]
+
         local windowWidth, windowHeight = love.graphics.getDimensions()
-        local startX, startY = windowWidth - notificationWindow.width - 4, windowHeight + notificationWindow.height + 4
-        local stopX, stopY = startX, windowHeight - notificationWindow.height - 4
+        local startX, startY = windowWidth - self.width - self.padding, windowHeight + self.height + self.padding
+        local stopX, stopY = startX, windowHeight - self.height - self.padding
 
         popup.timeAcc += dt
 
-        if popup.state == "starting" then
-            notificationLabel:setText(popup.message)
+        lerpWindowPosition(self, startX, startY, stopX, stopY, popup.lerpPercent)
 
-            local percent = popup.timeAcc / popupStartDuration
-
-            lerpWindowPosition(startX, startY, stopX, stopY, percent)
-
-            if popup.timeAcc > popupStartDuration then
-                popup.state = "waiting"
-                popup.timeAcc -= popupStartDuration
+        if stateDuration then
+            if popup.timeAcc > stateDuration and stateDuration ~= -1 then
+                popup.timeAcc -= stateDuration
+                popup.stateIndex += 1
+                popup.state = popupStates[popup.stateIndex]
             end
+
+        else
+            popup.done = true
+        end
+
+        if popup.state == "starting" then
+            popup.lerpPercent = popup.timeAcc / popupStartDuration
 
         elseif popup.state == "waiting" then
             -- Popup shouldn't go away if hovered
-            if notificationWindow.hovered then
-                popup.timeAcc -= dt
+            if self.hovered then
+                popup.timeAcc = 0
             end
 
-            if popup.timeAcc > popup.visibleDuration then
-                popup.state = "stopping"
-                popup.timeAcc -= popup.visibleDuration
-            end
-
-            lerpWindowPosition(startX, startY, stopX, stopY, 1)
+            popup.lerpPercent = 1
 
         elseif popup.state == "stopping" then
-            local percent = popup.timeAcc / popupStopDuration
-
-            lerpWindowPosition(startX, startY, stopX, stopY, 1 - percent)
-
-            if popup.timeAcc > popupStopDuration then
-                table.remove(notificationQueue, 1)
-            end
+            popup.lerpPercent = 1 - popup.timeAcc / popupStopDuration
         end
+
+    else
+        removePopupWindow(self)
+
+        activeNotification = false
     end
 end
 
 function notificationPopup.getPopupWindow()
-    if not notificationWindow then
-        notificationLabel = uiElements.label("")
-        notificationWindow = uiElements.panel({
-            notificationLabel
-        }):with({
-            updateHidden = true
-        }):hook({
-            update = notificationPopup.update
-        })
-    end
-
-    return notificationWindow
+    return notificationGroup
 end
 
 return notificationPopup
