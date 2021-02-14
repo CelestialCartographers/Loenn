@@ -35,7 +35,7 @@ function spinner.sprite(room, entity)
 
         -- Check if texture color exists, otherwise use default color
         -- Needed because Rainbow and Core colors doesn't have textures
-        if sprite.meta then
+        if sprite then
             return sprite
 
         else
