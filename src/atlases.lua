@@ -77,7 +77,7 @@ function atlases.getResource(resource, name)
     local targetResource = rawget(atlases[name], resource)
 
     if not targetResource then
-        local filename = modHandler.commonModContent .. "/Graphics/Atlases/" .. name .. "/" .. resource .. ".png"
+        local filename = string.format("%s/Graphics/Atlases/%s/%s.png", modHandler.commonModContent, name, resource)
         local sprite = spriteLoader.loadExternalSprite(filename)
 
         atlases[name][resource] = sprite

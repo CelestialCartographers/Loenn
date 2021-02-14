@@ -15,8 +15,16 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
     local typ = utils.typeof(drawable)
 
     if typ == "drawableRectangle" then
-        -- TODO - Support multiple sprites for outlined rectangles
-        self:addFromDrawable(drawable:getDrawableSprite())
+        local sprites = drawable:getDrawableSprite()
+
+        if #sprites == 0 then
+            self:addFromDrawable(sprites)
+
+        else
+            for _, sprite in ipairs(sprites) do
+                self:addFromDrawable(sprite)
+            end
+        end
 
         -- These should count as drawableSprites for batching reasons
         -- Otherwise a new batch would be created on every rectangle
@@ -52,13 +60,23 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
 end
 
 function orderedDrawingBatchMt.__index:draw()
-    local r, g, b, a = love.graphics.getColor()
+    local r, g, b, a
+    local changedColor = false
 
     for _, element in ipairs(self._drawables) do
-        local drawable, color = element[1], element[2] or {1.0, 1.0, 1.0, 1.0}
+        local drawable, color = element[1], element[2]
         local typ = utils.typeof(drawable)
 
-        love.graphics.setColor(color)
+        if color then
+            -- No need to fetch this if it isn't needed
+            if not changedColor then
+                r, g, b, a = love.graphics.getColor()
+            end
+
+            changedColor = true
+
+            love.graphics.setColor(color)
+        end
 
         if typ == "drawableFunction" then
             drawable:draw()
@@ -68,7 +86,9 @@ function orderedDrawingBatchMt.__index:draw()
         end
     end
 
-    love.graphics.setColor(r, g, b, a)
+    if changedColor then
+        love.graphics.setColor(r, g, b, a)
+    end
 end
 
 function orderedDrawingBatchMt.__index:clear()
@@ -83,8 +103,10 @@ end
 
 function orderedDrawingBatchMt.__index:release()
     for _, element in ipairs(self._drawables) do
-        if utils.typeof(element) == "SpriteBatch" then
-            element:release()
+        local drawable = element[1]
+
+        if utils.typeof(drawable) == "SpriteBatch" then
+            drawable:release()
         end
     end
 

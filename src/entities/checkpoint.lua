@@ -6,7 +6,12 @@ checkpoint.name = "checkpoint"
 checkpoint.depth = 9990
 
 function checkpoint.sprite(room, entity)
-    local bg = entity.bg or "1"
+    local bg = entity.bg
+
+    if not bg or bg == "" then
+        bg = "1"
+    end
+
     local texture = string.format("objects/checkpoint/bg/%s", bg)
     local sprite = drawableSprite.spriteFromTexture(texture, entity)
 

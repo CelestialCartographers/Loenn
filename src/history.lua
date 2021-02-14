@@ -1,5 +1,6 @@
 local timeline = require("structs.timeline")
 local configs = require("configs")
+local sceneHandler = require("scene_handler")
 
 local history = {}
 
@@ -14,11 +15,15 @@ function history.reset()
 end
 
 function history.undo()
-    history.timeline:backward()
+    if not history.timeline:backward() then
+        sceneHandler.sendEvent("editorHistoryUndoEmpty")
+    end
 end
 
 function history.redo()
-    history.timeline:forward()
+    if not history.timeline:forward() then
+        sceneHandler.sendEvent("editorHistoryRedoEmpty")
+    end
 end
 
 function history.addSnapshot(snapshot)
