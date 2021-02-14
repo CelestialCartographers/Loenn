@@ -49,8 +49,9 @@ function drawing.printCenteredText(text, x, y, width, height, font, fontSize, tr
     font = font or love.graphics.getFont()
     fontSize = fontSize or 1
 
-    trim = trim or trim == nil
-    text = trim and utils.trim(text) or text
+    if trim ~= false then
+        text = utils.trim(text)
+    end
 
     local longest, lines = font:getWrap(text, width / fontSize)
     local textHeight = #lines * (font:getHeight() * font:getLineHeight())

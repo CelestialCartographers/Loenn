@@ -7,6 +7,7 @@ local languageRegistry = require("language_registry")
 
 local drawing = require("drawing")
 local drawableFunction = require("structs.drawable_function")
+local drawableRectangle = require("structs.drawable_rectangle")
 
 local colors = require("colors")
 
@@ -83,6 +84,58 @@ function triggers.getDrawable(name, handler, room, trigger, viewport)
     end
 
     return drawableFunction.fromFunction(func), 0
+end
+
+local humanizedNameCache = {}
+
+function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
+    -- Add rectangles first, then batch draw all text
+
+    for i, trigger in ipairs(targets) do
+        local x = trigger.x or 0
+        local y = trigger.y or 0
+
+        local width = trigger.width or 16
+        local height = trigger.height or 16
+
+        local fillRectangle = drawableRectangle.fromRectangle("fill", colors.triggerColor, x, y, width, height)
+        local borderRectangle = drawableRectangle.fromRectangle("line", colors.triggerColor, x, y, width, height)
+
+        batch:addFromDrawable(fillRectangle)
+        batch:addFromDrawable(borderRectangle)
+
+        if i % yieldRate == 0 then
+            coroutine.yield(batch)
+        end
+    end
+
+    local function func()
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(colors.triggerTextColor)
+
+            for i, trigger in ipairs(targets) do
+                local name = trigger._name
+                local displayName = humanizedNameCache[name]
+
+                if not displayName then
+                    displayName = utils.humanizeVariableName(name)
+                    humanizedNameCache[name] = displayName
+                end
+
+                local x = trigger.x or 0
+                local y = trigger.y or 0
+
+                local width = trigger.width or 16
+                local height = trigger.height or 16
+
+                drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
+            end
+        end)
+    end
+
+    batch:addFromDrawable(drawableFunction.fromFunction(func))
+
+    return batch
 end
 
 -- Returns main trigger selection rectangle, then table of node rectangles

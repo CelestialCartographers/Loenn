@@ -358,12 +358,14 @@ local function getRoomTileBatch(room, tiles, fg)
         roomCache[roomName] = cache
     end
 
-    cache[key] = cache[key] or tasks.newTask(
-        (-> celesteRender.getTilesBatch(room, tiles, meta, fg)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
-        batchingTasks,
-        {room = room}
-    )
+    if not cache[key]then
+        cache[key] = tasks.newTask(
+            (-> celesteRender.getTilesBatch(room, tiles, meta, fg)),
+            (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
+            batchingTasks,
+            {room = room}
+        )
+    end
 
     return cache[key].result
 end
@@ -408,12 +410,14 @@ local function getRoomDecalsBatch(room, decals, fg, viewport)
         roomCache[roomName] = cache
     end
 
-    cache[key] = cache[key] or tasks.newTask(
-        (-> getDecalsBatchTaskFunc(decals, room, viewport)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
-        batchingTasks,
-        {room = room}
-    )
+    if not cache[key]then
+        cache[key] = tasks.newTask(
+            (-> getDecalsBatchTaskFunc(decals, room, viewport)),
+            (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
+            batchingTasks,
+            {room = room}
+        )
+    end
 
     return cache[key].result
 end
@@ -501,33 +505,22 @@ function celesteRender.getEntityBatch(room, entities, viewport, registeredEntiti
         cache.entities = nil
     end
 
-    cache.entities = cache.entities or tasks.newTask(
-        (-> getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
-        batchingTasks,
-        {room = room}
-    )
+    if not cache.entities then
+        cache.entities = tasks.newTask(
+            (-> getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)),
+            (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
+            batchingTasks,
+            {room = room}
+        )
+    end
 
     return cache.entities.result
 end
 
--- TODO - Make this saner in terms of setColor calls?
--- This could just be one rendering function
 local function getTriggerBatchTaskFunc(room, triggers, viewport)
     local batch = smartDrawingBatch.createOrderedBatch()
 
-    for i, trigger in ipairs(triggers) do
-        local name = trigger._name
-        local handler = triggerHandler.registeredTriggers[name]
-        local drawable, depth = triggerHandler.getDrawable(name, handler, room, trigger, viewport)
-
-        batch:addFromDrawable(drawable)
-
-        if i % YIELD_RATE == 0 then
-            tasks.yield()
-        end
-    end
-
+    triggerHandler.addDrawables(batch, room, triggers, viewport, YIELD_RATE)
     tasks.update(batch)
 
     return batch
@@ -546,12 +539,14 @@ function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
         cache.triggers = nil
     end
 
-    cache.triggers = cache.triggers or tasks.newTask(
-        (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", roomName, task.timeTotal * 1000))),
-        batchingTasks,
-        {room = room}
-    )
+    if not cache.triggers then
+        cache.triggers = tasks.newTask(
+            (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
+            (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", roomName, task.timeTotal * 1000))),
+            batchingTasks,
+            {room = room}
+        )
+    end
 
     return cache.triggers.result
 end
