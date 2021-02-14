@@ -83,8 +83,10 @@ end
 
 function orderedDrawingBatchMt.__index:release()
     for _, element in ipairs(self._drawables) do
-        if utils.typeof(element) == "SpriteBatch" then
-            element:release()
+        local drawable = element[1]
+
+        if utils.typeof(drawable) == "SpriteBatch" then
+            drawable:release()
         end
     end
 

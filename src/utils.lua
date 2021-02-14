@@ -205,11 +205,14 @@ function utils.callIterateFirstIfTable(f, value, ...)
     end
 end
 
-function utils.typeof(v)
-    local typ = type(v)
+function utils.typeof(value)
+    local typ = type(value)
 
-    if typ == "table" and v._type then
-        return v._type
+    if typ == "table" and value._type then
+        return value._type
+
+    elseif typ == "userdata" and value.type then
+        return value:type()
 
     else
         return typ
