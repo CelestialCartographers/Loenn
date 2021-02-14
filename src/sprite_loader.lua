@@ -71,10 +71,33 @@ function spriteLoader.getCachedDataImage(dataFile)
     end
 end
 
-function spriteLoader.loadExternalSprite(filename)
-    local image = love.graphics.newImage(filename)
-    local imageWidth, imageHeight = image:getDimensions()
+local filenameCheckTimesCache = {}
+local filenameImageCache = {}
 
+local function getExternalImage(filename, cacheDuration)
+    cacheDuration = cacheDuration or 10
+
+    local now = os.time()
+    local lastCheck = filenameCheckTimesCache[filename]
+
+    if not lastCheck or now > lastCheck + cacheDuration then
+        local success, image = pcall(love.graphics.newImage, filename)
+
+        filenameCheckTimesCache[filename] = os.time()
+        filenameImageCache[filename] = success and image
+    end
+
+    return filenameImageCache[filename]
+end
+
+function spriteLoader.loadExternalSprite(filename)
+    local image = getExternalImage(filename)
+
+    if not image then
+        return
+    end
+
+    local imageWidth, imageHeight = image:getDimensions()
     local meta = {
         image = image,
         width = imageWidth,
