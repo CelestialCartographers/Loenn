@@ -39,7 +39,7 @@ local triggersDepth = -math.huge
 
 -- TODO - Figure out good number
 local YIELD_RATE = 100
-local PRINT_BATCHING_DURATION = false
+local PRINT_BATCHING_DURATION = true
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = configs.editor.alwaysRedrawUnselectedRooms
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = configs.editor.prepareRoomRenderInBackground
 
@@ -50,7 +50,7 @@ local batchingTasks = {}
 
 local function loadCustomAutotiler(filename)
     if filename and filename ~= ""  then
-        local commonFilename = modHandler.commonModContent .. "/" .. filename
+        local commonFilename = modHandler.commonModContent .. "/" .. utils.convertToUnixPath(filename)
         local loaded, tilesMeta = pcall(autotiler.loadTilesetXML, commonFilename)
 
         return loaded, tilesMeta
@@ -62,8 +62,8 @@ function celesteRender.loadCustomTilesetAutotiler(state)
     celesteRender.tilesMetaBg = celesteRender.tilesMetaBgVanilla
 
     if state and state.side and state.side.meta then
-        local pathFg = utils.convertToUnixPath(state.side.meta.ForegroundTiles or "")
-        local pathBg = utils.convertToUnixPath(state.side.meta.BackgroundTiles or "")
+        local pathFg = state.side.meta.ForegroundTiles
+        local pathBg = state.side.meta.BackgroundTiles
 
         local loadedFg, tilesMetaFg = loadCustomAutotiler(pathFg)
         local loadedBg, tilesMetaBg = loadCustomAutotiler(pathBg)
@@ -348,15 +348,22 @@ local function getRoomTileBatch(room, tiles, fg)
     local key = fg and "tilesFg" or "tilesBg"
     local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
 
-    roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
+    local roomName = room.name
+    local cache = roomCache[roomName]
+
+    if not cache then
+        cache = {}
+        roomCache[roomName] = cache
+    end
+
+    cache[key] = cache[key] or tasks.newTask(
         (-> celesteRender.getTilesBatch(room, tiles, meta, fg)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
         batchingTasks,
         {room = room}
     )
 
-    return roomCache[room.name][key].result
+    return cache[key].result
 end
 
 function celesteRender.getTilesFgBatch(room, tiles, viewport)
@@ -391,15 +398,22 @@ end
 local function getRoomDecalsBatch(room, decals, fg, viewport)
     local key = fg and "decalsFg" or "decalsBg"
 
-    roomCache[room.name] = roomCache[room.name] or {}
-    roomCache[room.name][key] = roomCache[room.name][key] or tasks.newTask(
+    local roomName = room.name
+    local cache = roomCache[roomName]
+
+    if not cache then
+        cache = {}
+        roomCache[roomName] = cache
+    end
+
+    cache[key] = cache[key] or tasks.newTask(
         (-> getDecalsBatchTaskFunc(decals, room, viewport)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
         batchingTasks,
         {room = room}
     )
 
-    return roomCache[room.name][key].result
+    return cache[key].result
 end
 
 function celesteRender.getDecalsFgBatch(room, decals, viewport)
@@ -473,20 +487,26 @@ end
 function celesteRender.getEntityBatch(room, entities, viewport, registeredEntities, forceRedraw)
     registeredEntities = registeredEntities or entityHandler.registeredEntities
 
-    roomCache[room.name] = roomCache[room.name] or {}
+    local roomName = room.name
+    local cache = roomCache[roomName]
 
-    if forceRedraw and roomCache[room.name].entities.result ~= nil then
-        roomCache[room.name].entities = nil
+    if not cache then
+        cache = {}
+        roomCache[roomName] = cache
     end
 
-    roomCache[room.name].entities = roomCache[room.name].entities or tasks.newTask(
+    if forceRedraw and cache.entities.result ~= nil then
+        cache.entities = nil
+    end
+
+    cache.entities = cache.entities or tasks.newTask(
         (-> getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)),
         (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
         batchingTasks,
         {room = room}
     )
 
-    return roomCache[room.name].entities.result
+    return cache.entities.result
 end
 
 -- TODO - Make this saner in terms of setColor calls?
@@ -512,20 +532,26 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport)
 end
 
 function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
-    roomCache[room.name] = roomCache[room.name] or {}
+    local roomName = room.name
+    local cache = roomCache[roomName]
 
-    if forceRedraw and roomCache[room.name].triggers.result ~= nil then
-        roomCache[room.name].triggers = nil
+    if not cache then
+        cache = {}
+        roomCache[roomName] = cache
     end
 
-    roomCache[room.name].triggers = roomCache[room.name].triggers or tasks.newTask(
+    if forceRedraw and cache.triggers.result ~= nil then
+        cache.triggers = nil
+    end
+
+    cache.triggers = cache.triggers or tasks.newTask(
         (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
-        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
+        (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", roomName, task.timeTotal * 1000))),
         batchingTasks,
         {room = room}
     )
 
-    return roomCache[room.name].triggers.result
+    return cache.triggers.result
 end
 
 function celesteRender.drawTriggers(room, triggers, viewport)
@@ -557,9 +583,15 @@ function celesteRender.forceRoomBatchRender(room, viewport)
 end
 
 function celesteRender.getRoomBatches(room, viewport)
-    roomCache[room.name] = roomCache[room.name] or {}
+    local roomName = room.name
+    local cache = roomCache[roomName]
 
-    if not roomCache[room.name].complete then
+    if not cache then
+        cache = {}
+        roomCache[roomName] = cache
+    end
+
+    if not cache.complete then
         local depthBatches = {}
         local done = true
 
@@ -602,10 +634,10 @@ function celesteRender.getRoomBatches(room, viewport)
             orderedBatches[i] = pair[2]
         end
 
-        roomCache[room.name].complete = orderedBatches
+        cache.complete = orderedBatches
     end
 
-    return roomCache[room.name].complete
+    return cache.complete
 end
 
 local function drawRoomFromBatches(room, viewport, selected)
