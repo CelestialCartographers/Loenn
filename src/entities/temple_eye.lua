@@ -39,4 +39,11 @@ function templeEye.draw(room, entity, viewport)
     sprite3:draw()
 end
 
+function templeEye.selection(room, entity)
+    -- Same size, just need selection
+    local sprite = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/bg_eye", entity)
+
+    return sprite:getRectangle()
+end
+
 return templeEye
