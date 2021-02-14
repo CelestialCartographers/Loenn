@@ -212,9 +212,11 @@ function drawableSpriteStruct.spriteFromMeta(meta, data)
     drawableSprite.depth = data.depth
 
     drawableSprite.meta = meta
-    drawableSprite.quad = meta and meta.quad or nil
+    drawableSprite.quad = meta and meta.quad
 
-    setColor(drawableSprite, data.color)
+    if data.color then
+        setColor(drawableSprite, data.color)
+    end
 
     return setmetatable(drawableSprite, drawableSpriteMt)
 end
@@ -223,7 +225,9 @@ function drawableSpriteStruct.spriteFromTexture(texture, data)
     local atlas = data and data.atlas or "gameplay"
     local spriteMeta = atlases.getResource(texture, atlas)
 
-    return drawableSpriteStruct.spriteFromMeta(spriteMeta, data)
+    if spriteMeta then
+        return drawableSpriteStruct.spriteFromMeta(spriteMeta, data)
+    end
 end
 
 return drawableSpriteStruct
