@@ -62,8 +62,8 @@ function celesteRender.loadCustomTilesetAutotiler(state)
     celesteRender.tilesMetaBg = celesteRender.tilesMetaBgVanilla
 
     if state and state.side and state.side.meta then
-        local pathFg = state.side.meta.ForegroundTiles
-        local pathBg = state.side.meta.BackgroundTiles
+        local pathFg = utils.convertToUnixPath(state.side.meta.ForegroundTiles or "")
+        local pathBg = utils.convertToUnixPath(state.side.meta.BackgroundTiles or "")
 
         local loadedFg, tilesMetaFg = loadCustomAutotiler(pathFg)
         local loadedBg, tilesMetaBg = loadCustomAutotiler(pathBg)
@@ -588,15 +588,19 @@ function celesteRender.getRoomBatches(room, viewport)
             return false
         end
 
-        local orderedBatches = $()
+        local orderedBatches = {}
 
         for depth, batches in pairs(depthBatches) do
-            orderedBatches += {depth, batches}
+            table.insert(orderedBatches, {depth, batches})
         end
 
-        orderedBatches := sortby(v -> v[1])
-        orderedBatches := reverse
-        orderedBatches := map(v -> v[2])
+        table.sort(orderedBatches, function(lhs, rhs)
+            return lhs[1] > rhs[1]
+        end)
+
+        for i, pair in ipairs(orderedBatches) do
+            orderedBatches[i] = pair[2]
+        end
 
         roomCache[room.name].complete = orderedBatches
     end
@@ -608,7 +612,7 @@ local function drawRoomFromBatches(room, viewport, selected)
     local orderedBatches = celesteRender.getRoomBatches(room, viewport)
 
     if orderedBatches then
-        for depth, batch <- orderedBatches do
+        for depth, batch in ipairs(orderedBatches) do
             batch:draw()
         end
     end
@@ -617,16 +621,22 @@ end
 -- Return the canvas if it is ready, otherwise make a task for it
 local function getRoomCanvas(room, viewport, selected)
     local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+    local roomName = room.name
 
-    roomCache[room.name] = roomCache[room.name] or {}
+    local cache = roomCache[roomName]
 
-    if orderedBatches and not roomCache[room.name].canvas then
-        roomCache[room.name].canvas = tasks.newTask(
+    if not cache then
+        cache = {}
+        roomCache[roomName] = cache
+    end
+
+    if orderedBatches and not cache.canvas then
+        cache.canvas = tasks.newTask(
             function(task)
                 local canvas = love.graphics.newCanvas(room.width or 0, room.height or 0)
 
                 canvas:renderTo(function()
-                    for depth, batch <- orderedBatches do
+                    for depth, batch in ipairs(orderedBatches) do
                         batch:draw()
                     end
                 end)
@@ -639,13 +649,13 @@ local function getRoomCanvas(room, viewport, selected)
         )
     end
 
-    return roomCache[room.name].canvas and roomCache[room.name].canvas.result
+    return cache.canvas and cache.canvas.result
 end
 
 function celesteRender.drawRooms(rooms, viewport, selectedItem, selectedItemType)
     for _, room in ipairs(rooms) do
         local roomVisible = viewportHandler.roomVisible(room, viewport)
-        local selected = room == selectedItem, selectedItemType
+        local selected = room == selectedItem
 
         if selectedItemType == "table" then
             selected = selectedItem[room]
