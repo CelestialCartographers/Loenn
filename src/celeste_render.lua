@@ -39,7 +39,7 @@ local triggersDepth = -math.huge
 
 -- TODO - Figure out good number
 local YIELD_RATE = 100
-local PRINT_BATCHING_DURATION = true
+local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = configs.editor.alwaysRedrawUnselectedRooms
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = configs.editor.prepareRoomRenderInBackground
 
@@ -252,22 +252,24 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
 end
 
 local function drawInvalidTiles(batch, missingTiles, fg)
-    local color = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
+    if #missingTiles > 0 then
+        local color = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
 
-    local canvas = love.graphics.getCanvas()
-    local r, g, b, a = love.graphics.getColor()
+        local canvas = love.graphics.getCanvas()
+        local r, g, b, a = love.graphics.getColor()
 
-    love.graphics.setCanvas(batch._canvas)
-    love.graphics.setColor(color)
+        love.graphics.setCanvas(batch._canvas)
+        love.graphics.setColor(color)
 
-    for _, missing in ipairs(missingTiles) do
-        local x, y = missing[1], missing[2]
+        for _, missing in ipairs(missingTiles) do
+            local x, y = missing[1], missing[2]
 
-        love.graphics.rectangle("fill", x * 8 - 8, y * 8 - 8, 8, 8)
+            love.graphics.rectangle("fill", x * 8 - 8, y * 8 - 8, 8, 8)
+        end
+
+        love.graphics.setCanvas(canvas)
+        love.graphics.setColor(r, g, b, a)
     end
-
-    love.graphics.setCanvas(canvas)
-    love.graphics.setColor(r, g, b, a)
 end
 
 -- randomMatrix is for custom randomness, mostly to give the correct "slice" of the matrix when making fake tiles
