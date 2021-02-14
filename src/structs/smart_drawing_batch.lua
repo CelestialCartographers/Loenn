@@ -15,8 +15,16 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
     local typ = utils.typeof(drawable)
 
     if typ == "drawableRectangle" then
-        -- TODO - Support multiple sprites for outlined rectangles
-        self:addFromDrawable(drawable:getDrawableSprite())
+        local sprites = drawable:getDrawableSprite()
+
+        if #sprites == 0 then
+            self:addFromDrawable(sprites)
+
+        else
+            for _, sprite in ipairs(sprites) do
+                self:addFromDrawable(sprite)
+            end
+        end
 
         -- These should count as drawableSprites for batching reasons
         -- Otherwise a new batch would be created on every rectangle
