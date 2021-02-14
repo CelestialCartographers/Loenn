@@ -109,27 +109,30 @@ function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
         end
     end
 
+    local textBatch = love.graphics.newText(font)
+
+    for i, trigger in ipairs(targets) do
+        local name = trigger._name
+        local displayName = humanizedNameCache[name]
+
+        if not displayName then
+            displayName = utils.humanizeVariableName(name)
+            humanizedNameCache[name] = displayName
+        end
+
+        local x = trigger.x or 0
+        local y = trigger.y or 0
+
+        local width = trigger.width or 16
+        local height = trigger.height or 16
+
+        drawing.addCenteredText(textBatch, displayName, x, y, width, height, font, triggerFontSize)
+    end
+
     local function func()
         drawing.callKeepOriginalColor(function()
             love.graphics.setColor(colors.triggerTextColor)
-
-            for i, trigger in ipairs(targets) do
-                local name = trigger._name
-                local displayName = humanizedNameCache[name]
-
-                if not displayName then
-                    displayName = utils.humanizeVariableName(name)
-                    humanizedNameCache[name] = displayName
-                end
-
-                local x = trigger.x or 0
-                local y = trigger.y or 0
-
-                local width = trigger.width or 16
-                local height = trigger.height or 16
-
-                drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
-            end
+            love.graphics.draw(textBatch)
         end)
     end
 

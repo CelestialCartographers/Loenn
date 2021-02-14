@@ -69,6 +69,23 @@ function drawing.printCenteredText(text, x, y, width, height, font, fontSize, tr
     love.graphics.pop()
 end
 
+function drawing.addCenteredText(batch, text, x, y, width, height, font, fontSize, trim)
+    font = font or love.graphics.getFont()
+    fontSize = fontSize or 1
+
+    if trim ~= false then
+        text = utils.trim(text)
+    end
+
+    local longest, lines = font:getWrap(text, width / fontSize)
+    local textHeight = #lines * (font:getHeight() * font:getLineHeight())
+
+    local offsetX = 0
+    local offsetY = (height - textHeight) / 2
+
+    batch:addf(text, width / fontSize, "center", x + offsetX, y + offsetY, 0, fontSize, fontSize)
+end
+
 function drawing.getTrianglePoints(x, y, theta, height)
     theta = theta - math.pi / 2
 
