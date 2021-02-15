@@ -4,6 +4,7 @@ local uiUtils = require("ui.utils")
 
 local menubar = require("ui.menubar")
 local notifications = require("ui.notification")
+local tooltips = require("ui.tooltip")
 
 local uiRoot = {}
 
@@ -48,7 +49,8 @@ function uiRoot.updateWindows(windows)
     if not rootElement then
         rootElement = uiElements.group({
             mainColumn,
-            notifications.getPopupWindow()
+            notifications.getPopupWindow(),
+            tooltips.getTooltipWindow()
         }):with({
             style = {
                 bg = {},
