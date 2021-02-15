@@ -7,6 +7,8 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
+local widgetUtils = require("ui.widgets.utils")
+
 local notificationPopup = {}
 
 local activeNotification
@@ -65,21 +67,6 @@ local function removePopupWindow(window)
     end
 end
 
-local function lerpWindowPosition(window, fromX, fromY, toX, toY, percent, threshold)
-    threshold = threshold or 4
-
-    local currentX, currentY = window.x, window.y
-    local newX, newY = math.floor(fromX + (toX - fromX) * percent), math.floor(fromY + (toY - fromY) * percent)
-
-    if math.abs(currentX - newX) > threshold or math.abs(currentY - newY) > threshold then
-        window.x = newX
-        window.y = newY
-
-        window.parent:reflow()
-        ui.root:recollect(false, true)
-    end
-end
-
 local popupStates = {
     "starting",
     "waiting",
@@ -127,7 +114,7 @@ function notificationPopup.update(orig, self, dt)
 
         popup.timeAcc += dt
 
-        lerpWindowPosition(self, startX, startY, stopX, stopY, popup.lerpPercent)
+        widgetUtils.lerpWindowPosition(self, startX, startY, stopX, stopY, popup.lerpPercent)
 
         if stateDuration then
             if popup.timeAcc > stateDuration and stateDuration ~= -1 then
