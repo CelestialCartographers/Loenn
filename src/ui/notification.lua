@@ -15,20 +15,32 @@ local activeNotification
 local notificationWindows = {}
 local notificationGroup = uiElements.group(notificationWindows)
 
+local edgePadding = 16
+
 local popupStartDuration = 0.4
 local popupStopDuration = 0.4
 
-local function createPopupWindow(popup)
-    local widgets = {
-        uiElements.label(popup.message)
-    }
+local function removePopupWindow(window)
+    for i = #notificationWindows, 1, -1 do
+        local target = notificationWindows[i]
 
-    if popup.image then
-        local image = uiElements.image(popup.image, popup.quad)
+        if target == window then
+            table.remove(notificationWindows, i)
+            notificationGroup:reflow()
+            ui.root:recollect()
+            window:removeSelf()
 
-        table.insert(widgets, 1, image)
+            if activeNotification == target then
+                activeNotification = false
+            end
+
+            return
+        end
     end
+end
 
+local function createPopupWindow(popup)
+    local widgets = widgetUtils.getSimpleOverlayWidget(popup.widget)
     local row = uiElements.row(widgets)
 
     row.style.bg = {}
@@ -44,27 +56,27 @@ local function createPopupWindow(popup)
         y = -1024,
 
         popup = popup,
-        padding = 16
     })
 
+    local closeButton = uiElements.button(uiElements.image("ui:icons/close"), function()
+        removePopupWindow(panel)
+    end):with({
+        y = 0,
+
+    }):with(uiUtils.rightbound)
+
+    closeButton.style = {
+        padding = 6
+    }
+
+    table.insert(widgets, closeButton)
     table.insert(notificationWindows, panel)
+
+    row:reflow()
     notificationGroup:reflow()
     ui.root:recollect()
 
     return panel
-end
-
-local function removePopupWindow(window)
-    for i, target in ipairs(notificationWindows) do
-        if target == window then
-            table.remove(notificationWindows, i)
-            notificationGroup:reflow()
-            ui.root:recollect()
-            window:removeSelf()
-
-            return
-        end
-    end
 end
 
 local popupStates = {
@@ -73,11 +85,9 @@ local popupStates = {
     "stopping"
 }
 
-function notificationPopup.notify(message, duration, image, quad)
+function notificationPopup.notify(widget, duration)
     local popup = {
-        message = message,
-        image = image,
-        quad = quad,
+        widget = widget,
         durations = {
             popupStartDuration,
             duration or 3,
@@ -109,8 +119,8 @@ function notificationPopup.update(orig, self, dt)
         local stateDuration = popup.durations[popup.stateIndex]
 
         local windowWidth, windowHeight = love.graphics.getDimensions()
-        local startX, startY = windowWidth - self.width - self.padding, windowHeight + self.height + self.padding
-        local stopX, stopY = startX, windowHeight - self.height - self.padding
+        local startX, startY = windowWidth / 2 - self.width - edgePadding, windowHeight + self.height + edgePadding
+        local stopX, stopY = startX, windowHeight - self.height - edgePadding
 
         popup.timeAcc += dt
 
