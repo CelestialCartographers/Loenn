@@ -278,10 +278,16 @@ local function addPlacement(placement, res, name, handler, language)
     local modPrefix = modHandler.getEntityModPrefix(name)
     local simpleName = string.format("%s#%s", name, placement.name)
     local displayName = placement.name
-    local displayNameLanguage = language.entities[name].placements[placement.name]
+    local tooltipText
+    local displayNameLanguage = language.entities[name].name[placement.name]
+    local tooltipTextLanguage = language.entities[name].description[placement.name]
 
     if displayNameLanguage._exists then
         displayName = tostring(displayNameLanguage)
+    end
+
+    if tooltipTextLanguage._exists then
+        tooltipText = tostring(tooltipTextLanguage)
     end
 
     if modPrefix then
@@ -309,6 +315,7 @@ local function addPlacement(placement, res, name, handler, language)
     table.insert(res, {
         name = simpleName,
         displayName = displayName,
+        tooltipText = tooltipText,
         layer = "entities",
         placementType = placementType,
         itemTemplate = itemTemplate
