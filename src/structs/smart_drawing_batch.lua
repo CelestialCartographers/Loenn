@@ -60,20 +60,30 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
 end
 
 function orderedDrawingBatchMt.__index:draw()
-    local r, g, b, a
+    -- Initial and previous color
+    local ir, ig, ib, ia
+    local pr, pg, pb, pa
     local changedColor = false
 
     for _, element in ipairs(self._drawables) do
         local drawable, color = element[1], element[2]
         local typ = utils.typeof(drawable)
 
+        local r, g, b, a
+
         if color then
             -- No need to fetch this if it isn't needed
             if not changedColor then
-                r, g, b, a = love.graphics.getColor()
+                ir, ig, ib, ia = love.graphics.getColor()
             end
 
+            r, g, b, a = color[1], color[2], color[3], color[4]
+        end
+
+        if r ~= pr or g ~= pg or b ~= pb or a ~= pa then
+            color = color or {1.0, 1.0, 1.0, 1.0}
             changedColor = true
+            pr, pg, pb, pa = color[1], color[2], color[3], color[4]
 
             love.graphics.setColor(color)
         end
@@ -87,7 +97,7 @@ function orderedDrawingBatchMt.__index:draw()
     end
 
     if changedColor then
-        love.graphics.setColor(r, g, b, a)
+        love.graphics.setColor(ir, ig, ib, ia)
     end
 end
 
