@@ -472,7 +472,6 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
 
             else
                 for _, drawableItem in ipairs(drawable) do
-                    local depth = drawableItem.depth
                     local batch = getOrCreateSmartBatch(batches, utils.callIfFunction(depth, room, entity, viewport) or defaultDepth)
 
                     batch:addFromDrawable(drawableItem)
