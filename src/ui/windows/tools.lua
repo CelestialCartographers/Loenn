@@ -21,6 +21,7 @@ local function getMaterialItems(layer, sortItems)
     local materialItems = {}
 
     for i, material in ipairs(materials or {}) do
+        local materialTooltip
         local materialText = material
         local materialData = material
         local materialType = type(material)
@@ -28,12 +29,16 @@ local function getMaterialItems(layer, sortItems)
         if materialType == "table" then
             materialText = material.displayName or material.name
             materialData = material.name
+            materialTooltip = material.tooltipText
         end
 
-        table.insert(materialItems, uiElements.listItem({
+        local listItem = uiElements.listItem({
             text = materialText,
             data = materialData
-        }))
+        })
+
+        listItem.tooltipText = materialTooltip
+        table.insert(materialItems, listItem)
     end
 
     if sortItems or sortItems == nil then
