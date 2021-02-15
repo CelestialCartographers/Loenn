@@ -2,12 +2,45 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
+local utils = require("utils")
+
 local widgetUtils = {}
 
 function widgetUtils.removeWindowTitlebar(window)
     return window:with(function(el)
         table.remove(el.children, 1).parent = el
     end)
+end
+
+function widgetUtils.getSimpleOverlayWidget(widget)
+    local widgetType = utils.typeof(widget)
+
+    if widgetType == "string" then
+        widget = uiElements.label(widget)
+
+    elseif widgetType == "Image" then
+        widget = uiElements.image(widget)
+
+    elseif widgetType == "table" then
+        if widget.image then
+            -- Sprite metadata
+            widget = uiElements.image(widget.image, widget.quad)
+
+        elseif #widget > 0 then
+            -- Colored text
+            widget = uiElements.label(widget)
+        end
+
+    elseif widgetType == "function" then
+        widget = widget()
+    end
+
+    -- Make sure the processed widget is a table
+    if utils.typeof(widget) ~= "table" then
+        widget = {widget}
+    end
+
+    return widget
 end
 
 function widgetUtils.moveWindow(window, newX, newY, threshold, clamp, padding)
