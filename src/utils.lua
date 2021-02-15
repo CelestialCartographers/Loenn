@@ -208,8 +208,8 @@ end
 function utils.typeof(value)
     local typ = type(value)
 
-    if typ == "table" and value._type then
-        return value._type
+    if typ == "table" then
+        return rawget(value, "_type") or rawget(value, "__type") or typ
 
     elseif typ == "userdata" and value.type then
         return value:type()
