@@ -3,9 +3,14 @@ local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
 local padding = 16
+local tooltipWaitDuration = 0.5
+local lastX, lastY = 0, 0
+local waitedDuration = 0
+
 local targetElement
-local tooltipVisible = false
+local tooltipExists = false
 local tooltipWindow
+
 
 local tooltipHandler = {}
 
@@ -29,12 +34,26 @@ local function moveTooltipWindow(window, newX, newY, threshold, clamp)
     end
 end
 
-function tooltipHandler.tooltipWindowUpdate(orig, self)
-    orig(self)
+function tooltipHandler.tooltipWindowUpdate(orig, self, dt)
+    orig(self, dt)
 
+    local cursorX, cursorY = love.mouse.getPosition()
     local hovered = ui.hovering
+    local waitedEnough = waitedDuration >= tooltipWaitDuration
+
+    if not waitedEnough then
+        if cursorX == lastX and cursorY == lastY then
+            waitedDuration += dt
+
+        else
+            lastX, lastY = cursorX, cursorY
+            waitedDuration = 0
+        end
+    end
 
     if hovered ~= targetElement then
+        waitedDuration = 0
+
         if hovered then
             local tooltipText = rawget(hovered, "tooltipText")
 
@@ -43,17 +62,15 @@ function tooltipHandler.tooltipWindowUpdate(orig, self)
             end
 
             targetElement = hovered
-            tooltipVisible = not not tooltipText
+            tooltipExists = not not tooltipText
 
         else
             targetElement = false
-            tooltipVisible = false
+            tooltipExists = false
         end
     end
 
-    if tooltipVisible then
-        local cursorX, cursorY = love.mouse.getPosition()
-
+    if tooltipExists and waitedEnough then
         moveTooltipWindow(tooltipWindow, cursorX, cursorY - tooltipWindow.height)
 
     else
