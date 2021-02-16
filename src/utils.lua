@@ -106,7 +106,9 @@ function utils.newImage(path, internal)
 
         if fileData then
             local imageData = love.image.newImageData(fileData)
-            return love.graphics.newImage(imageData)
+            local image = love.graphics.newImage(imageData)
+
+            return image, imageData
         end
     end
 end

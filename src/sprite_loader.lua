@@ -5,6 +5,7 @@ local filesystem = require("filesystem")
 local config = require("config")
 local threadHandler = require("thread_handler")
 local binaryReader = require("binary_reader")
+local runtimeAtlas = require("runtime_atlas")
 
 local spriteLoader = {}
 
@@ -72,42 +73,49 @@ function spriteLoader.getCachedDataImage(dataFile)
 end
 
 local filenameCheckTimesCache = {}
-local filenameImageCache = {}
+local filenameImageDataCache = {}
 
-local function getExternalImage(filename, cacheDuration)
+local function getExternalImageData(filename, cacheDuration)
     cacheDuration = cacheDuration or 10
 
     local now = os.time()
     local lastCheck = filenameCheckTimesCache[filename]
 
     if not lastCheck or now > lastCheck + cacheDuration then
-        local success, image = pcall(love.graphics.newImage, filename)
+        local success, image = pcall(love.image.newImageData, filename)
 
         filenameCheckTimesCache[filename] = os.time()
-        filenameImageCache[filename] = success and image
+        filenameImageDataCache[filename] = success and image
     end
 
-    return filenameImageCache[filename]
+    return filenameImageDataCache[filename]
 end
 
 function spriteLoader.loadExternalSprite(filename)
-    local image = getExternalImage(filename)
+    local loadedImageData = getExternalImageData(filename)
 
-    if not image then
+    if not loadedImageData then
         return
     end
 
+    local image = love.graphics.newImage(loadedImageData)
+    -- TODO - Consider using the runtime atlases later when this is more complete
+    --local imageData, x, y = runtimeAtlas.addImageFirstAtlas(loadedImageData, filename)
+    local imageData, x, y = loadedImageData, 0, 0
+
     local imageWidth, imageHeight = image:getDimensions()
+    local atlasWidth, atlasHeight = imageData:getDimensions()
     local meta = {
         image = image,
+        imageData = imageData,
         width = imageWidth,
         height = imageHeight,
-        filename = filename
+        filename = "filename"
     }
 
     local sprite = {
-        x = 0,
-        y = 0,
+        x = x,
+        y = y,
 
         width = imageWidth,
         height = imageHeight,
@@ -118,13 +126,14 @@ function spriteLoader.loadExternalSprite(filename)
         realHeight = imageHeight,
 
         image = image,
+        imageData = imageData,
         meta = meta,
         filename = filename,
 
         loadedAt = os.time()
     }
 
-    sprite.quad = love.graphics.newQuad(0, 0, imageWidth, imageHeight, imageWidth, imageHeight)
+    sprite.quad = love.graphics.newQuad(x, y, imageWidth, imageHeight, atlasWidth, atlasHeight)
 
     return sprite
 end
@@ -153,7 +162,7 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
         local spritesImage, spritesImageData
 
         if useCache then
-            spritesImage, spritesImageData = spriteLoader.getCachedDataImage(dataFile), false
+            spritesImage, spritesImageData = spriteLoader.getCachedDataImage(dataFile)
         end
 
         if not spritesImage then
@@ -188,6 +197,7 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
                 realHeight = reader:readSignedShort(),
 
                 image = spritesImage,
+                imageData = spritesImageData,
                 filename = dataFilePath,
 
                 loadedAt = os.time()
