@@ -119,7 +119,7 @@ function notificationPopup.update(orig, self, dt)
         local stateDuration = popup.durations[popup.stateIndex]
 
         local windowWidth, windowHeight = love.graphics.getDimensions()
-        local startX, startY = windowWidth / 2 - self.width - edgePadding, windowHeight + self.height + edgePadding
+        local startX, startY = windowWidth - self.width - edgePadding, windowHeight + self.height + edgePadding
         local stopX, stopY = startX, windowHeight - self.height - edgePadding
 
         popup.timeAcc += dt
