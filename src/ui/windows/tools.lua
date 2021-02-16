@@ -1,3 +1,5 @@
+-- TODO - Hide material list if no materials?
+
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
@@ -11,11 +13,19 @@ local toolHandler = require("tool_handler")
 local toolWindow = {}
 
 toolWindow.toolList = false
-toolWindow.layerList = false
-toolWindow.materialList = false
+toolWindow.toolPanel = false
 
--- TODO - Use display name for now, otherwise entity variations don't work
--- In the future the "data" should be using a better identifier
+toolWindow.layerList = false
+toolWindow.layerPanel = false
+toolWindow.layerPanelVisible = true
+
+toolWindow.modeList = false
+toolWindow.modePanel = false
+toolWindow.modePanelVisible = true
+
+toolWindow.materialList = false
+toolWindow.materialPanel = false
+
 local function getMaterialItems(layer, sortItems)
     local materials = toolHandler.getMaterials(nil, layer)
     local materialItems = {}
@@ -60,7 +70,7 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
 end
 
 local function getLayerItems(toolName)
-    local layers = toolHandler.getLayers(toolName)
+    local layers = toolHandler.getLayers(toolName) or {}
     local layerItems = {}
 
     for _, layer in ipairs(layers) do
@@ -83,7 +93,67 @@ local function toolLayerChangedCallback(self, tool, layer)
     listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer))
 end
 
--- TODO - Sort/group results
+local function updateLayerList(name)
+    local items = getLayerItems(name)
+
+    listWidgets.updateItems(toolWindow.layerList, items)
+
+    local newVisible = #items > 0
+
+    if newVisible ~= toolWindow.layerPanelVisible then
+        if newVisible then
+            toolWindow.leftColumn:addChild(toolWindow.layerPanel, 2)
+
+        else
+            toolWindow.layerPanel:removeSelf()
+        end
+
+        toolWindow.layerPanelVisible = newVisible
+    end
+end
+
+local function getModeItems(toolName)
+    local modes = toolHandler.getModes(toolName) or {}
+    local modeItems = {}
+
+    for _, mode in ipairs(modes) do
+        table.insert(modeItems, uiElements.listItem({
+            text = mode,
+            data = mode
+        }))
+    end
+
+    return modeItems
+end
+
+local function modeCallback(list, mode)
+    toolHandler.setMode(mode)
+end
+
+local function toolModeChangedCallback(self, tool, mode)
+    listWidgets.setSelection(toolWindow.modeList, mode, true)
+end
+
+
+local function updateToolModeList(name)
+    local items = getModeItems(name)
+
+    listWidgets.updateItems(toolWindow.modeList, items)
+
+    local newVisible = #items > 0
+
+    if newVisible ~= toolWindow.modePanelVisible then
+        if newVisible then
+            toolWindow.leftColumn:addChild(toolWindow.modePanel)
+
+        else
+            toolWindow.modePanel:removeSelf()
+        end
+
+        toolWindow.modePanelVisible = newVisible
+    end
+end
+
 local function getToolItems(sortItems)
     local tools = toolHandler.tools
     local toolItems = {}
@@ -114,7 +184,8 @@ end
 
 local function toolChangedCallback(self, tool)
     listWidgets.setSelection(toolWindow.toolList, tool.name, true)
-    listWidgets.updateItems(toolWindow.layerList, getLayerItems(tool.name))
+    updateLayerList(tool.name)
+    updateToolModeList(tool.name)
 end
 
 function toolWindow.getWindow()
@@ -125,20 +196,28 @@ function toolWindow.getWindow()
     local toolItems = getToolItems()
     local layerItems = getLayerItems()
     local materialItems = getMaterialItems()
+    local modeItems = getModeItems()
 
     local scrolledMaterialList, materialList = listWidgets.getList(materialCallback, materialItems, materialListOptions)
     local scrolledLayerList, layerList = listWidgets.getList(layerCallback, layerItems)
     local scrolledToolList, toolList = listWidgets.getList(toolCallback, toolItems)
+    local scrolledModeList, modeList = listWidgets.getList(modeCallback, modeItems)
 
     toolWindow.toolList = toolList
     toolWindow.layerList = layerList
     toolWindow.materialList = materialList
+    toolWindow.modeList = modeList
+    toolWindow.toolPanel = uiElements.panel({toolList})
+    toolWindow.layerPanel = uiElements.panel({layerList})
+    toolWindow.modePanel = uiElements.panel({modeList})
+    toolWindow.leftColumn = uiElements.column({
+        toolWindow.toolPanel,
+        toolWindow.layerPanel,
+        toolWindow.modePanel
+    })
 
     local row = uiElements.row({
-        uiElements.column({
-            uiElements.panel({toolList}),
-            uiElements.panel({layerList}),
-        }),
+        toolWindow.leftColumn,
         uiElements.panel({scrolledMaterialList}):with(uiUtils.fillHeight(false))
     }):with(uiUtils.fillHeight(true))
 
@@ -148,6 +227,7 @@ function toolWindow.getWindow()
         editorToolChanged = toolChangedCallback,
         editorToolLayerChanged = toolLayerChangedCallback,
         editorToolMaterialChanged = toolMaterialChangedCallback,
+        editorToolModeChanged = toolModeChangedCallback
     })
 
     window.style.bg = {}
