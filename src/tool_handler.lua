@@ -147,6 +147,55 @@ function toolHandler.getLayer(name)
     return false
 end
 
+function toolHandler.getModes(name)
+    local handler = getHandler(name)
+
+    if handler then
+        if handler.getModes then
+            return handler.getModes()
+
+        else
+            return handler.modes
+        end
+    end
+
+    return {}
+end
+
+function toolHandler.setMode(mode, name)
+    local handler = getHandler(name)
+
+    if handler then
+        local oldMode = toolHandler.getMode(name)
+
+        if handler.setMode then
+            return handler.setMode(mode, oldMode)
+
+        elseif handler.mode then
+            handler.mode = mode
+
+            toolUtils.sendToolModeEvent(toolHandler.currentTool, mode)
+        end
+    end
+
+    return false
+end
+
+function toolHandler.getMode(name)
+    local handler = getHandler(name)
+
+    if handler then
+        if handler.getMode then
+            return handler.getMode()
+
+        else
+            return handler.mode
+        end
+    end
+
+    return false
+end
+
 function toolHandler.loadInternalTools(path)
     path = path or "tools"
 
