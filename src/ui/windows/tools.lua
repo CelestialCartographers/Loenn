@@ -95,12 +95,12 @@ local function getToolItems(sortItems)
         }))
     end
 
-    if sortItems or sortItems == nil then
+    if sortItems ~= false then
         table.sort(toolItems, function(lhs, rhs)
             local lhsGroup = tools[lhs.text].group or ""
             local rhsGroup = tools[rhs.text].group or ""
 
-            return lhsGroup < rhsGroup or lhs.text < rhs.text
+            return lhsGroup == rhsGroup and lhs.text < rhs.text or lhsGroup < rhsGroup
         end)
     end
 
