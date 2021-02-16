@@ -117,19 +117,23 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
 
     if materialType == "matrix" then
         local materialWidth, materialHeight = material:size()
+        local tilesWidth, tilesHeight = tilesMatrix:size()
 
         for i = 1, materialWidth do
             for j = 1, materialHeight do
                 local tx, ty = x + i - 1, y + j - 1
-                local target = tilesMatrix:get(tx, ty, "0")
-                local mat = material:getInbounds(i, j)
 
-                if mat ~= target and mat ~= " " then
-                    tilesMatrix:set(tx, ty, mat)
+                if tx >= 1 and ty >= 1 and tx <= tilesWidth and ty <= tilesHeight then
+                    local target = tilesMatrix:get(tx, ty, "0")
+                    local mat = material:getInbounds(i, j)
 
-                    -- Add the current tile and nearby tiles for redraw
-                    addNeighborIfMissing(tx, ty, needsUpdate, addedUpdate)
-                    addMissingNeighbors(tx, ty, needsUpdate, addedUpdate)
+                    if mat ~= target and mat ~= " " then
+                        tilesMatrix:set(tx, ty, mat)
+
+                        -- Add the current tile and nearby tiles for redraw
+                        addNeighborIfMissing(tx, ty, needsUpdate, addedUpdate)
+                        addMissingNeighbors(tx, ty, needsUpdate, addedUpdate)
+                    end
                 end
             end
         end
@@ -195,6 +199,39 @@ function brushHelper.getValidTiles(layer)
     local autoTiler = layer == "tilesFg" and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
 
     return autoTiler.paths
+end
+
+function brushHelper.cleanMaterialPath(path, layer)
+    -- Remove tileset/ from front and humanize
+
+    path = path:match("^tilesets/(.*)") or path
+
+    if layer == "tilesBg" then
+        path = path:match("^bg(.*)") or path
+    end
+
+    return utils.humanizeVariableName(path)
+end
+
+function brushHelper.getMaterialLookup(layer)
+    local lookup = {}
+    local paths = brushHelper.getValidTiles(layer)
+
+    for id, path in pairs(paths) do
+        local cleanPath = brushHelper.cleanMaterialPath(path, layer)
+
+        lookup[cleanPath] = id
+    end
+
+    lookup["Air"] = "0"
+
+    return lookup
+end
+
+function brushHelper.getRoomSnapshotValue(room, layer)
+    if room then
+        return utils.deepcopy(room[layer].matrix)
+    end
 end
 
 return brushHelper

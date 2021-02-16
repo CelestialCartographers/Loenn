@@ -10,13 +10,20 @@ local utils = require("utils")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local toolUtils = require("tool_utils")
+local matrixLib = require("matrix")
 
 local tool = {}
 
 tool._type = "tool"
-tool.name = "brush"
+tool.name = "rectangle"
 tool.group = "brush"
 tool.image = nil
+
+tool.mode = "line"
+tool.modes = {
+    "line",
+    "fill"
+}
 
 tool.layer = "tilesFg"
 tool.validLayers = {
@@ -29,6 +36,8 @@ tool.materialsLookup = {}
 
 local lastTileX, lastTileY = -1, -1
 local lastX, lastY = -1, -1
+local startX, startY
+local dragX, dragY
 
 local snapshotValue = nil
 local snapshotHasChanged = false
@@ -48,6 +57,41 @@ local function handleActionClick(x, y, force)
         end
 
         lastX, lastY = x, y
+    end
+end
+
+local function handleDragFinished()
+    local room = state.getSelectedRoom()
+
+    if room and startX and startY and dragX and dragY then
+        local tiles = room[tool.layer]
+        local tilesMatrix = tiles.matrix
+        local roomWidth, roomHeight = tiles.matrix:size()
+
+        local brushStartX, brushStartY = math.min(startX, dragX), math.min(startY, dragY)
+        local brushStopX, brushStopY = math.max(startX, dragX), math.max(startY, dragY)
+
+        -- Clamp inside room
+        -- Make sure the line mode doesn't push the borders into the room
+        brushStartX, brushStartY = math.max(brushStartX, -1), math.max(brushStartY, -1)
+        brushStopX, brushStopY = math.min(brushStopX, roomWidth), math.min(brushStopY, roomHeight)
+
+        local width, height = brushStopX - brushStartX + 1, brushStopY - brushStartY + 1
+        local matrix = matrixLib.filled(tool.material, width, height)
+
+        if width > 0 and height > 0 then
+            if tool.mode == "line" then
+                for x = 2, width - 1 do
+                    for y = 2, height - 1 do
+                        matrix:set(x, y, " ")
+                    end
+                end
+            end
+
+            brushHelper.placeTile(room, brushStartX + 1, brushStartY + 1, matrix, tool.layer)
+
+            snapshotHasChanged = true
+        end
     end
 end
 
@@ -151,7 +195,12 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
 
     if love.mouse.isDown(actionButton) then
-        handleActionClick(x, y)
+        local room = state.getSelectedRoom()
+
+        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
+
+        dragX, dragY = tx, ty
     end
 end
 
@@ -160,6 +209,14 @@ function tool.mousepressed(x, y, button, istouch, pressed)
 
     if button == actionButton then
         startTileSnapshot()
+
+        local room = state.getSelectedRoom()
+
+        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
+
+        startX, startY = tx, ty
+        dragX, dragY = tx, ty
     end
 end
 
@@ -167,21 +224,25 @@ function tool.mousereleased(x, y, button)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
+        handleDragFinished()
         stopTileSnapshot()
+
+        startX, startY = nil, nil
+        dragX, dragY = nil, nil
     end
 end
 
 function tool.draw()
     local room = state.getSelectedRoom()
 
-    if room then
-        local px, py = viewportHandler.getRoomCoordindates(room)
-        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
+    if room and startX and startY and dragX and dragY then
+        local brushX, brushY = math.min(startX, dragX), math.min(startY, dragY)
+        local width, height = math.abs(startX - dragX) + 1, math.abs(startY - dragY) + 1
 
         viewportHandler.drawRelativeTo(room.x, room.y, function()
             drawing.callKeepOriginalColor(function()
                 love.graphics.setColor(colors.brushColor)
-                love.graphics.rectangle("line", tx * 8, ty * 8, 8, 8)
+                love.graphics.rectangle("line", brushX * 8, brushY * 8, width * 8, height * 8)
             end)
         end)
     end
