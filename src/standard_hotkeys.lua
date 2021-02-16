@@ -48,6 +48,9 @@ local rawHotkeys = {
     -- Camera
     {configs.hotkeys.cameraZoomIn, viewportHandler.zoomIn, "Zoom in"},
     {configs.hotkeys.cameraZoomOut, viewportHandler.zoomOut, "Zoom out"},
+    {configs.hotkeys.cameraResetZoom, viewportHandler.resetZoom, "Reset Zoom"},
+    {configs.hotkeys.cameraHome, viewportHandler.home, "Reset camera position and scale"},
+    {configs.hotkeys.toggleFullscreen, viewportHandler.toggleFullscreen, "Toggle fullscreen"},
 }
 
 local hotkeys = {}

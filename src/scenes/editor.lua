@@ -36,8 +36,8 @@ function editorScene:draw()
 
         self.celesteRender.drawMap(self.viewerState)
 
-        love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
-        love.graphics.printf(itemName, 20, 80, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
+        love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 20, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
+        love.graphics.printf(itemName, 20, 60, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
     end
 
     self:propagateEvent("draw")
