@@ -1,11 +1,18 @@
+-- TODO - Get this over to a sprite based solution
+
 local drawableSpriteStruct = require("structs.drawable_sprite")
+local utils = require("utils")
 
 local feather = {}
 
 feather.name = "infiniteStar"
 feather.depth = 0
 feather.placements = {
-    name = "normal"
+    name = "normal",
+    data = {
+        shielded = false,
+        singleUse = false
+    }
 }
 
 function feather.draw(room, entity, viewport)
@@ -19,6 +26,10 @@ function feather.draw(room, entity, viewport)
     end
 
     featherSprite:draw()
+end
+
+function feather.selection(room, entity)
+    return utils.rectangle(entity.x - 12, entity.y - 12, 24, 24)
 end
 
 return feather

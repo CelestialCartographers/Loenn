@@ -35,6 +35,10 @@ function toolUtils.sendToolEvent(tool)
     sceneHandler.sendEvent("editorToolChanged", tool)
 end
 
+function toolUtils.sendToolModeEvent(tool, mode)
+    sceneHandler.sendEvent("editorToolModeChanged", tool, mode)
+end
+
 function toolUtils.sendLayerEvent(tool, layer)
     sceneHandler.sendEvent("editorToolLayerChanged", tool, layer)
 end

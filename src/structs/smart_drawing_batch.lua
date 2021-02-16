@@ -2,6 +2,47 @@ local utils = require("utils")
 local matrix = require("matrix")
 local drawing = require("drawing")
 
+local atlases = require("atlases")
+local runtimeAtlas = require("runtime_atlas")
+
+local arrayImage
+local arrayImageLookup
+
+-- TODO - Handle runtime atlases better, currently only the game atlases are loaded here
+-- Cache this exactly once for now, get a better system in the future
+local function getImageArray()
+    if arrayImage then
+        return arrayImage, arrayImageLookup
+    end
+
+    local images = {}
+    local layerLookup = {}
+
+    for atlasName, atlas in pairs(atlases) do
+        if type(atlas) == "table" then
+            local resource, sprite = next(atlas)
+            local imageData = sprite.imageData
+
+            table.insert(images, imageData)
+
+            layerLookup[#images] = imageData
+        end
+    end
+
+    for i, atlas in ipairs(runtimeAtlas.atlases) do
+        local imageData = atlas.imageData
+
+        table.insert(images, imageData)
+
+        layerLookup[#images] = imageData
+    end
+
+    arrayImage = love.graphics.newArrayImage(images)
+    arrayImageLookup = layerLookup
+
+    return arrayImage, arrayImageLookup
+end
+
 local smartDrawingBatch = {}
 
 local orderedDrawingBatchMt = {}
@@ -32,15 +73,19 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
 
     elseif typ == "drawableSprite" then
         local image = drawable.meta and drawable.meta.image
+        local imageData = drawable.meta and drawable.meta.imageData
+        local layer = self._layers[imageData]
 
-        if image then
+        if image or layer then
             local offsetX = drawable.offsetX or ((drawable.justificationX or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX)
             local offsetY = drawable.offsetY or ((drawable.justificationY or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY)
 
             local colorChanged = not utils.sameColor(drawable.color, self._lastColor)
+            local targetImage = layer and self._arrayImage or image
 
-            if image ~= self._lastImage or self._lastType ~= "drawableSprite" or colorChanged or not self._lastBatch then
-                self._lastBatch = love.graphics.newSpriteBatch(image, spriteBatchSize, spriteBatchMode)
+            if not layer and image ~= self._lastImage or self._lastType ~= "drawableSprite" or colorChanged or not self._lastBatch or layer and self._batchTarget ~= self._arrayImage then
+                self._lastBatch = love.graphics.newSpriteBatch(targetImage, spriteBatchSize, spriteBatchMode)
+                self._batchTarget = targetImage
                 self._imagesCurrentBatch = 0
                 table.insert(self._drawables, {self._lastBatch, drawable.color})
             end
@@ -48,7 +93,13 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
             self._lastImage = image
             self._lastColor = drawable.color
             self._imagesCurrentBatch += 1
-            self._lastBatch:add(drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
+
+            if layer then
+                self._lastBatch:addLayer(layer, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
+
+            else
+                self._lastBatch:add(drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, offsetX, offsetY)
+            end
         end
 
     elseif typ == "drawableFunction" then
@@ -60,20 +111,30 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
 end
 
 function orderedDrawingBatchMt.__index:draw()
-    local r, g, b, a
+    -- Initial and previous color
+    local ir, ig, ib, ia
+    local pr, pg, pb, pa
     local changedColor = false
 
     for _, element in ipairs(self._drawables) do
         local drawable, color = element[1], element[2]
         local typ = utils.typeof(drawable)
 
+        local r, g, b, a
+
         if color then
             -- No need to fetch this if it isn't needed
             if not changedColor then
-                r, g, b, a = love.graphics.getColor()
+                ir, ig, ib, ia = love.graphics.getColor()
             end
 
+            r, g, b, a = color[1], color[2], color[3], color[4]
+        end
+
+        if r ~= pr or g ~= pg or b ~= pb or a ~= pa then
+            color = color or {1.0, 1.0, 1.0, 1.0}
             changedColor = true
+            pr, pg, pb, pa = color[1], color[2], color[3], color[4]
 
             love.graphics.setColor(color)
         end
@@ -87,7 +148,7 @@ function orderedDrawingBatchMt.__index:draw()
     end
 
     if changedColor then
-        love.graphics.setColor(r, g, b, a)
+        love.graphics.setColor(ir, ig, ib, ia)
     end
 end
 
@@ -97,6 +158,7 @@ function orderedDrawingBatchMt.__index:clear()
     self._imagesCurrentBatch = 0
     self._lastBatch = nil
     self._lastImage = nil
+    self._batchTarget = nil
     self._lastColor = nil
     self._lastType = nil
 end
@@ -118,13 +180,18 @@ function smartDrawingBatch.createOrderedBatch()
         _type = "orderedDrawingBatch",
     }
 
+    local imageArray, layerLookup = getImageArray()
+
     res._drawables = {}
 
     res._imagesCurrentBatch = 0
+    res._batchTarget = nil
     res._lastBatch = nil
     res._lastImage = nil
     res._lastColor = nil
     res._lastType = nil
+    res._arrayImage = imageArray
+    res._layers = layerLookup
 
     return setmetatable(res, orderedDrawingBatchMt)
 end

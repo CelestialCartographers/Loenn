@@ -12,6 +12,7 @@ local history = require("history")
 local snapshotUtils = require("snapshot_utils")
 local hotkeyStruct = require("structs.hotkey")
 local layerHandlers = require("layer_handlers")
+local placementUtils = require("placement_utils")
 
 local tool = {}
 
@@ -197,10 +198,10 @@ local function pasteItems(room, layer, previews)
         local heightOffset = pasteCentered and height / 2 or 0
 
         for _, preview in ipairs(previews) do
-            -- TODO - Assign id if needed
-
             local item = preview.item
             local targetLayer = preview.layer
+
+            placementUtils.finalizePlacement(room, layer, item)
 
             item.x = cursorX + item.x - tlx - widthOffset
             item.y = cursorY + item.y - tly - heightOffset
