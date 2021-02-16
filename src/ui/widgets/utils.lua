@@ -12,7 +12,7 @@ function widgetUtils.removeWindowTitlebar(window)
     end)
 end
 
-function widgetUtils.getSimpleOverlayWidget(widget)
+function widgetUtils.getSimpleOverlayWidget(widget, ...)
     local widgetType = utils.typeof(widget)
 
     if widgetType == "string" then
@@ -32,7 +32,7 @@ function widgetUtils.getSimpleOverlayWidget(widget)
         end
 
     elseif widgetType == "function" then
-        widget = widget()
+        widget = widget(...)
     end
 
     -- Make sure the processed widget is a table

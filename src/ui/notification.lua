@@ -40,7 +40,7 @@ local function removePopupWindow(window)
 end
 
 local function createPopupWindow(popup)
-    local widgets = widgetUtils.getSimpleOverlayWidget(popup.widget)
+    local widgets = widgetUtils.getSimpleOverlayWidget(popup.widget, popup)
     local row = uiElements.row(widgets)
 
     row.style.bg = {}
