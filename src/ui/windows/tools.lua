@@ -135,9 +135,11 @@ function toolWindow.getWindow()
     toolWindow.materialList = materialList
 
     local row = uiElements.row({
-        scrolledToolList,
-        scrolledLayerList,
-        scrolledMaterialList
+        uiElements.column({
+            uiElements.panel({toolList}),
+            uiElements.panel({layerList}),
+        }),
+        uiElements.panel({scrolledMaterialList}):with(uiUtils.fillHeight(false))
     }):with(uiUtils.fillHeight(true))
 
     local window = uiElements.window("Tools", row):with(uiUtils.fillHeight(false))
@@ -147,6 +149,9 @@ function toolWindow.getWindow()
         editorToolLayerChanged = toolLayerChangedCallback,
         editorToolMaterialChanged = toolMaterialChangedCallback,
     })
+
+    window.style.bg = {}
+    window.style.border = {}
 
     widgetUtils.removeWindowTitlebar(window)
 
