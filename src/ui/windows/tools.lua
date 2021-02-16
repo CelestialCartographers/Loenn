@@ -75,13 +75,12 @@ end
 
 local function layerCallback(list, layer)
     toolHandler.setLayer(layer)
+    listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer))
 end
 
 local function toolLayerChangedCallback(self, tool, layer)
-    local materialItems = getMaterialItems(layer)
-
     listWidgets.setSelection(toolWindow.layerList, layer, true)
-    listWidgets.updateItems(toolWindow.materialList, materialItems)
+    listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer))
 end
 
 -- TODO - Sort/group results
@@ -110,13 +109,12 @@ end
 
 local function toolCallback(list, toolName)
     toolHandler.selectTool(toolName)
+    listWidgets.updateItems(toolWindow.layerList, getLayerItems(toolName))
 end
 
 local function toolChangedCallback(self, tool)
-    local layerItems = getLayerItems(tool.name)
-
     listWidgets.setSelection(toolWindow.toolList, tool.name, true)
-    listWidgets.updateItems(toolWindow.layerList, layerItems)
+    listWidgets.updateItems(toolWindow.layerList, getLayerItems(tool.name))
 end
 
 function toolWindow.getWindow()
