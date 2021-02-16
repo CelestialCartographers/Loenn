@@ -164,9 +164,6 @@ function listWidgets.getList(callback, items, options)
 
     local column = getColumnForList(searchField, scrolledList, options.searchBarLocation)
 
-    column.style.bg = {}
-    column.style.padding = 0
-
     return column, list, searchField
 end
 
