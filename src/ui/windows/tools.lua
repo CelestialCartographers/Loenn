@@ -227,7 +227,9 @@ function toolWindow.getWindow()
         editorToolChanged = toolChangedCallback,
         editorToolLayerChanged = toolLayerChangedCallback,
         editorToolMaterialChanged = toolMaterialChangedCallback,
-        editorToolModeChanged = toolModeChangedCallback
+        editorToolModeChanged = toolModeChangedCallback,
+
+        interactive = 0
     })
 
     window.style.bg = {}
