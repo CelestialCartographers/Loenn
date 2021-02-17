@@ -34,20 +34,25 @@ SOFTWARE.
 local fast_unpack = {}
 local unpack_mt = {}
 
-function unpack_mt.__call(u, tbl)
-    local len = #tbl
+function unpack_mt.__call(u, tbl, i, j)
+    i = i or 1
+    j = j or #tbl
 
-    if not u[len] then
-        local values = {}
-
-        for i = 1, len do
-            values[i] = string.format("t[%d]", i)
+    if not (u[i] and u[i][j]) then
+        if not u[i] then
+            u[i] = {}
         end
 
-        u[len] = assert(load(string.format("return function(t) return %s end", table.concat(values, ","))))()
+        local values = {}
+
+        for ind = i, j do
+            table.insert(values, string.format("t[%d]", ind))
+        end
+
+        u[i][j] = assert(load(string.format("return function(t) return %s end", table.concat(values, ","))))()
     end
 
-    return u[len](tbl)
+    return u[i][j](tbl)
 end
 
 setmetatable(fast_unpack, unpack_mt)
