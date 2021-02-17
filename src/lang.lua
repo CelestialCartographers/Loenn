@@ -38,7 +38,7 @@ function lang.parse(str, languageData)
                     target = target[part]
                 end
 
-                target._value = value
+                target._value = utils.unbackslashify(value)
             end
         end
     end
