@@ -32,6 +32,7 @@ end
 
 function languageRegistry.loadInternalFiles()
     pluginLoader.loadPlugins("lang", nil, languageRegistry.loadLanguageFile, false)
+    pluginLoader.loadPlugins("ui/lang", nil, languageRegistry.loadLanguageFile, false)
 end
 
 function languageRegistry.loadExternalFiles()
