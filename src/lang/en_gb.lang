@@ -6,6 +6,36 @@
 scenes.loading.loading=Loading
 
 
+# -- Layers --
+# layers.layerName.name
+# layers.layerName.description
+layers.tilesFg.name=Foreground Tiles
+layers.tilesBg.name=Background Tiles
+layers.decalsFg.name=Foreground Decals
+layers.decalsBg.name=Background Decals
+layers.entities.name=Entities
+layers.triggers.name=Triggers
+
+
+# -- Tools --
+# tools.toolName.name
+# tools.toolName.description
+# tools.toolName.mode.modeName.name
+# tools.toolName.mode.modeName.description
+tools.brush.name=Brush
+
+tools.rectangle.name=Rectangle
+
+tools.rectangle.modes.fill.name=Fill
+tools.rectangle.modes.fill.description=Fills the whole selected area.
+tools.rectangle.modes.line.name=Line
+tools.rectangle.modes.line.description=Fills only the border of the selected area.
+
+tools.selection.name=Placements
+
+tools.placement.name=Selections
+
+
 # -- Entities --
 # entities.entityName.name.*
 # entities.entityName.attribute.*
