@@ -1,0 +1,64 @@
+# Lönn Language File
+# Only for language file specific text!
+# Comments start with '#'
+
+# Common button text
+ui.button.yes=Yes
+ui.button.no=No
+ui.button.confirm=Confirm
+ui.button.cancel=Cancel
+ui.button.quit=Quit
+
+
+# Notifications
+ui.notifications.editorMapSaved=Saved map: %s
+ui.notifications.editorMapSaveFailed=Failed to save map: %s
+ui.notifications.editorMapLoaded=Loaded map: %s
+ui.notifications.editorMapLoadFailed=Failed to load map: %s
+ui.notifications.editorHistoryUndoEmpty=Unable to undo, end of history
+ui.notifications.editorHistoryRedoEmpty=Unable to redo, end of history
+ui.notifications.editorQuitWithChanges=You have unsaved pending changes.\nAre you sure you want to quit?
+ui.notifications.editorLoadWithChanges=You have unsaved pending changes.\nAre you sure you want to load this map?
+
+
+# Menubar
+ui.menubar.file=File
+ui.menubar.new=New
+ui.menubar.open=Open
+ui.menubar.recent=Recent
+ui.menubar.save=Save
+ui.menubar.save_as=Save as
+ui.menubar.exit=Exit
+
+ui.menubar.edit=Edit
+ui.menubar.undo=Undo
+ui.menubar.redo=Redo
+ui.menubar.settings=Settings
+
+ui.menubar.view=View
+
+ui.menubar.map=Map
+ui.menubar.stylegrounds=Stylegrounds
+ui.menubar.metadata=Metadata
+
+ui.menubar.room=Room
+ui.menubar.add=Add
+ui.menubar.configure=Configure
+ui.menubar.delete=Delete
+
+ui.menubar.debug=Debug
+ui.menubar.reload=Reload
+ui.menubar.reload_everything=Everything
+ui.menubar.reload_scenes=Scenes
+ui.menubar.reload_tools=Tools
+ui.menubar.reload_entities=Entities
+ui.menubar.reload_triggers=Triggers
+ui.menubar.reload_effects=Effects
+ui.menubar.reload_user_interface=User Interface
+ui.menubar.reload_language_files=Language Files
+ui.menubar.redraw_map=Redraw Map
+ui.menubar.test_console=Test Console
+
+ui.menubar.help=Help
+ui.menubar.about=About
+ui.menubar.check_for_updates=Check For Updates
