@@ -8,6 +8,7 @@ local widgetUtils = require("ui.widgets.utils")
 local listWidgets = require("ui.widgets.lists")
 local simpleDocks = require("ui.widgets.simple_docks")
 
+local languageRegistry = require("language_registry")
 local toolHandler = require("tool_handler")
 
 local toolWindow = {}
@@ -69,15 +70,33 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     listWidgets.setSelection(toolWindow.materialList, material, true)
 end
 
+local function getLanguageOrDefault(languagePath, default)
+    if languagePath._exists then
+        return tostring(languagePath)
+    end
+
+    return default
+end
+
 local function getLayerItems(toolName)
+    local language = languageRegistry.getLanguage()
     local layers = toolHandler.getLayers(toolName) or {}
     local layerItems = {}
 
     for _, layer in ipairs(layers) do
-        table.insert(layerItems, uiElements.listItem({
-            text = layer,
+        local displayName = getLanguageOrDefault(language.layers[layer].name, layer)
+        local tooltipText = getLanguageOrDefault(language.layers[layer].description)
+
+        local item = uiElements.listItem({
+            text = displayName,
             data = layer
-        }))
+        })
+
+        table.insert(layerItems, item)
+
+        if tooltipText then
+            item.tooltipText = tooltipText
+        end
     end
 
     return layerItems
@@ -113,14 +132,24 @@ local function updateLayerList(name)
 end
 
 local function getModeItems(toolName)
+    local language = languageRegistry.getLanguage()
     local modes = toolHandler.getModes(toolName) or {}
     local modeItems = {}
 
-    for _, mode in ipairs(modes) do
-        table.insert(modeItems, uiElements.listItem({
-            text = mode,
+    for _, mode in pairs(modes) do
+        local displayName = getLanguageOrDefault(language.tools[toolName].modes[mode].name, mode)
+        local tooltipText = getLanguageOrDefault(language.tools[toolName].modes[mode].description, mode)
+
+        local item = uiElements.listItem({
+            text = displayName,
             data = mode
-        }))
+        })
+
+        table.insert(modeItems, item)
+
+        if tooltipText then
+            item.tooltipText = tooltipText
+        end
     end
 
     return modeItems
@@ -155,20 +184,30 @@ local function updateToolModeList(name)
 end
 
 local function getToolItems(sortItems)
+    local language = languageRegistry.getLanguage()
     local tools = toolHandler.tools
     local toolItems = {}
 
     for name, tool in pairs(tools) do
-        table.insert(toolItems, uiElements.listItem({
-            text = name,
+        local displayName = getLanguageOrDefault(language.tools[name].name, name)
+        local tooltipText = getLanguageOrDefault(language.tools[name].description)
+
+        local item = uiElements.listItem({
+            text = displayName,
             data = name
-        }))
+        })
+
+        table.insert(toolItems, item)
+
+        if tooltipText then
+            item.tooltipText = tooltipText
+        end
     end
 
     if sortItems ~= false then
         table.sort(toolItems, function(lhs, rhs)
-            local lhsGroup = tools[lhs.text].group or ""
-            local rhsGroup = tools[rhs.text].group or ""
+            local lhsGroup = tools[lhs.data].group or ""
+            local rhsGroup = tools[rhs.data].group or ""
 
             return lhsGroup == rhsGroup and lhs.text < rhs.text or lhsGroup < rhsGroup
         end)
