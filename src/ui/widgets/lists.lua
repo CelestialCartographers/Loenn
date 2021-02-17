@@ -8,11 +8,21 @@ local function calculateWidth(orig, element)
     return element.inner.width
 end
 
-local function filterItems(items, search)
+local function filterItems(items, search, caseSensitive)
     local filtered = {}
 
+    if caseSensitive ~= false then
+        search = search:lower()
+    end
+
     for _, item in ipairs(items) do
-        if item.text:contains(search) then
+        local text = item.text
+
+        if caseSensitive ~= false then
+            text = text:lower()
+        end
+
+        if text:contains(search) then
             table.insert(filtered, item)
         end
     end
