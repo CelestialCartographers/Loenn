@@ -1,5 +1,4 @@
 -- Fake window that acts like a notification device
--- TODO - Use language file
 
 local ui = require("ui")
 local uiElements = require("ui.elements")
@@ -7,6 +6,7 @@ local uiUtils = require("ui.utils")
 
 local history = require("history")
 local loadedState = require("loaded_state")
+local languageRegistry = require("language_registry")
 
 local notifications = require("ui.notification")
 
@@ -14,27 +14,39 @@ local eventNotifications = {}
 local notificationHandlers = {}
 
 function notificationHandlers:editorMapSaved(filename)
-    notifications.notify(string.format("Saved map: %s", filename))
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(string.format(tostring(language.ui.notifications.editorMapSaved), filename))
 end
 
 function notificationHandlers:editorMapSaveFailed(filename)
-    notifications.notify(string.format("Failed to save map: %s", filename))
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(string.format(tostring(language.ui.notifications.editorMapSaveFailed), filename))
 end
 
 function notificationHandlers:editorMapLoaded(filename)
-    notifications.notify(string.format("Loaded map: %s", filename))
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(string.format(tostring(language.ui.notifications.editorMapLoaded), filename))
 end
 
 function notificationHandlers:editorMapLoadFailed(filename)
-    notifications.notify(string.format("Failed to load map: %s", filename))
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(string.format(tostring(language.ui.notifications.editorMapLoadFailed), filename))
 end
 
 function notificationHandlers:editorHistoryUndoEmpty()
-    notifications.notify("Unable to undo, end of history")
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(tostring(language.ui.notifications.editorHistoryUndoEmpty))
 end
 
 function notificationHandlers:editorHistoryRedoEmpty()
-    notifications.notify("Unable to redo, end of history")
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(tostring(language.ui.notifications.editorHistoryRedoEmpty))
 end
 
 local function closePopup(popup)
@@ -45,17 +57,19 @@ end
 
 -- TODO - Move over to modal when those are implemented
 function notificationHandlers:editorQuitWithChanges()
+    local language = languageRegistry.getLanguage()
+
     notifications.notify(function(popup)
         return uiElements.column({
-            uiElements.label("You have unsaved pending changes.\nAre you sure you want to quit?"),
+            uiElements.label(tostring(language.ui.notifications.editorQuitWithChanges)),
             uiElements.row({
-                uiElements.button("Quit", function()
+                uiElements.button(tostring(language.ui.button.quit), function()
                     -- Update history to think we have no changes
                     history.madeChanges = false
 
                     love.event.quit()
                 end),
-                uiElements.button("Cancel", function()
+                uiElements.button(tostring(language.ui.button.cancel), function()
                     closePopup(popup)
                 end),
             })
@@ -65,18 +79,20 @@ end
 
 -- TODO - Move over to modal when those are implemented
 function notificationHandlers:editorLoadWithChanges(currentFile, filename)
+    local language = languageRegistry.getLanguage()
+
     notifications.notify(function(popup)
         return uiElements.column({
-            uiElements.label("You have unsaved pending changes.\nAre you sure you want to load this map?"),
+            uiElements.label(tostring(language.ui.notifications.editorLoadWithChanges)),
             uiElements.row({
-                uiElements.button("Yes", function()
+                uiElements.button(tostring(language.ui.button.yes), function()
                     -- Update history to think we have no changes
                     history.madeChanges = false
 
                     loadedState.loadFile(filename)
                     closePopup(popup)
                 end),
-                uiElements.button("Cancel", function()
+                uiElements.button(tostring(language.ui.button.cancel), function()
                     closePopup(popup)
                 end),
             })
