@@ -132,8 +132,8 @@ function utils.humanizeVariableName(name)
     return res
 end
 
-function utils.unbackslashify(string)
-    return string:gsub("\\n", "\n")
+function utils.unbackslashify(text)
+    return text:gsub("\\n", "\n")
 end
 
 function utils.convertToUnixPath(path)
