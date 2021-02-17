@@ -31,9 +31,9 @@ tools.rectangle.modes.fill.description=Fills the whole selected area.
 tools.rectangle.modes.line.name=Line
 tools.rectangle.modes.line.description=Fills only the border of the selected area.
 
-tools.selection.name=Placements
+tools.selection.name=Selection
 
-tools.placement.name=Selections
+tools.placement.name=Placement
 
 
 # -- Entities --
