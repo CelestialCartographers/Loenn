@@ -7,6 +7,9 @@ function love.load()
         package.cpath = package.cpath .. ";" .. love.filesystem.getSourceBaseDirectory() .. "/?.so"
     end
 
+    -- Load faster unpack function
+    require("fast_unpack")
+
     -- Keeping it here since it is an option, and seems to make a difference at some points
     -- Attempt to expose to config option at some point
     --[[

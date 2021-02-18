@@ -66,7 +66,8 @@ local function getTrianglePoints(x, y, width, height, scale)
     local res = {}
 
     for i = 1, 8 do
-        local widthMul, heightMul = unpack(widthHeightMultipliers[i])
+        local multipliers = widthHeightMultipliers[i]
+        local widthMul, heightMul = multipliers[1], multipliers[2]
         local theta = angles[i]
 
         local borderOffsetX = widthMul == 0 and -triangleOffset or (widthMul == 1 and triangleOffset) or 0

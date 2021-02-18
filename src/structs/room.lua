@@ -78,14 +78,16 @@ function roomStruct.decode(data)
         local name = value.__name
 
         if structTilesNames[name] and value then
-            local target, struct = unpack(structTilesNames[name])
+            local handler = structTilesNames[name]
+            local target, struct = handler[1], handler[2]
 
             room[target] = struct.resize(struct.decode(value), roomTilesWidth, roomTilesHeight)
         end
 
         if structMutlipleNames[name] then
             for i, d in ipairs(value.__children or {}) do
-                local target, struct = unpack(structMutlipleNames[name])
+                local handler = structMutlipleNames[name]
+                local target, struct = handler[1], handler[2]
 
                 table.insert(room[target], struct.decode(d))
             end
