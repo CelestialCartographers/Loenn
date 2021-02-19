@@ -83,6 +83,8 @@ function textureAtlas.addImage(atlas, image, filename, layer)
                 return true, atlas.image, x, y
             end
         end
+
+        atlas.previousY = 0
     end
 
     return false, nil, 0, 0
@@ -106,6 +108,15 @@ function textureAtlas.addImageFirstAtlas(image, filename, createIfNeeded, onlyCh
     end
 
     return image, 0, 0
+end
+
+function textureAtlas.dumpCanvasImages()
+    for i = 1, #textureAtlas.atlases do
+        local data = textureAtlas.canvasArray:newImageData(i)
+
+        data:encode("png", "canvas_dump_" .. tostring(i) .. ".png")
+        data:release()
+    end
 end
 
 return textureAtlas
