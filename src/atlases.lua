@@ -4,6 +4,28 @@ local spriteLoader = require("sprite_loader")
 local utils = require("utils")
 
 local atlases = {}
+local atlasNames = {}
+
+local atlasesMt = {}
+
+function atlasesMt.__index(self, key)
+    local target = rawget(self, key) or rawget(self, atlasNames[key])
+
+    if target then
+        return target
+
+    else
+        for name, atlas in pairs(atlases) do
+            if name:lower() == key:lower() then
+                atlasNames[key] = name
+
+                return atlas
+            end
+        end
+    end
+end
+
+setmetatable(atlases, atlasesMt)
 
 local celesteAtlasRelativePath = utils.joinpath("Content", "Graphics", "Atlases")
 local gameplayMeta = "Gameplay.meta"
@@ -36,7 +58,7 @@ end
 function atlases.loadCelesteAtlases()
     local celesteAtlasPath = utils.joinpath(fileLocations.getCelesteDir(), celesteAtlasRelativePath)
 
-    atlases.loadCelesteAtlas("gameplay", gameplayMeta, celesteAtlasPath)
+    atlases.loadCelesteAtlas("Gameplay", gameplayMeta, celesteAtlasPath)
 end
 
 -- Remove everything until after the atlas name
@@ -72,7 +94,7 @@ end
 
 -- TODO - Make it possible to refetch the resource
 function atlases.getResource(resource, name)
-    name = name or "gameplay"
+    name = name or "Gameplay"
 
     if not atlases[name] then
         atlases.createAtlas(name)
@@ -93,7 +115,7 @@ function atlases.getResource(resource, name)
 end
 
 function atlases.loadExternalAtlases()
-    atlases.loadExternalAtlas("gameplay")
+    atlases.loadExternalAtlas("Gameplay")
 end
 
 return atlases

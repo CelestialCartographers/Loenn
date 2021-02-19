@@ -222,7 +222,7 @@ function drawableSpriteStruct.spriteFromMeta(meta, data)
 end
 
 function drawableSpriteStruct.spriteFromTexture(texture, data)
-    local atlas = data and data.atlas or "gameplay"
+    local atlas = data and data.atlas or "Gameplay"
     local spriteMeta = atlases.getResource(texture, atlas)
 
     if spriteMeta then
