@@ -51,16 +51,16 @@ function textureAtlas.addImage(atlas, image, filename, layer)
     for i = 1, #atlas.rectangles do
         local rectangle = atlas.rectangles[i]
 
-        -- Find a free space
+        -- Find free space
         if width <= rectangle.width and height <= rectangle.height then
             local x, y = rectangle.x, rectangle.y
 
-            -- Find remining free space
+            -- Find remaining free space after inserting the new image
             local remainingSpace = utils.subtractRectangle(rectangle, utils.rectangle(x, y, width, height))
 
             table.remove(atlas.rectangles, i)
 
-            for j, remaining in ipairs(remainingSpace) do
+            for _, remaining in ipairs(remainingSpace) do
                 table.insert(atlas.rectangles, remaining)
             end
 
