@@ -66,6 +66,57 @@ function utils.aabbCheckInline(x1, y1, w1, h1, x2, y2, w2, h2)
     return not (x2 >= x1 + w1 or x2 + w2 <= x1 or y2 >= y1 + h1 or y2 + h2 <= y1)
 end
 
+function utils.intersection(r1, r2)
+    local x = math.max(r1.x, r2.x)
+    local y = math.max(r1.y, r2.y)
+    local width = math.min(r1.x + r1.width, r2.x + r2.width) - x
+    local height = math.min(r1.y + r1.height, r2.y + r2.height) - y
+
+    return width > 0 and height > 0 and utils.rectangle(x, y, width, height) or nil
+end
+
+function utils.intersectionBounds(r1, r2)
+    local tlx = math.max(r1.x, r2.x)
+    local tly = math.max(r1.y, r2.y)
+    local brx = math.min(r1.x + r1.width, r2.x + r2.width)
+    local bry = math.min(r1.y + r1.height, r2.y + r2.height)
+
+    return tlx, tly, brx, bry
+end
+
+function utils.subtractRectangle(r1, r2)
+    local tlx, tly, brx, bry = utils.intersectionBounds(r1, r2)
+
+    if tlx >= brx and tly >= bry  then
+        -- No intersection
+        return {r1}
+    end
+
+    local remaining = {}
+
+    -- Left rectangle
+    if tlx > r1.x then
+        table.insert(remaining, utils.rectangle(r1.x, r1.y, tlx - r1.x, r1.height))
+    end
+
+    -- Right rectangle
+    if brx < r1.x + r1.width then
+        table.insert(remaining, utils.rectangle(brx, r1.y, r1.x + r1.width - brx, r1.height))
+    end
+
+    -- Top rectangle
+    if tly > r1.y then
+        table.insert(remaining, utils.rectangle(tlx, r1.y, brx - tlx, tly - r1.y))
+    end
+
+    -- Bottom rectangle
+    if bry < r1.y + r1.height then
+        table.insert(remaining, utils.rectangle(tlx, bry, brx - tlx, r1.y + r1.height - bry))
+    end
+
+    return remaining
+end
+
 function utils.getFileHandle(path, mode, internal)
     if internal then
         return love.filesystem.newFile(path, mode:gsub("b", ""))

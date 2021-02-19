@@ -38,53 +38,49 @@ function textureAtlas.addAtlas()
         height = textureAtlas.height,
         filename = atlasName,
         dataName = atlasName,
-        rectangles = {},
-        previousX = 0,
-        previousY = 0
+        rectangles = {utils.rectangle(0, 0, textureAtlas.width, textureAtlas.height)}
     }
 
     table.insert(textureAtlas.atlases, atlas)
 end
 
 -- TODO - Check if added already?
--- TODO - Use actual algorithm
 function textureAtlas.addImage(atlas, image, filename, layer)
     local width, height = image:getDimensions()
 
-    for x = atlas.previousX, atlas.width - 1, 16 do
-        for y = atlas.previousY, atlas.height - 1, 16 do
-            local areaClear = true
+    for i = 1, #atlas.rectangles do
+        local rectangle = atlas.rectangles[i]
 
-            if x + width <= atlas.width and y + height <= atlas.height then
-                for i, rectangle in ipairs(atlas.rectangles) do
-                    if utils.aabbCheckInline(x, y, width, height, rectangle.x, rectangle.y, rectangle.width, rectangle.height) then
-                        areaClear = false
+        -- Find a free space
+        if width <= rectangle.width and height <= rectangle.height then
+            local x, y = rectangle.x, rectangle.y
 
-                        break
-                    end
-                end
+            -- Find remining free space
+            local remainingSpace = utils.subtractRectangle(rectangle, utils.rectangle(x, y, width, height))
 
-            else
-                areaClear = false
+            table.remove(atlas.rectangles, i)
+
+            for j, remaining in ipairs(remainingSpace) do
+                table.insert(atlas.rectangles, remaining)
             end
 
-            if areaClear then
-                table.insert(atlas.rectangles, utils.rectangle(x, y, width, height))
+            -- TODO merge adjacent rectangles
+            -- TODO overlap rectangles
 
-                atlas.previousX = x
-                atlas.previousY = y
+            table.sort(atlas.rectangles, function(r1, r2)
+                return r1.width == r2.width and r1.height < r2.height or r1.width < r2.width
+            end)
 
-                local previousCanvas = love.graphics.getCanvas()
+            -- Add the image on the canvas
 
-                love.graphics.setCanvas(textureAtlas.canvasArray, layer)
-                love.graphics.draw(image, x, y)
-                love.graphics.setCanvas(previousCanvas)
+            local previousCanvas = love.graphics.getCanvas()
 
-                return true, atlas.image, x, y
-            end
+            love.graphics.setCanvas(textureAtlas.canvasArray, layer)
+            love.graphics.draw(image, x, y)
+            love.graphics.setCanvas(previousCanvas)
+
+            return true, atlas.image, x, y
         end
-
-        atlas.previousY = 0
     end
 
     return false, nil, 0, 0
@@ -94,7 +90,6 @@ function textureAtlas.addImageFirstAtlas(image, filename, createIfNeeded, onlyCh
     for i, atlas in ipairs(textureAtlas.atlases) do
         if not onlyCheck or onlyCheck and onlyCheck == i then
             local fit, atlasImage, x, y = textureAtlas.addImage(atlas, image, filename, i)
-
             if fit then
                 return atlasImage, x, y, i
             end
