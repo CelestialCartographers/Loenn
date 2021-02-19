@@ -84,12 +84,13 @@ function modHandler.mountMod(path, force)
     if not loaded or force then
         if modHandler.mountable(path) then
             -- Replace "." in ".zip" to prevent require from getting confused
-            local modFolderName = utils.filename(path):gsub("%.", "_")
+            local directory, filename = utils.dirname(path), utils.filename(path)
+            local modFolderName = filename:gsub("%.", "_")
             local specificMountPoint = string.format(modHandler.specificModContent, modFolderName) .. "/"
 
-            -- Append `/.` to trick physfs to mount the same path twice
+            -- Can't mount the same path twice, trick physfs into loading both
             love.filesystem.mountUnsandboxed(path, modHandler.commonModContent .. "/", 1)
-            love.filesystem.mountUnsandboxed(path .. "/.", specificMountPoint, 1)
+            love.filesystem.mountUnsandboxed(utils.joinpath(directory, ".", filename), specificMountPoint, 1)
 
             modHandler.loadedMods[modFolderName] = true
         end
