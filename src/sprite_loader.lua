@@ -75,14 +75,14 @@ end
 local filenameCheckTimesCache = {}
 local filenameImageDataCache = {}
 
-local function getExternalImageData(filename, cacheDuration)
+local function getExternalImage(filename, cacheDuration)
     cacheDuration = cacheDuration or 10
 
     local now = os.time()
     local lastCheck = filenameCheckTimesCache[filename]
 
     if not lastCheck or now > lastCheck + cacheDuration then
-        local success, image = pcall(love.image.newImageData, filename)
+        local success, image = pcall(love.graphics.newImage, filename)
 
         filenameCheckTimesCache[filename] = os.time()
         filenameImageDataCache[filename] = success and image
@@ -91,23 +91,45 @@ local function getExternalImageData(filename, cacheDuration)
     return filenameImageDataCache[filename]
 end
 
-function spriteLoader.loadExternalSprite(filename)
-    local loadedImageData = getExternalImageData(filename)
+-- We can keep quads since atlas sizes matches
+function spriteLoader.addAtlasToRuntimeAtlas(atlas, filename)
+    local metaLookup = {}
 
-    if not loadedImageData then
+    for i, imageMeta in pairs(atlas._imageMeta) do
+        local atlasImage, x, y, layer = runtimeAtlas.addImageFirstAtlas(imageMeta.image, filename)
+
+        metaLookup[imageMeta.image] = {
+            image = atlasImage,
+            layer = layer
+        }
+    end
+
+    for path, sprite in pairs(atlas) do
+        if type(sprite) == "table" and sprite.loadedAt then
+            local newImage = metaLookup[sprite.image].image
+            local layer = metaLookup[sprite.image].layer
+
+            sprite.image = newImage
+            sprite.layer = layer
+        end
+    end
+end
+
+function spriteLoader.loadExternalSprite(filename)
+    local image = getExternalImage(filename)
+
+    if not image then
         return
     end
 
-    local image = love.graphics.newImage(loadedImageData)
-    -- TODO - Consider using the runtime atlases later when this is more complete
-    --local imageData, x, y = runtimeAtlas.addImageFirstAtlas(loadedImageData, filename)
-    local imageData, x, y = loadedImageData, 0, 0
+    local atlasImage, x, y, layer = runtimeAtlas.addImageFirstAtlas(image, filename)
 
     local imageWidth, imageHeight = image:getDimensions()
-    local atlasWidth, atlasHeight = imageData:getDimensions()
+    local atlasWidth, atlasHeight = image:getDimensions()
+
     local meta = {
-        image = image,
-        imageData = imageData,
+        image = atlasImage,
+        layer = layer,
         width = imageWidth,
         height = imageHeight,
         filename = "filename"
@@ -125,8 +147,8 @@ function spriteLoader.loadExternalSprite(filename)
         realWidth = imageWidth,
         realHeight = imageHeight,
 
-        image = image,
-        imageData = imageData,
+        image = atlasImage,
+        layer = layer,
         meta = meta,
         filename = filename,
 
@@ -170,15 +192,16 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
         end
 
         local spritesWidth, spritesHeight = spritesImage:getDimensions()
-
-        table.insert(res._imageMeta, {
+        local meta = {
             image = spritesImage,
             imageData = spritesImageData,
             width = spritesWidth,
             height = spritesHeight,
             filename = dataFilePath,
             dataName = dataFile
-        })
+        }
+
+        table.insert(res._imageMeta, meta)
 
         for j = 1, sprites do
             local pathRaw = reader:readString()
@@ -198,6 +221,7 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
 
                 image = spritesImage,
                 imageData = spritesImageData,
+                meta = meta,
                 filename = dataFilePath,
 
                 loadedAt = os.time()
@@ -262,7 +286,7 @@ function spriteLoader.getCacheOrLoadSpriteAtlas(metaFn, atlasDir)
         local atlas = spriteLoader.loadSpriteAtlas(metaFn, atlasDir, false)
 
         metaData = {
-            mtime = os.time(),
+            mtime = filesystem.mtime(metaPath),
             filenames = {}
         }
 

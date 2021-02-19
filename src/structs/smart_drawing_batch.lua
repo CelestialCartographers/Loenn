@@ -8,39 +8,8 @@ local runtimeAtlas = require("runtime_atlas")
 local arrayImage
 local arrayImageLookup
 
--- TODO - Handle runtime atlases better, currently only the game atlases are loaded here
--- Cache this exactly once for now, get a better system in the future
-local function getImageArray()
-    if arrayImage then
-        return arrayImage, arrayImageLookup
-    end
-
-    local images = {}
-    local layerLookup = {}
-
-    for atlasName, atlas in pairs(atlases) do
-        if type(atlas) == "table" then
-            local resource, sprite = next(atlas)
-            local imageData = sprite.imageData
-
-            table.insert(images, imageData)
-
-            layerLookup[#images] = imageData
-        end
-    end
-
-    for i, atlas in ipairs(runtimeAtlas.atlases) do
-        local imageData = atlas.imageData
-
-        table.insert(images, imageData)
-
-        layerLookup[#images] = imageData
-    end
-
-    arrayImage = love.graphics.newArrayImage(images)
-    arrayImageLookup = layerLookup
-
-    return arrayImage, arrayImageLookup
+local function getLayeredImage()
+    return runtimeAtlas.canvasArray
 end
 
 local smartDrawingBatch = {}
@@ -73,17 +42,16 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
 
     elseif typ == "drawableSprite" then
         local image = drawable.meta and drawable.meta.image
-        local imageData = drawable.meta and drawable.meta.imageData
-        local layer = self._layers[imageData]
+        local layer = drawable.meta and drawable.meta.layer
 
-        if image or layer then
+        if image then
             local offsetX = drawable.offsetX or ((drawable.justificationX or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX)
             local offsetY = drawable.offsetY or ((drawable.justificationY or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY)
 
             local colorChanged = not utils.sameColor(drawable.color, self._lastColor)
-            local targetImage = layer and self._arrayImage or image
+            local targetImage = layer and self._layeredImage or image
 
-            if not layer and image ~= self._lastImage or self._lastType ~= "drawableSprite" or colorChanged or not self._lastBatch or layer and self._batchTarget ~= self._arrayImage then
+            if not layer and image ~= self._lastImage or self._lastType ~= "drawableSprite" or colorChanged or not self._lastBatch or layer and self._batchTarget ~= self._layeredImage then
                 self._lastBatch = love.graphics.newSpriteBatch(targetImage, spriteBatchSize, spriteBatchMode)
                 self._batchTarget = targetImage
                 self._imagesCurrentBatch = 0
@@ -180,7 +148,7 @@ function smartDrawingBatch.createOrderedBatch()
         _type = "orderedDrawingBatch",
     }
 
-    local imageArray, layerLookup = getImageArray()
+    local layeredImage = getLayeredImage()
 
     res._drawables = {}
 
@@ -190,8 +158,7 @@ function smartDrawingBatch.createOrderedBatch()
     res._lastImage = nil
     res._lastColor = nil
     res._lastType = nil
-    res._arrayImage = imageArray
-    res._layers = layerLookup
+    res._layeredImage = layeredImage
 
     return setmetatable(res, orderedDrawingBatchMt)
 end
@@ -381,7 +348,15 @@ local function drawCanvasArea(batch, x, y, meta, quad, drawX, drawY, rot, sx, sy
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
-    love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+    local image = meta.image
+    local layer = meta.layer
+
+    if layer then
+        love.graphics.drawLayer(image, layer, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+
+    else
+        love.graphics.draw(image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+    end
 end
 
 -- Assumes Canvas is set for performance reasons
@@ -395,7 +370,15 @@ local function redrawCanvasArea(batch, x, y, meta, quad, drawX, drawY, rot, sx, 
         love.graphics.setScissor(sectionX, sectionY, cellWidth, cellHeight)
         love.graphics.clear(0.0, 0.0, 0.0, 0.0)
 
-        love.graphics.draw(meta.image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+        local image = meta.image
+        local layer = meta.layer
+
+        if layer then
+            love.graphics.drawLayer(image, layer, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+
+        else
+            love.graphics.draw(image, quad, sectionX, sectionY, rot or 0, sx or 1, sy or 1, offsetX, offsetY)
+        end
     end
 end
 

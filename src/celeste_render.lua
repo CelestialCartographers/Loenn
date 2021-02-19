@@ -240,7 +240,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
 
     if not quadCache:get0(quadX, quadY) then
         local spriteMeta = atlases.gameplay[texture]
-        local spritesWidth, spritesHeight = spriteMeta.imageData:getDimensions()
+        local spritesWidth, spritesHeight = spriteMeta.image:getDimensions()
         local res = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
 
         quadCache:set0(quadX, quadY, res)
