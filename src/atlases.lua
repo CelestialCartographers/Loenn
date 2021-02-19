@@ -20,7 +20,11 @@ local function addAtlasMetatable(name)
 end
 
 function atlases.loadCelesteAtlas(name, meta, path)
-    atlases[name] = spriteLoader.getCacheOrLoadSpriteAtlas(meta, path)
+    local atlas = spriteLoader.getCacheOrLoadSpriteAtlas(meta, path)
+
+    spriteLoader.addAtlasToRuntimeAtlas(atlas, path)
+
+    atlases[name] = atlas
 
     addAtlasMetatable(name)
 end
