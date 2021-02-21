@@ -79,19 +79,4 @@ function windows.getLoadedWindows()
     return table.values(windows.windows)
 end
 
--- Add Debug UI reload function
-function debugUtils.reloadUI()
-    print("! Reloading windows")
-
-    windows.storeWindowPositions()
-    windows.unloadWindows()
-
-    windows.loadInternalWindows()
-    windows.loadExternalWindows()
-
-    uiRoot.updateWindows(windows.getLoadedWindows())
-
-    windows.restoreWindowPositions()
-end
-
 return windows
