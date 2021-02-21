@@ -21,6 +21,10 @@ ui.notifications.editorQuitWithChanges=You have unsaved pending changes.\nAre yo
 ui.notifications.editorLoadWithChanges=You have unsaved pending changes.\nAre you sure you want to load this map?
 
 
+# Forms
+forms.fieldTypes.unknown_type.label=Unknown field for type '%s' in field '%s'
+
+
 # Menubar
 ui.menubar.file=File
 ui.menubar.new=New
