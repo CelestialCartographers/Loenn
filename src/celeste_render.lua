@@ -717,9 +717,6 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
             drawing.callKeepOriginalColor(function()
                 love.graphics.setColor(backgroundColor)
                 love.graphics.rectangle("fill", 0, 0, width, height)
-
-                love.graphics.setColor(borderColor)
-                love.graphics.rectangle("line", 0, 0, width, height)
             end)
 
             if redrawRoom then
@@ -737,6 +734,11 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
                     end
                 end
             end
+
+            drawing.callKeepOriginalColor(function()
+                love.graphics.setColor(borderColor)
+                love.graphics.rectangle("line", 0, 0, width, height)
+            end)
         end)
     end
 end

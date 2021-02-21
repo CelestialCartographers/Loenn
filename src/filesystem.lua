@@ -22,13 +22,11 @@ function filesystem.dirname(path, sep)
     return path:match("(.*" .. sep .. ")")
 end
 
--- TODO - Sanitize parts with leading/trailing separator
--- IE {"foo", "/bar/"} becomes "foo//bar", expected "foo/bar"
 function filesystem.joinpath(...)
     local paths = {...}
     local sep = physfs.getDirSeparator()
 
-    return table.concat(paths, sep)
+    return table.concat(paths, sep):gsub(sep .. sep, sep)
 end
 
 function filesystem.splitpath(s)

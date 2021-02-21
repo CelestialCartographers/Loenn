@@ -269,7 +269,61 @@ triggers.windAttackTrigger.name.wind_attack=Snowballs
 triggers.windTrigger.name.wind=Wind Pattern
 
 
-
 # -- Mod Information --
 # mods.modName.*
 mods.everest.name=Everest
+
+
+# -- Room --
+# room.Attribute.name=Tooltip
+# room.Attribute.description=Tooltip
+
+room.name.name=Room Name
+room.musicProgress.name=Music Progress
+room.ambienceProgress.name=Ambience Progress
+room.x.name=X
+room.y.name=Y
+room.width.name=Width
+room.height.name=Height
+room.underwater.name=Underwater
+room.space.name=Space
+room.disableDownTransition.name=Disable Down Transition
+room.checkpoint.name=Checkpoint
+room.dark.name=Dark
+room.whisper.name=Whisper
+room.musicLayer1.name=Music Layer 1
+room.musicLayer2.name=Music Layer 2
+room.musicLayer3.name=Music Layer 3
+room.musicLayer4.name=Music Layer 4
+room.delayAltMusicFade.name=Delay Alternative Music Fade
+room.music.name=Music
+room.altMusic.name=Alternative Music
+room.windPattern.name=Wind Pattern
+room.color.name=Colour
+room.cameraOffsetX.name=Camera Offset X
+room.cameraOffsetY.name=Camera Offset Y
+
+room.name.description=The name of the room.
+room.musicProgress.description=The progress of the current song.
+room.ambienceProgress.description=The progress of the current ambience track.
+room.x.description=The x coordinate of the room.
+room.y.description=The y coordinate of the room.
+room.width.description=The width of the room.
+room.height.description=The height of the room.
+room.underwater.description=Whether the room is submerged in water.
+room.space.description=Whether the room is in space (end of Core).
+room.disableDownTransition.description=Whether the player is allowed to transition downwards or not.
+room.checkpoint.description=Whether the room has a checkpoint.
+room.dark.description=Whether the room is dark.
+room.whisper.description=Whether the room has the whisper layer enabled.
+room.musicLayer1.description=Whether the room has the first music layer enabled.
+room.musicLayer2.description=Whether the room has the second music layer enabled.
+room.musicLayer3.description=Whether the room has the third music layer enabled.
+room.musicLayer4.description=Whether the room has the fourth music layer enabled.
+room.delayAltMusicFade.description=Delay the alternative music fade.
+room.music.description=What song should be playing in the room, uses previous if left empty.
+room.altMusic.description=What alternative song should be playing. It is unsure what this means, as it seems to not be hooked up in the game anymore.
+room.windPattern.description=The type of wind in the room.
+room.color.description=The colour of the room in the debug map viewer.
+room.cameraOffsetX.description=Global horizontal offset of camera in room.
+room.cameraOffsetY.description=Global vertical offset of camera in room.

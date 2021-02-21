@@ -113,6 +113,10 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local roomCache = celesteRender.getRoomCache(room.name, layer)
     local batch = roomCache and roomCache.result
 
+    if not batch then
+        return false
+    end
+
     local materialType = utils.typeof(material)
 
     if materialType == "matrix" then
@@ -197,8 +201,11 @@ end
 
 function brushHelper.getValidTiles(layer)
     local autoTiler = layer == "tilesFg" and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
+    local paths = utils.deepcopy(autoTiler.paths)
 
-    return autoTiler.paths
+    paths["0"] = "Air"
+
+    return paths
 end
 
 function brushHelper.cleanMaterialPath(path, layer)
