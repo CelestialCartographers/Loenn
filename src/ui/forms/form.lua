@@ -122,7 +122,7 @@ function forms.getFormBody(data, options)
                 local element = columnElements[x][y]
 
                 if element then
-                    local centerVertically = rawget(element, "centerVerticall")
+                    local centerVertically = rawget(element, "centerVertically")
 
                     if centerVertically then
                         element.y = offsetY
