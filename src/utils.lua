@@ -87,7 +87,7 @@ end
 function utils.subtractRectangle(r1, r2)
     local tlx, tly, brx, bry = utils.intersectionBounds(r1, r2)
 
-    if tlx >= brx and tly >= bry  then
+    if tlx >= brx or tly >= bry  then
         -- No intersection
         return {r1}
     end
