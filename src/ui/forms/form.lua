@@ -140,18 +140,79 @@ function forms.getFormBody(data, options)
         ui:reflow()
     end)
 
-    return row
+    return row, formFields
 end
 
--- TODO - Add save and cancel button
+function forms.formValid(formFields)
+    local invalidFields = {}
+
+    for _, field in ipairs(formFields) do
+        if not field:fieldValid() then
+            table.insert(invalidFields, field.name)
+        end
+    end
+
+    return #invalidFields == 0, invalidFields
+end
+
+function forms.getFormData(formFields)
+    local data = {}
+
+    for _, field in ipairs(formFields) do
+        data[field.name] = field:getValue()
+    end
+
+    return data
+end
+
+function forms.formMustBeValidUpdate(formFields)
+    return function(orig, self, dt)
+        orig(self, dt)
+
+        self:setEnabled(forms.formValid(formFields))
+    end
+end
+
+function forms.packFormCallback(formFields, func)
+    func = func or function() end
+
+    return function(self, x, y, button)
+        return func(formFields, self)
+    end
+end
+
 -- TODO - Make body scrollable
-function forms.getForm(data, options)
+function forms.getForm(buttons, data, options)
+    buttons = buttons or {}
     data = data or {}
     options = options or {}
 
-    local body = forms.getFormBody(data, options)
+    local body, formFields = forms.getFormBody(data, options)
+    local scrollableBody = uiElements.scrollbox(body)
 
-    return body
+    local buttonElements = {}
+
+    for i, button in ipairs(buttons) do
+        local callback = forms.packFormCallback(formFields, button.callback)
+        local formMustBeValid = button.formMustBeValid
+        local buttonElement = uiElements.button(button.text, callback)
+
+        if formMustBeValid then
+            buttonElement:hook({
+                update = forms.formMustBeValidUpdate(formFields)
+            })
+        end
+
+        buttonElements[i] = buttonElement
+    end
+
+    local buttonRow = uiElements.row(buttonElements):with({
+        style = {
+            padding = 8
+        }
+    })
+
+    return uiElements.column({body, buttonRow})
 end
 
 function forms.loadFieldType(filename, registerAt, verbose)

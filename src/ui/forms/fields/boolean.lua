@@ -51,6 +51,7 @@ function booleanField.getElement(name, value, options)
 
     formField.label = label
     formField.dropdown = dropdown
+    formField.name = name
     formField.initialValue = value
     formField.currentValue = value
     formField.width = 2

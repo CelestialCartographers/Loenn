@@ -34,6 +34,7 @@ function unknownField.getElement(name, value, options)
 
     label.centerVertically = true
 
+    formField.name = name
     formField.initialValue = value
     formField.currentValue = value
     formField.width = 1

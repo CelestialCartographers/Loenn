@@ -51,6 +51,7 @@ function stringField.getElement(name, value, options)
 
     formField.label = label
     formField.field = field
+    formField.name = name
     formField.initialValue = value
     formField.currentValue = value
     formField.width = 2
