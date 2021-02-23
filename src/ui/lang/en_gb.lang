@@ -21,6 +21,12 @@ ui.notifications.editorQuitWithChanges=You have unsaved pending changes.\nAre yo
 ui.notifications.editorLoadWithChanges=You have unsaved pending changes.\nAre you sure you want to load this map?
 
 
+# Room Window
+ui.room_window.editing_room=Editing room - %s
+ui.room_window.creating_room=Creating
+ui.room_window.save_changes=Save changes
+ui.room_window.close_window=Close window
+
 # Forms
 forms.fieldTypes.unknown_type.label=Unknown field for type '%s' in field '%s'
 

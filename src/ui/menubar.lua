@@ -9,6 +9,8 @@ local debugUtils = require("debug_utils")
 local utils = require("utils")
 local languageRegistry = require("language_registry")
 
+local roomEditor = require("ui.room_editor")
+
 local menubar = {}
 
 menubar.menubar = {
@@ -36,8 +38,8 @@ menubar.menubar = {
         {"metadata"}
     }},
     {"room", {
-        {"add"},
-        {"configure"},
+        {"add", roomEditor.createNewRoom},
+        {"configure", roomEditor.editExistingRoom},
         {},
         {"delete"}
     }},
