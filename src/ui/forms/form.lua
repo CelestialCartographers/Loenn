@@ -103,6 +103,8 @@ function forms.getFormBody(data, options)
         }
     })
 
+    row:layout()
+
     ui.runLate(function()
         -- Adjust element Y positions to become more "grid like"
         local offsetY = 0
