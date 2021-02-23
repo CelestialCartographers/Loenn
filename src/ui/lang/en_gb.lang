@@ -23,7 +23,7 @@ ui.notifications.editorLoadWithChanges=You have unsaved pending changes.\nAre yo
 
 # Room Window
 ui.room_window.editing_room=Editing room - %s
-ui.room_window.creating_room=Creating
+ui.room_window.creating_room=Creating room
 ui.room_window.save_changes=Save changes
 ui.room_window.close_window=Close window
 

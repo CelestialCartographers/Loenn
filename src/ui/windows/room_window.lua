@@ -1,13 +1,14 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
-local loadedState = require("loaded_state")
 
+local loadedState = require("loaded_state")
 local languageRegistry = require("language_registry")
 local utils = require("utils")
 local widgetUtils = require("ui.widgets.utils")
 local form = require("ui.forms.form")
 local roomEditor = require("ui.room_editor")
+local windowStruct = require("structs.room")
 
 local roomWindow = {}
 
@@ -29,6 +30,10 @@ local fieldOrder = {
     "music",
 }
 
+local fieldTypes = {
+    name = "room_name_unique"
+}
+
 function roomWindow.createNewRoom()
     roomWindow.createRoomWindow(nil, false)
 end
@@ -46,9 +51,46 @@ local function roomWindowUpdate(orig, self, dt)
     windowPreviousY = self.y
 end
 
+local function saveRoomCallback(room, editing)
+    return function(formFields)
+        -- TODO
+        print(require("utils").serialize(form.getFormData(formFields)))
+    end
+end
+
+local function checkCheckpointEntity(room)
+    if room then
+        for _, entity in ipairs(room.entities) do
+            if entity._name == "checkpoint" then
+                return true, entity
+            end
+        end
+    end
+
+    return false
+end
+
 function roomWindow.createRoomWindow(room, editing)
-    -- TODO - Fake key, needs to be handled properly later
-    room.checkpoint = false
+    if editing then
+        room = utils.deepcopy(room)
+
+    else
+        -- Decoding with empty data produces a default room
+        room = windowStruct.decode({})
+
+        -- Copy over attributes from currently selected room
+        local currentRoom = loadedState.getSelectedRoom()
+
+        if currentRoom then
+            for _, attribute in ipairs(fieldOrder) do
+                room[attribute] = currentRoom[attribute]
+            end
+        end
+    end
+
+    -- Not a actual attribute of the room
+    -- Used to add a checkpoint entity
+    room.checkpoint = checkCheckpointEntity(room)
 
     local window
 
@@ -73,14 +115,18 @@ function roomWindow.createRoomWindow(room, editing)
         }
     end
 
+    for field, fieldType in pairs(fieldTypes) do
+        fieldInformation[field].fieldType = fieldType
+    end
+
+    -- Make sure new rooms can't use name from template room
+    fieldInformation.name.editedRoom = editing and room.name or false
+
     local buttons = {
         {
             text = tostring(language.ui.room_window.save_changes),
             formMustBeValid = true,
-            callback = function(formFields)
-                -- TODO - Implement
-                print(require("utils").serialize(form.getFormData(formFields)))
-            end
+            callback = saveRoomCallback(room, editing)
         },
         {
             text = tostring(language.ui.room_window.close_window),
