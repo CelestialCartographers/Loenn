@@ -37,6 +37,8 @@ function stringField.getElement(name, value, options)
         maxWidth = 160
     })
 
+    field:setPlaceholder(value)
+
     local element = uiElements.row({
         label,
         field

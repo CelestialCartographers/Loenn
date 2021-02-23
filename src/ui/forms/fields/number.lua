@@ -57,6 +57,8 @@ function numberField.getElement(name, value, options)
         maxWidth = 160
     })
 
+    field:setPlaceholder(tostring(value))
+
     local element = uiElements.row({
         label,
         field
