@@ -11,6 +11,11 @@ roomNameField.fieldType = "room_name_unique"
 roomNameField._MT = {}
 roomNameField._MT.__index = {}
 
+local invalidStyle = {
+    normalBorder = {0.65, 0.2, 0.2, 0.9, 2.0},
+    focusedBorder = {0.9, 0.2, 0.2, 1.0, 2.0}
+}
+
 function roomNameField._MT.__index:setValue(value)
     self.field:setText(value)
     self.currentValue = value
@@ -37,7 +42,23 @@ end
 
 local function fieldChanged(formField)
     return function(element, new, old)
+        local wasValid = formField:fieldValid()
+
         formField.currentValue = new
+
+        local valid = formField:fieldValid()
+
+        if wasValid ~= valid then
+            if valid then
+                -- Reset to default
+                formField.field.style = nil
+
+            else
+                formField.field.style = invalidStyle
+            end
+
+            formField.field:repaint()
+        end
     end
 end
 

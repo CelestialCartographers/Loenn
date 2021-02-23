@@ -37,10 +37,10 @@ local function fieldChanged(formField)
         if wasValid ~= valid then
             if valid then
                 -- Reset to default
-                --formField.field.style = nil
+                formField.field.style = nil
 
             else
-                --formField.field.style = invalidStyle
+                formField.field.style = invalidStyle
             end
 
             formField.field:repaint()
