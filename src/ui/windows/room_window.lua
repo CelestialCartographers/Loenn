@@ -8,15 +8,21 @@ local utils = require("utils")
 local widgetUtils = require("ui.widgets.utils")
 local form = require("ui.forms.form")
 local roomEditor = require("ui.room_editor")
-local windowStruct = require("structs.room")
+local roomStruct = require("structs.room")
+local snapshotUtils = require("snapshot_utils")
+local history = require("history")
+local celesteRender = require("celeste_render")
+local viewportHandler = require("viewport_handler")
 
 local roomWindow = {}
 
 local roomWindows = {}
-local targetRoom = nil
 local windowPreviousX = 0
 local windowPreviousY = 0
 local roomWindowGroup = uiElements.group(roomWindows)
+
+local minimumRoomWidth = 320
+local minimumRoomHeight = 184
 
 local fieldOrder = {
     "name", "color",
@@ -39,8 +45,6 @@ function roomWindow.createNewRoom()
 end
 
 function roomWindow.editExistingRoom(room)
-    targetRoom = room or loadedState.getSelectedRoom()
-
     roomWindow.createRoomWindow(room, true)
 end
 
@@ -51,10 +55,46 @@ local function roomWindowUpdate(orig, self, dt)
     windowPreviousY = self.y
 end
 
+local saveRoomManualAttributes = {
+    width = true,
+    height = true,
+    checkpoint = true
+}
+
+-- TODO - Handle checkpoint flag
+-- TODO - Adding new room
 local function saveRoomCallback(room, editing)
     return function(formFields)
-        -- TODO
-        print(require("utils").serialize(form.getFormData(formFields)))
+        local newRoomData = form.getFormData(formFields)
+
+        if editing then
+            local targetRoom = loadedState.getRoomByName(room.name)
+            local before = utils.deepcopy(targetRoom)
+
+            local newWidth = math.max(minimumRoomWidth, newRoomData.width)
+            local newHeight = math.max(minimumRoomHeight, newRoomData.height)
+
+            local deltaWidth = math.ceil((newWidth - before.width) / 8)
+            local deltaHeight = math.ceil((newHeight - before.height) / 8)
+
+            for attribute, value in pairs(newRoomData) do
+                if not saveRoomManualAttributes[attribute] and targetRoom[attribute] ~= value then
+                    targetRoom[attribute] = value
+                end
+            end
+
+            roomStruct.directionalResize(targetRoom, "right", deltaWidth)
+            roomStruct.directionalResize(targetRoom, "down", deltaHeight)
+
+            local snapshot = snapshotUtils.roomSnapshot(targetRoom, "Edited room", before, utils.deepcopy(targetRoom))
+
+            history.addSnapshot(snapshot)
+            celesteRender.invalidateRoomCache(targetRoom)
+            celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
+
+        else
+            -- TODO
+        end
     end
 end
 
@@ -76,7 +116,7 @@ function roomWindow.createRoomWindow(room, editing)
 
     else
         -- Decoding with empty data produces a default room
-        room = windowStruct.decode({})
+        room = roomStruct.decode({})
 
         -- Copy over attributes from currently selected room
         local currentRoom = loadedState.getSelectedRoom()
