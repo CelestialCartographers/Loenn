@@ -35,7 +35,7 @@ function roomStruct.decode(data)
     room.width = data.width or 40 * 8
     room.height = data.height or 23 * 8
 
-    room.musicLayer1 = data.musicLayer1== nil or data.musicLayer1
+    room.musicLayer1 = data.musicLayer1 == nil or data.musicLayer1
     room.musicLayer2 = data.musicLayer2 == nil or data.musicLayer2
     room.musicLayer3 = data.musicLayer3 == nil or data.musicLayer3
     room.musicLayer4 = data.musicLayer4 == nil or data.musicLayer4
