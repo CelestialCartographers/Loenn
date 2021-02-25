@@ -125,14 +125,14 @@ function spriteLoader.loadExternalSprite(filename)
     local atlasImage, x, y, layer = runtimeAtlas.addImageFirstAtlas(image, filename)
 
     local imageWidth, imageHeight = image:getDimensions()
-    local atlasWidth, atlasHeight = image:getDimensions()
+    local atlasWidth, atlasHeight = atlasImage:getDimensions()
 
     local meta = {
         image = atlasImage,
         layer = layer,
         width = imageWidth,
         height = imageHeight,
-        filename = "filename"
+        filename = filename
     }
 
     local sprite = {
