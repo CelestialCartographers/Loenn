@@ -37,6 +37,8 @@ function booleanField.getElement(name, value, options)
         maxWidth = 160
     })
 
+    dropdown:setSelectedIndex(value and 1 or 2)
+
     local element = uiElements.row({
         label,
         dropdown
