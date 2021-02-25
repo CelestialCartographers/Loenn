@@ -51,11 +51,24 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
             local colorChanged = not utils.sameColor(drawable.color, self._lastColor)
             local targetImage = layer and self._layeredImage or image
 
-            if not layer and image ~= self._lastImage or self._lastType ~= "drawableSprite" or colorChanged or not self._lastBatch or layer and self._batchTarget ~= self._layeredImage then
+            if not layer and image ~= self._lastImage or self._lastType ~= "drawableSprite" or not self._lastBatch or layer and self._batchTarget ~= self._layeredImage then
                 self._lastBatch = love.graphics.newSpriteBatch(targetImage, spriteBatchSize, spriteBatchMode)
                 self._batchTarget = targetImage
                 self._imagesCurrentBatch = 0
-                table.insert(self._drawables, {self._lastBatch, drawable.color})
+
+                table.insert(self._drawables, self._lastBatch)
+            end
+
+            if colorChanged then
+                if drawable.color then
+                    local color = drawable.color
+                    local r, g, b, a = color[1], color[2], color[3], color[4]
+
+                    self._lastBatch:setColor(r, g, b, a)
+
+                else
+                    self._lastBatch:setColor()
+                end
             end
 
             self._lastImage = image
@@ -72,7 +85,7 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
 
     elseif typ == "drawableFunction" then
         -- Handles colors itself
-        table.insert(self._drawables, {drawable, nil})
+        table.insert(self._drawables, drawable)
     end
 
     self._lastType = typ
@@ -84,28 +97,8 @@ function orderedDrawingBatchMt.__index:draw()
     local pr, pg, pb, pa
     local changedColor = false
 
-    for _, element in ipairs(self._drawables) do
-        local drawable, color = element[1], element[2]
+    for _, drawable in ipairs(self._drawables) do
         local typ = utils.typeof(drawable)
-
-        local r, g, b, a
-
-        if color then
-            -- No need to fetch this if it isn't needed
-            if not changedColor then
-                ir, ig, ib, ia = love.graphics.getColor()
-            end
-
-            r, g, b, a = color[1], color[2], color[3], color[4]
-        end
-
-        if r ~= pr or g ~= pg or b ~= pb or a ~= pa then
-            color = color or {1.0, 1.0, 1.0, 1.0}
-            changedColor = true
-            pr, pg, pb, pa = color[1], color[2], color[3], color[4]
-
-            love.graphics.setColor(color)
-        end
 
         if typ == "drawableFunction" then
             drawable:draw()
