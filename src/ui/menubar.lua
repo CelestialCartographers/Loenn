@@ -5,6 +5,8 @@ local uiUtils = require("ui.utils")
 local loadedState = require("loaded_state")
 local history = require("history")
 local debugUtils = require("debug_utils")
+local notifications = require("ui.notification")
+local sceneHandler = require("scene_handler")
 
 local utils = require("utils")
 local languageRegistry = require("language_registry")
@@ -12,6 +14,20 @@ local languageRegistry = require("language_registry")
 local roomEditor = require("ui.room_editor")
 
 local menubar = {}
+
+local function deleteCurrentRoom()
+    local map = loadedState.map
+    local item = loadedState.getSelectedItem()
+
+    if map and item then
+        sceneHandler.sendEvent("editorRoomDelete", map, item)
+    end
+end
+
+-- debugUtils.reloadUI might change, wrap in function
+local function reloadUI()
+    debugUtils.reloadUI()
+end
 
 menubar.menubar = {
     {"file", {
@@ -41,7 +57,7 @@ menubar.menubar = {
         {"add", roomEditor.createNewRoom},
         {"configure", roomEditor.editExistingRoom},
         {},
-        {"delete"}
+        {"delete", deleteCurrentRoom}
     }},
     {"debug", {
         {"reload", {
@@ -51,7 +67,7 @@ menubar.menubar = {
             {"reload_entities", debugUtils.reloadEntities},
             {"reload_triggers", debugUtils.reloadTriggers},
             {"reload_effects"},
-            {"reload_user_interface", function() debugUtils.reloadUI() end}, -- debugUtils.reloadUI might change, call in function
+            {"reload_user_interface", reloadUI},
             {"reload_language_files", debugUtils.reloadLanguageFiles}
         }},
         {"redraw_map", debugUtils.redrawMap},
