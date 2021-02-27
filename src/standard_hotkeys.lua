@@ -7,6 +7,7 @@ local roomHotkeyUtils = require("room_hotkey_utils")
 
 local hotkeyStruct = require("structs.hotkey")
 
+-- TODO - Language file
 -- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
 -- TODO - Support hotswapping hotkey activators
 local rawHotkeys = {
@@ -37,6 +38,9 @@ local rawHotkeys = {
     {configs.hotkeys.roomResizeRightShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileRight, "Shrink room one tile right"},
     {configs.hotkeys.roomResizeUpShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileUp, "Shrink room one tile up"},
     {configs.hotkeys.roomResizeDownShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileDown, "Shrink room one tile down"},
+
+    -- Room Delete
+    {configs.hotkeys.roomDelete, roomHotkeyUtils.deleteSelectedRoom, "Delete selected room"},
 
     -- Debug hotkeys
     {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},

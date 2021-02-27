@@ -34,6 +34,9 @@ return {
     roomResizeUpShrink = false,
     roomResizeDownShrink = false,
 
+    -- Room Deletion
+    roomDelete = "alt + delete",
+
     -- Debug
     debugReloadEntities = "f5",
     debugRedrawMap = "f6",
