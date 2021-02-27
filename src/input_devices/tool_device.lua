@@ -47,11 +47,40 @@ local function tryRoomSwap(x, y, button, istouch, presses)
     end
 end
 
+-- Make sure we don't send release/click events for room swaps
+local consumeNextRelease = false
+
+function device.mousereleased(x, y, button, istouch, presses, click)
+    if consumeNextRelease then
+        return true
+    end
+
+    local currentTool = toolHandler.currentTool
+
+    if click then
+        local consume = tryRoomSwap(x, y, button, istouch, presses)
+
+        if consume then
+            consumeNextRelease = true
+
+            return true
+        end
+    end
+
+    if currentTool and currentTool.mousereleased then
+        currentTool.mousereleased(x, y, button, istouch, presses, click)
+    end
+end
+
 function device.mouseclicked(x, y, button, istouch, presses)
+    consumeNextRelease = false
+
     local consume = tryRoomSwap(x, y, button, istouch, presses)
     local currentTool = toolHandler.currentTool
 
     if consume then
+        consumeNextRelease = true
+
         return true
     end
 
