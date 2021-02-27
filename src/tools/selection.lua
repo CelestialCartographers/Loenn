@@ -106,21 +106,23 @@ local function drawSelectionPreviews(room)
         -- Potentially find a better solution?
         viewportHandler.drawRelativeTo(room.x, room.y, function()
             drawing.callKeepOriginalColor(function()
+                love.graphics.setColor(fillColor)
+
                 for _, rectangle in ipairs(selectionPreviews) do
                     local x, y = rectangle.x, rectangle.y
                     local width, height = rectangle.width, rectangle.height
 
-                    love.graphics.setColor(fillColor)
                     love.graphics.rectangle("fill", x, y, width, height)
                 end
             end)
 
             drawing.callKeepOriginalColor(function()
+                love.graphics.setColor(borderColor)
+
                 for _, rectangle in ipairs(selectionPreviews) do
                     local x, y = rectangle.x, rectangle.y
                     local width, height = rectangle.width, rectangle.height
 
-                    love.graphics.setColor(borderColor)
                     love.graphics.rectangle("line", x, y, width, height)
                 end
             end)
