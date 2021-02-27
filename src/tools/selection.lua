@@ -60,11 +60,10 @@ end
 
 local function selectionChanged(x, y, width, height, fromClick)
     local room = state.getSelectedRoom()
+    selectionRectangle = utils.rectangle(x, y, width, height)
 
     -- Only update if needed
     if x ~= selectionRectangle.x or y ~= selectionRectangle.y or width ~= selectionRectangle.width or height ~= selectionRectangle.height then
-        selectionRectangle = utils.rectangle(x, y, width, height)
-
         local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
 
         if fromClick then
