@@ -9,10 +9,13 @@ local widgetUtils = require("ui.widgets.utils")
 local form = require("ui.forms.form")
 local roomEditor = require("ui.room_editor")
 local roomStruct = require("structs.room")
+local tilesStruct = require("structs.tiles")
+local objectTilesStruct = require("structs.object_tiles")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
+local mapItemUtils = require("map_item_utils")
 
 local roomWindow = {}
 
@@ -61,6 +64,12 @@ local saveRoomManualAttributes = {
     checkpoint = true
 }
 
+local structTilesNames = {
+    {"tilesFg", tilesStruct},
+    {"tilesBg", tilesStruct},
+    {"tilesObj", objectTilesStruct}
+}
+
 -- TODO - Handle checkpoint flag
 -- TODO - Adding new room
 local function saveRoomCallback(room, editing)
@@ -78,7 +87,7 @@ local function saveRoomCallback(room, editing)
             local deltaHeight = math.ceil((newHeight - before.height) / 8)
 
             for attribute, value in pairs(newRoomData) do
-                if not saveRoomManualAttributes[attribute] and targetRoom[attribute] ~= value then
+                if not saveRoomManualAttributes[attribute] then
                     targetRoom[attribute] = value
                 end
             end
@@ -93,7 +102,27 @@ local function saveRoomCallback(room, editing)
             celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
 
         else
-            -- TODO
+            local map = loadedState.map
+            local newRoom = utils.deepcopy(room)
+
+            local roomTilesWidth = math.ceil(newRoom.width / 8)
+            local roomTilesHeight = math.ceil(newRoom.height / 8)
+
+            for attribute, value in pairs(newRoomData) do
+                if not saveRoomManualAttributes[attribute] then
+                    newRoom[attribute] = value
+                end
+            end
+
+            for _, handlerData in ipairs(structTilesNames) do
+                local target, struct = handlerData[1], handlerData[2]
+
+                newRoom[target] = struct.resize(struct.decode(""), roomTilesWidth, roomTilesHeight)
+            end
+
+            if map then
+                mapItemUtils.addItem(map, newRoom)
+            end
         end
     end
 end
