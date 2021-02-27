@@ -35,6 +35,13 @@ local function getRoomItems()
     return roomItems
 end
 
+local function updateList(list)
+    local roomItems = getRoomItems()
+
+    listWidgets.setSelection(list, 1, true)
+    listWidgets.updateItems(list, roomItems, false, true, false)
+end
+
 function roomList.roomSelectedCallback(element, item)
     local currentRoom = state.getSelectedRoom()
 
@@ -49,26 +56,41 @@ function roomList.roomSelectedCallback(element, item)
     end
 end
 
-function roomList.editorMapTargetChanged(list)
+function roomList:editorMapTargetChanged()
     return function(element, target, targetType)
         if targetType == "room" then
             local roomNameCleaned = cleanRoomName(target.name)
-            local selected = listWidgets.setSelection(list, roomNameCleaned, true, true)
+            local selected = listWidgets.setSelection(self, roomNameCleaned, true, true)
 
             if not selected then
-                listWidgets.setFilterText(list, "", true)
-                listWidgets.setSelection(list, roomNameCleaned, true, true)
+                listWidgets.setFilterText(self, "", true)
+                listWidgets.setSelection(self, roomNameCleaned, true, true)
             end
         end
     end
 end
 
-function roomList.editorMapLoaded(list)
+function roomList:editorMapLoaded()
     return function()
-        local roomItems = getRoomItems()
+        updateList(self)
+    end
+end
 
-        listWidgets.setSelection(list, 1)
-        listWidgets.updateItems(list, roomItems)
+function roomList:editorRoomDeleted(room)
+    return function()
+        updateList(self)
+    end
+end
+
+function roomList:editorRoomAdded(room)
+    return function()
+        updateList(self)
+    end
+end
+
+function roomList:uiRoomWindowRoomChanged(room)
+    return function()
+        updateList(self)
     end
 end
 
@@ -85,7 +107,10 @@ function roomList.getWindow()
 
     window:with({
         editorMapTargetChanged = roomList.editorMapTargetChanged(list),
-        editorMapLoaded = roomList.editorMapLoaded(list)
+        editorMapLoaded = roomList.editorMapLoaded(list),
+        editorRoomDeleted = roomList.editorRoomDeleted(list),
+        editorRoomAdded = roomList.editorRoomAdded(list),
+        uiRoomWindowRoomChanged = roomList.uiRoomWindowRoomChanged(list)
     })
 
     widgetUtils.removeWindowTitlebar(window)

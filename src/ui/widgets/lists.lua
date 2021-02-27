@@ -64,7 +64,7 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
     return selectedTarget
 end
 
-function listWidgets.updateItems(list, items, fromFilter, callbackRequiresChange)
+function listWidgets.updateItems(list, items, fromFilter, preventCallback, callbackRequiresChange)
     local previousSelection = list.selected and list.selected.data
     local newSelection = nil
 
@@ -89,7 +89,7 @@ function listWidgets.updateItems(list, items, fromFilter, callbackRequiresChange
     list.children = processedItems
 
     ui.runLate(function()
-        listWidgets.setSelection(list, newSelection, false, callbackRequiresChange)
+        listWidgets.setSelection(list, newSelection, preventCallback, callbackRequiresChange)
     end)
 
     list:reflow()
@@ -104,7 +104,7 @@ local function filterList(list, search)
     local unfilteredItems = list.unfilteredItems
     local filteredItems = filterItems(unfilteredItems, search)
 
-    listWidgets.updateItems(list, filteredItems, true, true)
+    listWidgets.updateItems(list, filteredItems, true, false, true)
 end
 
 local function searchFieldChanged(element, new, old)

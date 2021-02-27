@@ -16,6 +16,7 @@ local history = require("history")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
 local mapItemUtils = require("map_item_utils")
+local sceneHandler = require("scene_handler")
 
 local roomWindow = {}
 
@@ -71,7 +72,6 @@ local structTilesNames = {
 }
 
 -- TODO - Handle checkpoint flag
--- TODO - Adding new room
 local function saveRoomCallback(room, editing)
     return function(formFields)
         local newRoomData = form.getFormData(formFields)
@@ -100,6 +100,8 @@ local function saveRoomCallback(room, editing)
             history.addSnapshot(snapshot)
             celesteRender.invalidateRoomCache(targetRoom)
             celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
+
+            sceneHandler.sendEvent("uiRoomWindowRoomChanged", room)
 
         else
             local map = loadedState.map
