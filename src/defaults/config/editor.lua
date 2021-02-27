@@ -1,6 +1,7 @@
 return {
     -- Tools and Interactions
     toolActionButton = 1,
+    contextMenuButton = 2,
     canvasMoveButton = 2,
     objectCloneButton = 3,
 

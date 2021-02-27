@@ -8,6 +8,7 @@ local utils = require("utils")
 local toolUtils = require("tool_utils")
 local history = require("history")
 local snapshotUtils = require("snapshot_utils")
+local selectionUtils = require("selections")
 
 local tool = {}
 
@@ -42,6 +43,9 @@ local function getCurrentPlacementType()
 end
 
 local function getCursorGridPosition(x, y)
+    x = x or 0
+    y = y or 0
+
     local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
 
     if precise then
@@ -352,6 +356,21 @@ function tool.mousepressed(x, y, button, istouch, presses)
         if px and py then
             dragStarted(px, py)
             placePointPlacement()
+        end
+    end
+end
+
+function tool.mouseclicked(x, y, button, istouch, presses)
+    local contextMenuButton = configs.editor.contextMenuButton
+
+    if button == contextMenuButton then
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
+
+        if cursorX and cursorY then
+            local room = state.getSelectedRoom()
+            local contextTargets = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY)
+
+            selectionUtils.sendContextMenuEvent(contextTargets)
         end
     end
 end

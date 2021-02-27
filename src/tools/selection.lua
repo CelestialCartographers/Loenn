@@ -422,6 +422,7 @@ end
 -- Special case
 function tool.mouseclicked(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
+    local contextMenuButton = configs.editor.contextMenuButton
 
     if button == actionButton then
         local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
@@ -429,6 +430,16 @@ function tool.mouseclicked(x, y, button, istouch, presses)
         if cursorX and cursorY then
             selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
             selectionFinished()
+        end
+
+    elseif button == contextMenuButton then
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
+
+        if cursorX and cursorY then
+            local room = state.getSelectedRoom()
+            local previewTargets = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY, selectionPreviews)
+
+            selectionUtils.sendContextMenuEvent(previewTargets)
         end
     end
 end

@@ -1,5 +1,6 @@
 local layerHandlers = require("layer_handlers")
 local utils = require("utils")
+local sceneHandler = require("scene_handler")
 
 local selectionUtils = {}
 
@@ -61,6 +62,32 @@ function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
     end
 
     return selected
+end
+
+function selectionUtils.getContextSelections(room, layer, x, y, selections)
+    local previewTargets
+
+    if selections and #selections > 0 then
+        previewTargets = utils.deepcopy(selections)
+
+    else
+        local rectangle = utils.rectangle(x - 1, y - 1, 3, 3)
+        local hoveredSelections = selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
+
+        if #hoveredSelections > 0 then
+            selectionUtils.orderSelectionsByScore(hoveredSelections)
+
+            previewTargets = {hoveredSelections[1]}
+        end
+    end
+
+    return previewTargets
+end
+
+function selectionUtils.sendContextMenuEvent(selections)
+    if selections and #selections > 0 then
+        sceneHandler.sendEvent("editorSelectionContextMenu", selections)
+    end
 end
 
 return selectionUtils
