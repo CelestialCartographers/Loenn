@@ -21,8 +21,8 @@ tool.image = nil
 
 tool.mode = "line"
 tool.modes = {
-    "line",
-    "fill"
+    "fill",
+    "line"
 }
 
 tool.layer = "tilesFg"
