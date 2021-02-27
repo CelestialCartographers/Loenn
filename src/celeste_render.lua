@@ -701,7 +701,7 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
     local redrawRoom = selected or ALWAYS_REDRAW_UNSELECTED_ROOMS
     local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
-    if visible then
+    if visible or selected then
         local roomX = room.x or 0
         local roomY = room.y or 0
 
