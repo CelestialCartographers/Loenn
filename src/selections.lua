@@ -1,9 +1,9 @@
 local layerHandlers = require("layer_handlers")
 local utils = require("utils")
 
-local selections = {}
+local selectionUtils = {}
 
-function selections.getSelectionsForRoom(room, layer)
+function selectionUtils.getSelectionsForRoom(room, layer)
     local rectangles = {}
     local handler = layerHandlers.getHandler(layer)
 
@@ -38,11 +38,20 @@ function selections.getSelectionsForRoom(room, layer)
     return rectangles
 end
 
-function selections.getSelectionsForRoomInRectangle(room, layer, rectangle)
+-- Sort by area, smaller first
+function selectionUtils.orderSelectionsByScore(selections)
+    table.sort(selections, function(lhs, rhs)
+        return lhs.width * lhs.height < rhs.width * rhs.height
+    end)
+
+    return selections
+end
+
+function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
     local selected = {}
 
     if room and rectangle then
-        local rectangles = selections.getSelectionsForRoom(room, layer)
+        local rectangles = selectionUtils.getSelectionsForRoom(room, layer)
 
         for _, selection in ipairs(rectangles) do
             if utils.aabbCheck(rectangle, selection) then
@@ -54,4 +63,4 @@ function selections.getSelectionsForRoomInRectangle(room, layer, rectangle)
     return selected
 end
 
-return selections
+return selectionUtils

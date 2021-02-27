@@ -33,6 +33,8 @@ local selectionRectangle = nil
 local selectionCompleted = false
 local selectionStartX, selectionStartY = nil ,nil
 local selectionPreviews = nil
+local selectionCycleTargets = {}
+local selectionCycleIndex = 1
 
 local copyPreviews = nil
 
@@ -56,13 +58,30 @@ local function selectionStarted(x, y)
     selectionStartY = y
 end
 
-local function selectionChanged(x, y, width, height)
+local function selectionChanged(x, y, width, height, fromClick)
     local room = state.getSelectedRoom()
 
     -- Only update if needed
     if x ~= selectionRectangle.x or y ~= selectionRectangle.y or width ~= selectionRectangle.width or height ~= selectionRectangle.height then
         selectionRectangle = utils.rectangle(x, y, width, height)
-        selectionPreviews = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
+
+        local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
+
+        if fromClick then
+            selectionUtils.orderSelectionsByScore(newSelections)
+
+            if #selectionCycleTargets > 0 and utils.equals(newSelections, selectionCycleTargets, false) then
+                selectionCycleIndex = utils.mod1(selectionCycleIndex + 1, #selectionCycleTargets)
+            end
+
+            selectionCycleTargets = newSelections
+            selectionPreviews = {selectionCycleTargets[selectionCycleIndex]}
+
+        else
+            selectionPreviews = newSelections
+            selectionCycleTargets = {}
+            selectionCycleIndex = 1
+        end
     end
 end
 
@@ -408,7 +427,7 @@ function tool.mouseclicked(x, y, button, istouch, presses)
         local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
         if cursorX and cursorY then
-            selectionChanged(cursorX - 1, cursorY - 1, 3, 3)
+            selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
             selectionFinished()
         end
     end
