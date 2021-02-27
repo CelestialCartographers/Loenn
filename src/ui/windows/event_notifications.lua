@@ -7,6 +7,7 @@ local uiUtils = require("ui.utils")
 local history = require("history")
 local loadedState = require("loaded_state")
 local languageRegistry = require("language_registry")
+local mapItemUtils = require("map_item_utils")
 
 local notifications = require("ui.notification")
 
@@ -90,6 +91,28 @@ function notificationHandlers:editorLoadWithChanges(currentFile, filename)
                     history.madeChanges = false
 
                     loadedState.loadFile(filename)
+                    closePopup(popup)
+                end),
+                uiElements.button(tostring(language.ui.button.cancel), function()
+                    closePopup(popup)
+                end),
+            })
+        })
+    end, -1)
+end
+
+-- TODO - Move over to modal when those are implemented
+function notificationHandlers:editorRoomDelete(map, item)
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(function(popup)
+        return uiElements.column({
+            uiElements.label(tostring(language.ui.notifications.editorDeleteRoom)),
+            uiElements.row({
+                uiElements.button(tostring(language.ui.button.confirm), function()
+                    mapItemUtils.deleteItem(map, item)
+                    loadedState.selectItem(nil)
+
                     closePopup(popup)
                 end),
                 uiElements.button(tostring(language.ui.button.cancel), function()
