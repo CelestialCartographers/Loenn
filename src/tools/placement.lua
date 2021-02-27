@@ -355,7 +355,6 @@ function tool.mousepressed(x, y, button, istouch, presses)
 
         if px and py then
             dragStarted(px, py)
-            placePointPlacement()
         end
     end
 end
@@ -396,6 +395,7 @@ function tool.mousereleased(x, y, button, istouch, presses)
 
     if button == actionButton then
         dragFinished()
+        placePointPlacement()
     end
 end
 
