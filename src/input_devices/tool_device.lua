@@ -48,6 +48,8 @@ local consumeNextRelease = false
 
 function device.mousereleased(x, y, button, istouch, presses, click)
     if consumeNextRelease then
+        consumeNextRelease = false
+
         return true
     end
 
