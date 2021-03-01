@@ -220,6 +220,44 @@ function triggers.deleteSelection(room, layer, selection)
     return false
 end
 
+function triggers.addNodeToSelection(room, layer, selection)
+    local targets = triggers.getRoomItems(room, layer)
+    local target, node = selection.item, selection.node
+    local minimumNodes, maximumNodes = triggers.nodeLimits(room, layer, target)
+
+    for i, trigger in ipairs(targets) do
+        if trigger == target then
+            local nodes = trigger.nodes or {}
+
+            -- Make sure we don't add more nodes than supported
+            if #nodes >= maximumNodes and maximumNodes ~= -1 then
+                return false
+            end
+
+            if not trigger.nodes then
+                trigger.nodes = nodes
+            end
+
+            if node == 0 then
+                local nodeX = trigger.x + (trigger.width or 0) + 8
+                local nodeY = trigger.y
+
+                table.insert(nodes, 1, {x = nodeX, y = nodeY})
+
+            else
+                local nodeX = nodes[node].x + (trigger.width or 0) + 8
+                local nodeY = nodes[node].y
+
+                table.insert(nodes, node + 1, {x = nodeX, y = nodeY})
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
 -- Returns all triggers of room
 function triggers.getRoomItems(room, layer)
     return room.triggers

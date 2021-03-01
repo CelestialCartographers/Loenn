@@ -252,6 +252,57 @@ function entities.deleteSelection(room, layer, selection)
     return false
 end
 
+function entities.addNodeToSelection(room, layer, selection)
+    local targets = entities.getRoomItems(room, layer)
+    local target, node = selection.item, selection.node
+    local name = target._name
+    local handler = entities.registeredEntities[name]
+    local minimumNodes, maximumNodes = entities.nodeLimits(room, layer, target)
+
+    for i, entity in ipairs(targets) do
+        if entity == target then
+            local nodes = entity.nodes or {}
+
+            -- Make sure we don't add more nodes than supported
+            if #nodes >= maximumNodes and maximumNodes ~= -1 then
+                return false
+            end
+
+            if not entity.nodes then
+                entity.nodes = nodes
+            end
+
+            -- Notify addition
+            if handler.onNodeAdded then
+                handler.onNodeAdded(room, entity, node)
+            end
+
+            -- Custom node adding
+            if handler.nodeAdded then
+                return handler.nodeAdded(room, entity, node)
+
+            else
+                if node == 0 then
+                    local nodeX = entity.x + (entity.width or 0) + 8
+                    local nodeY = entity.y
+
+                    table.insert(nodes, 1, {x = nodeX, y = nodeY})
+
+                else
+                    local nodeX = nodes[node].x + (entity.width or 0) + 8
+                    local nodeY = nodes[node].y
+
+                    table.insert(nodes, node + 1, {x = nodeX, y = nodeY})
+                end
+
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
 local function guessPlacementType(name, handler, placement)
     if placement and placement.data then
         if placement.data.width or placement.data.height then

@@ -192,6 +192,50 @@ local function deleteItems(room, layer, previews)
     return snapshot, redraw
 end
 
+-- TODO - Test when node support is better
+local function addNode(room, layer, previews)
+    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
+        local redraw = false
+        local selectionsBefore = utils.deepcopy(selectionPreviews)
+        local newPreviews = {}
+
+        for _, selection in ipairs(previews) do
+            local added = selectionItemUtils.addNodeToSelection(room, layer, selection)
+
+            if added then
+                local item = selection.item
+                local node = selection.node
+
+                -- Make sure selection nodes for the target is correct
+                for _, target in ipairs(previews) do
+                    if target.item == item then
+                        if target.node >= node then
+                            target.node += 1
+                        end
+                    end
+                end
+
+                -- Add new node to selections
+                local rectangles = selectionUtils.getSelectionsForItem(room, layer, item)
+
+                -- Nodes are off by one here since the main entity would be the first rectangle
+                -- We also insert after the target node, meaning the total offset is two
+                table.insert(newPreviews, rectangles[node + 2])
+
+                redraw = true
+            end
+        end
+
+        for _, newPreview in ipairs(newPreviews) do
+            table.insert(previews, newPreview)
+        end
+
+        return redraw, selectionsBefore
+    end, room, layer, "Node Added")
+
+    return snapshot, redraw
+end
+
 local function getPreviewsCorners(previews)
     local tlx, tly = math.huge, math.huge
     local brx, bry = -math.huge, -math.huge
@@ -293,6 +337,27 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
 
     if targetKey == key then
         local snapshot, redraw = deleteItems(room, tool.layer, selectionPreviews)
+
+        if redraw then
+            history.addSnapshot(snapshot)
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
+
+        return true
+    end
+
+    return false
+end
+
+local function handleNodeAddKey(room, key, scancode, isrepeat)
+    if not selectionPreviews then
+        return
+    end
+
+    local targetKey = configs.editor.itemAddNode
+
+    if targetKey == key then
+        local snapshot, redraw = addNode(room, tool.layer, selectionPreviews)
 
         if redraw then
             history.addSnapshot(snapshot)
@@ -455,6 +520,7 @@ function tool.keypressed(key, scancode, isrepeat)
 
     handleItemMovementKeys(room, key, scancode, isrepeat)
     handleItemDeletionKey(room, key, scancode, isrepeat)
+    handleNodeAddKey(room, key, scancode, isrepeat)
 end
 
 function tool.draw()

@@ -4,6 +4,33 @@ local sceneHandler = require("scene_handler")
 
 local selectionUtils = {}
 
+function selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
+    rectangles = rectangles or {}
+
+    local handler = layerHandlers.getHandler(layer)
+    local main, nodes = handler.getSelection(room, item)
+
+    if main then
+        main.item = item
+        main.node = 0
+        main.layer = layer
+
+        table.insert(rectangles, main)
+    end
+
+    if nodes then
+        for j, node in ipairs(nodes) do
+            node.item = item
+            node.node = j
+            node.layer = layer
+
+            table.insert(rectangles, node)
+        end
+    end
+
+    return rectangles
+end
+
 function selectionUtils.getSelectionsForRoom(room, layer)
     local rectangles = {}
     local handler = layerHandlers.getHandler(layer)
@@ -13,25 +40,7 @@ function selectionUtils.getSelectionsForRoom(room, layer)
 
         if items then
             for i, item in ipairs(items) do
-                local main, nodes = handler.getSelection(room, item)
-
-                if main then
-                    main.item = item
-                    main.node = 0
-                    main.layer = layer
-
-                    table.insert(rectangles, main)
-                end
-
-                if nodes then
-                    for j, node in ipairs(nodes) do
-                        node.item = item
-                        node.node = j
-                        node.layer = layer
-
-                        table.insert(rectangles, node)
-                    end
-                end
+                selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
             end
         end
     end

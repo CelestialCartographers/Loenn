@@ -23,4 +23,14 @@ function selectionItemUtils.deleteSelection(room, layer, item)
     return false
 end
 
+function selectionItemUtils.addNodeToSelection(room, layer, item)
+    local handler = layerHandlers.getHandler(layer)
+
+    if room and handler and handler.addNodeToSelection then
+        return handler.addNodeToSelection(room, layer, item)
+    end
+
+    return false
+end
+
 return selectionItemUtils

@@ -20,6 +20,8 @@ return {
 
     itemDelete = "delete",
 
+    itemAddNode = "n",
+
     -- Rendering
     prepareRoomRenderInBackground = true,
     alwaysRedrawUnselectedRooms = false,
