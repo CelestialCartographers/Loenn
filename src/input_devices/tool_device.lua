@@ -40,10 +40,6 @@ local function tryRoomSwap(x, y, button, istouch, presses)
                 return true
             end
         end
-
-        if currentTool and currentTool.mouseclicked then
-            currentTool.mouseclicked(x, y, button, istouch, presses)
-        end
     end
 end
 
