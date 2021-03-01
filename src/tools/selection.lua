@@ -63,14 +63,17 @@ local function selectionChanged(x, y, width, height, fromClick)
     selectionRectangle = utils.rectangle(x, y, width, height)
 
     -- Only update if needed
-    if x ~= selectionRectangle.x or y ~= selectionRectangle.y or width ~= selectionRectangle.width or height ~= selectionRectangle.height then
+    if fromClick or x ~= selectionRectangle.x or y ~= selectionRectangle.y or width ~= selectionRectangle.width or height ~= selectionRectangle.height then
         local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
 
         if fromClick then
             selectionUtils.orderSelectionsByScore(newSelections)
 
-            if #selectionCycleTargets > 0 and utils.equals(newSelections, selectionCycleTargets, false) then
-                selectionCycleIndex = utils.mod1(selectionCycleIndex + 1, #selectionCycleTargets)
+            if #newSelections > 0 and utils.equals(newSelections, selectionCycleTargets, false) then
+                selectionCycleIndex = utils.mod1(selectionCycleIndex + 1, #newSelections)
+
+            else
+                selectionCycleIndex = 1
             end
 
             selectionCycleTargets = newSelections
@@ -79,7 +82,7 @@ local function selectionChanged(x, y, width, height, fromClick)
         else
             selectionPreviews = newSelections
             selectionCycleTargets = {}
-            selectionCycleIndex = 1
+            selectionCycleIndex = 0
         end
     end
 end
