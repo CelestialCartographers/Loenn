@@ -1,6 +1,5 @@
 local utils = require("utils")
 local fileLocations = require("file_locations")
-local lfs = require("lfs_ffi")
 
 local modHandler = {}
 
@@ -46,7 +45,7 @@ function modHandler.findLanguageFiles(startPath)
 end
 
 function modHandler.mountable(path)
-    local attributes = lfs.attributes(path)
+    local attributes = utils.pathAttributes(path)
 
     if attributes and attributes.mode == "directory" then
         return true, "folder"
@@ -102,7 +101,7 @@ end
 function modHandler.mountMods(directory, force)
     directory = directory or utils.joinpath(fileLocations.getCelesteDir(), "Mods")
 
-    for filename, dir in lfs.dir(directory) do
+    for filename, dir in utils.listDir(directory) do
         if filename ~= "." and filename ~= ".." then
             modHandler.mountMod(utils.joinpath(directory, filename), force)
 

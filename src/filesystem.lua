@@ -102,6 +102,14 @@ function filesystem.getFilenames(path, recursive, filenames, predicate, useYield
     return filenames
 end
 
+function filesystem.pathAttributes(path)
+    return lfs.attributes(path)
+end
+
+function filesystem.listDir(path)
+    return lfs.dir(path)
+end
+
 function filesystem.isFile(path)
     local attrs = lfs.attributes(path)
 
