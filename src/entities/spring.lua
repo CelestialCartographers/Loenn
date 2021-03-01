@@ -7,7 +7,10 @@ local springUp = {}
 
 springUp.name = "spring"
 springUp.placements = {
-    name = "up"
+    name = "up",
+    data = {
+        playerCanUse = true
+    }
 }
 
 function springUp.sprite(room, entity)
@@ -23,7 +26,10 @@ local springRight = {}
 
 springRight.name = "wallSpringLeft"
 springRight.placements = {
-    name = "right"
+    name = "right",
+    data = {
+        playerCanUse = true
+    }
 }
 
 function springRight.sprite(room, entity)
@@ -40,7 +46,10 @@ local springLeft = {}
 
 springLeft.name = "wallSpringRight"
 springLeft.placements = {
-    name = "left"
+    name = "left",
+    data = {
+        playerCanUse = true
+    }
 }
 
 function springLeft.sprite(room, entity)
