@@ -100,18 +100,20 @@ function atlases.getResource(resource, name)
         atlases.createAtlas(name)
     end
 
-    local targetResource = rawget(atlases[name], resource)
+    if resource then
+        local targetResource = rawget(atlases[name], resource)
 
-    if not targetResource then
-        local filename = string.format("%s/Graphics/Atlases/%s/%s.png", modHandler.commonModContent, name, resource)
-        local sprite = spriteLoader.loadExternalSprite(filename)
+        if not targetResource then
+            local filename = string.format("%s/Graphics/Atlases/%s/%s.png", modHandler.commonModContent, name, resource)
+            local sprite = spriteLoader.loadExternalSprite(filename)
 
-        atlases[name][resource] = sprite
+            atlases[name][resource] = sprite
 
-        return sprite
+            return sprite
+        end
+
+        return targetResource
     end
-
-    return targetResource
 end
 
 function atlases.loadExternalAtlases()

@@ -186,27 +186,29 @@ function entities.getNodeRectangles(room, entity, viewport)
     local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, nil)
     local nodeRectangle
 
-    if #nodeDrawable > 0 then
-        nodeRectangle = getSpriteRectangle(nodeDrawable)
-
-    else
-        nodeRectangle = nodeDrawable:getRectangle()
-    end
-
-    local x, y = entity.x or 0, entity.y or 0
-    local rectangleX, rectangleY = nodeRectangle.x, nodeRectangle.y
-
-    for i, node in ipairs(nodes) do
-        if handler.nodeRectangle then
-            rectangles[i] = handler.nodeRectangle(room, entity, i)
+    if nodeDrawable then
+        if #nodeDrawable > 0 then
+            nodeRectangle = getSpriteRectangle(nodeDrawable)
 
         else
-            local offsetX, offsetY = node.x - x, node.y - y
+            nodeRectangle = nodeDrawable:getRectangle()
+        end
 
-            nodeRectangle.x = rectangleX + offsetX
-            nodeRectangle.y = rectangleY + offsetY
+        local x, y = entity.x or 0, entity.y or 0
+        local rectangleX, rectangleY = nodeRectangle.x, nodeRectangle.y
 
-            rectangles[i] = utils.deepcopy(nodeRectangle)
+        for i, node in ipairs(nodes) do
+            if handler.nodeRectangle then
+                rectangles[i] = handler.nodeRectangle(room, entity, i)
+
+            else
+                local offsetX, offsetY = node.x - x, node.y - y
+
+                nodeRectangle.x = rectangleX + offsetX
+                nodeRectangle.y = rectangleY + offsetY
+
+                rectangles[i] = utils.deepcopy(nodeRectangle)
+            end
         end
     end
 
