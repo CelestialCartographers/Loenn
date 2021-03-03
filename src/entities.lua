@@ -2,6 +2,7 @@ local utils = require("utils")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
+local drawing = require("drawing")
 
 local languageRegistry = require("language_registry")
 
@@ -120,8 +121,99 @@ function entities.getDrawable(name, handler, room, entity, viewport)
     end
 end
 
+function entities.getNodeDrawable(name, handler, room, entity, viewport)
+    handler = handler or entities.registeredEntities[name]
+
+    if handler.nodeSprite then
+        local sprites = handler.nodeSprite(room, entity, viewport)
+
+        if sprites then
+            if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
+                return sprites, sprites.depth
+
+            else
+                return sprites, nil
+            end
+        end
+
+    elseif handler.nodeTexture then
+        local texture = utils.callIfFunction(handler.nodeTexture, room, entity)
+        local drawable = drawableSprite.spriteFromTexture(texture, entity)
+
+        return drawable
+
+    elseif handler.nodeDraw then
+        return drawableFunction.fromFunction(handler.nodeDraw, room, entity, viewport)
+
+    else
+        return entities.getDrawable(name, handler, room, entity, viewport)
+    end
+end
+
+local function getSpriteRectangle(drawables)
+    -- TODO - Inline coverRectangles?
+    -- Check if this is expensive enough in larger rooms
+
+    local rectangles = {}
+
+    for i, drawable in ipairs(drawables) do
+        if drawable.getRectangle then
+            rectangles[i] = drawable:getRectangle()
+
+            if drawable.ignoreRest then
+                break
+            end
+        end
+    end
+
+    local x, y, width, height = utils.coverRectangles(rectangles)
+
+    return utils.rectangle(x, y, width, height)
+end
+
+-- TODO - Offset to node
+function entities.getNodeRectangles(room, entity, viewport)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+    local nodes = entity.nodes
+
+    if not nodes then
+        return nil
+    end
+
+    local rectangles = {}
+
+    local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, nil)
+    local nodeRectangle
+
+    if #nodeDrawable > 0 then
+        nodeRectangle = getSpriteRectangle(nodeDrawable)
+
+    else
+        nodeRectangle = nodeDrawable:getRectangle()
+    end
+
+    local x, y = entity.x or 0, entity.y or 0
+    local rectangleX, rectangleY = nodeRectangle.x, nodeRectangle.y
+
+    for i, node in ipairs(nodes) do
+        if handler.nodeRectangle then
+            rectangles[i] = handler.nodeRectangle(room, entity, i)
+
+        else
+            local offsetX, offsetY = node.x - x, node.y - y
+
+            nodeRectangle.x = rectangleX + offsetX
+            nodeRectangle.y = rectangleY + offsetY
+
+            rectangles[i] = utils.deepcopy(nodeRectangle)
+        end
+    end
+
+    return rectangles
+end
+
 -- Returns main entity selection rectangle, then table of node rectangles
--- TODO - Implement nodes
 function entities.getSelection(room, entity, viewport)
     local name = entity._name
     local handler = entities.registeredEntities[name]
@@ -130,33 +222,91 @@ function entities.getSelection(room, entity, viewport)
         return handler.selection(room, entity)
 
     elseif handler.rectangle then
-        return handler.rectangle(room, entity), nil
+        return handler.rectangle(room, entity), entities.getNodeRectangles(room, entity)
 
     else
         local drawable = entities.getDrawable(name, handler, room, entity)
+        local nodeRectangles = entities.getNodeRectangles(room, entity)
 
         if #drawable == 0 and drawable.getRectangle then
-            return drawable:getRectangle(), nil
+            return drawable:getRectangle(), nodeRectangles
 
         else
-            -- TODO - Inline coverRectangles?
-            -- Check if this is expensive enough in larger rooms
+            return getSpriteRectangle(drawable), nodeRectangles
+        end
+    end
+end
 
-            local rectangles = {}
+-- TODO - Implement in more performant way?
+function entities.drawSelected(room, layer, entity, color)
+    color = color or colors.selectionCompleteNodeLineColor
 
-            for i, draw in ipairs(drawable) do
-                if draw.getRectangle then
-                    rectangles[i] = draw:getRectangle()
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
 
-                    if draw.ignoreRest then
-                        break
+    if handler.drawSelected then
+        return handler.drawSelected(room, layer, entity, color)
+
+    else
+        local x, y = entity.x or 0, entity.y or 0
+        local halfWidth, halfHeight = (entity.width or 0) / 2, (entity.height or 0) / 2
+        local nodes = entity.nodes
+
+        if nodes and #nodes > 0 then
+            local nodeLineRenderType = utils.callIfFunction(handler.nodeLineRenderType) or "none"
+            local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, nil)
+
+            if nodeDrawable then
+                local entityRenderX, entityRenderY = x + halfWidth, y + halfHeight
+                local previousX, previousY = entityRenderX, entityRenderY
+
+                for _, node in ipairs(nodes) do
+                    local nodeX, nodeY = node.x or 0, node.y or 0
+                    local nodeRenderX, nodeRenderY = nodeX + halfWidth, nodeY + halfHeight
+
+                    drawing.callKeepOriginalColor(function()
+                        love.graphics.setColor(color)
+
+                        if nodeLineRenderType == "line" then
+                            love.graphics.line(previousX, previousY, nodeRenderX, nodeRenderY)
+
+                        elseif nodeLineRenderType == "fan" then
+                            love.graphics.line(entityRenderX, entityRenderY, nodeX, nodeY)
+                        end
+                    end)
+
+                    previousX = nodeRenderX
+                    previousY = nodeRenderY
+
+                    local offsetX, offsetY = nodeX - x, nodeY - y
+
+                    -- Reset offset so we can reuse this for next node
+                    if #nodeDrawable > 0 then
+                        for _, drawable in ipairs(nodeDrawable) do
+                            if drawable.x and drawable.y then
+                                drawable.x += offsetX
+                                drawable.y += offsetY
+
+                                drawable:draw()
+
+                                drawable.x -= offsetX
+                                drawable.y -= offsetY
+                            end
+                        end
+
+                    else
+                        if nodeDrawable.x and nodeDrawable.y then
+                            nodeDrawable.x += offsetX
+                            nodeDrawable.y += offsetY
+
+                            nodeDrawable:draw()
+
+                            nodeDrawable.x -= offsetX
+                            nodeDrawable.y -= offsetY
+                        end
                     end
                 end
             end
-
-            local x, y, width, height = utils.coverRectangles(rectangles)
-
-            return utils.rectangle(x, y, width, height), nil
         end
     end
 end

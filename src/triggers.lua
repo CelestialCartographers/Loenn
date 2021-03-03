@@ -162,6 +162,47 @@ function triggers.getSelection(room, trigger)
     return mainRectangle, nodeRectangles
 end
 
+-- TODO - Implement in more performant way?
+function triggers.drawSelected(room, layer, trigger, color)
+    color = color or colors.selectionCompleteNodeLineColor
+
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    local x, y = trigger.x or 0, trigger.y or 0
+    local width, height = trigger.width or 0, trigger.height or 0
+    local halfWidth, halfHeight = width / 2, height / 2
+    local nodes = trigger.nodes
+
+    if nodes and #nodes > 0 then
+        local nodeLineRenderType = utils.callIfFunction(handler.nodeLineRenderType) or "line"
+        local triggerRenderX, triggerRenderY = x + halfWidth, y + halfHeight
+        local previousX, previousY = triggerRenderX, triggerRenderY
+
+        drawing.callKeepOriginalColor(function()
+            for _, node in ipairs(nodes) do
+                local nodeX, nodeY = node.x or 0, node.y or 0
+
+                love.graphics.setColor(color)
+
+                if nodeLineRenderType == "line" then
+                    love.graphics.line(previousX, previousY, nodeX, nodeY)
+
+                elseif nodeLineRenderType == "fan" then
+                    love.graphics.line(triggerRenderX, triggerRenderY, nodeX, nodeY)
+                end
+
+                love.graphics.setColor(colors.triggerColor)
+                love.graphics.rectangle("fill", nodeX - 2, nodeY - 2, 5, 5)
+                love.graphics.rectangle("line", nodeX - 2, nodeY - 2, 5, 5)
+
+                previousX = nodeX
+                previousY = nodeY
+            end
+        end)
+    end
+end
+
 function triggers.moveSelection(room, layer, selection, x, y)
     local trigger, node = selection.item, selection.node
 

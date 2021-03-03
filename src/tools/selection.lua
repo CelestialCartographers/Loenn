@@ -115,7 +115,26 @@ local function drawSelectionArea(room)
     end
 end
 
-local function drawSelectionPreviews(room)
+local function drawItemSelections(room)
+    if selectionPreviews then
+        local drawnItems = {}
+        local color = selectionCompleted and colors.selectionCompleteNodeLineColor or colors.selectionPreviewNodeLineColor
+
+        viewportHandler.drawRelativeTo(room.x, room.y, function()
+            for _, preview in ipairs(selectionPreviews) do
+                local item = preview.item
+
+                if not drawnItems[item] then
+                    drawnItems[item] = true
+
+                    selectionItemUtils.drawSelected(room, preview.layer, item, color)
+                end
+            end
+        end)
+    end
+end
+
+local function drawSelectionRectangles(room)
     if selectionPreviews then
         local preview = not selectionCompleted
 
@@ -528,7 +547,8 @@ function tool.draw()
 
     if room then
         drawSelectionArea(room)
-        drawSelectionPreviews(room)
+        drawItemSelections(room)
+        drawSelectionRectangles(room)
     end
 end
 
