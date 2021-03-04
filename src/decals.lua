@@ -6,17 +6,25 @@ local mods = require("mods")
 local decals = {}
 
 local decalsPrefix = "^decals/"
-local decalFrameSuffix = "%d*$"
 
 -- A frame should only be kept if it has no trailing number
 -- Or if the trailing number is 0, 00, 000, ... etc
+-- Using manual byte checks for performance reasons
 local function keepFrame(name, removeAnimationFrames)
     if removeAnimationFrames then
-        local numberSuffix = name:match(decalFrameSuffix)
+        for i = #name, 1, -1 do
+            local byte = string.byte(name, i, i)
+            local isNumber = byte >= 48 and byte <= 57
 
-        for i = 1, #numberSuffix do
-            if numberSuffix:sub(i, i) ~= "0" then
-                return false
+            if isNumber then
+                local isZero = byte == 48
+
+                if not isZero then
+                    return false
+                end
+
+            else
+                return true
             end
         end
     end
