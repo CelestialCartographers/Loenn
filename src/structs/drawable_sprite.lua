@@ -140,14 +140,27 @@ function drawableSpriteMt.__index:draw()
     local offsetX = self.offsetX or ((self.justificationX or 0.0) * self.meta.realWidth + self.meta.offsetX)
     local offsetY = self.offsetY or ((self.justificationY or 0.0) * self.meta.realHeight + self.meta.offsetY)
 
+    local layer = self.meta.layer
+
     if self.color and type(self.color) == "table" then
         drawing.callKeepOriginalColor(function()
             love.graphics.setColor(self.color)
-            love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+
+            if layer then
+                love.graphics.drawLayer(self.meta.image, layer, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+
+            else
+                love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+            end
         end)
 
     else
-        love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+        if layer then
+            love.graphics.drawLayer(self.meta.image, layer, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+
+        else
+            love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+        end
     end
 end
 
