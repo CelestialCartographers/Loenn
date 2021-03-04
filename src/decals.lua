@@ -13,7 +13,7 @@ local decalsPrefix = "^decals/"
 local function keepFrame(name, removeAnimationFrames)
     if removeAnimationFrames then
         for i = #name, 1, -1 do
-            local byte = string.byte(name, i, i)
+            local byte = name:byte(i, i)
             local isNumber = byte >= 48 and byte <= 57
 
             if isNumber then

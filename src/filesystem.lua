@@ -46,12 +46,28 @@ function filesystem.samePath(path1, path2)
     end
 end
 
+-- Maunal iteration for performance
+-- String matching is expensive
 function filesystem.fileExtension(path)
-    return path:match("[^.]+$")
+    for i = #path, 1, -1 do
+        if path:byte(i, i) == 46 then
+            return path:sub(i + 1, #path)
+        end
+    end
+
+    return path
 end
 
+-- Maunal iteration for performance
+-- String matching or getting ext just to sub is expensive
 function filesystem.stripExtension(path)
-    return path:sub(1, #path - #filesystem.fileExtension(path) - 1)
+    for i = #path, 1, -1 do
+        if path:byte(i, i) == 46 then
+            return path:sub(1, i - 1)
+        end
+    end
+
+    return path
 end
 
 function filesystem.mkdir(path, mode)
