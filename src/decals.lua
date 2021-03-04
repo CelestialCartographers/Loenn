@@ -1,6 +1,7 @@
 local atlases = require("atlases")
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local mods = require("mods")
 
 local decals = {}
 
@@ -9,30 +10,58 @@ local decalFrameSuffix = "%d*$"
 
 -- A frame should only be kept if it has no trailing number
 -- Or if the trailing number is 0, 00, 000, ... etc
-local function keepFrame(name)
-    local numberSuffix = name:match(decalFrameSuffix)
+local function keepFrame(name, removeAnimationFrames)
+    if removeAnimationFrames then
+        local numberSuffix = name:match(decalFrameSuffix)
 
-    for i = 1, #numberSuffix do
-        if numberSuffix:sub(i, i) ~= "0" then
-            return false
+        for i = 1, #numberSuffix do
+            if numberSuffix:sub(i, i) ~= "0" then
+                return false
+            end
         end
     end
 
     return true
 end
 
--- TODO - Support custom decals here
--- Might not be in atlases.gameplay because of lazy loading
-function decals.getDecalNames(removeFrames)
-    removeFrames = removeFrames == nil or removeFrames
+local function hasPngExt(filename)
+    return utils.fileExtension(filename) == "png"
+end
+
+function decals.getDecalNames(removeAnimationFrames, yield)
+    removeAnimationFrames = removeAnimationFrames ~= false
+    yield = yield ~= false
 
     local res = {}
+    local added = {}
 
+    -- Any loaded sprites
     for name, sprite in pairs(atlases.gameplay) do
         if name:match(decalsPrefix) then
-            if not removeFrames or keepFrame(name) then
+            if keepFrame(name, removeAnimationFrames) then
+                added[name] = true
+
                 table.insert(res, name)
             end
+        end
+    end
+
+    -- Mod content sprites
+    -- Some of these might have already been loaded
+    local modCommonPath = mods.commonModContent .. "/Graphics/Atlases/Gameplay/decals"
+    local modCommonPathLength = #modCommonPath
+
+    for i, name in ipairs(utils.getFilenames(modCommonPath, true, {}, hasPngExt)) do
+        -- Remove mod common path, keep decals/ prefix
+        local nameNoExt = utils.stripExtension(name)
+        local resourceName = nameNoExt:sub(modCommonPathLength - 5)
+
+        if not added[resourceName] and keepFrame(resourceName, removeAnimationFrames) then
+            table.insert(res, resourceName)
+        end
+
+        if yield and i % 100 == 0 then
+            coroutine.yield()
         end
     end
 
