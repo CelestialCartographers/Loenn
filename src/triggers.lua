@@ -162,6 +162,47 @@ function triggers.getSelection(room, trigger)
     return mainRectangle, nodeRectangles
 end
 
+-- TODO - Implement in more performant way?
+function triggers.drawSelected(room, layer, trigger, color)
+    color = color or colors.selectionCompleteNodeLineColor
+
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    local x, y = trigger.x or 0, trigger.y or 0
+    local width, height = trigger.width or 0, trigger.height or 0
+    local halfWidth, halfHeight = width / 2, height / 2
+    local nodes = trigger.nodes
+
+    if nodes and #nodes > 0 then
+        local nodeLineRenderType = utils.callIfFunction(handler.nodeLineRenderType) or "line"
+        local triggerRenderX, triggerRenderY = x + halfWidth, y + halfHeight
+        local previousX, previousY = triggerRenderX, triggerRenderY
+
+        drawing.callKeepOriginalColor(function()
+            for _, node in ipairs(nodes) do
+                local nodeX, nodeY = node.x or 0, node.y or 0
+
+                love.graphics.setColor(color)
+
+                if nodeLineRenderType == "line" then
+                    love.graphics.line(previousX, previousY, nodeX, nodeY)
+
+                elseif nodeLineRenderType == "fan" then
+                    love.graphics.line(triggerRenderX, triggerRenderY, nodeX, nodeY)
+                end
+
+                love.graphics.setColor(colors.triggerColor)
+                love.graphics.rectangle("fill", nodeX - 2, nodeY - 2, 5, 5)
+                love.graphics.rectangle("line", nodeX - 2, nodeY - 2, 5, 5)
+
+                previousX = nodeX
+                previousY = nodeY
+            end
+        end)
+    end
+end
+
 function triggers.moveSelection(room, layer, selection, x, y)
     local trigger, node = selection.item, selection.node
 
@@ -211,6 +252,44 @@ function triggers.deleteSelection(room, layer, selection)
                 if nodes then
                     table.remove(nodes, node)
                 end
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
+function triggers.addNodeToSelection(room, layer, selection)
+    local targets = triggers.getRoomItems(room, layer)
+    local target, node = selection.item, selection.node
+    local minimumNodes, maximumNodes = triggers.nodeLimits(room, layer, target)
+
+    for i, trigger in ipairs(targets) do
+        if trigger == target then
+            local nodes = trigger.nodes or {}
+
+            -- Make sure we don't add more nodes than supported
+            if #nodes >= maximumNodes and maximumNodes ~= -1 then
+                return false
+            end
+
+            if not trigger.nodes then
+                trigger.nodes = nodes
+            end
+
+            if node == 0 then
+                local nodeX = trigger.x + (trigger.width or 0) + 8
+                local nodeY = trigger.y
+
+                table.insert(nodes, 1, {x = nodeX, y = nodeY})
+
+            else
+                local nodeX = nodes[node].x + (trigger.width or 0) + 8
+                local nodeY = nodes[node].y
+
+                table.insert(nodes, node + 1, {x = nodeX, y = nodeY})
             end
 
             return true

@@ -33,6 +33,8 @@ local selectionRectangle = nil
 local selectionCompleted = false
 local selectionStartX, selectionStartY = nil ,nil
 local selectionPreviews = nil
+local selectionCycleTargets = {}
+local selectionCycleIndex = 1
 
 local copyPreviews = nil
 
@@ -56,13 +58,33 @@ local function selectionStarted(x, y)
     selectionStartY = y
 end
 
-local function selectionChanged(x, y, width, height)
+local function selectionChanged(x, y, width, height, fromClick)
     local room = state.getSelectedRoom()
 
     -- Only update if needed
-    if x ~= selectionRectangle.x or y ~= selectionRectangle.y or width ~= selectionRectangle.width or height ~= selectionRectangle.height then
+    if fromClick or x ~= selectionRectangle.x or y ~= selectionRectangle.y or math.abs(width) ~= selectionRectangle.width or math.abs(height) ~= selectionRectangle.height then
         selectionRectangle = utils.rectangle(x, y, width, height)
-        selectionPreviews = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
+
+        local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
+
+        if fromClick then
+            selectionUtils.orderSelectionsByScore(newSelections)
+
+            if #newSelections > 0 and utils.equals(newSelections, selectionCycleTargets, false) then
+                selectionCycleIndex = utils.mod1(selectionCycleIndex + 1, #newSelections)
+
+            else
+                selectionCycleIndex = 1
+            end
+
+            selectionCycleTargets = newSelections
+            selectionPreviews = {selectionCycleTargets[selectionCycleIndex]}
+
+        else
+            selectionPreviews = newSelections
+            selectionCycleTargets = {}
+            selectionCycleIndex = 0
+        end
     end
 end
 
@@ -94,7 +116,26 @@ local function drawSelectionArea(room)
     end
 end
 
-local function drawSelectionPreviews(room)
+local function drawItemSelections(room)
+    if selectionPreviews then
+        local drawnItems = {}
+        local color = selectionCompleted and colors.selectionCompleteNodeLineColor or colors.selectionPreviewNodeLineColor
+
+        viewportHandler.drawRelativeTo(room.x, room.y, function()
+            for _, preview in ipairs(selectionPreviews) do
+                local item = preview.item
+
+                if not drawnItems[item] then
+                    drawnItems[item] = true
+
+                    selectionItemUtils.drawSelected(room, preview.layer, item, color)
+                end
+            end
+        end)
+    end
+end
+
+local function drawSelectionRectangles(room)
     if selectionPreviews then
         local preview = not selectionCompleted
 
@@ -106,21 +147,23 @@ local function drawSelectionPreviews(room)
         -- Potentially find a better solution?
         viewportHandler.drawRelativeTo(room.x, room.y, function()
             drawing.callKeepOriginalColor(function()
+                love.graphics.setColor(fillColor)
+
                 for _, rectangle in ipairs(selectionPreviews) do
                     local x, y = rectangle.x, rectangle.y
                     local width, height = rectangle.width, rectangle.height
 
-                    love.graphics.setColor(fillColor)
                     love.graphics.rectangle("fill", x, y, width, height)
                 end
             end)
 
             drawing.callKeepOriginalColor(function()
+                love.graphics.setColor(borderColor)
+
                 for _, rectangle in ipairs(selectionPreviews) do
                     local x, y = rectangle.x, rectangle.y
                     local width, height = rectangle.width, rectangle.height
 
-                    love.graphics.setColor(borderColor)
                     love.graphics.rectangle("line", x, y, width, height)
                 end
             end)
@@ -165,6 +208,50 @@ local function deleteItems(room, layer, previews)
 
         return redraw, selectionsBefore
     end, room, layer, "Selection Deleted")
+
+    return snapshot, redraw
+end
+
+-- TODO - Test when node support is better
+local function addNode(room, layer, previews)
+    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
+        local redraw = false
+        local selectionsBefore = utils.deepcopy(selectionPreviews)
+        local newPreviews = {}
+
+        for _, selection in ipairs(previews) do
+            local added = selectionItemUtils.addNodeToSelection(room, layer, selection)
+
+            if added then
+                local item = selection.item
+                local node = selection.node
+
+                -- Make sure selection nodes for the target is correct
+                for _, target in ipairs(previews) do
+                    if target.item == item then
+                        if target.node >= node then
+                            target.node += 1
+                        end
+                    end
+                end
+
+                -- Add new node to selections
+                local rectangles = selectionUtils.getSelectionsForItem(room, layer, item)
+
+                -- Nodes are off by one here since the main entity would be the first rectangle
+                -- We also insert after the target node, meaning the total offset is two
+                table.insert(newPreviews, rectangles[node + 2])
+
+                redraw = true
+            end
+        end
+
+        for _, newPreview in ipairs(newPreviews) do
+            table.insert(previews, newPreview)
+        end
+
+        return redraw, selectionsBefore
+    end, room, layer, "Node Added")
 
     return snapshot, redraw
 end
@@ -270,6 +357,27 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
 
     if targetKey == key then
         local snapshot, redraw = deleteItems(room, tool.layer, selectionPreviews)
+
+        if redraw then
+            history.addSnapshot(snapshot)
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
+
+        return true
+    end
+
+    return false
+end
+
+local function handleNodeAddKey(room, key, scancode, isrepeat)
+    if not selectionPreviews then
+        return
+    end
+
+    local targetKey = configs.editor.itemAddNode
+
+    if targetKey == key then
+        local snapshot, redraw = addNode(room, tool.layer, selectionPreviews)
 
         if redraw then
             history.addSnapshot(snapshot)
@@ -401,13 +509,24 @@ end
 -- Special case
 function tool.mouseclicked(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
+    local contextMenuButton = configs.editor.contextMenuButton
 
     if button == actionButton then
         local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
         if cursorX and cursorY then
-            selectionChanged(cursorX - 1, cursorY - 1, 3, 3)
+            selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
             selectionFinished()
+        end
+
+    elseif button == contextMenuButton then
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
+
+        if cursorX and cursorY then
+            local room = state.getSelectedRoom()
+            local previewTargets = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY, selectionPreviews)
+
+            selectionUtils.sendContextMenuEvent(previewTargets)
         end
     end
 end
@@ -421,6 +540,7 @@ function tool.keypressed(key, scancode, isrepeat)
 
     handleItemMovementKeys(room, key, scancode, isrepeat)
     handleItemDeletionKey(room, key, scancode, isrepeat)
+    handleNodeAddKey(room, key, scancode, isrepeat)
 end
 
 function tool.draw()
@@ -428,7 +548,8 @@ function tool.draw()
 
     if room then
         drawSelectionArea(room)
-        drawSelectionPreviews(room)
+        drawItemSelections(room)
+        drawSelectionRectangles(room)
     end
 end
 

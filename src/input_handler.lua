@@ -62,7 +62,7 @@ function love.mousereleased(x, y, button, istouch, presses)
         sceneHandler.sendEvent("mouseclicked", startX, startY, button, istouch, presses)
     end
 
-    sceneHandler.sendEvent("mousereleased", x, y, button, istouch, presses)
+    sceneHandler.sendEvent("mousereleased", x, y, button, istouch, presses, not consideredDrag)
 
     mouseButtonsPressed[button] = nil
 end

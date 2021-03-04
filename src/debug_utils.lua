@@ -12,6 +12,11 @@ local origYield = coroutine.yield
 
 local debugUtils = {}
 
+-- Clear restart of Lua state without restarting application
+function debugUtils.restartProcess()
+    love.event.quit("restart")
+end
+
 function debugUtils.reloadEntities()
     print("! Reloading entities")
 

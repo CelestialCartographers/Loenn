@@ -1,6 +1,7 @@
 return {
     -- Tools and Interactions
     toolActionButton = 1,
+    contextMenuButton = 2,
     canvasMoveButton = 2,
     objectCloneButton = 3,
 
@@ -18,6 +19,8 @@ return {
     itemMoveDown = "down",
 
     itemDelete = "delete",
+
+    itemAddNode = "n",
 
     -- Rendering
     prepareRoomRenderInBackground = true,

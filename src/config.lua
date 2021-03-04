@@ -1,5 +1,4 @@
 local utils = require("utils")
-local lfs = require("lfs_ffi")
 
 local config = {}
 local configMt = {}
@@ -55,7 +54,7 @@ function config.writeConfigData(filename, data, pretty)
         success, content = utils.serialize(data, pretty)
 
         if success then
-            lfs.mkdir(utils.dirname(filename))
+            utils.mkdir(utils.dirname(filename))
             local fh = io.open(tempFilename, "wb")
 
             if fh then
@@ -100,7 +99,7 @@ function config.updateConfig(conf)
     if matchDisk then
         local mtime = rawget(conf, "mtime") or 0
         local filename = rawget(conf, "filename")
-        local attrs = lfs.attributes(filename)
+        local attrs = utils.pathAttributes(filename)
 
         if attrs and attrs.modification > mtime then
             rawset(conf, "data", config.readConfigData(filename))

@@ -462,17 +462,20 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
         if handler then
             local defaultDepth = entityHandler.getDefaultDepth(name, handler, room, entity, viewport)
             local drawable, depth = entityHandler.getDrawable(name, handler, room, entity, viewport)
+            local handlerDepth = utils.callIfFunction(depth, room, entity, viewport)
 
             -- Special case for multiple drawable sprites
             -- Maybe handle this better later
             if drawable and #drawable == 0 then
-                local batch = getOrCreateSmartBatch(batches, utils.callIfFunction(depth, room, entity, viewport) or defaultDepth)
+                local batchDepth = drawable.depth or depth or handlerDepth or defaultDepth
+                local batch = getOrCreateSmartBatch(batches, batchDepth)
 
                 batch:addFromDrawable(drawable)
 
             else
                 for _, drawableItem in ipairs(drawable) do
-                    local batch = getOrCreateSmartBatch(batches, utils.callIfFunction(depth, room, entity, viewport) or defaultDepth)
+                    local batchDepth = drawableItem.depth or depth or handlerDepth or defaultDepth
+                    local batch = getOrCreateSmartBatch(batches, batchDepth)
 
                     batch:addFromDrawable(drawableItem)
                 end
@@ -701,7 +704,7 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
     local redrawRoom = selected or ALWAYS_REDRAW_UNSELECTED_ROOMS
     local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
 
-    if visible then
+    if visible or selected then
         local roomX = room.x or 0
         local roomY = room.y or 0
 

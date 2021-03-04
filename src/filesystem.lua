@@ -46,16 +46,32 @@ function filesystem.samePath(path1, path2)
     end
 end
 
+-- Maunal iteration for performance
+-- String matching is expensive
 function filesystem.fileExtension(path)
-    return path:match("[^.]+$")
+    for i = #path, 1, -1 do
+        if path:byte(i, i) == 46 then
+            return path:sub(i + 1, #path)
+        end
+    end
+
+    return path
 end
 
+-- Maunal iteration for performance
+-- String matching or getting ext just to sub is expensive
 function filesystem.stripExtension(path)
-    return path:sub(1, #path - #filesystem.fileExtension(path) - 1)
+    for i = #path, 1, -1 do
+        if path:byte(i, i) == 46 then
+            return path:sub(1, i - 1)
+        end
+    end
+
+    return path
 end
 
 function filesystem.mkdir(path, mode)
-    return lfs.mkdir(path, mode or 755)
+    return lfs.mkdir(path, mode or 436) -- octal mode 664
 end
 
 filesystem.chdir = lfs.chdir
@@ -100,6 +116,14 @@ function filesystem.getFilenames(path, recursive, filenames, predicate, useYield
     findRecursive(filenames, path, recursive, predicate, useYields)
 
     return filenames
+end
+
+function filesystem.pathAttributes(path)
+    return lfs.attributes(path)
+end
+
+function filesystem.listDir(path)
+    return lfs.dir(path)
 end
 
 function filesystem.isFile(path)

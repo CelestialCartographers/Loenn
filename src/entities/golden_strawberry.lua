@@ -1,18 +1,36 @@
--- TODO - Support nodes
-
 local strawberry = {}
 
 strawberry.name = "goldenBerry"
 strawberry.depth = -100
+strawberry.nodeLineRenderType = "fan"
 
 function strawberry.texture(room, entity)
     local winged = entity.winged
+    local hasNodes = entity.nodes and #entity.nodes > 0
 
     if winged then
-        return "collectables/goldberry/wings01"
+        if hasNodes then
+            return "collectables/ghostgoldberry/wings01"
+
+        else
+            return "collectables/goldberry/wings01"
+        end
 
     else
-        return "collectables/goldberry/idle00"
+        if hasNodes then
+            return "collectables/ghostgoldberry/idle00"
+
+        else
+            return "collectables/goldberry/idle00"
+        end
+    end
+end
+
+function strawberry.nodeTexture(room, entity)
+    local hasNodes = entity.nodes and #entity.nodes > 0
+
+    if hasNodes then
+        return "collectables/goldberry/seed00"
     end
 end
 
@@ -32,5 +50,9 @@ strawberry.placements = {
         }
     }
 }
+
+function strawberry.nodeLimits(room, entity)
+    return 0, -1
+end
 
 return strawberry

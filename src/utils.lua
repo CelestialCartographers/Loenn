@@ -413,6 +413,38 @@ function utils.deepcopy(v, copyMetatables)
     end
 end
 
+-- Shallow mode doesn't check table values recursively
+function utils.equals(lhs, rhs, shallow)
+    if lhs == rhs then
+        return true
+    end
+
+    local lhsType = type(lhs)
+    local rhsType = type(rhs)
+
+    if lhsType ~= rhsType then
+        return false
+    end
+
+    if lhsType == "table" then
+        local equalFunc = shallow and (a, b -> a == b) or utils.equals
+
+        for k, v in pairs(lhs) do
+            if not equalFunc(rhs[k], v) then
+                return false
+            end
+        end
+
+        for k, v in pairs(rhs) do
+            if not equalFunc(lhs[k], v) then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
 function utils.clamp(value, min, max)
     return math.min(math.max(value, min), max)
 end
