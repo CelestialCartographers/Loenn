@@ -138,9 +138,11 @@ function decals.getPlacements(layer)
     local names = decals.getDecalNames()
 
     for i, name in ipairs(names) do
+        local nameNoDecalsPrefix = name:sub(8, #name)
+
         res[i] = {
             name = name,
-            displayName = name,
+            displayName = nameNoDecalsPrefix,
             layer = layer,
             placementType = "point",
             itemTemplate = {
