@@ -5,7 +5,7 @@ local mods = require("mods")
 
 local decals = {}
 
-local decalsPrefix = "^decals/"
+local decalsPrefix = "decals/"
 
 -- A frame should only be kept if it has no trailing number
 -- Or if the trailing number is 0, 00, 000, ... etc
@@ -45,7 +45,7 @@ function decals.getDecalNames(removeAnimationFrames, yield)
 
     -- Any loaded sprites
     for name, sprite in pairs(atlases.gameplay) do
-        if name:match(decalsPrefix) then
+        if utils.startsWith(name, decalsPrefix) then
             if keepFrame(name, removeAnimationFrames) then
                 added[name] = true
 
