@@ -212,7 +212,6 @@ local function deleteItems(room, layer, previews)
     return snapshot, redraw
 end
 
--- TODO - Test when node support is better
 local function addNode(room, layer, previews)
     local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
         local redraw = false
