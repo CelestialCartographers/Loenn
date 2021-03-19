@@ -103,7 +103,12 @@ end
 function decals.getSelection(room, decal)
     local drawable = decals.getDrawable(decal.texture, nil, room, decal, nil)
 
-    return drawable:getRectangle()
+    if drawable then
+        return drawable:getRectangle()
+
+    else
+        return utils.rectangle(decal.x - 2, decal.y - 2, 5, 5)
+    end
 end
 
 function decals.moveSelection(room, layer, selection, x, y)
