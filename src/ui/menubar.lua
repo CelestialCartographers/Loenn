@@ -24,6 +24,13 @@ local function deleteCurrentRoom()
     end
 end
 
+local function notYetImplementedNotification()
+    local language = languageRegistry.getLanguage()
+    local text = tostring(language.ui.menubar.not_yet_implemented)
+
+    notifications.notify(text)
+end
+
 -- debugUtils.reloadUI might change, wrap in function
 local function reloadUI()
     debugUtils.reloadUI()
@@ -33,7 +40,7 @@ menubar.menubar = {
     {"file", {
         {"new", loadedState.newMap},
         {"open", loadedState.openMap},
-        {"recent", {}},
+        {"recent", notYetImplementedNotification},
         {},
         {"save", loadedState.saveCurrentMap},
         {"save_as", loadedState.saveAsCurrentMap},
@@ -44,14 +51,12 @@ menubar.menubar = {
         {"undo", history.undo},
         {"redo", history.redo},
         {},
-        {"settings"}
+        {"settings", notYetImplementedNotification}
     }},
-    {"view", {
-
-    }},
+    {"view", notYetImplementedNotification},
     {"map", {
-        {"stylegrounds"},
-        {"metadata"}
+        {"stylegrounds", notYetImplementedNotification},
+        {"metadata", notYetImplementedNotification}
     }},
     {"room", {
         {"add", roomEditor.createNewRoom},
@@ -66,7 +71,7 @@ menubar.menubar = {
             {"reload_tools", debugUtils.reloadTools},
             {"reload_entities", debugUtils.reloadEntities},
             {"reload_triggers", debugUtils.reloadTriggers},
-            {"reload_effects"},
+            {"reload_effects", notYetImplementedNotification},
             {"reload_user_interface", reloadUI},
             {"reload_language_files", debugUtils.reloadLanguageFiles}
         }},
@@ -74,8 +79,8 @@ menubar.menubar = {
         {"test_console", debugUtils.debug}
     }},
     {"help", {
-        {"check_for_updates"},
-        {"about"}
+        {"check_for_updates", notYetImplementedNotification},
+        {"about", notYetImplementedNotification}
     }}
 }
 
