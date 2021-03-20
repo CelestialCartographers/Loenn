@@ -76,17 +76,38 @@ end
 function selectionUtils.getContextSelections(room, layer, x, y, selections)
     local previewTargets
 
-    if selections and #selections > 0 then
-        previewTargets = utils.deepcopy(selections)
+    local rectangle = utils.rectangle(x - 1, y - 1, 3, 3)
+    local hoveredSelections = selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
 
-    else
-        local rectangle = utils.rectangle(x - 1, y - 1, 3, 3)
-        local hoveredSelections = selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
+    selectionUtils.orderSelectionsByScore(hoveredSelections)
 
-        if #hoveredSelections > 0 then
-            selectionUtils.orderSelectionsByScore(hoveredSelections)
+    if #hoveredSelections > 0 then
+        if selections and #selections > 0 then
+            -- Make sure we are at hovering one of the selections
+            local hoveringFromSelections = false
 
-            previewTargets = {hoveredSelections[1]}
+            for _, hovered in ipairs(hoveredSelections) do
+                for _, selection in ipairs(selections) do
+                    if hovered.item == selection.item then
+                        hoveringFromSelections = true
+
+                        break
+                    end
+                end
+
+                if hoveringFromSelections then
+                    break
+                end
+            end
+
+            if hoveringFromSelections then
+                previewTargets = utils.deepcopy(selections)
+            end
+
+        else
+            if #hoveredSelections > 0 then
+                previewTargets = {hoveredSelections[1]}
+            end
         end
     end
 
