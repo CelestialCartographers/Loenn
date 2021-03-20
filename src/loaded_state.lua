@@ -12,6 +12,27 @@ local sideStruct = require("structs.side")
 
 local state = {}
 
+local function updateSideState(side, filename, eventName)
+    eventName = eventName or "editorMapLoaded"
+
+    celesteRender.invalidateRoomCache()
+    celesteRender.clearBatchingTasks()
+
+    state.filename = filename
+    state.side = side
+    state.map = state.side.map
+
+    celesteRender.loadCustomTilesetAutotiler(state)
+
+    history.reset()
+
+    state.selectItem(state.map and state.map.rooms[1])
+
+    sceneHandler.changeScene("Editor")
+
+    sceneHandler.sendEvent(eventName, filename)
+end
+
 function state.loadFile(filename)
     if not filename then
         return
@@ -32,22 +53,7 @@ function state.loadFile(filename)
                 tasks.newTask(
                     (-> sideStruct.decodeTaskable(binTask.result)),
                     function(decodeTask)
-                        celesteRender.invalidateRoomCache()
-                        celesteRender.clearBatchingTasks()
-
-                        state.filename = filename
-                        state.side = decodeTask.result
-                        state.map = state.side.map
-
-                        celesteRender.loadCustomTilesetAutotiler(state)
-
-                        history.reset()
-
-                        state.selectItem(state.map and state.map.rooms[1])
-
-                        sceneHandler.changeScene("Editor")
-
-                        sceneHandler.sendEvent("editorMapLoaded", filename)
+                        updateSideState(decodeTask.result, filename, "editorMapLoaded")
                     end
                 )
 
@@ -128,6 +134,18 @@ end
 
 function state.openMap()
     filesystem.openDialog(fileLocations.getCelesteDir(), nil, state.loadFile)
+end
+
+function state.newMap()
+    if history.madeChanges then
+        sceneHandler.sendEvent("editorNewMapWithChanges")
+
+        return
+    end
+
+    local newSide = sideStruct.decode({})
+
+    updateSideState(newSide, nil, "editorMapNew")
 end
 
 function state.saveAsCurrentMap()
