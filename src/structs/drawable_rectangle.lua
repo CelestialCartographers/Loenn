@@ -4,32 +4,12 @@
 local utils = require("utils")
 local drawing = require("drawing")
 local drawableSprite = require("structs.drawable_sprite")
+local spriteLoader = require("sprite_loader")
 
 local drawableRectangle = {}
 
--- TODO - Consider finding this on the Celeste Gameplay atlas if possible
--- Better batching
 drawableRectangle.tintingPixelFilename = "assets/1x1-tinting-pixel.png"
-drawableRectangle.tintingPixel = love.graphics.newImage(drawableRectangle.tintingPixelFilename)
-drawableRectangle.fakeTintingPixelImageMeta = {
-    x = 0,
-    y = 0,
-
-    width = 1,
-    height = 1,
-
-    offsetX = 0,
-    offsetY = 0,
-    realWidth = 1,
-    realHeight = 1,
-
-    image = drawableRectangle.tintingPixel,
-    filename = drawableRectangle.tintingPixelFilename,
-
-    quad = love.graphics.newQuad(0, 0, 1, 1, 1, 1),
-
-    loadedAt = os.time()
-}
+drawableRectangle.tintingPixelMeta = spriteLoader.loadExternalSprite(drawableRectangle.tintingPixelFilename)
 
 local function getDrawableSpriteForRectangle(x, y, width, height, color)
     local data = {}
@@ -45,7 +25,7 @@ local function getDrawableSpriteForRectangle(x, y, width, height, color)
 
     data.color = utils.getColor(color)
 
-    return drawableSprite.spriteFromMeta(drawableRectangle.fakeTintingPixelImageMeta, data)
+    return drawableSprite.spriteFromMeta(drawableRectangle.tintingPixelMeta, data)
 end
 
 

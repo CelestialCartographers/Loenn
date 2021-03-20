@@ -20,7 +20,6 @@ orderedDrawingBatchMt.__index = {}
 local spriteBatchMode = "static"
 local spriteBatchSize = 1000
 
--- TODO - Make tinting smarter? Batch based on color?
 function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
     local typ = utils.typeof(drawable)
 

@@ -5,7 +5,7 @@ local mods = require("mods")
 
 local decals = {}
 
-local decalsPrefix = "^decals/"
+local decalsPrefix = "decals/"
 
 -- A frame should only be kept if it has no trailing number
 -- Or if the trailing number is 0, 00, 000, ... etc
@@ -45,7 +45,7 @@ function decals.getDecalNames(removeAnimationFrames, yield)
 
     -- Any loaded sprites
     for name, sprite in pairs(atlases.gameplay) do
-        if name:match(decalsPrefix) then
+        if utils.startsWith(name, decalsPrefix) then
             if keepFrame(name, removeAnimationFrames) then
                 added[name] = true
 
@@ -103,7 +103,12 @@ end
 function decals.getSelection(room, decal)
     local drawable = decals.getDrawable(decal.texture, nil, room, decal, nil)
 
-    return drawable:getRectangle()
+    if drawable then
+        return drawable:getRectangle()
+
+    else
+        return utils.rectangle(decal.x - 2, decal.y - 2, 5, 5)
+    end
 end
 
 function decals.moveSelection(room, layer, selection, x, y)
@@ -138,9 +143,11 @@ function decals.getPlacements(layer)
     local names = decals.getDecalNames()
 
     for i, name in ipairs(names) do
+        local nameNoDecalsPrefix = name:sub(8, #name)
+
         res[i] = {
             name = name,
-            displayName = name,
+            displayName = nameNoDecalsPrefix,
             layer = layer,
             placementType = "point",
             itemTemplate = {

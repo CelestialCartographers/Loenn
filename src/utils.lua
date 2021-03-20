@@ -168,6 +168,10 @@ function utils.trim(s)
     return string.match(s, "^%s*(.*%S)") or ""
 end
 
+function utils.startsWith(s, start)
+    return s:sub(1, #start) == start
+end
+
 function utils.humanizeVariableName(name)
     local res = name
 
