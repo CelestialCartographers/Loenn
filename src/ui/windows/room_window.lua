@@ -20,10 +20,10 @@ local sceneHandler = require("scene_handler")
 
 local roomWindow = {}
 
-local roomWindows = {}
+local activeWindows = {}
 local windowPreviousX = 0
 local windowPreviousY = 0
-local roomWindowGroup = uiElements.group(roomWindows)
+local roomWindowGroup = uiElements.group({})
 
 local minimumRoomWidth = 320
 local minimumRoomHeight = 184
@@ -173,7 +173,7 @@ function roomWindow.createRoomWindow(room, editing)
     local windowY = windowPreviousY
 
     -- Don't stack windows on top of each other
-    if #roomWindows > 0 then
+    if #activeWindows > 0 then
         windowX, windowY = 0, 0
     end
 
@@ -202,6 +202,14 @@ function roomWindow.createRoomWindow(room, editing)
         {
             text = tostring(language.ui.room_window.close_window),
             callback = function(formFields)
+                for i, w in ipairs(activeWindows) do
+                    if w == window then
+                        table.remove(activeWindows, i)
+
+                        break
+                    end
+                end
+
                 window:removeSelf()
             end
         }
@@ -222,7 +230,9 @@ function roomWindow.createRoomWindow(room, editing)
         update = roomWindowUpdate
     })
 
+    table.insert(activeWindows, window)
     table.insert(roomWindowGroup.parent.children, window)
+
     roomWindowGroup.parent:reflow()
 
     return window
