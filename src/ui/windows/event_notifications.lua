@@ -32,6 +32,12 @@ function notificationHandlers:editorMapLoaded(filename)
     notifications.notify(string.format(tostring(language.ui.notifications.editorMapLoaded), filename))
 end
 
+function notificationHandlers:editorMapNew(filename)
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(string.format(tostring(language.ui.notifications.editorMapNew), filename))
+end
+
 function notificationHandlers:editorMapLoadFailed(filename)
     local language = languageRegistry.getLanguage()
 

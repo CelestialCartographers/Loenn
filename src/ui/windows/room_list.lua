@@ -76,6 +76,12 @@ function roomList:editorMapLoaded()
     end
 end
 
+function roomList:editorMapNew()
+    return function()
+        updateList(self)
+    end
+end
+
 function roomList:editorRoomDeleted(room)
     return function()
         updateList(self)
@@ -108,6 +114,7 @@ function roomList.getWindow()
     window:with({
         editorMapTargetChanged = roomList.editorMapTargetChanged(list),
         editorMapLoaded = roomList.editorMapLoaded(list),
+        editorMapNew = roomList.editorMapNew(list),
         editorRoomDeleted = roomList.editorRoomDeleted(list),
         editorRoomAdded = roomList.editorRoomAdded(list),
         uiRoomWindowRoomChanged = roomList.uiRoomWindowRoomChanged(list)

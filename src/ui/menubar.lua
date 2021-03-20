@@ -31,7 +31,7 @@ end
 
 menubar.menubar = {
     {"file", {
-        {"new"},
+        {"new", loadedState.newMap},
         {"open", loadedState.openMap},
         {"recent", {}},
         {},
