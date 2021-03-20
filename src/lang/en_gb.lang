@@ -146,8 +146,9 @@ entities.hanginglamp.name.hanging_lamp=Hanging Lamp
 
 
 # -- Triggers --
-# triggers.triggerName.name.*
-# triggers.triggerName.tooltips.*
+# triggers.entityName.name.*
+# triggers.entityName.attribute.*
+# triggers.entityName.description.*
 
 # Alt Music
 triggers.altMusicTrigger.name.alt_music=Alt Music

@@ -18,7 +18,7 @@ function mapStruct.decode(data)
     map.stylesFg = {}
     map.stylesBg = {}
 
-    for i, d in ipairs(data.__children) do
+    for i, d in ipairs(data.__children or {}) do
         if d.__name == "levels" then
             for j, room in ipairs(d.__children or {}) do
                 table.insert(map.rooms, roomStruct.decode(room))

@@ -583,6 +583,52 @@ function entities.nodeLimits(room, layer, entity)
     end
 end
 
+function entities.ignoredFields(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.ignoredFields then
+        return handler.ignoredFields(entity)
+
+    else
+        return {"_name", "_id", "originX", "originY"}
+    end
+end
+
+function entities.fieldOrder(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.fieldOrder then
+        return handler.fieldOrder(entity)
+
+    else
+        local fields = {"x", "y"}
+
+        if entity.width ~= nil then
+            table.insert(fields, "width")
+        end
+
+        if entity.height ~= nil then
+            table.insert(fields, "height")
+        end
+
+        return fields
+    end
+end
+
+function entities.languageData(layer, entity, language)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.languageData then
+        return handler.languageData(entity)
+
+    else
+        return language.entities[name]
+    end
+end
+
 -- Returns all entities of room
 function entities.getRoomItems(room, layer)
     return room.entities

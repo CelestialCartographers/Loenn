@@ -178,4 +178,17 @@ function decals.getRoomItems(room, layer)
     return layer == "decalsFg" and room.decalsFg or room.decalsBg
 end
 
+function decals.ignoredFields(layer, decal)
+    return {}
+end
+
+function decals.fieldOrder(layer, decal)
+    return {"x", "y", "scaleX", "scaleY", "texture"}
+end
+
+function decals.languageData(layer, decal, language)
+    return language.decals
+end
+
+
 return decals

@@ -401,6 +401,42 @@ function triggers.nodeLimits(room, layer, trigger)
     end
 end
 
+function triggers.ignoredFields(layer, entity)
+    local name = entity._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.ignoredFields then
+        return handler.ignoredFields(entity)
+
+    else
+        return {"_name", "_id", "originX", "originY"}
+    end
+end
+
+function triggers.fieldOrder(layer, entity)
+    local name = entity._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.fieldOrder then
+        return handler.fieldOrder(entity)
+
+    else
+        return {"x", "y", "width", "height"}
+    end
+end
+
+function triggers.languageData(layer, entity, language)
+    local name = entity._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.languageData then
+        return handler.languageData(entity)
+
+    else
+        return language.triggers[name]
+    end
+end
+
 triggers.initDefaultRegistry()
 
 return triggers
