@@ -36,10 +36,39 @@ tools.selection.name=Selection
 tools.placement.name=Placement
 
 
+# -- Decals --
+# decals.attribute
+# decals.description
+
+# Default
+decals.attribute.x=X
+decals.attribute.y=Y
+decals.attribute.scaleX=Scale X
+decals.attribute.scaleY=Scale Y
+decals.attribute.texture=Texture
+decals.description.x=X position of decal.
+decals.description.y=Y position of decal.
+decals.description.scaleX=Horizontal scale of decal.
+decals.description.scaleY=Vertical scale of decal.
+decals.description.texture=Texture path forof the decal.
+
+
 # -- Entities --
 # entities.entityName.name.*
 # entities.entityName.attribute.*
 # entities.entityName.description.*
+
+# Default
+entities.default.attribute.x=X
+entities.default.attribute.y=Y
+entities.default.attribute.width=Width
+entities.default.attribute.height=Height
+entities.default.attribute.nodes=Nodes
+entities.default.description.x=X position of entity.
+entities.default.description.y=Y position of entity.
+entities.default.description.width=Width of entity.
+entities.default.description.height=Height of entity.
+entities.default.description.nodes=Nodes for the entity.
 
 # Refill
 entities.refill.name.one_dash=Refill
@@ -146,9 +175,21 @@ entities.hanginglamp.name.hanging_lamp=Hanging Lamp
 
 
 # -- Triggers --
-# triggers.entityName.name.*
-# triggers.entityName.attribute.*
-# triggers.entityName.description.*
+# triggers.triggerName.name.*
+# triggers.triggerName.attribute.*
+# triggers.triggerName.description.*
+
+# Default
+triggers.default.attribute.x=X
+triggers.default.attribute.y=Y
+triggers.default.attribute.width=Width
+triggers.default.attribute.height=Height
+triggers.default.attribute.nodes=Nodes
+triggers.default.description.x=X position of trigger.
+triggers.default.description.y=Y position of trigger.
+triggers.default.description.width=Width of trigger.
+triggers.default.description.height=Height of trigger.
+triggers.default.description.nodes=Nodes for the trigger.
 
 # Alt Music
 triggers.altMusicTrigger.name.alt_music=Alt Music

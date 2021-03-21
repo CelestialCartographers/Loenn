@@ -625,7 +625,7 @@ function entities.languageData(layer, entity, language)
         return handler.languageData(entity)
 
     else
-        return language.entities[name]
+        return language.entities[name], language.entities.default
     end
 end
 
