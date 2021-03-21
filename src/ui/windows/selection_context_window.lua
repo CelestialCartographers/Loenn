@@ -57,9 +57,15 @@ end
 
 local function getItemLanguage(layer, item, language)
     local handler = layerHandlers.getHandler(layer)
-    local itemLanguage = handler.languageData and handler.languageData(layer, item, language) or language
 
-    return itemLanguage
+    if handler and handler.languageData then
+        local itemLanguage, fallbackLanguage = handler.languageData(layer, item, language)
+
+        return itemLanguage, fallbackLanguage or itemLanguage
+
+    else
+        return language, language
+    end
 end
 
 local function getLanguageKey(key, language, default)
@@ -118,17 +124,19 @@ function contextWindow.createContextMenu(selections)
     local fieldOrder = getItemFieldOrder(targetLayer, targetItem)
     local fieldIgnored = getItemIgnoredFields(targetLayer, targetItem)
 
-    local fieldLanguage = getItemLanguage(targetLayer, targetItem, language)
+    local fieldLanguage, fallbackLanguage = getItemLanguage(targetLayer, targetItem, language)
     local languageTooltips = fieldLanguage.description
     local languageAttributes = fieldLanguage.attribute
+    local fallbackTooltips = fallbackLanguage.description
+    local fallbackAttributes = fallbackLanguage.attribute
 
     for _, field in ipairs(fieldOrder) do
         local value = targetItem[field]
 
         if value ~= nil then
             local humanizedName = utils.humanizeVariableName(field)
-            local displayName = getLanguageKey(field, languageAttributes, humanizedName)
-            local tooltip = getLanguageKey(field, languageTooltips)
+            local displayName = getLanguageKey(field, languageAttributes, getLanguageKey(field, fallbackAttributes, humanizedName))
+            local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
 
             fieldsAdded[field] = true
             dummyData[field] = utils.deepcopy(value)
