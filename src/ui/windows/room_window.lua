@@ -17,6 +17,7 @@ local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
 local mapItemUtils = require("map_item_utils")
 local sceneHandler = require("scene_handler")
+local entityStruct = require("structs.entity")
 
 local roomWindow = {}
 
@@ -71,7 +72,45 @@ local structTilesNames = {
     {"tilesObj", objectTilesStruct}
 }
 
--- TODO - Handle checkpoint flag
+local function findFirstEntity(room, name)
+    for _, entity in ipairs(room.entities) do
+        if entity._name == name then
+            return entity
+        end
+    end
+end
+
+local function handleCheckpoint(room, hasCheckpoint)
+    if hasCheckpoint then
+        local existingCheckpoint = findFirstEntity(room, "checkpoint")
+
+        if not existingCheckpoint then
+            local player = findFirstEntity(room, "player")
+            local checkpoint = entityStruct.decode({
+                __name = "checkpoint",
+
+                x = player.x or 0,
+                y = player.y or 0,
+
+                allowOrigin = true
+            })
+
+            table.insert(room.entities, checkpoint)
+        end
+
+    else
+        local entities = room.entities
+
+        for i = #entities, 1, -1 do
+            local entity = entities[i]
+
+            if entity._name == "checkpoint" then
+                table.remove(entities, i)
+            end
+        end
+    end
+end
+
 local function saveRoomCallback(room, editing)
     return function(formFields)
         local newRoomData = form.getFormData(formFields)
@@ -94,6 +133,8 @@ local function saveRoomCallback(room, editing)
 
             roomStruct.directionalResize(targetRoom, "right", deltaWidth)
             roomStruct.directionalResize(targetRoom, "down", deltaHeight)
+
+            handleCheckpoint(targetRoom, newRoomData.checkpoint)
 
             local snapshot = snapshotUtils.roomSnapshot(targetRoom, "Edited room", before, utils.deepcopy(targetRoom))
 
@@ -121,6 +162,8 @@ local function saveRoomCallback(room, editing)
 
                 newRoom[target] = struct.resize(struct.decode(""), roomTilesWidth, roomTilesHeight)
             end
+
+            handleCheckpoint(newRoom, newRoomData.checkpoint)
 
             if map then
                 mapItemUtils.addItem(map, newRoom)
