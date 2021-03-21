@@ -83,9 +83,12 @@ local function getLayerItems(toolName)
     local layers = toolHandler.getLayers(toolName) or {}
     local layerItems = {}
 
+    local layersNames = language.layers.name
+    local layersDescriptions = language.layers.description
+
     for _, layer in ipairs(layers) do
-        local displayName = getLanguageOrDefault(language.layers[layer].name, layer)
-        local tooltipText = getLanguageOrDefault(language.layers[layer].description)
+        local displayName = getLanguageOrDefault(layersNames[layer], layer)
+        local tooltipText = getLanguageOrDefault(layersDescriptions[layer])
 
         local item = uiElements.listItem({
             text = displayName,
@@ -188,9 +191,12 @@ local function getToolItems(sortItems)
     local tools = toolHandler.tools
     local toolItems = {}
 
+    local toolNames = language.tools.name
+    local toolDescriptions = language.tools.description
+
     for name, tool in pairs(tools) do
-        local displayName = getLanguageOrDefault(language.tools[name].name, name)
-        local tooltipText = getLanguageOrDefault(language.tools[name].description)
+        local displayName = getLanguageOrDefault(toolNames[name], name)
+        local tooltipText = getLanguageOrDefault(toolDescriptions[name])
 
         local item = uiElements.listItem({
             text = displayName,

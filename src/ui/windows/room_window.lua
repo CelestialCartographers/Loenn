@@ -222,10 +222,13 @@ function roomWindow.createRoomWindow(room, editing)
 
     local fieldInformation = {}
 
+    local roomAttributes = language.room.attribute
+    local roomDescriptions = language.room.description
+
     for _, field in ipairs(fieldOrder) do
         fieldInformation[field] = {
-            displayName = tostring(language.room[field].name),
-            tooltipText = tostring(language.room[field].description)
+            displayName = tostring(roomAttributes[field]),
+            tooltipText = tostring(roomDescriptions[field])
         }
     end
 
