@@ -433,7 +433,7 @@ function triggers.languageData(layer, entity, language)
         return handler.languageData(entity)
 
     else
-        return language.triggers[name]
+        return language.triggers[name], language.triggers.default
     end
 end
 

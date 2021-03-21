@@ -7,39 +7,68 @@ scenes.loading.loading=Loading
 
 
 # -- Layers --
-# layers.layerName.name
-# layers.layerName.description
-layers.tilesFg.name=Foreground Tiles
-layers.tilesBg.name=Background Tiles
-layers.decalsFg.name=Foreground Decals
-layers.decalsBg.name=Background Decals
-layers.entities.name=Entities
-layers.triggers.name=Triggers
+# layers.name.layerName
+# layers.description.layerName
+layers.name.tilesFg=Foreground Tiles
+layers.name.tilesBg=Background Tiles
+layers.name.decalsFg=Foreground Decals
+layers.name.decalsBg=Background Decals
+layers.name.entities=Entities
+layers.name.triggers=Triggers
 
 
 # -- Tools --
-# tools.toolName.name
-# tools.toolName.description
-# tools.toolName.mode.modeName.name
-# tools.toolName.mode.modeName.description
-tools.brush.name=Brush
+# tools.name.toolName
+# tools.description.toolName
+# tools.toolName.mode.name.modeName
+# tools.toolName.mode.description.modeName
+tools.name.brush=Brush
 
-tools.rectangle.name=Rectangle
+tools.name.rectangle=Rectangle
 
-tools.rectangle.modes.fill.name=Fill
-tools.rectangle.modes.fill.description=Fills the whole selected area.
-tools.rectangle.modes.line.name=Line
-tools.rectangle.modes.line.description=Fills only the border of the selected area.
+tools.rectangle.modes.name.fill=Fill
+tools.rectangle.modes.description.fill=Fills the whole selected area.
+tools.rectangle.modes.name.line=Line
+tools.rectangle.modes.description.line=Fills only the border of the selected area.
 
-tools.selection.name=Selection
+tools.name.selection=Selection
 
-tools.placement.name=Placement
+tools.name.placement=Placement
+
+
+# -- Decals --
+# decals.attribute
+# decals.description
+
+# Default
+decals.attribute.x=X
+decals.attribute.y=Y
+decals.attribute.scaleX=Scale X
+decals.attribute.scaleY=Scale Y
+decals.attribute.texture=Texture
+decals.description.x=X position of decal.
+decals.description.y=Y position of decal.
+decals.description.scaleX=Horizontal scale of decal.
+decals.description.scaleY=Vertical scale of decal.
+decals.description.texture=Texture path forof the decal.
 
 
 # -- Entities --
 # entities.entityName.name.*
 # entities.entityName.attribute.*
 # entities.entityName.description.*
+
+# Default
+entities.default.attribute.x=X
+entities.default.attribute.y=Y
+entities.default.attribute.width=Width
+entities.default.attribute.height=Height
+entities.default.attribute.nodes=Nodes
+entities.default.description.x=X position of entity.
+entities.default.description.y=Y position of entity.
+entities.default.description.width=Width of entity.
+entities.default.description.height=Height of entity.
+entities.default.description.nodes=Nodes for the entity.
 
 # Refill
 entities.refill.name.one_dash=Refill
@@ -146,9 +175,21 @@ entities.hanginglamp.name.hanging_lamp=Hanging Lamp
 
 
 # -- Triggers --
-# triggers.entityName.name.*
-# triggers.entityName.attribute.*
-# triggers.entityName.description.*
+# triggers.triggerName.name.*
+# triggers.triggerName.attribute.*
+# triggers.triggerName.description.*
+
+# Default
+triggers.default.attribute.x=X
+triggers.default.attribute.y=Y
+triggers.default.attribute.width=Width
+triggers.default.attribute.height=Height
+triggers.default.attribute.nodes=Nodes
+triggers.default.description.x=X position of trigger.
+triggers.default.description.y=Y position of trigger.
+triggers.default.description.width=Width of trigger.
+triggers.default.description.height=Height of trigger.
+triggers.default.description.nodes=Nodes for the trigger.
 
 # Alt Music
 triggers.altMusicTrigger.name.alt_music=Alt Music
@@ -276,55 +317,55 @@ mods.everest.name=Everest
 
 
 # -- Room --
-# room.Attribute.name=Tooltip
-# room.Attribute.description=Tooltip
+# room.attribute.Attribute=Attribute Display Name
+# room.description.Attribute=Tooltip
 
-room.name.name=Room Name
-room.musicProgress.name=Music Progress
-room.ambienceProgress.name=Ambience Progress
-room.x.name=X
-room.y.name=Y
-room.width.name=Width
-room.height.name=Height
-room.underwater.name=Underwater
-room.space.name=Space
-room.disableDownTransition.name=Disable Down Transition
-room.checkpoint.name=Checkpoint
-room.dark.name=Dark
-room.whisper.name=Whisper
-room.musicLayer1.name=Music Layer 1
-room.musicLayer2.name=Music Layer 2
-room.musicLayer3.name=Music Layer 3
-room.musicLayer4.name=Music Layer 4
-room.delayAltMusicFade.name=Delay Alternative Music Fade
-room.music.name=Music
-room.altMusic.name=Alternative Music
-room.windPattern.name=Wind Pattern
-room.color.name=Colour
-room.cameraOffsetX.name=Camera Offset X
-room.cameraOffsetY.name=Camera Offset Y
+room.attribute.name=Room Name
+room.attribute.musicProgress=Music Progress
+room.attribute.ambienceProgress=Ambience Progress
+room.attribute.x=X
+room.attribute.y=Y
+room.attribute.width=Width
+room.attribute.height=Height
+room.attribute.underwater=Underwater
+room.attribute.space=Space
+room.attribute.disableDownTransition=Disable Down Transition
+room.attribute.checkpoint=Checkpoint
+room.attribute.dark=Dark
+room.attribute.whisper=Whisper
+room.attribute.musicLayer1=Music Layer 1
+room.attribute.musicLayer2=Music Layer 2
+room.attribute.musicLayer3=Music Layer 3
+room.attribute.musicLayer4=Music Layer 4
+room.attribute.delayAltMusicFade=Delay Alternative Music Fade
+room.attribute.music=Music
+room.attribute.altMusic=Alternative Music
+room.attribute.windPattern=Wind Pattern
+room.attribute.color=Colour
+room.attribute.cameraOffsetX=Camera Offset X
+room.attribute.cameraOffsetY=Camera Offset Y
 
-room.name.description=The name of the room.
-room.musicProgress.description=The progress of the current song.
-room.ambienceProgress.description=The progress of the current ambience track.
-room.x.description=The x coordinate of the room.
-room.y.description=The y coordinate of the room.
-room.width.description=The width of the room.
-room.height.description=The height of the room.
-room.underwater.description=Whether the room is submerged in water.
-room.space.description=Whether the room is in space (end of Core).
-room.disableDownTransition.description=Whether the player is allowed to transition downwards or not.
-room.checkpoint.description=Whether the room has a checkpoint.
-room.dark.description=Whether the room is dark.
-room.whisper.description=Whether the room has the whisper layer enabled.
-room.musicLayer1.description=Whether the room has the first music layer enabled.
-room.musicLayer2.description=Whether the room has the second music layer enabled.
-room.musicLayer3.description=Whether the room has the third music layer enabled.
-room.musicLayer4.description=Whether the room has the fourth music layer enabled.
-room.delayAltMusicFade.description=Delay the alternative music fade.
-room.music.description=What song should be playing in the room, uses previous if left empty.
-room.altMusic.description=What alternative song should be playing. It is unsure what this means, as it seems to not be hooked up in the game anymore.
-room.windPattern.description=The type of wind in the room.
-room.color.description=The colour of the room in the debug map viewer.
-room.cameraOffsetX.description=Global horizontal offset of camera in room.
-room.cameraOffsetY.description=Global vertical offset of camera in room.
+room.description.name=The name of the room.
+room.description.musicProgress=The progress of the current song.
+room.description.ambienceProgress=The progress of the current ambience track.
+room.description.x=The x coordinate of the room.
+room.description.y=The y coordinate of the room.
+room.description.width=The width of the room.
+room.description.height=The height of the room.
+room.description.underwater=Whether the room is submerged in water.
+room.description.space=Whether the room is in space (end of Core).
+room.description.disableDownTransition=Whether the player is allowed to transition downwards or not.
+room.description.checkpoint=Whether the room has a checkpoint.
+room.description.dark=Whether the room is dark.
+room.description.whisper=Whether the room has the whisper layer enabled.
+room.description.musicLayer1=Whether the room has the first music layer enabled.
+room.description.musicLayer2=Whether the room has the second music layer enabled.
+room.description.musicLayer3=Whether the room has the third music layer enabled.
+room.description.musicLayer4=Whether the room has the fourth music layer enabled.
+room.description.delayAltMusicFade=Delay the alternative music fade.
+room.description.music=What song should be playing in the room, uses previous if left empty.
+room.description.altMusic=What alternative song should be playing. It is unsure what this means, as it seems to not be hooked up in the game anymore.
+room.description.windPattern=The type of wind in the room.
+room.description.color=The colour of the room in the debug map viewer.
+room.description.cameraOffsetX=Global horizontal offset of camera in room.
+room.description.cameraOffsetY=Global vertical offset of camera in room.
