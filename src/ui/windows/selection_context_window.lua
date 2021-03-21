@@ -11,6 +11,7 @@ local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local viewportHandler = require("viewport_handler")
 local layerHandlers = require("layer_handlers")
+local toolUtils = require("tool_utils")
 
 local contextWindow = {}
 
@@ -69,9 +70,29 @@ local function getLanguageKey(key, language, default)
     return default
 end
 
+-- TODO - Add history support
 local function saveChangesCallback(selections)
-    return function(data)
-        -- TODO - Make history snapshot and apply data
+    return function(formFields)
+        local redraw = {}
+        local newData = form.getFormData(formFields)
+        local room = loadedState.getSelectedRoom()
+
+        for _, selection in ipairs(selections) do
+            local layer = selection.layer
+            local item = selection.item
+
+            for k, v in pairs(newData) do
+                item[k] = v
+            end
+
+            redraw[layer] = true
+        end
+
+        if room then
+            for layer, _ in pairs(redraw) do
+                toolUtils.redrawTargetLayer(room, layer)
+            end
+        end
     end
 end
 
