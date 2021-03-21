@@ -101,7 +101,7 @@ function selectionUtils.getContextSelections(room, layer, x, y, selections)
             end
 
             if hoveringFromSelections then
-                previewTargets = utils.deepcopy(selections)
+                previewTargets = table.shallowcopy(selections)
             end
 
         else
