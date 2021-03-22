@@ -1,7 +1,9 @@
 local nodeStruct = {}
 
 function nodeStruct.decodeNodes(children)
-    local res = {}
+    local res = {
+        _type = "nodes"
+    }
 
     for i, data in ipairs(children or {}) do
         local node = nodeStruct.decode(data)

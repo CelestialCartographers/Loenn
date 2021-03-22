@@ -588,7 +588,7 @@ function entities.ignoredFields(layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler and handler.ignoredFields then
-        return handler.ignoredFields(entity)
+        return utils.callIfFunction(handler.ignoredFields, entity)
 
     else
         return {"_name", "_id", "originX", "originY"}
@@ -600,7 +600,7 @@ function entities.fieldOrder(layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler and handler.fieldOrder then
-        return handler.fieldOrder(entity)
+        return utils.callIfFunction(handler.fieldOrder, entity)
 
     else
         local fields = {"x", "y"}
@@ -614,6 +614,18 @@ function entities.fieldOrder(layer, entity)
         end
 
         return fields
+    end
+end
+
+function entities.fieldInformation(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.fieldInformation then
+        return utils.callIfFunction(handler.fieldInformation, entity)
+
+    else
+        return {}
     end
 end
 
