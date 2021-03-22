@@ -52,7 +52,14 @@ local function getItemFieldOrder(layer, item)
     local handler = layerHandlers.getHandler(layer)
     local fieldOrder = handler.fieldOrder and handler.fieldOrder(layer, item) or {}
 
-    return fieldOrder
+    return utils.deepcopy(fieldOrder)
+end
+
+local function getItemFieldInformation(layer, item)
+    local handler = layerHandlers.getHandler(layer)
+    local fieldInformation = handler.fieldInformation and handler.fieldInformation(layer, item) or {}
+
+    return utils.deepcopy(fieldInformation)
 end
 
 local function getItemLanguage(layer, item, language)
@@ -77,7 +84,7 @@ local function getLanguageKey(key, language, default)
 end
 
 -- TODO - Add history support
-local function saveChangesCallback(selections)
+function contextWindow.saveChangesCallback(selections)
     return function(formFields)
         local redraw = {}
         local newData = form.getFormData(formFields)
@@ -102,6 +109,62 @@ local function saveChangesCallback(selections)
     end
 end
 
+function contextWindow.prepareFormData(layer, item, language)
+    local dummyData = {}
+
+    local fieldsAdded = {}
+    local fieldInformation = getItemFieldInformation(layer, item)
+    local fieldOrder = getItemFieldOrder(layer, item)
+    local fieldIgnored = getItemIgnoredFields(layer, item)
+
+    local fieldLanguage, fallbackLanguage = getItemLanguage(layer, item, language)
+    local languageTooltips = fieldLanguage.description
+    local languageAttributes = fieldLanguage.attribute
+    local fallbackTooltips = fallbackLanguage.description
+    local fallbackAttributes = fallbackLanguage.attribute
+
+    for _, field in ipairs(fieldOrder) do
+        local value = item[field]
+
+        if value ~= nil then
+            local humanizedName = utils.humanizeVariableName(field)
+            local displayName = getLanguageKey(field, languageAttributes, getLanguageKey(field, fallbackAttributes, humanizedName))
+            local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
+
+            if not fieldInformation[field] then
+                fieldInformation[field] = {}
+            end
+
+            fieldsAdded[field] = true
+            dummyData[field] = utils.deepcopy(value)
+            fieldInformation[field].displayName = displayName
+            fieldInformation[field].tooltipText = tooltip
+        end
+    end
+
+    for field, value in pairs(item) do
+        -- Some fields should not be exposed automatically
+        -- Any fields already added should not be added again
+        if not globallyFilteredKeys[field] and not fieldIgnored[field] and not fieldsAdded[field] then
+            local humanizedName = utils.humanizeVariableName(field)
+            local displayName = getLanguageKey(field, languageAttributes, humanizedName)
+            local tooltip = getLanguageKey(field, languageTooltips)
+
+            table.insert(fieldOrder, field)
+
+            if not fieldInformation[field] then
+                fieldInformation[field] = {}
+            end
+
+            dummyData[field] = utils.deepcopy(value)
+            fieldInformation[field].displayName = displayName
+            fieldInformation[field].tooltipText = tooltip
+        end
+    end
+
+    return dummyData, fieldInformation, fieldOrder
+end
+
 function contextWindow.createContextMenu(selections)
     local targetSelection = selections[1]
     local targetItem = targetSelection.item
@@ -117,59 +180,12 @@ function contextWindow.createContextMenu(selections)
         windowX, windowY = 0, 0
     end
 
-    local dummyData = {}
-
-    local fieldInformation = {}
-    local fieldsAdded = {}
-    local fieldOrder = getItemFieldOrder(targetLayer, targetItem)
-    local fieldIgnored = getItemIgnoredFields(targetLayer, targetItem)
-
-    local fieldLanguage, fallbackLanguage = getItemLanguage(targetLayer, targetItem, language)
-    local languageTooltips = fieldLanguage.description
-    local languageAttributes = fieldLanguage.attribute
-    local fallbackTooltips = fallbackLanguage.description
-    local fallbackAttributes = fallbackLanguage.attribute
-
-    for _, field in ipairs(fieldOrder) do
-        local value = targetItem[field]
-
-        if value ~= nil then
-            local humanizedName = utils.humanizeVariableName(field)
-            local displayName = getLanguageKey(field, languageAttributes, getLanguageKey(field, fallbackAttributes, humanizedName))
-            local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
-
-            fieldsAdded[field] = true
-            dummyData[field] = utils.deepcopy(value)
-            fieldInformation[field] = {
-                displayName = displayName,
-                tooltipText = tooltip
-            }
-        end
-    end
-
-    for field, value in pairs(targetItem) do
-        -- Some fields should not be exposed automatically
-        -- Any fields already added should not be added again
-        if not globallyFilteredKeys[field] and not fieldIgnored[field] and not fieldsAdded[field] then
-            local humanizedName = utils.humanizeVariableName(field)
-            local displayName = getLanguageKey(field, languageAttributes, humanizedName)
-            local tooltip = getLanguageKey(field, languageTooltips)
-
-            table.insert(fieldOrder, field)
-
-            dummyData[field] = utils.deepcopy(value)
-            fieldInformation[field] = {
-                displayName = displayName,
-                tooltipText = tooltip
-            }
-        end
-    end
-
+    local dummyData, fieldInformation, fieldOrder = contextWindow.prepareFormData(targetLayer, targetItem, language)
     local buttons = {
         {
             text = tostring(language.ui.room_window.save_changes),
             formMustBeValid = true,
-            callback = saveChangesCallback(selections)
+            callback = contextWindow.saveChangesCallback(selections)
         },
         {
             text = tostring(language.ui.room_window.close_window),
@@ -188,12 +204,12 @@ function contextWindow.createContextMenu(selections)
     }
 
     local windowTitle = tostring(language.ui.selection_context_window.title)
-    local roomForm = form.getForm(buttons, dummyData, {
+    local selectionForm = form.getForm(buttons, dummyData, {
         fields = fieldInformation,
         fieldOrder = fieldOrder
     })
 
-    window = uiElements.window(windowTitle, roomForm):with({
+    window = uiElements.window(windowTitle, selectionForm):with({
         x = windowX,
         y = windowY,
 
