@@ -277,9 +277,7 @@ function roomWindow.createRoomWindow(room, editing)
     })
 
     table.insert(activeWindows, window)
-    table.insert(roomWindowGroup.parent.children, window)
-
-    roomWindowGroup.parent:reflow()
+    roomWindowGroup.parent:addChild(window)
 
     return window
 end

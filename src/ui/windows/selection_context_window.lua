@@ -219,9 +219,7 @@ function contextWindow.createContextMenu(selections)
     })
 
     table.insert(activeWindows, window)
-    table.insert(contextGroup.parent.children, window)
-
-    contextGroup.parent:reflow()
+    contextGroup.parent:addChild(window)
 
     return window
 end
