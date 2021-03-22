@@ -617,6 +617,18 @@ function entities.fieldOrder(layer, entity)
     end
 end
 
+function entities.fieldInformation(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.fieldInformation then
+        return handler.fieldInformation(entity)
+
+    else
+        return {}
+    end
+end
+
 function entities.languageData(layer, entity, language)
     local name = entity._name
     local handler = entities.registeredEntities[name]

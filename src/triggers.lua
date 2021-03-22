@@ -425,6 +425,18 @@ function triggers.fieldOrder(layer, entity)
     end
 end
 
+function triggers.fieldInformation(layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.fieldInformation then
+        return handler.fieldInformation(trigger)
+
+    else
+        return {}
+    end
+end
+
 function triggers.languageData(layer, entity, language)
     local name = entity._name
     local handler = triggers.registeredTriggers[name]
