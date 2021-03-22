@@ -29,6 +29,10 @@ function roomNameField._MT.__index:fieldValid()
     local editedRoom = self.options.editedRoom
     local currentName = self.currentValue
 
+    if not currentName or currentName == "" then
+        return false
+    end
+
     if loadedState.map then
         for _, room in ipairs(loadedState.map.rooms) do
             if room.name == currentName and editedRoom ~= currentName then
