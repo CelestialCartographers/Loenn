@@ -280,6 +280,14 @@ function utils.typeof(value)
     end
 end
 
+function utils.isInteger(value)
+    if type(value) == "number" then
+        return value % 1 == 0
+    end
+
+    return false
+end
+
 function utils.group(t, by)
     local res = {}
 
