@@ -29,7 +29,7 @@ local roomWindowGroup = uiElements.group({})
 local minimumRoomWidth = 320
 local minimumRoomHeight = 184
 
-local fieldOrder = {
+local defaultFieldOrder = {
     "name", "color",
     "x", "y",
     "width", "height",
@@ -39,6 +39,33 @@ local fieldOrder = {
     "musicLayer1", "musicLayer2", "musicLayer3", "musicLayer4",
     "ambienceProgress", "musicProgress",
     "music",
+}
+
+local defaultFieldInformation = {
+    x = {
+        fieldType = "integer"
+    },
+    y = {
+        fieldType = "integer"
+    },
+
+    width = {
+        fieldType = "integer"
+    },
+    height = {
+        fieldType = "integer"
+    },
+
+    color = {
+        fieldType = "integer"
+    },
+
+    musicProgress = {
+        fieldType = "string"
+    },
+    ambienceProgress = {
+        fieldType = "string"
+    }
 }
 
 local fieldTypes = {
@@ -196,7 +223,7 @@ function roomWindow.createRoomWindow(room, editing)
         local currentRoom = loadedState.getSelectedRoom()
 
         if currentRoom then
-            for _, attribute in ipairs(fieldOrder) do
+            for _, attribute in ipairs(defaultFieldOrder) do
                 room[attribute] = currentRoom[attribute]
             end
         end
@@ -220,16 +247,18 @@ function roomWindow.createRoomWindow(room, editing)
         windowX, windowY = 0, 0
     end
 
-    local fieldInformation = {}
+    local fieldInformation = utils.deepcopy(defaultFieldInformation)
 
     local roomAttributes = language.room.attribute
     local roomDescriptions = language.room.description
 
-    for _, field in ipairs(fieldOrder) do
-        fieldInformation[field] = {
-            displayName = tostring(roomAttributes[field]),
-            tooltipText = tostring(roomDescriptions[field])
-        }
+    for _, field in ipairs(defaultFieldOrder) do
+        if not fieldInformation[field] then
+            fieldInformation[field] = {}
+        end
+
+        fieldInformation[field].displayName = tostring(roomAttributes[field])
+        fieldInformation[field].tooltipText = tostring(roomDescriptions[field])
     end
 
     for field, fieldType in pairs(fieldTypes) do
@@ -263,7 +292,7 @@ function roomWindow.createRoomWindow(room, editing)
 
     local roomForm = form.getForm(buttons, room, {
         fields = fieldInformation,
-        fieldOrder = fieldOrder,
+        fieldOrder = defaultFieldOrder,
         ignoreUnordered = true
     })
 
