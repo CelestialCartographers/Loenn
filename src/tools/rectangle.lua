@@ -197,10 +197,12 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     if love.mouse.isDown(actionButton) then
         local room = state.getSelectedRoom()
 
-        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
-        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
+        if room then
+            local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+            local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
-        dragX, dragY = tx, ty
+            dragX, dragY = tx, ty
+        end
     end
 end
 
@@ -212,11 +214,13 @@ function tool.mousepressed(x, y, button, istouch, pressed)
 
         local room = state.getSelectedRoom()
 
-        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
-        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
+        if room then
+            local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+            local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
-        startX, startY = tx, ty
-        dragX, dragY = tx, ty
+            startX, startY = tx, ty
+            dragX, dragY = tx, ty
+        end
     end
 end
 
