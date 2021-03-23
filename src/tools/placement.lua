@@ -88,11 +88,14 @@ end
 
 local function dragFinished()
     local room = state.getSelectedRoom()
-    local placementType = getCurrentPlacementType()
 
-    if placementType == "rectangle" or placementType == "line" then
-        placeItemWithHistory(room)
-        toolUtils.redrawTargetLayer(room, tool.layer)
+    if room then
+        local placementType = getCurrentPlacementType()
+
+        if placementType == "rectangle" or placementType == "line" then
+            placeItemWithHistory(room)
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
     end
 
     placementDragCompleted = true
@@ -105,11 +108,14 @@ end
 
 local function placePointPlacement()
     local room = state.getSelectedRoom()
-    local placementType = getCurrentPlacementType()
 
-    if placementType == "point" then
-        placeItemWithHistory(room)
-        toolUtils.redrawTargetLayer(room, tool.layer)
+    if room then
+        local placementType = getCurrentPlacementType()
+
+        if placementType == "point" then
+            placeItemWithHistory(room)
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
     end
 end
 
