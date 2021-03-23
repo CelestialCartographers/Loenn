@@ -54,6 +54,7 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
                 self._lastBatch = love.graphics.newSpriteBatch(targetImage, spriteBatchSize, spriteBatchMode)
                 self._batchTarget = targetImage
                 self._imagesCurrentBatch = 0
+                self._lastColor = nil
 
                 table.insert(self._drawables, self._lastBatch)
             end
@@ -66,7 +67,7 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
                     self._lastBatch:setColor(r, g, b, a)
 
                 else
-                    self._lastBatch:setColor()
+                    self._lastBatch:setColor(1.0, 1.0, 1.0, 1.0)
                 end
             end
 
