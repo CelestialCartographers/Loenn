@@ -248,6 +248,13 @@ function toolWindow.getWindow()
     local scrolledToolList, toolList = listWidgets.getList(toolCallback, toolItems)
     local scrolledModeList, modeList = listWidgets.getList(modeCallback, modeItems)
 
+    -- Make sure lists are visually updated
+    -- This does some extra logic to hide the lists if they are empty
+    ui.runLate(function()
+        updateLayerList()
+        updateToolModeList()
+    end)
+
     toolWindow.toolList = toolList
     toolWindow.layerList = layerList
     toolWindow.materialList = materialList
