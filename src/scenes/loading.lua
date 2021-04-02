@@ -45,6 +45,8 @@ function loadingScene:firstEnter()
     local fileLocations = require("file_locations")
     local viewerState = require("loaded_state")
 
+    local userInterfaceDevice = require("ui.ui_device")
+
     -- Load internal language first
     -- External language files aren't needed during loading
     languageRegistry.loadInternalFiles()
@@ -74,6 +76,10 @@ function loadingScene:firstEnter()
             languageRegistry.loadExternalFiles()
 
             atlases.loadCelesteAtlases()
+
+            if userInterfaceDevice.initializeDevice then
+                userInterfaceDevice.initializeDevice()
+            end
 
             -- This can take a while depending on the amount of installed mods
             -- By default it is lazy loaded

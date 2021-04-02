@@ -621,12 +621,31 @@ function entities.fieldInformation(layer, entity)
     local name = entity._name
     local handler = entities.registeredEntities[name]
 
-    if handler and handler.fieldInformation then
-        return utils.callIfFunction(handler.fieldInformation, entity)
+    local fieldInfo = {
+        x = {
+            fieldType = "integer",
+        },
+        y = {
+            fieldType = "integer",
+        },
 
-    else
-        return {}
+        width = {
+            fieldType = "integer"
+        },
+        height = {
+            fieldType = "integer"
+        }
+    }
+
+    if handler and handler.fieldInformation then
+        local customFieldInformation = utils.callIfFunction(handler.fieldInformation, entity)
+
+        for k, v in pairs(customFieldInformation) do
+            fieldInfo[k] = v
+        end
     end
+
+    return fieldInfo
 end
 
 function entities.languageData(layer, entity, language)

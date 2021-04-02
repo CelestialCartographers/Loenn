@@ -429,11 +429,28 @@ function triggers.fieldInformation(layer, trigger)
     local name = trigger._name
     local handler = triggers.registeredTriggers[name]
 
-    if handler and handler.fieldInformation then
-        return utils.callIfFunction(handler.fieldInformation, trigger)
+    local fieldInfo = {
+        x = {
+            fieldType = "integer",
+        },
+        y = {
+            fieldType = "integer",
+        },
 
-    else
-        return {}
+        width = {
+            fieldType = "integer"
+        },
+        height = {
+            fieldType = "integer"
+        }
+    }
+
+    if handler and handler.fieldInformation then
+        local customFieldInformation = utils.callIfFunction(handler.fieldInformation, trigger)
+
+        for k, v in pairs(customFieldInformation) do
+            fieldInfo[k] = v
+        end
     end
 end
 

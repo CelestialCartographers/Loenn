@@ -10,7 +10,7 @@ function mapStruct.decode(data)
         _type = "map"
     }
 
-    map.package = data._package
+    map.package = data._package or ""
 
     map.rooms = {}
     map.fillers = {}
