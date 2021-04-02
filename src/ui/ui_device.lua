@@ -34,15 +34,17 @@ function debugUtils.reloadUI()
     windows.restoreWindowPositions()
 end
 
-forms.loadInternalFieldTypes()
-forms.loadExternalFieldTypes()
+function ui.initializeDevice()
+    forms.loadInternalFieldTypes()
+    forms.loadExternalFieldTypes()
 
-windows.loadInternalWindows()
-windows.loadExternalWindows()
+    windows.loadInternalWindows()
+    windows.loadExternalWindows()
 
-local uiRootElement = uiRoot.getRootElement(windows.getLoadedWindows())
+    local uiRootElement = uiRoot.getRootElement(windows.getLoadedWindows())
 
-ui.init(uiRootElement, false)
-ui.features.eventProxies = true
+    ui.init(uiRootElement, false)
+    ui.features.eventProxies = true
+end
 
 return ui
