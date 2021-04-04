@@ -202,6 +202,9 @@ entities.dreamBlock.description.fastMoving=Changes the dream block between two s
 entities.dreamBlock.description.oneUse=Determines whether the dream block should disappear after one use.
 entities.dreamBlock.description.below=Determines whether the dream block should render in the background or foreground.
 
+# Bumper
+entities.bigSpinner.name.bumper=Bumper
+
 # Floating Debris
 entities.floatingDebris.name.floating_debris=Floating Debris
 
@@ -402,6 +405,9 @@ entities.dashBlock.description.permanent=Once broken, the block will remain that
 # Exit Block
 entities.exitBlock.description.tileType=Determines the visual appearance of the wall.
 entities.exitBlock.description.playTransitionReveal=Determines whether revealing the block should play the reveal jingle.
+
+# Cassette
+entities.cassette.name.cassette=Cassette
 
 # Cassette Block
 entities.cassetteBlock.description.index=The colour of the cassette block.
