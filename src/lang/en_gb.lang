@@ -449,6 +449,9 @@ entities.everest/customBirdTutorial.description.onlyOnce=Whether the bird should
 entities.introCar.description.hasRoadAndBarriers=Determines whether the car should come with road and barriers.
 
 # Core Mode Toggle
+entities.coreModeToggle.name.both=Core Mode Toggle (Both)
+entities.coreModeToggle.name.fire=Core Mode Toggle (Fire)
+entities.coreModeToggle.name.ice=Core Mode Toggle (Ice)
 entities.coreModeToggle.description.onlyIce=Whether the switch can only turn the core mode to ice.
 entities.coreModeToggle.description.onlyFire=Whether the switch can only turn the core mode to fire.
 entities.coreModeToggle.description.persistent=Whether the core mode persists after death instead of resetting to initial room entry state.
