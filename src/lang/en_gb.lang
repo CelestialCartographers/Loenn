@@ -209,6 +209,7 @@ entities.floatingDebris.name.floating_debris=Floating Debris
 entities.hanginglamp.name.hanging_lamp=Hanging Lamp
 
 # Badeline Boost
+entities.badelineBoost.name.boost=Badeline Boost
 entities.badelineBoost.description.lockCamera=Upon activation, the camera cannot pan away from the entity.
 entities.badelineBoost.description.canSkip=Badeline will skip to the next position if the player is too far to the right of the current one  (100 pixels).
 entities.badelineBoost.description.finalCh9Boost=Whether this boost should be able to end the level, transporting the player to room "end-granny". If the player has a golden berry, and this isn't a golden boost, they are transported to the golden room "end-golden" instead.\nRequires a Blackhole in the background, does not work if it is in the foreground.
@@ -216,6 +217,7 @@ entities.badelineBoost.description.finalCh9GoldenBoost=Used to indicate that we 
 entities.badelineBoost.description.finalCh9Dialog=If finalCh9Boost is also set and doesn't go to golden room, this will trigger the Farewell ending dialog.
 
 # Badeline Boss
+entities.finalBoss.name.boss=Badeline Boss
 entities.finalBoss.description.startHit=Determines whether or not Badeline waits to attack until the first hit or upon room entry.
 entities.finalBoss.description.patternIndex=Determines what pattern of attack Badeline uses.\n 0 - Badeline transforms into the boss after being hit once\n 1 - Shoots orbs\n 2 - Shoots laser followed by one orb\n 3 - Shoots five streams of two orbs\n 4 - Shoots five streams of two orbs followed by one laser\n 5 - Shoots laser followed by three streams of two orbs\n 6 - Shoots lasers\n 7 - Shoots orbs with less delay\n 8 - Shoots lasers with less delay\n 9 - Shoots streams of two orbs\n 10 - Does nothing\n 11 - Shoots orbs with more delay\n 12 - Does nothing\n 13 - Shoots orbs after getting hit once\n 14 - Shoots lasers with very short delay\n 15 - Shoots lasers with more delay
 entities.finalBoss.description.cameraLockY=Whether the camera should be locked vertically, functioning similarly as a killbox.
