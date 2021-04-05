@@ -348,6 +348,7 @@ entities.everest/memorial.description.sprite=What sprite to render for the memor
 entities.everest/memorial.description.spacing=The spacing for the letters.
 
 # Water
+entities.water.name.water=Water
 entities.water.description.hasBottom=Determines whether or not the water has a bottom.
 
 # NPC
