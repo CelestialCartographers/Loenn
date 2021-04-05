@@ -226,6 +226,7 @@ entities.finalBoss.description.patternIndex=Determines what pattern of attack Ba
 entities.finalBoss.description.cameraLockY=Whether the camera should be locked vertically, functioning similarly as a killbox.
 
 # Fire Ball
+entities.fireBall.name.fireball=Fireball
 entities.fireBall.description.amount=Determines the amount of fireballs on a track.
 entities.fireBall.description.offset=Determines how far into the path the fireball starts.
 entities.fireBall.description.speed=Determines how fast a fireball reaches the end of the track.
