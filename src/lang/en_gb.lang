@@ -232,6 +232,15 @@ entities.fireBall.description.offset=Determines how far into the path the fireba
 entities.fireBall.description.speed=Determines how fast a fireball reaches the end of the track.
 entities.fireBall.description.notCoreMode=Determines whether the fireball should ignore the current core mode and default to ice variant.
 
+# Fire Barrier
+entities.fireBarrier.name.fire_barrier=Fire Barrier
+
+# Ice Block
+entities.iceBlock.name.ice_block=Ice Block
+
+# Nega Block
+entities.negaBlock.name.nega_block=Nega Block
+
 # Tentacles
 entities.tentacles.description.slide_until=Changes how far tentacles fall back when Madeline comes into fear distance.
 entities.tentacles.description.fear_distance=Determines the distance Madeline has to be at for the tentacles to fall back.
