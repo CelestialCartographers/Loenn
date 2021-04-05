@@ -1,23 +1,23 @@
-local badelineBoost = {}
+local badelineBoss = {}
 
-badelineBoost.name = "badelineBoost"
-badelineBoost.depth = -1000000
-badelineBoost.nodeLineRenderType = "line"
-badelineBoost.texture = "objects/badelineboost/idle00"
+badelineBoss.name = "finalBoss"
+badelineBoss.depth = 0
+badelineBoss.nodeLineRenderType = "line"
+badelineBoss.texture = "characters/badelineBoss/charge00"
 
-badelineBoost.placements = {
-    name = "boost",
+badelineBoss.placements = {
+    name = "boss",
     data = {
-        lockCamera = true,
-        canSkip = false,
-        finalCh9Boost = false,
-        finalCh9GoldenBoost = false,
-        finalCh9Dialog = false
+        patternIndex = 1,
+        startHit = false,
+        cameraPastY = 120,
+        cameraLockY = true,
+        canChangeMusic = true
     }
 }
 
-function badelineBoost.nodeLimits(room, entity)
+function badelineBoss.nodeLimits(room, entity)
     return 0, -1
 end
 
-return badelineBoost
+return badelineBoss
