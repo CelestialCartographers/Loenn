@@ -280,8 +280,8 @@ local function pasteItems(room, layer, previews)
 
         local tlx, tly, brx, bry = getPreviewsCorners(previews)
         local width, height = brx - tlx, bry - tly
-        local widthOffset = pasteCentered and width / 2 or 0
-        local heightOffset = pasteCentered and height / 2 or 0
+        local widthOffset = pasteCentered and math.floor(width / 2) or 0
+        local heightOffset = pasteCentered and math.floor(height / 2) or 0
 
         for _, preview in ipairs(previews) do
             local item = preview.item
