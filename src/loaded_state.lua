@@ -66,9 +66,12 @@ function state.loadFile(filename)
     )
 end
 
--- TODO - Make and use a tasked version of sideStruct encode
-function state.saveFile(filename)
+function state.saveFile(filename, addExtIfMissing)
     if filename and state.side then
+        if addExtIfMissing ~= false and filesystem.fileExtension(filename) ~= "bin" then
+            filename ..= ".bin"
+        end
+
         tasks.newTask(
             (-> sideStruct.encodeTaskable(state.side)),
             function(encodeTask)
@@ -133,7 +136,7 @@ function state.getSelectedItem()
 end
 
 function state.openMap()
-    filesystem.openDialog(fileLocations.getCelesteDir(), nil, state.loadFile)
+    filesystem.openDialog(fileLocations.getCelesteDir(), "bin", state.loadFile)
 end
 
 function state.newMap()
@@ -150,7 +153,7 @@ end
 
 function state.saveAsCurrentMap()
     if state.side then
-        filesystem.saveDialog(state.filename, nil, state.saveFile)
+        filesystem.saveDialog(state.filename, "bin", state.saveFile)
     end
 end
 
