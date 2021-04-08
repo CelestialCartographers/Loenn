@@ -7,6 +7,7 @@ local configs = require("configs")
 local utils = require("utils")
 local toolUtils = require("tool_utils")
 local history = require("history")
+local nodeStruct = require("structs.node")
 local snapshotUtils = require("snapshot_utils")
 local selectionUtils = require("selections")
 
@@ -244,7 +245,7 @@ local function updatePlacementNodes()
     if minimumNodes > 0 then
         -- Add nodes until placement has minimum amount of nodes
         if not item.nodes then
-            item.nodes = {}
+            item.nodes = nodeStruct.decodeNodes({})
         end
 
         while #item.nodes < minimumNodes do

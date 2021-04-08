@@ -3,6 +3,7 @@ local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
 local drawing = require("drawing")
+local nodeStruct = require("structs.node")
 
 local languageRegistry = require("language_registry")
 
@@ -413,7 +414,7 @@ function entities.addNodeToSelection(room, layer, selection)
 
     for i, entity in ipairs(targets) do
         if entity == target then
-            local nodes = entity.nodes or {}
+            local nodes = entity.nodes or nodeStruct.decodeNodes({})
 
             -- Make sure we don't add more nodes than supported
             if #nodes >= maximumNodes and maximumNodes ~= -1 then

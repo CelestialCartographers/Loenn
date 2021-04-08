@@ -2,6 +2,7 @@ local utils = require("utils")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
+local nodeStruct = require("structs.node")
 
 local languageRegistry = require("language_registry")
 
@@ -268,7 +269,7 @@ function triggers.addNodeToSelection(room, layer, selection)
 
     for i, trigger in ipairs(targets) do
         if trigger == target then
-            local nodes = trigger.nodes or {}
+            local nodes = trigger.nodes or nodeStruct.decodeNodes({})
 
             -- Make sure we don't add more nodes than supported
             if #nodes >= maximumNodes and maximumNodes ~= -1 then
