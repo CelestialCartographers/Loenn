@@ -43,20 +43,6 @@ local function getCurrentPlacementType()
     return placementType
 end
 
-local function getCursorGridPosition(x, y)
-    x = x or 0
-    y = y or 0
-
-    local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
-
-    if precise then
-        return x, y
-
-    else
-        return math.floor((x + 4) / 8) * 8, math.floor((y + 4) / 8) * 8
-    end
-end
-
 local function placeItemWithHistory(room)
     local snapshot = snapshotUtils.roomLayerSnapshot(function()
         placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
@@ -66,7 +52,7 @@ local function placeItemWithHistory(room)
 end
 
 local function dragStarted(x, y)
-    x, y = getCursorGridPosition(x, y)
+    x, y = placementUtils.getGridPosition(x, y)
 
     placementRectangle = utils.rectangle(x, y, 0, 0)
     placementDragCompleted = false
@@ -77,8 +63,8 @@ end
 
 local function dragChanged(x, y, width, height)
     if placementRectangle then
-        x, y = getCursorGridPosition(x, y)
-        width, height = getCursorGridPosition(width, height)
+        x, y = placementUtils.getGridPosition(x, y)
+        width, height = placementUtils.getGridPosition(width, height)
 
         -- Only update if needed
         if x ~= placementRectangle.x or y ~= placementRectangle.y or width ~= placementRectangle.width or height ~= placementRectangle.height then
@@ -131,7 +117,7 @@ local function getPlacementOffset()
         end
     end
 
-    return getCursorGridPosition(placementCurrentX, placementCurrentY)
+    return placementUtils.getGridPosition(placementCurrentX, placementCurrentY)
 end
 
 local function updatePlacementDrawable()
@@ -216,7 +202,7 @@ local function updateLinePlacement(template, item, itemX, itemY)
         end
 
     else
-        local stopX, stopY = getCursorGridPosition(placementCurrentX, placementCurrentY)
+        local stopX, stopY = placementUtils.getGridPosition(placementCurrentX, placementCurrentY)
 
         if stopX ~= node.x or stopY ~= node.y then
             node.x = stopX

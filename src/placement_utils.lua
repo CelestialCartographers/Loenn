@@ -1,5 +1,7 @@
 local layerHandlers = require("layer_handlers")
 local utils = require("utils")
+local keyboardHelper = require("keyboard_helper")
+local configs = require("configs")
 
 local placementUtils = {}
 
@@ -41,6 +43,20 @@ function placementUtils.finalizePlacement(room, layer, item)
                 return
             end
         end
+    end
+end
+
+function placementUtils.getGridPosition(x, y, precise)
+    x = x or 0
+    y = y or 0
+
+    precise = precise ~= false and keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+
+    if precise then
+        return x, y
+
+    else
+        return math.floor((x + 4) / 8) * 8, math.floor((y + 4) / 8) * 8
     end
 end
 
