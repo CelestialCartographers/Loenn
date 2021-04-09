@@ -10,6 +10,7 @@ local history = require("history")
 local nodeStruct = require("structs.node")
 local snapshotUtils = require("snapshot_utils")
 local selectionUtils = require("selections")
+local selectionItemUtils = require("selection_item_utils")
 
 local tool = {}
 
@@ -297,21 +298,26 @@ local function selectPlacement(name, index)
     return false
 end
 
-local function drawPlacement(room)
-    if room and placementTemplate and placementTemplate.drawable then
-        viewportHandler.drawRelativeTo(room.x, room.y, function()
-            if utils.typeof(placementTemplate.drawable) == "table" then
-                for _, drawable in ipairs(placementTemplate.drawable) do
-                    if drawable.draw then
-                        drawable:draw()
-                    end
-                end
-
-            else
-                if placementTemplate.drawable.draw then
-                    placementTemplate.drawable:draw()
-                end
+local function drawPlacementDrawable(room)
+    if utils.typeof(placementTemplate.drawable) == "table" then
+        for _, drawable in ipairs(placementTemplate.drawable) do
+            if drawable.draw then
+                drawable:draw()
             end
+        end
+
+    else
+        if placementTemplate.drawable.draw then
+            placementTemplate.drawable:draw()
+        end
+    end
+end
+
+local function drawPlacement(room)
+    if room and placementTemplate and placementTemplate.drawable and placementTemplate.item then
+        viewportHandler.drawRelativeTo(room.x, room.y, function()
+            drawPlacementDrawable(room)
+            selectionItemUtils.drawSelected(room, tool.layer, placementTemplate.item)
         end)
     end
 end
