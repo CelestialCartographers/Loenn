@@ -6,7 +6,9 @@ water.borderColor = {0.0, 0.0, 1.0, 1.0}
 water.placements = {
     name = "water",
     data = {
-        hasBottom = false
+        hasBottom = false,
+        width = 8,
+        height = 8
     }
 }
 
