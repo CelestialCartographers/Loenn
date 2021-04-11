@@ -52,8 +52,16 @@ local function placeItemWithHistory(room)
     history.addSnapshot(snapshot)
 end
 
+-- Get grid position and figure out if it should be offset or not based on the placement type
+local function getGridPosition(x, y, precise)
+    local placementType = getCurrentPlacementType()
+    local addHalf = placementType ~= "rectangle"
+
+    return placementUtils.getGridPosition(x, y, precise, addHalf)
+end
+
 local function dragStarted(x, y)
-    x, y = placementUtils.getGridPosition(x, y)
+    x, y = getGridPosition(x, y)
 
     placementRectangle = utils.rectangle(x, y, 0, 0)
     placementDragCompleted = false
@@ -64,8 +72,23 @@ end
 
 local function dragChanged(x, y, width, height)
     if placementRectangle then
-        x, y = placementUtils.getGridPosition(x, y)
-        width, height = placementUtils.getGridPosition(width, height)
+        local gridSize = placementUtils.getGridSize()
+
+        x, y = getGridPosition(x, y)
+        width, height = getGridPosition(width, height)
+
+        width += gridSize * utils.sign(width)
+        height += gridSize * utils.sign(height)
+
+        -- Pivot around the start tile
+        -- Feels better when dragging towards top left
+        if width < 0 then
+            x += gridSize
+        end
+
+        if height < 0 then
+            y += gridSize
+        end
 
         -- Only update if needed
         if x ~= placementRectangle.x or y ~= placementRectangle.y or width ~= placementRectangle.width or height ~= placementRectangle.height then
@@ -109,7 +132,6 @@ end
 
 -- TODO - Clean up
 local function getPlacementOffset()
-    local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
     local placementType = getCurrentPlacementType()
 
     if placementType == "rectangle" or placementType == "line" then
@@ -118,7 +140,7 @@ local function getPlacementOffset()
         end
     end
 
-    return placementUtils.getGridPosition(placementCurrentX, placementCurrentY)
+    return getGridPosition(placementCurrentX, placementCurrentY)
 end
 
 local function updatePlacementDrawable()
@@ -151,8 +173,9 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
     local resizeWidth, resizeHeight = placementUtils.canResize(room, layer, item)
     local minimumWidth, minimumHeight = placementUtils.minimumSize(room, layer, item)
 
-    local itemWidth = math.max(dragging and placementRectangle.width or 8, minimumWidth or 8)
-    local itemHeight = math.max(dragging and placementRectangle.height or 8, minimumHeight or 8)
+    local gridSize = placementUtils.getGridSize()
+    local itemWidth = math.max(dragging and placementRectangle.width or gridSize, minimumWidth or gridSize)
+    local itemHeight = math.max(dragging and placementRectangle.height or gridSize, minimumHeight or gridSize)
 
     -- Always update when not dragging
     if not dragging then
@@ -204,7 +227,7 @@ local function updateLinePlacement(template, item, itemX, itemY)
         end
 
     else
-        local stopX, stopY = placementUtils.getGridPosition(placementCurrentX, placementCurrentY)
+        local stopX, stopY = getGridPosition(placementCurrentX, placementCurrentY)
 
         if stopX ~= firstNode.x or stopY ~= firstNode.y then
             firstNode.x = stopX
@@ -399,7 +422,6 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     mouseMoved(px, py)
 
     if not placementDragCompleted and love.mouse.isDown(actionButton) then
-
         if px and py and placementDragStartX and placementDragStartY then
             local width, height = px - placementDragStartX, py - placementDragStartY
 

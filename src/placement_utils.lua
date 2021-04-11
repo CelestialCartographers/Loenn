@@ -46,7 +46,13 @@ function placementUtils.finalizePlacement(room, layer, item)
     end
 end
 
-function placementUtils.getGridPosition(x, y, precise)
+function placementUtils.getGridSize(precise)
+    precise = precise ~= false and keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+
+    return precise and 1 or 8
+end
+
+function placementUtils.getGridPosition(x, y, precise, addHalf)
     x = x or 0
     y = y or 0
 
@@ -56,7 +62,15 @@ function placementUtils.getGridPosition(x, y, precise)
         return x, y
 
     else
-        return math.floor((x + 4) / 8) * 8, math.floor((y + 4) / 8) * 8
+        local gridSize = placementUtils.getGridSize(precise)
+        local halfSize = math.floor(gridSize / 2)
+
+        if addHalf ~= false then
+            return math.floor((x + halfSize) / gridSize) * gridSize, math.floor((y + halfSize) / gridSize) * gridSize
+
+        else
+            return math.floor(x / gridSize) * gridSize, math.floor(y / gridSize) * gridSize
+        end
     end
 end
 
