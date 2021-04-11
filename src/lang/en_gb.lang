@@ -293,6 +293,8 @@ entities.movingPlatform.description.texture=What texture to use for the platform
 entities.sinkingPlatform.description.texture=What texture to use for the platform.
 
 # Crumble Block
+entities.crumbleBlock.name.default=Crumble Block (Default)
+entities.crumbleBlock.name.cliffside=Crumble Block (Cliffside)
 entities.crumbleBlock.description.texture=What texture to use for the crumble block.
 
 # Fake Block
