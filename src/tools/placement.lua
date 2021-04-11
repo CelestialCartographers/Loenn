@@ -189,31 +189,42 @@ end
 
 local function updateLinePlacement(template, item, itemX, itemY)
     local dragging = placementRectangle and not placementDragCompleted
-    local node = item.nodes[1] or {}
+    local firstNode = item.nodes[1] or {}
+    local needsUpdate = false
 
     if not dragging then
         if itemX ~= item.x or itemY ~= item.y then
             item.x = itemX
             item.y = itemY
 
-            node.x = itemX + 8
-            node.y = itemY + 8
+            firstNode.x = itemX + 16
+            firstNode.y = itemY
 
-            return true
+            needsUpdate = true
         end
 
     else
         local stopX, stopY = placementUtils.getGridPosition(placementCurrentX, placementCurrentY)
 
-        if stopX ~= node.x or stopY ~= node.y then
-            node.x = stopX
-            node.y = stopY
+        if stopX ~= firstNode.x or stopY ~= firstNode.y then
+            firstNode.x = stopX
+            firstNode.y = stopY
 
-            return true
+            needsUpdate = true
         end
     end
 
-    return false
+    -- Update all existing nodes to be after the first node
+    if needsUpdate then
+        for i, node in ipairs(item.nodes) do
+            if i ~= 1 then
+                node.x = firstNode.x + 16 * i - 16
+                node.y = firstNode.y
+            end
+        end
+    end
+
+    return needsUpdate
 end
 
 local placementUpdaters = {
@@ -230,11 +241,20 @@ local function updatePlacementNodes()
     local minimumNodes, maximumNodes = placementUtils.nodeLimits(room, tool.layer, item)
 
     if minimumNodes > 0 then
-        -- Add nodes until placement has minimum amount of nodes
-        if not item.nodes then
+        -- Set up empty nodes table if needed
+        -- Make the nodes table the correct type, makes it less tedious in plugins
+        if item.nodes then
+            for _, node in ipairs(item.nodes) do
+                node.__type = nodeStruct.nodeTypeName
+            end
+
+        else
             item.nodes = nodeStruct.decodeNodes({})
         end
 
+        item.nodes.__type = nodeStruct.nodesTypeName
+
+        -- Add nodes until placement has minimum amount of nodes
         while #item.nodes < minimumNodes do
             local widthOffset = item.width or 0
             local nodeOffset = (#item.nodes + 1) * 16
@@ -251,11 +271,10 @@ local function updatePlacementNodes()
         if placementType ~= "line" then
             for i, node in ipairs(item.nodes) do
                 local widthOffset = item.width or 0
-                local heightOffset = (item.height or 0) / 2
                 local nodeOffsetX = #item.nodes * 16
 
                 node.x = item.x + widthOffset + nodeOffsetX
-                node.y = item.y + heightOffset
+                node.y = item.y
             end
         end
     end
