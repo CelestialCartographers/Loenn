@@ -467,18 +467,20 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
 
             -- Special case for multiple drawable sprites
             -- Maybe handle this better later
-            if drawable and #drawable == 0 then
-                local batchDepth = drawable.depth or depth or handlerDepth or defaultDepth
-                local batch = getOrCreateSmartBatch(batches, batchDepth)
-
-                batch:addFromDrawable(drawable)
-
-            else
-                for _, drawableItem in ipairs(drawable) do
-                    local batchDepth = drawableItem.depth or depth or handlerDepth or defaultDepth
+            if drawable then
+                if #drawable == 0 then
+                    local batchDepth = drawable.depth or depth or handlerDepth or defaultDepth
                     local batch = getOrCreateSmartBatch(batches, batchDepth)
 
-                    batch:addFromDrawable(drawableItem)
+                    batch:addFromDrawable(drawable)
+
+                else
+                    for _, drawableItem in ipairs(drawable) do
+                        local batchDepth = drawableItem.depth or depth or handlerDepth or defaultDepth
+                        local batch = getOrCreateSmartBatch(batches, batchDepth)
+
+                        batch:addFromDrawable(drawableItem)
+                    end
                 end
             end
 
