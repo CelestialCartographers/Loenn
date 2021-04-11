@@ -378,6 +378,10 @@ entities.lockBlock.description.sprite=Changes the visual appearance of the locke
 entities.lockBlock.description.unlock_sfx=The sound to play when unlocking the door. Leave empty for default.
 entities.lockBlock.description.stepMusicProgress=Whether unlocking the door should increment the music progress by one.
 
+# Key
+entities.key.name.normal=Key
+entities.key.name.with_return=Key (With Return)
+
 # Wind Trigger
 triggers.windTrigger.description.pattern=Changes the abilities of the room's current wind type.
 
@@ -539,6 +543,7 @@ entities.swapBlock.description.theme=The visual theme of the swap block.
 entities.zipMover.description.theme=The visual theme of the zip mover.
 
 # Moon Creature
+entities.moonCreature.name.moon_creature=Moon Creature
 entities.moonCreature.description.number=How many moon creatures should spawn in the cluster.
 
 # Floaty Space Block
