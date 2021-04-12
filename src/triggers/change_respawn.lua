@@ -1,12 +1,9 @@
 local changeRespawn = {}
 
 changeRespawn.name = "changeRespawnTrigger"
+changeRespawn.nodeLimits = {0, 1}
 changeRespawn.placements = {
     name = "change_respawn"
 }
-
-function changeRespawn.nodeLimits(room, trigger)
-    return 0, 1
-end
 
 return changeRespawn

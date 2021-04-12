@@ -609,7 +609,12 @@ function entities.nodeLimits(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler and handler.nodeLimits then
-        return handler.nodeLimits(room, entity)
+        if type(handler.nodeLimits) == "function" then
+            return handler.nodeLimits(room, entity)
+
+        else
+            return unpack(handler.node)
+        end
 
     else
         return 0, 0

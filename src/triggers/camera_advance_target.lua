@@ -3,6 +3,7 @@
 local cameraAdvanceTarget = {}
 
 cameraAdvanceTarget.name = "cameraAdvanceTargetTrigger"
+cameraAdvanceTarget.nodeLimits = {1, 1}
 cameraAdvanceTarget.placements = {
     name = "camera_advance_target",
     data = {
@@ -14,9 +15,5 @@ cameraAdvanceTarget.placements = {
         yOnly = false
     }
 }
-
-function cameraAdvanceTarget.nodeLimits(room, trigger)
-    return 1, 1
-end
 
 return cameraAdvanceTarget

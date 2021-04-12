@@ -4,7 +4,7 @@ badelineBoss.name = "finalBoss"
 badelineBoss.depth = 0
 badelineBoss.nodeLineRenderType = "line"
 badelineBoss.texture = "characters/badelineBoss/charge00"
-
+badelineBoss.nodeLimits = {0, -1}
 badelineBoss.placements = {
     name = "boss",
     data = {
@@ -15,9 +15,5 @@ badelineBoss.placements = {
         canChangeMusic = true
     }
 }
-
-function badelineBoss.nodeLimits(room, entity)
-    return 0, -1
-end
 
 return badelineBoss

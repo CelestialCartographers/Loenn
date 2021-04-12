@@ -4,7 +4,7 @@ fireball.name = "fireBall"
 fireball.depth = 0
 fireball.nodeLineRenderType = "line"
 fireball.texture = "objects/fireball/fireball01"
-
+fireball.nodeLimits = {0, -1}
 fireball.placements = {
     name = "fireball",
     data = {
@@ -14,9 +14,5 @@ fireball.placements = {
         notCoreMode = false
     }
 }
-
-function fireball.nodeLimits(room, entity)
-    return 0, -1
-end
 
 return fireball

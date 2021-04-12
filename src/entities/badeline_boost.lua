@@ -4,7 +4,7 @@ badelineBoost.name = "badelineBoost"
 badelineBoost.depth = -1000000
 badelineBoost.nodeLineRenderType = "line"
 badelineBoost.texture = "objects/badelineboost/idle00"
-
+badelineBoost.nodeLimits = {0, -1}
 badelineBoost.placements = {
     name = "boost",
     data = {
@@ -15,9 +15,5 @@ badelineBoost.placements = {
         finalCh9Dialog = false
     }
 }
-
-function badelineBoost.nodeLimits(room, entity)
-    return 0, -1
-end
 
 return badelineBoost
