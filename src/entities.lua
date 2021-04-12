@@ -613,7 +613,7 @@ function entities.nodeLimits(room, layer, entity)
             return handler.nodeLimits(room, entity)
 
         else
-            return unpack(handler.node)
+            return unpack(handler.nodeLimits)
         end
 
     else
