@@ -90,6 +90,22 @@ function entities.getDrawable(name, handler, room, entity, viewport)
         local texture = utils.callIfFunction(handler.texture, room, entity)
         local drawable = drawableSprite.spriteFromTexture(texture, entity)
 
+        if handler.justification then
+            drawable:setJustification(unpack(handler.justification))
+        end
+
+        if handler.scale then
+            drawable:setScale(unpack(handler.scale))
+        end
+
+        if handler.offset then
+            drawable:setOffset(unpack(handler.offset))
+        end
+
+        if handler.rotation then
+            drawable.rotation = handler.rotation
+        end
+
         return drawable
 
     elseif handler.draw then
@@ -140,6 +156,22 @@ function entities.getNodeDrawable(name, handler, room, entity, viewport)
     elseif handler.nodeTexture then
         local texture = utils.callIfFunction(handler.nodeTexture, room, entity)
         local drawable = drawableSprite.spriteFromTexture(texture, entity)
+
+        if handler.nodeJustification then
+            drawable:setJustification(unpack(handler.nodeJustification))
+        end
+
+        if handler.nodeScale then
+            drawable:setScale(unpack(handler.nodeScale))
+        end
+
+        if handler.nodeOffset then
+            drawable:setOffset(unpack(handler.nodeOffset))
+        end
+
+        if handler.nodeRotation then
+            drawable.rotation = handler.nodeRotation
+        end
 
         return drawable
 
