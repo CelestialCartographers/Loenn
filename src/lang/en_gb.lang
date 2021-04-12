@@ -245,8 +245,15 @@ entities.negaBlock.name.nega_block=Nega Block
 entities.tentacles.description.slide_until=Changes how far tentacles fall back when Madeline comes into fear distance.
 entities.tentacles.description.fear_distance=Determines the distance Madeline has to be at for the tentacles to fall back.
 
+# Seeker
+entities.seeker.name.seeker=Seeker
+
 # Seeker Statue
+entities.seekerStatue.name.seeker_statue=Seeker Statue
 entities.seekerStatue.description.hatch=Determines whether the statue releases its seeker when the player is to the right of it, or when the player gets close enough.
+
+# Seeker Barrier
+entities.seekerBarrier.name.seeker_barrier=Seeker Barrier
 
 # Chapter Checkpoint
 entities.checkpoint.description.inventory=Determines the player's inventory when loading from the given chapter.\n Automatic keeps the inventory from Metadata\n Prologue: 0 dashes, Dream blocks disabled, wearing a backpack, ground refills enabled\n Default: 1 dash, Dream blocks enabled, wearing a backpack, ground refills enabled\n OldSite: 1 dash, Dream blocks disabled, wearing a backpack, ground refills enabled\n CH6End: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills enabled\n TheSummit: 2 dashes, Dream blocks enabled, not wearing a backpack, ground refills enabled\n Core: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills disabled
