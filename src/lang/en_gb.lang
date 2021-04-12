@@ -382,8 +382,11 @@ entities.lockBlock.description.stepMusicProgress=Whether unlocking the door shou
 entities.key.name.normal=Key
 entities.key.name.with_return=Key (With Return)
 
-# Wind Trigger
-triggers.windTrigger.description.pattern=Changes the abilities of the room's current wind type.
+# Payphone
+entities.payphone.name.payphone=Payphone
+
+# Pico Console
+entities.picoconsole.name.pico_console=Pico Console
 
 # Trigger Spikes Originals
 entities.triggerSpikesOriginalLeft.description.type=Changes the visual appearance of the spikes.
@@ -797,6 +800,9 @@ triggers.windAttackTrigger.name.wind_attack=Snowballs
 
 # Wind Pattern
 triggers.windTrigger.name.wind=Wind Pattern
+
+# Wind Trigger
+triggers.windTrigger.description.pattern=Changes the abilities of the room's current wind type.
 
 
 # -- Mod Information --
