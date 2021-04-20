@@ -30,6 +30,8 @@ tool.validLayers = {
 local placementsAvailable = nil
 local placementTemplate = nil
 
+local placementMouseX = 0
+local placementMouseY = 0
 local placementCurrentX = 0
 local placementCurrentY = 0
 local placementDragStartX = 0
@@ -388,6 +390,13 @@ function tool.getMaterials()
     return placementsAvailable
 end
 
+-- Offset the placement correctly for the new room
+function tool.editorMapTargetChanged()
+    local px, py = toolUtils.getCursorPositionInRoom(placementMouseX, placementMouseY)
+
+    mouseMoved(px, py)
+end
+
 function tool.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
@@ -418,6 +427,8 @@ end
 function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
     local px, py = toolUtils.getCursorPositionInRoom(x, y)
+
+    placementMouseX, placementMouseY = x, y
 
     mouseMoved(px, py)
 
