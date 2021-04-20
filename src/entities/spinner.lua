@@ -1,6 +1,7 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
 
-local defaultSpinnerColor = "white"
+local defaultSpinnerColor = "blue"
+local unknownSpinnerColor = "white"
 local spinnerColors = {
     "blue",
     "red",
@@ -67,7 +68,7 @@ function spinner.sprite(room, entity)
             return sprite
 
         else
-            texture = "danger/crystal/fg_" .. string.lower(defaultSpinnerColor) .. "00"
+            texture = "danger/crystal/fg_" .. string.lower(unknownSpinnerColor) .. "00"
 
             return drawableSpriteStruct.spriteFromTexture(texture, position)
         end
