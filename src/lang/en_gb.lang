@@ -338,11 +338,15 @@ entities.moveBlock.description.canSteer=Determines whether the move block can be
 entities.moveBlock.description.fast=Changes the move block between two speeds.
 entities.moveBlock.description.direction=Determines the direction the move block moves in upon activation.
 
+# White Block
+entities.whiteblock.name.white_block=White Block
+
 # Switch Gate
 entities.switchGate.description.persistent=Will stay open once activated, even if the player dies.
 entities.switchGate.description.sprite=Changes the visual appearance of the switch gate.
 
 # Cliffside Flag
+entities.cliffside_flag.name.cliffside_flag=Cliffside Big Flag
 entities.cliffside_flag.description.index=Changes the visual appearance of the flag.
 
 # Dash Switch Horizontal
