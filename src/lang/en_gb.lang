@@ -242,6 +242,7 @@ entities.iceBlock.name.ice_block=Ice Block
 entities.negaBlock.name.nega_block=Nega Block
 
 # Tentacles
+entities.tentacles.name.tentacles=Tentacles
 entities.tentacles.description.slide_until=Changes how far tentacles fall back when Madeline comes into fear distance.
 entities.tentacles.description.fear_distance=Determines the distance Madeline has to be at for the tentacles to fall back.
 
@@ -454,7 +455,11 @@ entities.templeGate.description.type=Determines what abilities the gate has.
 entities.templeMirror.description.reflectX=The horizontal offset for the reflection.
 entities.templeMirror.description.reflectY=The vertical offset for the reflection.
 
+# Sandwich Lava
+entities.sandwichLava.name.lava_sandwich=Lava Sandwich
+
 # Rising Lava
+entities.risingLava.name.rising_lava=Rising Lava
 entities.risingLava.description.intro=Determines whether the lava rises up from below the bottom of the screen or starts already present near the bottom.
 
 # Ridge Gate
@@ -503,9 +508,11 @@ entities.crushBlock.description.chillout=Whether the block should have the large
 entities.bigWaterfall.description.layer=Where the waterfall should render.\nFG is in the foreground.\nBG is in the background and parallaxes.
 
 # Sound Source
+entities.soundSource.name.sound_source=Sound Source
 entities.soundSource.description.sound=The sound event that will be played.
 
 # Summit Background Manager
+entities.SummitBackgroundManager.name.manager=Summit Background Manager
 entities.SummitBackgroundManager.description.dark=Whether the background is dark or not.
 entities.SummitBackgroundManager.description.cutscene=Dialog ID of cutscene to display. Leave empty for no cutscene.
 entities.SummitBackgroundManager.description.index=Index of text to display when ascending. -1 for no text.
@@ -513,6 +520,7 @@ entities.SummitBackgroundManager.description.intro_launch=Used for first boost i
 entities.SummitBackgroundManager.description.ambience=Ambience background music.
 
 # Cutscene Node
+entities.cutsceneNode.name.cutscene_node=Cutscene Node
 entities.cutsceneNode.description.nodeName=Name of node. Used to find the entity from code.
 
 # Hahaha
@@ -523,6 +531,7 @@ entities.hahaha.description.triggerLaughSfx=Whether the laugh should also play a
 entities.finalBossMovingBlock.description.nodeIndex=The node index of the Badeline boss this should fall down on.
 
 # Everest Core Message
+entities.everest/coreMessage.name.core_message=Core Message
 entities.everest/coreMessage.description.line=Which line of the dialogue to use.
 entities.everest/coreMessage.description.dialog=The dialogue key to use.
 entities.everest/coreMessage.description.outline=Whether the text has a black outline or not.
@@ -530,7 +539,11 @@ entities.everest/coreMessage.description.outline=Whether the text has a black ou
 # Star Jump Block
 entities.starJumpBlock.description.sinks=Whether the block sinks when the player stands on it.
 
+# Star Jump Controller
+entities.starClimbController.name.controller=Star Climb Controller
+
 # Star Jump Graphics Controller (Everest)
+entities.everest/starClimbGraphicsController.name.controller=Star Climb Graphics Controller
 entities.everest/starClimbGraphicsController.description.fgColor=The foreground colour of the Star Jump Block effect.
 entities.everest/starClimbGraphicsController.description.bgColor=The background colour of the Star Jump Block effect.
 

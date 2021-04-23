@@ -1,0 +1,16 @@
+local tentacles = {}
+
+tentacles.name = "tentacles"
+tentacles.depth = 0
+tentacles.texture = "@Internal@/tentacles"
+tentacles.nodeLimits = {1, -1}
+tentacles.placements = {
+    name = "tentacles",
+    data = {
+        fear_distance = "",
+        slide_until = 0
+    }
+}
+
+
+return tentacles
