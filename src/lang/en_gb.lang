@@ -319,6 +319,7 @@ entities.fakeBlock.description.playTransitionReveal=Determines whether entering 
 entities.glassBlock.description.sinks=Whether the tile should sink when the player is on top.
 
 # Cobweb
+entities.cobweb.name.cobweb=Cobweb
 entities.cobweb.description.color=Determines the colour of the cobweb.
 
 # Lightbeam
