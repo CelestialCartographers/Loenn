@@ -202,6 +202,9 @@ entities.dreamBlock.description.fastMoving=Changes the dream block between two s
 entities.dreamBlock.description.oneUse=Determines whether the dream block should disappear after one use.
 entities.dreamBlock.description.below=Determines whether the dream block should render in the background or foreground.
 
+# Bumper
+entities.bigSpinner.name.bumper=Bumper
+
 # Floating Debris
 entities.floatingDebris.name.floating_debris=Floating Debris
 
@@ -209,6 +212,7 @@ entities.floatingDebris.name.floating_debris=Floating Debris
 entities.hanginglamp.name.hanging_lamp=Hanging Lamp
 
 # Badeline Boost
+entities.badelineBoost.name.boost=Badeline Boost
 entities.badelineBoost.description.lockCamera=Upon activation, the camera cannot pan away from the entity.
 entities.badelineBoost.description.canSkip=Badeline will skip to the next position if the player is too far to the right of the current one  (100 pixels).
 entities.badelineBoost.description.finalCh9Boost=Whether this boost should be able to end the level, transporting the player to room "end-granny". If the player has a golden berry, and this isn't a golden boost, they are transported to the golden room "end-golden" instead.\nRequires a Blackhole in the background, does not work if it is in the foreground.
@@ -216,22 +220,41 @@ entities.badelineBoost.description.finalCh9GoldenBoost=Used to indicate that we 
 entities.badelineBoost.description.finalCh9Dialog=If finalCh9Boost is also set and doesn't go to golden room, this will trigger the Farewell ending dialog.
 
 # Badeline Boss
+entities.finalBoss.name.boss=Badeline Boss
 entities.finalBoss.description.startHit=Determines whether or not Badeline waits to attack until the first hit or upon room entry.
 entities.finalBoss.description.patternIndex=Determines what pattern of attack Badeline uses.\n 0 - Badeline transforms into the boss after being hit once\n 1 - Shoots orbs\n 2 - Shoots laser followed by one orb\n 3 - Shoots five streams of two orbs\n 4 - Shoots five streams of two orbs followed by one laser\n 5 - Shoots laser followed by three streams of two orbs\n 6 - Shoots lasers\n 7 - Shoots orbs with less delay\n 8 - Shoots lasers with less delay\n 9 - Shoots streams of two orbs\n 10 - Does nothing\n 11 - Shoots orbs with more delay\n 12 - Does nothing\n 13 - Shoots orbs after getting hit once\n 14 - Shoots lasers with very short delay\n 15 - Shoots lasers with more delay
 entities.finalBoss.description.cameraLockY=Whether the camera should be locked vertically, functioning similarly as a killbox.
 
 # Fire Ball
+entities.fireBall.name.fireball=Fireball
 entities.fireBall.description.amount=Determines the amount of fireballs on a track.
 entities.fireBall.description.offset=Determines how far into the path the fireball starts.
 entities.fireBall.description.speed=Determines how fast a fireball reaches the end of the track.
 entities.fireBall.description.notCoreMode=Determines whether the fireball should ignore the current core mode and default to ice variant.
 
+# Fire Barrier
+entities.fireBarrier.name.fire_barrier=Fire Barrier
+
+# Ice Block
+entities.iceBlock.name.ice_block=Ice Block
+
+# Nega Block
+entities.negaBlock.name.nega_block=Nega Block
+
 # Tentacles
+entities.tentacles.name.tentacles=Tentacles
 entities.tentacles.description.slide_until=Changes how far tentacles fall back when Madeline comes into fear distance.
 entities.tentacles.description.fear_distance=Determines the distance Madeline has to be at for the tentacles to fall back.
 
+# Seeker
+entities.seeker.name.seeker=Seeker
+
 # Seeker Statue
+entities.seekerStatue.name.seeker_statue=Seeker Statue
 entities.seekerStatue.description.hatch=Determines whether the statue releases its seeker when the player is to the right of it, or when the player gets close enough.
+
+# Seeker Barrier
+entities.seekerBarrier.name.seeker_barrier=Seeker Barrier
 
 # Chapter Checkpoint
 entities.checkpoint.description.inventory=Determines the player's inventory when loading from the given chapter.\n Automatic keeps the inventory from Metadata\n Prologue: 0 dashes, Dream blocks disabled, wearing a backpack, ground refills enabled\n Default: 1 dash, Dream blocks enabled, wearing a backpack, ground refills enabled\n OldSite: 1 dash, Dream blocks disabled, wearing a backpack, ground refills enabled\n CH6End: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills enabled\n TheSummit: 2 dashes, Dream blocks enabled, not wearing a backpack, ground refills enabled\n Core: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills disabled
@@ -246,6 +269,12 @@ entities.rotateSpinner.description.dust=Changes the appearance of the blade to b
 entities.rotateSpinner.description.star=Changes the appearance of the blade to be a star.
 
 # Spinner
+entities.spinner.name.dust_sprite=Dust Sprite
+entities.spinner.name.blue=Crystal Spinner (Blue)
+entities.spinner.name.red=Crystal Spinner (Red)
+entities.spinner.name.purple=Crystal Spinner (Purple)
+entities.spinner.name.core=Crystal Spinner (Core)
+entities.spinner.name.rainbow=Crystal Spinner (Rainbow)
 entities.spinner.description.attachToSolid=The spinner attaches to the surface of the entity or block, and can be moved by them.
 
 # TrackSpinner
@@ -278,6 +307,8 @@ entities.movingPlatform.description.texture=What texture to use for the platform
 entities.sinkingPlatform.description.texture=What texture to use for the platform.
 
 # Crumble Block
+entities.crumbleBlock.name.default=Crumble Block (Default)
+entities.crumbleBlock.name.cliffside=Crumble Block (Cliffside)
 entities.crumbleBlock.description.texture=What texture to use for the crumble block.
 
 # Fake Block
@@ -288,6 +319,7 @@ entities.fakeBlock.description.playTransitionReveal=Determines whether entering 
 entities.glassBlock.description.sinks=Whether the tile should sink when the player is on top.
 
 # Cobweb
+entities.cobweb.name.cobweb=Cobweb
 entities.cobweb.description.color=Determines the colour of the cobweb.
 
 # Lightbeam
@@ -306,11 +338,15 @@ entities.moveBlock.description.canSteer=Determines whether the move block can be
 entities.moveBlock.description.fast=Changes the move block between two speeds.
 entities.moveBlock.description.direction=Determines the direction the move block moves in upon activation.
 
+# White Block
+entities.whiteblock.name.white_block=White Block
+
 # Switch Gate
 entities.switchGate.description.persistent=Will stay open once activated, even if the player dies.
 entities.switchGate.description.sprite=Changes the visual appearance of the switch gate.
 
 # Cliffside Flag
+entities.cliffside_flag.name.cliffside_flag=Cliffside Big Flag
 entities.cliffside_flag.description.index=Changes the visual appearance of the flag.
 
 # Dash Switch Horizontal
@@ -333,6 +369,7 @@ entities.everest/memorial.description.sprite=What sprite to render for the memor
 entities.everest/memorial.description.spacing=The spacing for the letters.
 
 # Water
+entities.water.name.water=Water
 entities.water.description.hasBottom=Determines whether or not the water has a bottom.
 
 # NPC
@@ -360,8 +397,15 @@ entities.lockBlock.description.sprite=Changes the visual appearance of the locke
 entities.lockBlock.description.unlock_sfx=The sound to play when unlocking the door. Leave empty for default.
 entities.lockBlock.description.stepMusicProgress=Whether unlocking the door should increment the music progress by one.
 
-# Wind Trigger
-triggers.windTrigger.description.pattern=Changes the abilities of the room's current wind type.
+# Key
+entities.key.name.normal=Key
+entities.key.name.with_return=Key (With Return)
+
+# Payphone
+entities.payphone.name.payphone=Payphone
+
+# Pico Console
+entities.picoconsole.name.pico_console=Pico Console
 
 # Trigger Spikes Originals
 entities.triggerSpikesOriginalLeft.description.type=Changes the visual appearance of the spikes.
@@ -401,6 +445,9 @@ entities.dashBlock.description.permanent=Once broken, the block will remain that
 entities.exitBlock.description.tileType=Determines the visual appearance of the wall.
 entities.exitBlock.description.playTransitionReveal=Determines whether revealing the block should play the reveal jingle.
 
+# Cassette
+entities.cassette.name.cassette=Cassette
+
 # Cassette Block
 entities.cassetteBlock.description.index=The colour of the cassette block.
 entities.cassetteBlock.description.tempo=The tempo of the cassette blocks. The first non 1 tempo cassette block decides the tempo for all cassette blocks in the room.
@@ -413,7 +460,11 @@ entities.templeGate.description.type=Determines what abilities the gate has.
 entities.templeMirror.description.reflectX=The horizontal offset for the reflection.
 entities.templeMirror.description.reflectY=The vertical offset for the reflection.
 
+# Sandwich Lava
+entities.sandwichLava.name.lava_sandwich=Lava Sandwich
+
 # Rising Lava
+entities.risingLava.name.rising_lava=Rising Lava
 entities.risingLava.description.intro=Determines whether the lava rises up from below the bottom of the screen or starts already present near the bottom.
 
 # Ridge Gate
@@ -441,6 +492,9 @@ entities.everest/customBirdTutorial.description.onlyOnce=Whether the bird should
 entities.introCar.description.hasRoadAndBarriers=Determines whether the car should come with road and barriers.
 
 # Core Mode Toggle
+entities.coreModeToggle.name.both=Core Mode Toggle (Both)
+entities.coreModeToggle.name.fire=Core Mode Toggle (Fire)
+entities.coreModeToggle.name.ice=Core Mode Toggle (Ice)
 entities.coreModeToggle.description.onlyIce=Whether the switch can only turn the core mode to ice.
 entities.coreModeToggle.description.onlyFire=Whether the switch can only turn the core mode to fire.
 entities.coreModeToggle.description.persistent=Whether the core mode persists after death instead of resetting to initial room entry state.
@@ -459,9 +513,11 @@ entities.crushBlock.description.chillout=Whether the block should have the large
 entities.bigWaterfall.description.layer=Where the waterfall should render.\nFG is in the foreground.\nBG is in the background and parallaxes.
 
 # Sound Source
+entities.soundSource.name.sound_source=Sound Source
 entities.soundSource.description.sound=The sound event that will be played.
 
 # Summit Background Manager
+entities.SummitBackgroundManager.name.manager=Summit Background Manager
 entities.SummitBackgroundManager.description.dark=Whether the background is dark or not.
 entities.SummitBackgroundManager.description.cutscene=Dialog ID of cutscene to display. Leave empty for no cutscene.
 entities.SummitBackgroundManager.description.index=Index of text to display when ascending. -1 for no text.
@@ -469,6 +525,7 @@ entities.SummitBackgroundManager.description.intro_launch=Used for first boost i
 entities.SummitBackgroundManager.description.ambience=Ambience background music.
 
 # Cutscene Node
+entities.cutsceneNode.name.cutscene_node=Cutscene Node
 entities.cutsceneNode.description.nodeName=Name of node. Used to find the entity from code.
 
 # Hahaha
@@ -479,6 +536,7 @@ entities.hahaha.description.triggerLaughSfx=Whether the laugh should also play a
 entities.finalBossMovingBlock.description.nodeIndex=The node index of the Badeline boss this should fall down on.
 
 # Everest Core Message
+entities.everest/coreMessage.name.core_message=Core Message
 entities.everest/coreMessage.description.line=Which line of the dialogue to use.
 entities.everest/coreMessage.description.dialog=The dialogue key to use.
 entities.everest/coreMessage.description.outline=Whether the text has a black outline or not.
@@ -486,7 +544,11 @@ entities.everest/coreMessage.description.outline=Whether the text has a black ou
 # Star Jump Block
 entities.starJumpBlock.description.sinks=Whether the block sinks when the player stands on it.
 
+# Star Jump Controller
+entities.starClimbController.name.controller=Star Climb Controller
+
 # Star Jump Graphics Controller (Everest)
+entities.everest/starClimbGraphicsController.name.controller=Star Climb Graphics Controller
 entities.everest/starClimbGraphicsController.description.fgColor=The foreground colour of the Star Jump Block effect.
 entities.everest/starClimbGraphicsController.description.bgColor=The background colour of the Star Jump Block effect.
 
@@ -515,6 +577,7 @@ entities.swapBlock.description.theme=The visual theme of the swap block.
 entities.zipMover.description.theme=The visual theme of the zip mover.
 
 # Moon Creature
+entities.moonCreature.name.moon_creature=Moon Creature
 entities.moonCreature.description.number=How many moon creatures should spawn in the cluster.
 
 # Floaty Space Block
@@ -768,6 +831,9 @@ triggers.windAttackTrigger.name.wind_attack=Snowballs
 
 # Wind Pattern
 triggers.windTrigger.name.wind=Wind Pattern
+
+# Wind Trigger
+triggers.windTrigger.description.pattern=Changes the abilities of the room's current wind type.
 
 
 # -- Mod Information --

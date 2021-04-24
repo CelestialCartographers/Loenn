@@ -3,6 +3,7 @@ local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
 local drawing = require("drawing")
+local nodeStruct = require("structs.node")
 
 local languageRegistry = require("language_registry")
 
@@ -89,6 +90,22 @@ function entities.getDrawable(name, handler, room, entity, viewport)
         local texture = utils.callIfFunction(handler.texture, room, entity)
         local drawable = drawableSprite.spriteFromTexture(texture, entity)
 
+        if handler.justification then
+            drawable:setJustification(unpack(handler.justification))
+        end
+
+        if handler.scale then
+            drawable:setScale(unpack(handler.scale))
+        end
+
+        if handler.offset then
+            drawable:setOffset(unpack(handler.offset))
+        end
+
+        if handler.rotation then
+            drawable.rotation = handler.rotation
+        end
+
         return drawable
 
     elseif handler.draw then
@@ -139,6 +156,22 @@ function entities.getNodeDrawable(name, handler, room, entity, viewport)
     elseif handler.nodeTexture then
         local texture = utils.callIfFunction(handler.nodeTexture, room, entity)
         local drawable = drawableSprite.spriteFromTexture(texture, entity)
+
+        if handler.nodeJustification then
+            drawable:setJustification(unpack(handler.nodeJustification))
+        end
+
+        if handler.nodeScale then
+            drawable:setScale(unpack(handler.nodeScale))
+        end
+
+        if handler.nodeOffset then
+            drawable:setOffset(unpack(handler.nodeOffset))
+        end
+
+        if handler.nodeRotation then
+            drawable.rotation = handler.nodeRotation
+        end
 
         return drawable
 
@@ -413,7 +446,7 @@ function entities.addNodeToSelection(room, layer, selection)
 
     for i, entity in ipairs(targets) do
         if entity == target then
-            local nodes = entity.nodes or {}
+            local nodes = entity.nodes or nodeStruct.decodeNodes({})
 
             -- Make sure we don't add more nodes than supported
             if #nodes >= maximumNodes and maximumNodes ~= -1 then
@@ -576,7 +609,12 @@ function entities.nodeLimits(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler and handler.nodeLimits then
-        return handler.nodeLimits(room, entity)
+        if type(handler.nodeLimits) == "function" then
+            return handler.nodeLimits(room, entity)
+
+        else
+            return unpack(handler.nodeLimits)
+        end
 
     else
         return 0, 0

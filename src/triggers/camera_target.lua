@@ -3,6 +3,7 @@
 local cameraTarget = {}
 
 cameraTarget.name = "cameraTargetTrigger"
+cameraTarget.nodeLimits = {1, 1}
 cameraTarget.placements = {
     name = "camera_target",
     data = {
@@ -13,9 +14,5 @@ cameraTarget.placements = {
         deleteFlag = ""
     }
 }
-
-function cameraTarget.nodeLimits(room, trigger)
-    return 1, 1
-end
 
 return cameraTarget

@@ -1,10 +1,39 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
 
-local defaultSpinnerColor = "Blue"
+local defaultSpinnerColor = "blue"
+local unknownSpinnerColor = "white"
+local spinnerColors = {
+    "blue",
+    "red",
+    "purple",
+    "core",
+    "rainbow"
+}
 
 local spinner = {}
 
 spinner.name = "spinner"
+spinner.placements = {
+    {
+        name = "dust_sprite",
+        data = {
+            color = "blue",
+            dust = true,
+            attachToSolid = false
+        }
+    }
+}
+
+for _, color in ipairs(spinnerColors) do
+    table.insert(spinner.placements, {
+        name = color,
+        data = {
+            color = color,
+            dust = false,
+            attachToSolid = false
+        }
+    })
+end
 
 function spinner.depth(room, entity)
     return entity.dusty and -50 or -8500
@@ -39,7 +68,7 @@ function spinner.sprite(room, entity)
             return sprite
 
         else
-            texture = "danger/crystal/fg_" .. string.lower(defaultSpinnerColor) .. "00"
+            texture = "danger/crystal/fg_" .. string.lower(unknownSpinnerColor) .. "00"
 
             return drawableSpriteStruct.spriteFromTexture(texture, position)
         end

@@ -280,8 +280,12 @@ local function pasteItems(room, layer, previews)
 
         local tlx, tly, brx, bry = getPreviewsCorners(previews)
         local width, height = brx - tlx, bry - tly
-        local widthOffset = pasteCentered and width / 2 or 0
-        local heightOffset = pasteCentered and height / 2 or 0
+        local widthOffset = pasteCentered and math.floor(width / 2) or 0
+        local heightOffset = pasteCentered and math.floor(height / 2) or 0
+
+        -- Make sure items that are already on the grid stay on it
+        local offsetX, offsetY = cursorX - tlx - widthOffset, cursorY - tly - heightOffset
+        local offsetGridX, offsetGridY = placementUtils.getGridPosition(offsetX, offsetY, false)
 
         for _, preview in ipairs(previews) do
             local item = preview.item
@@ -289,10 +293,10 @@ local function pasteItems(room, layer, previews)
 
             placementUtils.finalizePlacement(room, layer, item)
 
-            item.x = cursorX + item.x - tlx - widthOffset
-            item.y = cursorY + item.y - tly - heightOffset
-            preview.x = cursorX + preview.x - tlx - widthOffset
-            preview.y = cursorY + preview.y - tly - heightOffset
+            item.x = item.x + offsetGridX
+            item.y = item.y + offsetGridY
+            preview.x = preview.x + offsetGridX
+            preview.y = preview.y + offsetGridY
 
             local targetItems = layerItems[targetLayer]
 

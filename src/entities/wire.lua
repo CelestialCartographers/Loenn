@@ -4,6 +4,7 @@ local utils = require("utils")
 local wire = {}
 
 wire.name = "wire"
+wire.nodeLimits = {1, 1}
 
 function wire.depth(room, entity)
     return entity.above and -8500 or 2000
@@ -49,10 +50,6 @@ function wire.selection(room, entity)
     end
 
     return main, nodes
-end
-
-function wire.nodeLimits(room, entity)
-    return 1, 1
 end
 
 wire.placements = {

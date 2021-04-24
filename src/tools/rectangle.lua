@@ -35,7 +35,8 @@ tool.material = "0"
 tool.materialsLookup = {}
 
 local lastTileX, lastTileY = -1, -1
-local lastX, lastY = -1, -1
+local lastClickX, lastClickY = -1, -1
+local lastMouseX, lastMouseY = -1, -1
 local startX, startY
 local dragX, dragY
 
@@ -56,7 +57,7 @@ local function handleActionClick(x, y, force)
             snapshotHasChanged = true
         end
 
-        lastX, lastY = x, y
+        lastClickX, lastClickY = x, y
     end
 end
 
@@ -193,14 +194,15 @@ end
 
 function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
+    local room = state.getSelectedRoom()
 
-    if love.mouse.isDown(actionButton) then
-        local room = state.getSelectedRoom()
+    if room then
+        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
-        if room then
-            local px, py = viewportHandler.getRoomCoordindates(room, x, y)
-            local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
+        lastMouseX, lastMouseY = tx, ty
 
+        if love.mouse.isDown(actionButton) then
             dragX, dragY = tx, ty
         end
     end
@@ -239,9 +241,14 @@ end
 function tool.draw()
     local room = state.getSelectedRoom()
 
-    if room and startX and startY and dragX and dragY then
-        local brushX, brushY = math.min(startX, dragX), math.min(startY, dragY)
-        local width, height = math.abs(startX - dragX) + 1, math.abs(startY - dragY) + 1
+    if room  then
+        local brushX, brushY = lastMouseX, lastMouseY
+        local width, height = 1, 1
+
+        if startX and startY and dragX and dragY then
+            brushX, brushY = math.min(startX, dragX), math.min(startY, dragY)
+            width, height = math.abs(startX - dragX) + 1, math.abs(startY - dragY) + 1
+        end
 
         viewportHandler.drawRelativeTo(room.x, room.y, function()
             drawing.callKeepOriginalColor(function()

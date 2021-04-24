@@ -7,8 +7,10 @@ local configs = require("configs")
 local utils = require("utils")
 local toolUtils = require("tool_utils")
 local history = require("history")
+local nodeStruct = require("structs.node")
 local snapshotUtils = require("snapshot_utils")
 local selectionUtils = require("selections")
+local selectionItemUtils = require("selection_item_utils")
 
 local tool = {}
 
@@ -28,6 +30,8 @@ tool.validLayers = {
 local placementsAvailable = nil
 local placementTemplate = nil
 
+local placementMouseX = 0
+local placementMouseY = 0
 local placementCurrentX = 0
 local placementCurrentY = 0
 local placementDragStartX = 0
@@ -42,20 +46,6 @@ local function getCurrentPlacementType()
     return placementType
 end
 
-local function getCursorGridPosition(x, y)
-    x = x or 0
-    y = y or 0
-
-    local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
-
-    if precise then
-        return x, y
-
-    else
-        return math.floor((x + 4) / 8) * 8, math.floor((y + 4) / 8) * 8
-    end
-end
-
 local function placeItemWithHistory(room)
     local snapshot = snapshotUtils.roomLayerSnapshot(function()
         placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
@@ -64,8 +54,16 @@ local function placeItemWithHistory(room)
     history.addSnapshot(snapshot)
 end
 
+-- Get grid position and figure out if it should be offset or not based on the placement type
+local function getGridPosition(x, y, precise)
+    local placementType = getCurrentPlacementType()
+    local addHalf = placementType ~= "rectangle"
+
+    return placementUtils.getGridPosition(x, y, precise, addHalf)
+end
+
 local function dragStarted(x, y)
-    x, y = getCursorGridPosition(x, y)
+    x, y = getGridPosition(x, y)
 
     placementRectangle = utils.rectangle(x, y, 0, 0)
     placementDragCompleted = false
@@ -76,8 +74,23 @@ end
 
 local function dragChanged(x, y, width, height)
     if placementRectangle then
-        x, y = getCursorGridPosition(x, y)
-        width, height = getCursorGridPosition(width, height)
+        local gridSize = placementUtils.getGridSize()
+
+        x, y = getGridPosition(x, y)
+        width, height = getGridPosition(width, height)
+
+        width += gridSize * utils.sign(width)
+        height += gridSize * utils.sign(height)
+
+        -- Pivot around the start tile
+        -- Feels better when dragging towards top left
+        if width < 0 then
+            x += gridSize
+        end
+
+        if height < 0 then
+            y += gridSize
+        end
 
         -- Only update if needed
         if x ~= placementRectangle.x or y ~= placementRectangle.y or width ~= placementRectangle.width or height ~= placementRectangle.height then
@@ -121,7 +134,6 @@ end
 
 -- TODO - Clean up
 local function getPlacementOffset()
-    local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
     local placementType = getCurrentPlacementType()
 
     if placementType == "rectangle" or placementType == "line" then
@@ -130,7 +142,7 @@ local function getPlacementOffset()
         end
     end
 
-    return getCursorGridPosition(placementCurrentX, placementCurrentY)
+    return getGridPosition(placementCurrentX, placementCurrentY)
 end
 
 local function updatePlacementDrawable()
@@ -163,8 +175,9 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
     local resizeWidth, resizeHeight = placementUtils.canResize(room, layer, item)
     local minimumWidth, minimumHeight = placementUtils.minimumSize(room, layer, item)
 
-    local itemWidth = math.max(dragging and placementRectangle.width or 8, minimumWidth or 8)
-    local itemHeight = math.max(dragging and placementRectangle.height or 8, minimumHeight or 8)
+    local gridSize = placementUtils.getGridSize()
+    local itemWidth = math.max(dragging and placementRectangle.width or gridSize, minimumWidth or gridSize)
+    local itemHeight = math.max(dragging and placementRectangle.height or gridSize, minimumHeight or gridSize)
 
     -- Always update when not dragging
     if not dragging then
@@ -201,31 +214,42 @@ end
 
 local function updateLinePlacement(template, item, itemX, itemY)
     local dragging = placementRectangle and not placementDragCompleted
-    local node = item.nodes[1] or {}
+    local firstNode = item.nodes[1] or {}
+    local needsUpdate = false
 
     if not dragging then
         if itemX ~= item.x or itemY ~= item.y then
             item.x = itemX
             item.y = itemY
 
-            node.x = itemX + 8
-            node.y = itemY + 8
+            firstNode.x = itemX + 16
+            firstNode.y = itemY
 
-            return true
+            needsUpdate = true
         end
 
     else
-        local stopX, stopY = getCursorGridPosition(placementCurrentX, placementCurrentY)
+        local stopX, stopY = getGridPosition(placementCurrentX, placementCurrentY)
 
-        if stopX ~= node.x or stopY ~= node.y then
-            node.x = stopX
-            node.y = stopY
+        if stopX ~= firstNode.x or stopY ~= firstNode.y then
+            firstNode.x = stopX
+            firstNode.y = stopY
 
-            return true
+            needsUpdate = true
         end
     end
 
-    return false
+    -- Update all existing nodes to be after the first node
+    if needsUpdate then
+        for i, node in ipairs(item.nodes) do
+            if i ~= 1 then
+                node.x = firstNode.x + 16 * i - 16
+                node.y = firstNode.y
+            end
+        end
+    end
+
+    return needsUpdate
 end
 
 local placementUpdaters = {
@@ -242,11 +266,20 @@ local function updatePlacementNodes()
     local minimumNodes, maximumNodes = placementUtils.nodeLimits(room, tool.layer, item)
 
     if minimumNodes > 0 then
-        -- Add nodes until placement has minimum amount of nodes
-        if not item.nodes then
-            item.nodes = {}
+        -- Set up empty nodes table if needed
+        -- Make the nodes table the correct type, makes it less tedious in plugins
+        if item.nodes then
+            for _, node in ipairs(item.nodes) do
+                node.__type = nodeStruct.nodeTypeName
+            end
+
+        else
+            item.nodes = nodeStruct.decodeNodes({})
         end
 
+        item.nodes.__type = nodeStruct.nodesTypeName
+
+        -- Add nodes until placement has minimum amount of nodes
         while #item.nodes < minimumNodes do
             local widthOffset = item.width or 0
             local nodeOffset = (#item.nodes + 1) * 16
@@ -263,11 +296,10 @@ local function updatePlacementNodes()
         if placementType ~= "line" then
             for i, node in ipairs(item.nodes) do
                 local widthOffset = item.width or 0
-                local heightOffset = (item.height or 0) / 2
                 local nodeOffsetX = #item.nodes * 16
 
                 node.x = item.x + widthOffset + nodeOffsetX
-                node.y = item.y + heightOffset
+                node.y = item.y
             end
         end
     end
@@ -310,21 +342,26 @@ local function selectPlacement(name, index)
     return false
 end
 
-local function drawPlacement(room)
-    if room and placementTemplate and placementTemplate.drawable then
-        viewportHandler.drawRelativeTo(room.x, room.y, function()
-            if utils.typeof(placementTemplate.drawable) == "table" then
-                for _, drawable in ipairs(placementTemplate.drawable) do
-                    if drawable.draw then
-                        drawable:draw()
-                    end
-                end
-
-            else
-                if placementTemplate.drawable.draw then
-                    placementTemplate.drawable:draw()
-                end
+local function drawPlacementDrawable(room)
+    if utils.typeof(placementTemplate.drawable) == "table" then
+        for _, drawable in ipairs(placementTemplate.drawable) do
+            if drawable.draw then
+                drawable:draw()
             end
+        end
+
+    else
+        if placementTemplate.drawable.draw then
+            placementTemplate.drawable:draw()
+        end
+    end
+end
+
+local function drawPlacement(room)
+    if room and placementTemplate and placementTemplate.drawable and placementTemplate.item then
+        viewportHandler.drawRelativeTo(room.x, room.y, function()
+            drawPlacementDrawable(room)
+            selectionItemUtils.drawSelected(room, tool.layer, placementTemplate.item)
         end)
     end
 end
@@ -351,6 +388,13 @@ end
 
 function tool.getMaterials()
     return placementsAvailable
+end
+
+-- Offset the placement correctly for the new room
+function tool.editorMapTargetChanged()
+    local px, py = toolUtils.getCursorPositionInRoom(placementMouseX, placementMouseY)
+
+    mouseMoved(px, py)
 end
 
 function tool.mousepressed(x, y, button, istouch, presses)
@@ -384,10 +428,11 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
     local px, py = toolUtils.getCursorPositionInRoom(x, y)
 
+    placementMouseX, placementMouseY = x, y
+
     mouseMoved(px, py)
 
     if not placementDragCompleted and love.mouse.isDown(actionButton) then
-
         if px and py and placementDragStartX and placementDragStartY then
             local width, height = px - placementDragStartX, py - placementDragStartY
 

@@ -3,6 +3,7 @@ local fileLocations = require("file_locations")
 
 local modHandler = {}
 
+modHandler.internalModContent = "@Internal@"
 modHandler.commonModContent = "@ModsCommon@"
 modHandler.specificModContent = "$%s$"
 modHandler.pluginFolderNames = {

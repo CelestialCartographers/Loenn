@@ -1,11 +1,12 @@
-local drawableSpriteStruct = require("structs.drawable_sprite")
-
 local springDepth = -8501
 local springTexture = "objects/spring/00"
 
 local springUp = {}
 
 springUp.name = "spring"
+springUp.depth = springDepth
+springUp.justification = {0.5, 1.0}
+springUp.texture = springTexture
 springUp.placements = {
     name = "up",
     data = {
@@ -13,18 +14,13 @@ springUp.placements = {
     }
 }
 
-function springUp.sprite(room, entity)
-    local sprite = drawableSpriteStruct.spriteFromTexture(springTexture, entity)
-
-    sprite.depth = springDepth
-    sprite:setJustification(0.5, 1.0)
-
-    return sprite
-end
-
 local springRight = {}
 
 springRight.name = "wallSpringLeft"
+springRight.depth = springDepth
+springRight.justification = {0.5, 1.0}
+springRight.texture = springTexture
+springRight.rotation = math.pi / 2
 springRight.placements = {
     name = "right",
     data = {
@@ -32,35 +28,19 @@ springRight.placements = {
     }
 }
 
-function springRight.sprite(room, entity)
-    local sprite = drawableSpriteStruct.spriteFromTexture(springTexture, entity)
-
-    sprite.depth = springDepth
-    sprite.rotation = math.pi / 2
-    sprite:setJustification(0.5, 1.0)
-
-    return sprite
-end
-
 local springLeft = {}
 
 springLeft.name = "wallSpringRight"
+springLeft.depth = springDepth
+springLeft.justification = {0.5, 1.0}
+springLeft.texture = springTexture
+springLeft.rotation = -math.pi / 2
 springLeft.placements = {
     name = "left",
     data = {
         playerCanUse = true
     }
 }
-
-function springLeft.sprite(room, entity)
-    local sprite = drawableSpriteStruct.spriteFromTexture(springTexture, entity)
-
-    sprite.depth = springDepth
-    sprite.rotation = -math.pi / 2
-    sprite:setJustification(0.5, 1.0)
-
-    return sprite
-end
 
 return {
     springUp,

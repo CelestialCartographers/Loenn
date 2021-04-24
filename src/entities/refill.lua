@@ -6,12 +6,14 @@ refill.placements = {
     {
         name = "one_dash",
         data = {
+            oneUse = false,
             twoDash = false
         }
     },
     {
         name = "two_dashes",
         data = {
+            oneUse = false,
             twoDash = true
         }
     }

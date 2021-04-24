@@ -1,6 +1,7 @@
 local rumble = {}
 
 rumble.name = "rumbleTrigger"
+rumble.nodeLimits = {2, 2}
 rumble.placements = {
     name = "rumble",
     data = {
@@ -9,9 +10,5 @@ rumble.placements = {
         constrainHeight = false
     }
 }
-
-function rumble.nodeLimits(room, trigger)
-    return 2, 2
-end
 
 return rumble

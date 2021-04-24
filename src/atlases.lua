@@ -92,6 +92,25 @@ function atlases.loadExternalAtlas(name)
     end
 end
 
+function atlases.addInternalPrefix(resource)
+    return modHandler.internalModContent .. "/" .. resource
+end
+
+function atlases.getInternalResource(resource, name)
+    if utils.startsWith(resource, modHandler.internalModContent) then
+        -- Remove internal mod prefix and first /
+        local internalResource = resource:sub(#modHandler.internalModContent + 2)
+        local filename = string.format("assets/atlases/%s/%s.png", name, internalResource)
+        local sprite = spriteLoader.loadExternalSprite(filename)
+
+        if sprite then
+            atlases[name][resource] = sprite
+
+            return sprite
+        end
+    end
+end
+
 -- TODO - Make it possible to refetch the resource
 function atlases.getResource(resource, name)
     name = name or "Gameplay"
@@ -103,13 +122,20 @@ function atlases.getResource(resource, name)
     if resource then
         local targetResource = rawget(atlases[name], resource)
 
+        -- First attempt to see if this is an external resource
+        -- Then check if it is an internal one
         if not targetResource then
             local filename = string.format("%s/Graphics/Atlases/%s/%s.png", modHandler.commonModContent, name, resource)
             local sprite = spriteLoader.loadExternalSprite(filename)
 
-            atlases[name][resource] = sprite
+            if sprite then
+                atlases[name][resource] = sprite
 
-            return sprite
+                return sprite
+
+            else
+                return atlases.getInternalResource(resource, name)
+            end
         end
 
         return targetResource

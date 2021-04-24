@@ -11,6 +11,7 @@ local matrix = require("matrix")
 local configs = require("configs")
 local bit = require("bit")
 local modHandler = require("mods")
+local depths = require("object_depths")
 
 local entityHandler = require("entities")
 local triggerHandler = require("triggers")
@@ -29,13 +30,13 @@ celesteRender.tilesMetaBg = celesteRender.tilesMetaBgVanilla
 
 celesteRender.tilesSpriteMetaCache = {}
 
-local tilesFgDepth = -10000
-local tilesBgDepth = 10000
+local tilesFgDepth = depths.fgTerrain
+local tilesBgDepth = depths.bgTerrain
 
-local decalsFgDepth = -10500
-local decalsBgDepth = 9000
+local decalsFgDepth = depths.fgDecals
+local decalsBgDepth = depths.bgDecals
 
-local triggersDepth = -math.huge
+local triggersDepth = depths.triggers
 
 -- TODO - Figure out good number
 local YIELD_RATE = 100
@@ -466,18 +467,20 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
 
             -- Special case for multiple drawable sprites
             -- Maybe handle this better later
-            if drawable and #drawable == 0 then
-                local batchDepth = drawable.depth or depth or handlerDepth or defaultDepth
-                local batch = getOrCreateSmartBatch(batches, batchDepth)
-
-                batch:addFromDrawable(drawable)
-
-            else
-                for _, drawableItem in ipairs(drawable) do
-                    local batchDepth = drawableItem.depth or depth or handlerDepth or defaultDepth
+            if drawable then
+                if #drawable == 0 then
+                    local batchDepth = drawable.depth or depth or handlerDepth or defaultDepth
                     local batch = getOrCreateSmartBatch(batches, batchDepth)
 
-                    batch:addFromDrawable(drawableItem)
+                    batch:addFromDrawable(drawable)
+
+                else
+                    for _, drawableItem in ipairs(drawable) do
+                        local batchDepth = drawableItem.depth or depth or handlerDepth or defaultDepth
+                        local batch = getOrCreateSmartBatch(batches, batchDepth)
+
+                        batch:addFromDrawable(drawableItem)
+                    end
                 end
             end
 

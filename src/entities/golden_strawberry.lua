@@ -3,6 +3,7 @@ local strawberry = {}
 strawberry.name = "goldenBerry"
 strawberry.depth = -100
 strawberry.nodeLineRenderType = "fan"
+strawberry.nodeLimits = {0, -1}
 
 function strawberry.texture(room, entity)
     local winged = entity.winged
@@ -50,9 +51,5 @@ strawberry.placements = {
         }
     }
 }
-
-function strawberry.nodeLimits(room, entity)
-    return 0, -1
-end
 
 return strawberry

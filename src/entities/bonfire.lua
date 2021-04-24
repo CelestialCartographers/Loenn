@@ -1,14 +1,13 @@
-local drawableSpriteStruct = require("structs.drawable_sprite")
-
 local bonfire = {}
 
 bonfire.name = "bonfire"
 bonfire.depth = -5
+bonfire.justification = {0.5, 1.0}
 bonfire.placements = {
     name = "bonfire"
 }
 
-local function getTexture(entity)
+ function bonfire.texture(room, entity)
     local mode = entity.mode
 
     if mode == "lit" then
@@ -20,15 +19,6 @@ local function getTexture(entity)
     else
         return "objects/campfire/fire00"
     end
-end
-
-function bonfire.sprite(room, entity)
-    local texture = getTexture(entity)
-    local sprite = drawableSpriteStruct.spriteFromTexture(texture, entity)
-
-    sprite:setJustification(0.5, 1.0)
-
-    return sprite
 end
 
 return bonfire

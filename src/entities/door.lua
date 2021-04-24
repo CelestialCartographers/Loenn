@@ -1,12 +1,10 @@
-local drawableSpriteStruct = require("structs.drawable_sprite")
-local utils = require("utils")
-
 local door = {}
 
 local textures = {"wood", "metal"}
 
 door.name = "door"
 door.depth = 8998
+door.justification = {0.5, 1.0}
 door.placements = {}
 
 for i, texture in ipairs(textures) do
@@ -18,7 +16,7 @@ for i, texture in ipairs(textures) do
     }
 end
 
-local function getTexture(entity)
+function door.texture(room, entity)
     local variant = entity["type"]
 
     if variant == "wood" then
@@ -27,15 +25,6 @@ local function getTexture(entity)
     else
         return "objects/door/metaldoor00"
     end
-end
-
-function door.sprite(room, entity)
-    local texture = getTexture(entity)
-    local sprite = drawableSpriteStruct.spriteFromTexture(texture, entity)
-
-    sprite:setJustification(0.5, 1.0)
-
-    return sprite
 end
 
 return door

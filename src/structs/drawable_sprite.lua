@@ -243,4 +243,8 @@ function drawableSpriteStruct.spriteFromTexture(texture, data)
     end
 end
 
+function drawableSpriteStruct.spriteFromInternalTexture(texture, data)
+    return drawableSpriteStruct.spriteFromTexture(atlases.addInternalPrefix(texture), data)
+end
+
 return drawableSpriteStruct

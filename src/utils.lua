@@ -376,6 +376,18 @@ function utils.mod1(n, d)
     return m == 0 and d or m
 end
 
+function utils.sign(n)
+    if n > 0 then
+        return 1
+
+    elseif n < 0 then
+        return -1
+
+    else
+        return 0
+    end
+end
+
 function utils.logn(base, n)
     return math.log(n) / math.log(base)
 end

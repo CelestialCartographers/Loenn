@@ -8,8 +8,7 @@ local spriteLoader = require("sprite_loader")
 
 local drawableRectangle = {}
 
-drawableRectangle.tintingPixelFilename = "assets/1x1-tinting-pixel.png"
-drawableRectangle.tintingPixelMeta = spriteLoader.loadExternalSprite(drawableRectangle.tintingPixelFilename)
+drawableRectangle.tintingPixelTexture = "1x1-tinting-pixel"
 
 local function getDrawableSpriteForRectangle(x, y, width, height, color)
     local data = {}
@@ -25,7 +24,7 @@ local function getDrawableSpriteForRectangle(x, y, width, height, color)
 
     data.color = utils.getColor(color)
 
-    return drawableSprite.spriteFromMeta(drawableRectangle.tintingPixelMeta, data)
+    return drawableSprite.spriteFromInternalTexture(drawableRectangle.tintingPixelTexture, data)
 end
 
 
