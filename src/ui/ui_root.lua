@@ -51,8 +51,8 @@ function uiRoot.updateWindows(windows)
         rootElement = uiElements.group({
             mainColumn,
             notifications.getPopupWindow(),
-            tooltips.getTooltipWindow(),
-            contextMenus.getContextMenu()
+            contextMenus.getContextMenu(),
+            tooltips.getTooltipWindow()
         }):with({
             style = {
                 bg = {},
