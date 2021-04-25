@@ -9,9 +9,14 @@ stringField.fieldType = "string"
 stringField._MT = {}
 stringField._MT.__index = {}
 
+local invalidStyle = {
+    normalBorder = {0.65, 0.2, 0.2, 0.9, 2.0},
+    focusedBorder = {0.9, 0.2, 0.2, 1.0, 2.0}
+}
+
 function stringField._MT.__index:setValue(value)
-    self.field:setText(value)
-    self.currentValue = value
+    self.field:setText(self.displayTransformer(value))
+    self.currentValue = self.valueTransformer(value)
 end
 
 function stringField._MT.__index:getValue()
@@ -19,28 +24,55 @@ function stringField._MT.__index:getValue()
 end
 
 function stringField._MT.__index:fieldValid()
-    return type(self:getValue()) == "string"
+    return self.validator(self:getValue())
 end
 
 local function fieldChanged(formField)
     return function(element, new, old)
-        formField.currentValue = new
+        local wasValid = formField:fieldValid()
+        local valid = formField.validator(new)
+
+        formField.currentValue = formField.valueTransformer(new)
+
+        if wasValid ~= valid then
+            if valid then
+                -- Reset to default
+                formField.field.style = nil
+
+            else
+                formField.field.style = invalidStyle
+            end
+
+            formField.field:repaint()
+        end
     end
 end
 
 function stringField.getElement(name, value, options)
     local formField = {}
 
+    local validator = options.validator or function(v)
+        return type(v) == "string"
+    end
+
+    local valueTransformer = options.valueTransformer or function(v)
+        return v
+    end
+
+    local displayTransformer = options.displayTransformer or function(v)
+        return v
+    end
+
     local minWidth = options.minWidth or options.width or 160
     local maxWidth = options.maxWidth or options.width or 160
 
     local label = uiElements.label(options.displayName or name)
-    local field = uiElements.field(value, fieldChanged(formField)):with({
+    local field = uiElements.field(displayTransformer(value), fieldChanged(formField)):with({
         minWidth = minWidth,
         maxWidth = maxWidth
     })
 
-    field:setPlaceholder(value)
+    field:setPlaceholder(displayTransformer(value))
 
     local element = uiElements.row({
         label,
@@ -59,6 +91,9 @@ function stringField.getElement(name, value, options)
     formField.name = name
     formField.initialValue = value
     formField.currentValue = value
+    formField.validator = validator
+    formField.valueTransformer = valueTransformer
+    formField.displayTransformer = displayTransformer
     formField.width = 2
     formField.elements = {
         label, field
