@@ -27,7 +27,7 @@ local function createContextMenu(spawnedFrom, widget)
     window.spawnedFrom = spawnedFrom
 
     table.insert(contextStack, window)
-    contextMenuRoot:reflow()
+    contextMenuRoot:layout()
     ui.root:recollect()
 
     ui.runLate(function()
