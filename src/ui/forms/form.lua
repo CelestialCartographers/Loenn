@@ -26,20 +26,27 @@ function forms.getFieldElement(name, value, options)
     end
 end
 
+function forms.getFieldOptions(name, options)
+    return options.fields and options.fields[name] or {}
+end
+
 -- TODO - Options
 -- Dropdowns, editable, etc
 function forms.getFormFields(data, options)
     local ignored = table.flip(options.ignored or {})
     local ignoreUnordered = options.ignoreUnordered
+    local hidden = table.flip(options.hidden or {})
+    local hideUnordered = options.hideUnordered
     local fieldOrder = options.fieldOrder or {}
 
     local elements = {}
 
     for _, name in ipairs(fieldOrder) do
-        local fieldOptions = options.fields and options.fields[name] or {}
+        local fieldOptions = forms.getFieldOptions(name, options)
         local element = forms.getFieldElement(name, data[name], fieldOptions)
 
         ignored[name] = true
+        element._hidden = hidden[name]
 
         table.insert(elements, element)
     end
@@ -47,8 +54,11 @@ function forms.getFormFields(data, options)
     if not ignoreUnordered then
         for name, value in pairs(data) do
             if not ignored[name] then
-                local fieldOptions = options.fields and options.fields[name] or {}
+                local fieldOptions = forms.getFieldOptions(name, options)
                 local element = forms.getFieldElement(name, value, fieldOptions)
+
+                element._fieldType = name
+                element._hidden = hidden[name] or hideUnordered
 
                 table.insert(elements, element)
             end
@@ -75,17 +85,19 @@ function forms.getFormBody(data, options)
     for _, field in ipairs(formFields) do
         local fieldWidth = field.width or 1
 
-        if column + fieldWidth - 1 > columnCount then
-            column = 1
-            rows += 1
-        end
+        if not field._hidden then
+            if column + fieldWidth - 1 > columnCount then
+                column = 1
+                rows += 1
+            end
 
-        for _, element in ipairs(field.elements) do
-            local targetColumn = columnElements[column]
+            for _, element in ipairs(field.elements) do
+                local targetColumn = columnElements[column]
 
-            table.insert(targetColumn, element)
+                table.insert(targetColumn, element)
 
-            column += 1
+                column += 1
+            end
         end
     end
 
@@ -165,6 +177,17 @@ function forms.getFormData(formFields)
     end
 
     return data
+end
+
+function forms.setFormData(formFields, data, alwaysUpdate)
+    for _, field in ipairs(formFields) do
+        local name = field.name
+        local newValue = data[name]
+
+        if alwaysUpdate ~= false or newValue then
+            field:setValue(newValue)
+        end
+    end
 end
 
 function forms.formMustBeValidUpdate(formFields)
