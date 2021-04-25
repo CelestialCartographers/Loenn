@@ -31,10 +31,13 @@ end
 function booleanField.getElement(name, value, options)
     local formField = {}
 
+    local minWidth = options.minWidth or options.width or 160
+    local maxWidth = options.maxWidth or options.width or 160
+
     local label = uiElements.label(options.displayName or name)
     local dropdown = uiElements.dropdown({"True", "False"}, dropdownChanged(formField)):with({
-        minWidth = 160,
-        maxWidth = 160
+        minWidth = minWidth,
+        maxWidth = maxWidth
     })
 
     dropdown:setSelectedIndex(value and 1 or 2)

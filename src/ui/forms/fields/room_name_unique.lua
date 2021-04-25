@@ -69,10 +69,13 @@ end
 function roomNameField.getElement(name, value, options)
     local formField = {}
 
+    local minWidth = options.minWidth or options.width or 160
+    local maxWidth = options.maxWidth or options.width or 160
+
     local label = uiElements.label(options.displayName or name)
     local field = uiElements.field(value, fieldChanged(formField)):with({
-        minWidth = 160,
-        maxWidth = 160
+        minWidth = minWidth,
+        maxWidth = maxWidth
     })
 
     field:setPlaceholder(value)
