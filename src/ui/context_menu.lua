@@ -4,6 +4,7 @@ local uiUtils = require("ui.utils")
 
 local utils = require("utils")
 local widgetUtils = require("ui.widgets.utils")
+local configs = require("configs")
 
 local targetElement
 local contextMenuRoot
@@ -60,7 +61,7 @@ function contextMenuHandler.contextWindowUpdate(orig, self, dt)
     end
 end
 
-function contextMenuHandler.showContextMenu(...)
+function contextMenuHandler.showContextMenu(widget, options)
     targetElement = ui.hovering
 
     local stackSize = #contextStack
@@ -84,7 +85,7 @@ function contextMenuHandler.showContextMenu(...)
         end
     end
 
-    createContextMenu(targetElement, widgetUtils.getSimpleOverlayWidget(...))
+    createContextMenu(targetElement, widgetUtils.getSimpleOverlayWidget(widget))
 end
 
 function contextMenuHandler.getContextMenu()
@@ -95,14 +96,26 @@ function contextMenuHandler.getContextMenu()
     return contextMenuRoot
 end
 
--- TODO - Use menu button from Lönn config
-function contextMenuHandler.addContextMenu(target, ...)
-    local arguments = {...}
+local function defaultShowMenu(customButton)
+    return function(self, x, y, button, istouch)
+        local menuButton = customButton or configs.editor.contextMenuButton
+
+        return button == menuButton
+    end
+end
+
+function contextMenuHandler.addContextMenu(target, widget, options)
+    options = options or {}
+
+    local shouldShowMenu = options.shouldShowMenu or defaultShowMenu(options.contextButton)
 
     target:hook({
         onRelease = function(orig, self, x, y, button, istouch)
-            if button == 2 then
-                contextMenuHandler.showContextMenu(unpack(arguments))
+            if shouldShowMenu(self, x, y, button, istouch) then
+                contextMenuHandler.showContextMenu(widget, options)
+
+            else
+                orig(self, x, y, button, istouch)
             end
         end
     })
