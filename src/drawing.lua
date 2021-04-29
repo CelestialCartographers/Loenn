@@ -81,9 +81,10 @@ function drawing.addCenteredText(batch, text, x, y, width, height, font, fontSiz
     local textHeight = #lines * (font:getHeight() * font:getLineHeight())
 
     local offsetX = 0
-    local offsetY = (height - textHeight) / 2
+    local offsetY = math.floor((height - textHeight) / 2)
+    local wrapLimit = math.floor(width / fontSize)
 
-    batch:addf(text, width / fontSize, "center", x + offsetX, y + offsetY, 0, fontSize, fontSize)
+    batch:addf(text, wrapLimit, "center", x + offsetX, y + offsetY, 0, fontSize, fontSize)
 end
 
 function drawing.getTrianglePoints(x, y, theta, height)
