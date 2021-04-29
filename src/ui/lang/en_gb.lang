@@ -29,10 +29,29 @@ ui.room_window.creating_room=Creating room
 ui.room_window.save_changes=Save changes
 ui.room_window.close_window=Close window
 
+
 # Selection Context Window
 ui.selection_context_window.title=Editing Selections
 ui.selection_context_window.save_changes=Save changes
 ui.selection_context_window.close_window=Close window
+
+
+# Color Picker
+ui.colorPicker.fieldTypes.name.r=R
+ui.colorPicker.fieldTypes.name.g=G
+ui.colorPicker.fieldTypes.name.b=B
+ui.colorPicker.fieldTypes.name.h=H
+ui.colorPicker.fieldTypes.name.s=S
+ui.colorPicker.fieldTypes.name.v=V
+ui.colorPicker.fieldTypes.name.hexColor=Hex
+ui.colorPicker.fieldTypes.description.r=Red component of the colour, between 0 and 255.
+ui.colorPicker.fieldTypes.description.g=Green component of the colour, between 0 and 255.
+ui.colorPicker.fieldTypes.description.b=Blue component of the colour, between 0 and 255.
+ui.colorPicker.fieldTypes.description.h=Hue of the colour, between 0 and 360.
+ui.colorPicker.fieldTypes.description.s=Saturation of the colour, between 0 and 100.
+ui.colorPicker.fieldTypes.description.v=Value of the colour, between 0 and 100.
+ui.colorPicker.fieldTypes.description.hexColor=Hexadecimal representation of the colour.
+
 
 # Forms
 forms.fieldTypes.unknown_type.label=Unknown field for type '%s' in field '%s'
