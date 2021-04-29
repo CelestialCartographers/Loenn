@@ -5,6 +5,11 @@ local wire = {}
 
 wire.name = "wire"
 wire.nodeLimits = {1, 1}
+wire.fieldInformation = {
+    color = {
+        fieldType = "color"
+    }
+}
 
 function wire.depth(room, entity)
     return entity.above and -8500 or 2000

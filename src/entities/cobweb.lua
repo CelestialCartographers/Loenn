@@ -6,6 +6,11 @@ local cobweb = {}
 cobweb.name = "cobweb"
 cobweb.nodeLimits = {1, -1}
 cobweb.depth = -1
+cobweb.fieldInformation = {
+    color = {
+        fieldType = "color"
+    }
+}
 
 local function drawFromMiddle(middle, target)
     local coords = {target.x, target.y}

@@ -16,7 +16,15 @@ everestStarClimbGraphicsController.placements = {
     name = "controller",
     data = {
         fgColor = "A3FFFF",
-        bgColro = "293E4B"
+        bgColor = "293E4B"
+    }
+}
+everestStarClimbGraphicsController.fieldInformation = {
+    fgColor = {
+        fieldType = "color"
+    },
+    bgColor = {
+        fieldType = "color"
     }
 }
 
