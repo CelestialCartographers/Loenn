@@ -59,7 +59,10 @@ function widgetUtils.moveWindow(window, newX, newY, threshold, clamp, padding)
         window.x = newX
         window.y = newY
 
-        window.parent:reflow()
+        if window.parent then
+            window.parent:reflow()
+        end
+
         ui.root:recollect(false, true)
     end
 end
