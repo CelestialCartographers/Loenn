@@ -552,6 +552,17 @@ function utils.clamp(value, min, max)
     return math.min(math.max(value, min), max)
 end
 
+function utils.round(n, decimals)
+    if decimals and decimals > 0 then
+        local pow = 10^decimals
+
+        return math.floor(n * pow + 0.5) / pow
+
+    else
+        return math.floor(n + 0.5)
+    end
+end
+
 -- Add all of require utils into utils
 for k, v <- requireUtils do
     utils[k] = v
