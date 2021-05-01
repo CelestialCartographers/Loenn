@@ -90,6 +90,7 @@ local function areaInteraction(interactionData)
 
         data.s = saturation * 100
         data.v = value * 100
+        interactionData.forceFieldUpdate = true
 
         formHelper.setFormData(formFields, data)
     end
@@ -105,6 +106,7 @@ local function sliderInteraction(interactionData)
         local data = formHelper.getFormData(formFields)
 
         data.h = hue * 360
+        interactionData.forceFieldUpdate = true
 
         updateAreaColors(hue)
         formHelper.setFormData(formFields, data)
@@ -207,7 +209,7 @@ local function fieldUpdater(interactionData)
     return function()
         local formFields = interactionData.formFields
 
-        if formHelper.formValid(formFields) then
+        if interactionData.forceFieldUpdate or  formHelper.formValid(formFields) then
             local formData = formHelper.getFormData(formFields)
             local changedGroup = findChangedColorGroup(formData, interactionData.previousFormData or formData)
 
@@ -218,6 +220,7 @@ local function fieldUpdater(interactionData)
             end
 
             interactionData.previousFormData = formData
+            interactionData.forceFieldUpdate = false
         end
     end
 end
