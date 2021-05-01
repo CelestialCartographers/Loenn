@@ -183,20 +183,20 @@ local function updateFields(data, changedGroup, interactionData)
     end
 
     if changedGroup == "rgb" then
-        local r, g, b = data.r / 255, data.g / 255, data.b / 255
+        local r, g, b = (data.r or 0) / 255, (data.g or 0) / 255, (data.b or 0)/ 255
 
         updateHsvFields(data, r, g, b)
         updateHexField(data, r, g, b)
 
     elseif changedGroup == "hsv" then
-        local h, s, v = data.h / 360, data.s / 100, data.v / 100
+        local h, s, v = (data.h or 0) / 360, (data.s or 0) / 100, (data.v or 0) / 100
         updateRgbFields(data, h, s, v)
 
         local r, g, b = data.r / 255, data.g / 255, data.b / 255
         updateHexField(data, r, g, b)
     end
 
-    updateAreaColors(data.h / 360)
+    updateAreaColors((data.h or 0) / 360)
 
     if callback then
         callback(data)
