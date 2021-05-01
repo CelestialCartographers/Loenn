@@ -88,8 +88,8 @@ local function areaInteraction(interactionData)
         local value = 1 - (innerY / areaSize)
         local data = formHelper.getFormData(formFields)
 
-        data.s = saturation * 100
-        data.v = value * 100
+        data.s = utils.round(saturation * 100, hsvFieldDecimals)
+        data.v = utils.round(value * 100, hsvFieldDecimals)
         interactionData.forceFieldUpdate = true
 
         formHelper.setFormData(formFields, data)
@@ -105,7 +105,7 @@ local function sliderInteraction(interactionData)
         local hue = innerY / areaSize
         local data = formHelper.getFormData(formFields)
 
-        data.h = hue * 360
+        data.h = utils.round(hue * 360, hsvFieldDecimals)
         interactionData.forceFieldUpdate = true
 
         updateAreaColors(hue)
