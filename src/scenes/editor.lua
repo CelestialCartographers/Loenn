@@ -1,5 +1,7 @@
 local editorScene = {}
 
+local configs = require("configs")
+
 editorScene.name = "Editor"
 
 editorScene._displayWipe = true
@@ -31,13 +33,12 @@ end
 
 function editorScene:draw()
     if self.viewerState.map then
-        local item, itemType = self.viewerState.getSelectedItem()
-        local itemName = item and itemType == "room" and string.format("Room: %s", item.name) or string.format("Filler: %s %s", item.x, item.y)
-
+        love.graphics.setLineWidth(1)
         self.celesteRender.drawMap(self.viewerState)
 
-        love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
-        love.graphics.printf(itemName, 20, 80, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
+        if configs.editor.displayFPS then
+            love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
+        end
     end
 
     self:propagateEvent("draw")
