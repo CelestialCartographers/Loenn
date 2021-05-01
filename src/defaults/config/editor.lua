@@ -30,5 +30,8 @@ return {
     lazyLoadExternalAtlases = true,
 
     -- History
-    historyEntryLimit = false
+    historyEntryLimit = false,
+
+    -- Debug
+    displayFPS = false
 }
