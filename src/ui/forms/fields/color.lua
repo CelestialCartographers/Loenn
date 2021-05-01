@@ -79,21 +79,18 @@ local function fieldDrawColorPreview(orig, widget)
     orig(widget)
 
     local parsed = widget and widget._parsed
+    local r, g, b, a = widget._r or 0, widget._g or 0, widget._b or 0, parsed and 1 or 0
+    local pr, pg, pb, pa = love.graphics.getColor()
 
-    if parsed then
-        local r, g, b = widget._r, widget._g, widget._b
-        local pr, pg, pb, pa = love.graphics.getColor()
+    local drawX, drawY, width, height = getColorPreviewArea(widget)
 
-        local drawX, drawY, width, height = getColorPreviewArea(widget)
-
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.rectangle("fill",  drawX, drawY, width, height)
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.rectangle("fill",  drawX + 1, drawY + 1, width - 2, height - 2)
-        love.graphics.setColor(r, g, b)
-        love.graphics.rectangle("fill",  drawX + 2, drawY + 2, width - 4, height - 4)
-        love.graphics.setColor(pr, pg, pb, pa)
-    end
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.rectangle("fill",  drawX, drawY, width, height)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.rectangle("fill",  drawX + 1, drawY + 1, width - 2, height - 2)
+    love.graphics.setColor(r, g, b, a)
+    love.graphics.rectangle("fill",  drawX + 2, drawY + 2, width - 4, height - 4)
+    love.graphics.setColor(pr, pg, pb, pa)
 end
 
 local function shouldShowMenu(widget, x, y, button)
