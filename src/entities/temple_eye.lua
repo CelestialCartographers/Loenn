@@ -4,6 +4,9 @@ local drawableSpriteStruct = require("structs.drawable_sprite")
 local templeEye = {}
 
 templeEye.name = "templeEye"
+templeEye.placements = {
+    name = "temple_eye"
+}
 
 local function isBackground(room, entity)
     local x = entity.x or 0
@@ -24,19 +27,19 @@ function templeEye.draw(room, entity, viewport)
     local angle = math.atan2(roomY - entity.y, roomX - entity.x)
 
     local pupilData = {
-        x = entity.x + math.cos(angle),
-        y = entity.y + math.sin(angle)
+        x = entity.x + math.cos(angle) * 2,
+        y = entity.y + math.sin(angle) * 2
     }
 
     local layer = isBackground(room, entity) and "bg" or "fg"
 
-    local sprite1 = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_eye", entity)
-    local sprite2 = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_lid00", entity)
-    local sprite3 = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_pupil", pupilData)
+    local eyeSprite = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_eye", entity)
+    local lidSprite = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_lid00", entity)
+    local pupilSprite = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_pupil", pupilData)
 
-    sprite1:draw()
-    sprite2:draw()
-    sprite3:draw()
+    eyeSprite:draw()
+    lidSprite:draw()
+    pupilSprite:draw()
 end
 
 function templeEye.selection(room, entity)

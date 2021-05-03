@@ -225,6 +225,9 @@ entities.finalBoss.description.startHit=Determines whether or not Badeline waits
 entities.finalBoss.description.patternIndex=Determines what pattern of attack Badeline uses.\n 0 - Badeline transforms into the boss after being hit once\n 1 - Shoots orbs\n 2 - Shoots laser followed by one orb\n 3 - Shoots five streams of two orbs\n 4 - Shoots five streams of two orbs followed by one laser\n 5 - Shoots laser followed by three streams of two orbs\n 6 - Shoots lasers\n 7 - Shoots orbs with less delay\n 8 - Shoots lasers with less delay\n 9 - Shoots streams of two orbs\n 10 - Does nothing\n 11 - Shoots orbs with more delay\n 12 - Does nothing\n 13 - Shoots orbs after getting hit once\n 14 - Shoots lasers with very short delay\n 15 - Shoots lasers with more delay
 entities.finalBoss.description.cameraLockY=Whether the camera should be locked vertically, functioning similarly as a killbox.
 
+# Oshiro Boss
+entities.friendlyGhost.name.oshiro_boss=Oshiro Boss
+
 # Fire Ball
 entities.fireBall.name.fireball=Fireball
 entities.fireBall.description.amount=Determines the amount of fireballs on a track.
@@ -255,6 +258,9 @@ entities.seekerStatue.description.hatch=Determines whether the statue releases i
 
 # Seeker Barrier
 entities.seekerBarrier.name.seeker_barrier=Seeker Barrier
+
+# Player Seeker
+entities.playerSeeker.name.player_seeker=Player Seeker
 
 # Chapter Checkpoint
 entities.checkpoint.description.inventory=Determines the player's inventory when loading from the given chapter.\n Automatic keeps the inventory from Metadata\n Prologue: 0 dashes, Dream blocks disabled, wearing a backpack, ground refills enabled\n Default: 1 dash, Dream blocks enabled, wearing a backpack, ground refills enabled\n OldSite: 1 dash, Dream blocks disabled, wearing a backpack, ground refills enabled\n CH6End: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills enabled\n TheSummit: 2 dashes, Dream blocks enabled, not wearing a backpack, ground refills enabled\n Core: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills disabled
@@ -466,6 +472,12 @@ entities.templeGate.description.type=Determines what abilities the gate has.
 # Temple Mirror
 entities.templeMirror.description.reflectX=The horizontal offset for the reflection.
 entities.templeMirror.description.reflectY=The vertical offset for the reflection.
+
+# Temple Eye
+entities.templeEye.name.temple_eye=Temple Eye
+
+# Big Temple Eye
+entities.templeBigEyeball.name.temple_big_eyeball=Temple Big Eyeball
 
 # Sandwich Lava
 entities.sandwichLava.name.lava_sandwich=Lava Sandwich
