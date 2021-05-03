@@ -91,19 +91,39 @@ function entities.getDrawable(name, handler, room, entity, viewport)
         local drawable = drawableSprite.spriteFromTexture(texture, entity)
 
         if handler.justification then
-            drawable:setJustification(unpack(handler.justification))
+            if type(handler.justification) == "function" then
+                drawable:setJustification(handler.justification(room, entity))
+
+            else
+                drawable:setJustification(unpack(handler.justification))
+            end
         end
 
         if handler.scale then
-            drawable:setScale(unpack(handler.scale))
+            if type(handler.scale) == "function" then
+                drawable:setScale(handler.scale(room, entity))
+
+            else
+                drawable:setScale(unpack(handler.scale))
+            end
         end
 
         if handler.offset then
-            drawable:setOffset(unpack(handler.offset))
+            if type(handler.offset) == "function" then
+                drawable:setOffset(handler.offset(room, entity))
+
+            else
+                drawable:setOffset(unpack(handler.offset))
+            end
         end
 
         if handler.rotation then
-            drawable.rotation = handler.rotation
+            if type(handler.rotation) == "function" then
+                drawable.rotation = handler.rotation(room, entity)
+
+            else
+                drawable.rotation = handler.rotation
+            end
         end
 
         return drawable
