@@ -588,7 +588,12 @@ function entities.canResize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.canResize then
-        return handler.canResize(room, entity)
+        if type(handler.canResize) == "function" then
+            return handler.canResize(room, entity)
+
+        else
+            return unpack(handler.canResize)
+        end
 
     else
         return entity.width ~= nil, entity.height ~= nil
@@ -600,7 +605,12 @@ function entities.minimumSize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.minimumSize then
-        return handler.minimumSize(room, entity)
+        if type(handler.minimumSize) == "function" then
+            return handler.minimumSize(room, entity)
+
+        else
+            return unpack(handler.minimumSize)
+        end
     end
 end
 
