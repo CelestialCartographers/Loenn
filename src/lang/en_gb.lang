@@ -479,7 +479,11 @@ entities.ridgeGate.description.strawberries=Determines when the gate will appear
 entities.ridgeGate.description.keys=Determines when the gate will appear, creating a block after certain keys are collected. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
 entities.ridgeGate.description.texture=The visual apparence of the gate. Defaults to "objects/ridgeGate".
 
+# Summit Cloud
+entities.summitcloud.name.summit_cloud=Summit Cloud
+
 # Summit Checkpoints
+entities.summitcheckpoint.name.summit_checkpoint=Summit Checkpoint
 entities.summitcheckpoint.description.number=Changes the number on the checkpoint card. (Max = 99)
 
 # Bird
