@@ -326,7 +326,14 @@ entities.cobweb.description.color=Determines the colour of the cobweb.
 entities.lightbeam.description.rotation=Determines the rotation of the lightbeam.
 entities.lightbeam.description.flag=Only show up if the given flag is set, or always if left empty.
 
+# Theo Crystal
+entities.theoCrystal.name.theo_crystal=Theo Crystal
+
+# Theo Crystal Pedestal
+entities.theoCrystalPedestal.name.pedestal=Theo Crystal Pedestal
+
 # Torch
+entities.torch.name.torch=Torch
 entities.torch.description.startLit=Changes whether the light will start lit, or have the player's touch activate it.
 
 # Heart Door
