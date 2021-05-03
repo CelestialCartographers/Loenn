@@ -333,6 +333,12 @@ entities.fakeBlock.description.playTransitionReveal=Determines whether entering 
 # Glass Block
 entities.glassBlock.description.sinks=Whether the tile should sink when the player is on top.
 
+# Kevin's PC
+entities.kevins_pc.name.kevins_pc=Kevin's PC
+
+# Internet Café
+entities.wavedashmachine.name.cafe=Internet Café
+
 # Cobweb
 entities.cobweb.name.cobweb=Cobweb
 entities.cobweb.description.color=Determines the colour of the cobweb.
@@ -644,6 +650,7 @@ entities.flingBird.description.waiting=Whether the bird should visually look lik
 entities.flingBirdIntro.description.crashes=Determines which cutscene is played after the bird is caught.
 
 # Lightning Breaker Box
+entities.lightningBlock.name.breaker_box=Lightning Breaker Box
 entities.lightningBlock.description.music_session=Whether the music should be stored in session when box is broken.
 entities.lightningBlock.description.flipX=Whether the sprite should be vertically mirrored.
 entities.lightningBlock.description.flag=Whether the breaker box should disable all lightning entities without the perLevel attribute set when loading a new room. 
