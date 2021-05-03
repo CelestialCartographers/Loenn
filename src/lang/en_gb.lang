@@ -244,6 +244,15 @@ entities.iceBlock.name.ice_block=Ice Block
 # Nega Block
 entities.negaBlock.name.nega_block=Nega Block
 
+# Invisible Barrier
+entities.invisibleBarrier.name.invisible_barrier=Invisible Barrier
+
+# Strawberry Blockfield
+entities.blockField.name.block_field=Strawberry Blockfield
+
+# Killbox
+entities.killbox.name.killbox=Killbox
+
 # Tentacles
 entities.tentacles.name.tentacles=Tentacles
 entities.tentacles.description.slide_until=Changes how far tentacles fall back when Madeline comes into fear distance.
@@ -624,6 +633,7 @@ entities.birdPath.description.speedMult=Speed multiplier for the flight speed.
 entities.fakeHeart.description.color=Which colour to use for the heart.\nNormal - Blue\nBSide - Red\nCSide - Yellow
 
 # Lightning
+entities.lightning.name.lightning=Lightning
 entities.lightning.description.moveTime=The time it takes to move from the base position to the node position.
 entities.lightning.description.perLevel=Whether the lightning ignores the global disabling flag set by breaker boxes with the flag attribute set.
 
