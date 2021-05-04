@@ -283,11 +283,13 @@ function entities.getSelection(room, entity, viewport)
         local drawable = entities.getDrawable(name, handler, room, entity)
         local nodeRectangles = entities.getNodeRectangles(room, entity)
 
-        if #drawable == 0 and drawable.getRectangle then
-            return drawable:getRectangle(), nodeRectangles
+        if drawable then
+            if #drawable == 0 and drawable.getRectangle then
+                return drawable:getRectangle(), nodeRectangles
 
-        else
-            return getSpriteRectangle(drawable), nodeRectangles
+            else
+                return getSpriteRectangle(drawable), nodeRectangles
+            end
         end
     end
 end
