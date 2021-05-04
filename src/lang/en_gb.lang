@@ -97,6 +97,9 @@ entities.door.name.wood=Door (Wood)
 entities.door.name.metal=Door (Metal)
 entities.door.description.type=Changes the door to metal or wood.
 
+# Trapdoor
+entities.trapdoor.name.trapdoor=Trapdoor
+
 # Dream Mirror
 entities.dreammirror.name.normal=Dream Mirror
 
@@ -421,6 +424,10 @@ entities.slider.description.clockwise=Whether the slider will run clockwise or c
 entities.slider.description.surface=Attaches the slider to a surface.
 
 # Lock Block
+entities.lockBlock.name.wood=Lock Block (Wood)
+entities.lockBlock.name.temple_a=Lock Block (Temple A)
+entities.lockBlock.name.temple_b=Lock Block (Temple B)
+entities.lockBlock.name.moon=Lock Block (Moon)
 entities.lockBlock.description.sprite=Changes the visual appearance of the locked door.
 entities.lockBlock.description.unlock_sfx=The sound to play when unlocking the door. Leave empty for default.
 entities.lockBlock.description.stepMusicProgress=Whether unlocking the door should increment the music progress by one.
@@ -444,7 +451,12 @@ entities.triggerSpikesOriginalRight.description.type=Changes the visual appearan
 # Coverup Wall
 entities.coverupWall.description.tiletype=Changes the visual appearance of the wall.
 
+# Fall Plateau
+entities.plateau.name.plateau=Plateau
+
 # Lamp
+entities.lamp.name.normal=Lamp
+entities.lamp.name.broken=Lamp (Broken)
 entities.lamp.description.broken=Changes the visual appearance of the lamp to be broken.
 
 # Falling Block
