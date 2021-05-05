@@ -302,6 +302,7 @@ entities.trackSpinner.description.dust=Turns the visual appearance of the blade 
 entities.trackSpinner.description.star=Turns the visual appearance of the blade into a star.
 
 # Watchtower
+entities.towerviewer.name.watchtower=Watchtower
 entities.towerviewer.description.summit=Whether the watch tower should zoom on the final node or not. Requires nodes to function, otherwise game will crash.
 entities.towerviewer.description.onlyY=Whether the watch tower can only move vertically. If the watch tower has nodes it will still follow them.
 
@@ -394,6 +395,7 @@ entities.dashSwitchV.description.sprite=Changes the visual appearance of the swi
 entities.memorial.description.dreaming=Changes the memorial's text to the dream state from Old Site.
 
 # Memorial (Everest)
+entities.everest/memorial.name.memorial=Custom Memorial
 entities.everest/memorial.description.dreaming=Changes the memorial's text to the dream state from Old Site.
 entities.everest/memorial.description.dialog=What dialog ID to pull the memorial's text from.
 entities.everest/memorial.description.sprite=What sprite to render for the memorial.
@@ -407,6 +409,7 @@ entities.water.description.hasBottom=Determines whether or not the water has a b
 entities.npc.description.npc=Changes which NPC entity appears from a list of entities. Certain entities carry dialogue from certain scenes in the game.
 
 # NPC (Everest)
+entities.everest/npc.name.npc=Custom NPC
 entities.everest/npc.description.indicatorOffsetX=Offset for the chat icon on the X axis.
 entities.everest/npc.description.indicatorOffsetY=Offset for the chat icon on the Y axis.
 entities.everest/npc.description.dialogId=The dialog ID to use for the dialogue.
@@ -637,6 +640,7 @@ entities.floatySpaceBlock.description.tiletype=Determines the visual appearance 
 entities.floatySpaceBlock.description.disableSpawnOffset=Whether or not the entity should spawn without the random offset.
 
 # Plyback Tutorial
+entities.playbackTutorial.name.playback=Ghost Player Playback
 entities.playbackTutorial.description.tutorial=Determines which tutorial ghost is played.\nFilename is relative to the `Tutorials` folder, and without the .bin extension.
 
 # Crumble Wall On Rumble
