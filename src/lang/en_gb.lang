@@ -526,11 +526,13 @@ entities.summitcheckpoint.name.summit_checkpoint=Summit Checkpoint
 entities.summitcheckpoint.description.number=Changes the number on the checkpoint card. (Max = 99)
 
 # Bird
+entities.bird.name.bird=Bird NPC
 entities.bird.description.mode=Determines what properties the bird has.
 entities.bird.description.onlyOnce=Determines whether the bird should only show itself once when in "MoveToNodes" mode.
 entities.bird.description.onlyIfPlayerLeft=The bird will only spawn if the player starts to the left of it.
 
 # Custom Tutorial Bird (Everest)
+entities.everest/customBirdTutorial.name.bird=Custom Bird Tutorial
 entities.everest/customBirdTutorial.description.birdId=The unique id of the bird when used in combination with Custom Tutorial Bird triggers. Useful for extra control over multiple birds in one room.
 entities.everest/customBirdTutorial.description.controls=The controls to display in the bubble, separated by commas. Each part can be:\n- a path to a texture in the Gui atlas (for example "tinyarrow")\n- a direction: Down, DownRight, Right, UpRight, Up, UpLeft, Left, DownLeft\n- a button: Jump, Dash, Grab, Talk, ESC, Pause, MenuLeft, MenuRight, MenuUp, MenuDown, MenuConfirm, MenuCancel, MenuJournal, QuickRestart\n- a dialog ID, if you prefix it with "dialog:" (for example, "dialog:TUTORIAL_DREAMJUMP")\n- plain text
 entities.everest/customBirdTutorial.description.info=The speech bubble title. Can either be a dialog ID or a path to a texture in the GUI atlas.
@@ -643,6 +645,7 @@ entities.crumbleWallOnRumble.description.tiletype=Determines the visual appearan
 entities.crumbleWallOnRumble.description.persistent=Once broken, the block will remain that way, even if the player dies.
 
 # Bird Path
+entities.birdPath.name.bird_path=Bird Path
 entities.birdPath.description.only_once=If the bird will only fly the path once, and not come back on death or room transitions.
 entities.birdPath.description.onlyIfLeft=The bird will only fly if the player is to the left of the entity.
 entities.birdPath.description.speedMult=Speed multiplier for the flight speed.
@@ -656,9 +659,11 @@ entities.lightning.description.moveTime=The time it takes to move from the base 
 entities.lightning.description.perLevel=Whether the lightning ignores the global disabling flag set by breaker boxes with the flag attribute set.
 
 # Fling Bird
+entities.flingBird.name.fling_bird=Fling Bird
 entities.flingBird.description.waiting=Whether the bird should visually look like it is tired and waiting to grab the player.
 
 # Fling Bird Intro
+entities.flingBirdIntro.name.fling_bird=Fling Bird Intro
 entities.flingBirdIntro.description.crashes=Determines which cutscene is played after the bird is caught.
 
 # Lightning Breaker Box
