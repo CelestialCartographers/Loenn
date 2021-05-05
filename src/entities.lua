@@ -11,6 +11,8 @@ local drawableSprite = require("structs.drawable_sprite")
 local drawableFunction = require("structs.drawable_function")
 local drawableRectangle = require("structs.drawable_rectangle")
 
+local missingTextureName = modHandler.internalModContent .. "/missing_image"
+
 local colors = require("colors")
 
 local entities = {}
@@ -127,7 +129,16 @@ function entities.getDrawable(name, handler, room, entity, viewport)
         local texture = utils.callIfFunction(handler.texture, room, entity)
         local drawable = drawableSprite.spriteFromTexture(texture, entity)
 
-        addAutomaticDrawableFields(handler, drawable, room, entity)
+        if drawable then
+            addAutomaticDrawableFields(handler, drawable, room, entity)
+
+        else
+            drawable = drawableSprite.spriteFromTexture(missingTextureName, entity)
+
+            if configs.editor.warnOnMissingTexture then
+                print(string.format("Could not find texture '%s' for entity '%s' in room '%s'", texture, entity._name, room.name))
+            end
+        end
 
         return drawable
 
