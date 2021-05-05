@@ -70,6 +70,43 @@ function entities.getDefaultDepth(name, handler, room, entity, viewport)
     return utils.callIfFunction(handler.depth, room, entity, viewport) or 0
 end
 
+local function addAutomaticDrawableFields(handler, drawable, room, entity)
+    if handler.justification then
+        if type(handler.justification) == "function" then
+            drawable:setJustification(handler.justification(room, entity))
+
+        else
+            drawable:setJustification(unpack(handler.justification))
+        end
+    end
+
+    if handler.scale then
+        if type(handler.scale) == "function" then
+            drawable:setScale(handler.scale(room, entity))
+
+        else
+            drawable:setScale(unpack(handler.scale))
+        end
+    end
+
+    if handler.offset then
+        if type(handler.offset) == "function" then
+            drawable:setOffset(handler.offset(room, entity))
+
+        else
+            drawable:setOffset(unpack(handler.offset))
+        end
+    end
+
+    if handler.rotation then
+        drawable.rotation = utils.callIfFunction(handler.rotation, room, entity)
+    end
+
+    if handler.color then
+        drawable.color = utils.callIfFunction(handler.color, room, entity)
+    end
+end
+
 -- Returns drawable, depth
 function entities.getDrawable(name, handler, room, entity, viewport)
     handler = handler or entities.registeredEntities[name]
@@ -90,41 +127,7 @@ function entities.getDrawable(name, handler, room, entity, viewport)
         local texture = utils.callIfFunction(handler.texture, room, entity)
         local drawable = drawableSprite.spriteFromTexture(texture, entity)
 
-        if handler.justification then
-            if type(handler.justification) == "function" then
-                drawable:setJustification(handler.justification(room, entity))
-
-            else
-                drawable:setJustification(unpack(handler.justification))
-            end
-        end
-
-        if handler.scale then
-            if type(handler.scale) == "function" then
-                drawable:setScale(handler.scale(room, entity))
-
-            else
-                drawable:setScale(unpack(handler.scale))
-            end
-        end
-
-        if handler.offset then
-            if type(handler.offset) == "function" then
-                drawable:setOffset(handler.offset(room, entity))
-
-            else
-                drawable:setOffset(unpack(handler.offset))
-            end
-        end
-
-        if handler.rotation then
-            if type(handler.rotation) == "function" then
-                drawable.rotation = handler.rotation(room, entity)
-
-            else
-                drawable.rotation = handler.rotation
-            end
-        end
+        addAutomaticDrawableFields(handler, drawable, room, entity)
 
         return drawable
 
