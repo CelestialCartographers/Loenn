@@ -31,14 +31,14 @@ function languageRegistry.unloadFiles()
 end
 
 function languageRegistry.loadInternalFiles()
-    pluginLoader.loadPlugins("lang", nil, languageRegistry.loadLanguageFile, false)
-    pluginLoader.loadPlugins("ui/lang", nil, languageRegistry.loadLanguageFile, false)
+    pluginLoader.loadPlugins("lang", nil, languageRegistry.loadLanguageFile, false, "lang")
+    pluginLoader.loadPlugins("ui/lang", nil, languageRegistry.loadLanguageFile, false, "lang")
 end
 
 function languageRegistry.loadExternalFiles()
     local filenames = modHandler.findLanguageFiles("lang")
 
-    pluginLoader.loadPlugins(filenames, nil, languageRegistry.loadLanguageFile)
+    pluginLoader.loadPlugins(filenames, nil, languageRegistry.loadLanguageFile, "lang")
 end
 
 return languageRegistry
