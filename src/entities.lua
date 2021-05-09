@@ -157,12 +157,9 @@ function entities.getDrawable(name, handler, room, entity, viewport)
 
         -- If both fillColor and borderColor is specified then make a rectangle with these
         if handler.fillColor and handler.borderColor then
-            local drawableFill = drawableRectangle.fromRectangle("fill", handler.fillColor, rectangle):getDrawableSprite()
-            local drawableBorder = drawableRectangle.fromRectangle("line", handler.borderColor, rectangle):getDrawableSprite()
+            local drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, handler.fillColor, handler.borderColor):getDrawableSprite()
 
-            table.insert(drawableBorder, 1, drawableFill)
-
-            return drawableBorder
+            return drawableSprites
 
         else
             local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)

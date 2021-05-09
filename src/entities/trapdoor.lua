@@ -11,7 +11,7 @@ trapdoor.placements = {
 local color = {22 / 255, 27 / 255, 48 / 255, 1.0}
 
 function trapdoor.sprite(room, entity)
-    return drawableRectangle.fromRectangle("fill", color, entity.x, entity.y + 6, 24, 4)
+    return drawableRectangle.fromRectangle("fill", entity.x, entity.y + 6, 24, 4, color)
 end
 
 return trapdoor
