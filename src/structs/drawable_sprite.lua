@@ -137,8 +137,8 @@ function drawableSpriteMt.__index:drawRectangle(mode, color)
 end
 
 function drawableSpriteMt.__index:draw()
-    local offsetX = self.offsetX or ((self.justificationX or 0.0) * self.meta.realWidth + self.meta.offsetX)
-    local offsetY = self.offsetY or ((self.justificationY or 0.0) * self.meta.realHeight + self.meta.offsetY)
+    local offsetX = math.floor(self.offsetX or ((self.justificationX or 0.0) * self.meta.realWidth + self.meta.offsetX))
+    local offsetY = math.floor(self.offsetY or ((self.justificationY or 0.0) * self.meta.realHeight + self.meta.offsetY))
 
     local layer = self.meta.layer
 

@@ -97,6 +97,9 @@ entities.door.name.wood=Door (Wood)
 entities.door.name.metal=Door (Metal)
 entities.door.description.type=Changes the door to metal or wood.
 
+# Trapdoor
+entities.trapdoor.name.trapdoor=Trapdoor
+
 # Dream Mirror
 entities.dreammirror.name.normal=Dream Mirror
 
@@ -225,6 +228,12 @@ entities.finalBoss.description.startHit=Determines whether or not Badeline waits
 entities.finalBoss.description.patternIndex=Determines what pattern of attack Badeline uses.\n 0 - Badeline transforms into the boss after being hit once\n 1 - Shoots orbs\n 2 - Shoots laser followed by one orb\n 3 - Shoots five streams of two orbs\n 4 - Shoots five streams of two orbs followed by one laser\n 5 - Shoots laser followed by three streams of two orbs\n 6 - Shoots lasers\n 7 - Shoots orbs with less delay\n 8 - Shoots lasers with less delay\n 9 - Shoots streams of two orbs\n 10 - Does nothing\n 11 - Shoots orbs with more delay\n 12 - Does nothing\n 13 - Shoots orbs after getting hit once\n 14 - Shoots lasers with very short delay\n 15 - Shoots lasers with more delay
 entities.finalBoss.description.cameraLockY=Whether the camera should be locked vertically, functioning similarly as a killbox.
 
+# Oshiro Boss
+entities.friendlyGhost.name.oshiro_boss=Oshiro Boss
+
+# Oshiro Door
+entities.oshirodoor.name.oshiro_door=Oshiro Door
+
 # Fire Ball
 entities.fireBall.name.fireball=Fireball
 entities.fireBall.description.amount=Determines the amount of fireballs on a track.
@@ -241,6 +250,15 @@ entities.iceBlock.name.ice_block=Ice Block
 # Nega Block
 entities.negaBlock.name.nega_block=Nega Block
 
+# Invisible Barrier
+entities.invisibleBarrier.name.invisible_barrier=Invisible Barrier
+
+# Strawberry Blockfield
+entities.blockField.name.block_field=Strawberry Blockfield
+
+# Killbox
+entities.killbox.name.killbox=Killbox
+
 # Tentacles
 entities.tentacles.name.tentacles=Tentacles
 entities.tentacles.description.slide_until=Changes how far tentacles fall back when Madeline comes into fear distance.
@@ -255,6 +273,9 @@ entities.seekerStatue.description.hatch=Determines whether the statue releases i
 
 # Seeker Barrier
 entities.seekerBarrier.name.seeker_barrier=Seeker Barrier
+
+# Player Seeker
+entities.playerSeeker.name.player_seeker=Player Seeker
 
 # Chapter Checkpoint
 entities.checkpoint.description.inventory=Determines the player's inventory when loading from the given chapter.\n Automatic keeps the inventory from Metadata\n Prologue: 0 dashes, Dream blocks disabled, wearing a backpack, ground refills enabled\n Default: 1 dash, Dream blocks enabled, wearing a backpack, ground refills enabled\n OldSite: 1 dash, Dream blocks disabled, wearing a backpack, ground refills enabled\n CH6End: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills enabled\n TheSummit: 2 dashes, Dream blocks enabled, not wearing a backpack, ground refills enabled\n Core: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills disabled
@@ -284,6 +305,7 @@ entities.trackSpinner.description.dust=Turns the visual appearance of the blade 
 entities.trackSpinner.description.star=Turns the visual appearance of the blade into a star.
 
 # Watchtower
+entities.towerviewer.name.watchtower=Watchtower
 entities.towerviewer.description.summit=Whether the watch tower should zoom on the final node or not. Requires nodes to function, otherwise game will crash.
 entities.towerviewer.description.onlyY=Whether the watch tower can only move vertically. If the watch tower has nodes it will still follow them.
 
@@ -316,7 +338,14 @@ entities.fakeBlock.description.tiletype=Changes the visual appearance of the wal
 entities.fakeBlock.description.playTransitionReveal=Determines whether entering the block should play the reveal jingle.
 
 # Glass Block
+entities.glassBlock.name.glass_block=Glass Block
 entities.glassBlock.description.sinks=Whether the tile should sink when the player is on top.
+
+# Kevin's PC
+entities.kevins_pc.name.kevins_pc=Kevin's PC
+
+# Internet Café
+entities.wavedashmachine.name.cafe=Internet Café
 
 # Cobweb
 entities.cobweb.name.cobweb=Cobweb
@@ -326,7 +355,14 @@ entities.cobweb.description.color=Determines the colour of the cobweb.
 entities.lightbeam.description.rotation=Determines the rotation of the lightbeam.
 entities.lightbeam.description.flag=Only show up if the given flag is set, or always if left empty.
 
+# Theo Crystal
+entities.theoCrystal.name.theo_crystal=Theo Crystal
+
+# Theo Crystal Pedestal
+entities.theoCrystalPedestal.name.pedestal=Theo Crystal Pedestal
+
 # Torch
+entities.torch.name.torch=Torch
 entities.torch.description.startLit=Changes whether the light will start lit, or have the player's touch activate it.
 
 # Heart Door
@@ -363,6 +399,7 @@ entities.dashSwitchV.description.sprite=Changes the visual appearance of the swi
 entities.memorial.description.dreaming=Changes the memorial's text to the dream state from Old Site.
 
 # Memorial (Everest)
+entities.everest/memorial.name.memorial=Custom Memorial
 entities.everest/memorial.description.dreaming=Changes the memorial's text to the dream state from Old Site.
 entities.everest/memorial.description.dialog=What dialog ID to pull the memorial's text from.
 entities.everest/memorial.description.sprite=What sprite to render for the memorial.
@@ -376,6 +413,7 @@ entities.water.description.hasBottom=Determines whether or not the water has a b
 entities.npc.description.npc=Changes which NPC entity appears from a list of entities. Certain entities carry dialogue from certain scenes in the game.
 
 # NPC (Everest)
+entities.everest/npc.name.npc=Custom NPC
 entities.everest/npc.description.indicatorOffsetX=Offset for the chat icon on the X axis.
 entities.everest/npc.description.indicatorOffsetY=Offset for the chat icon on the Y axis.
 entities.everest/npc.description.dialogId=The dialog ID to use for the dialogue.
@@ -393,6 +431,10 @@ entities.slider.description.clockwise=Whether the slider will run clockwise or c
 entities.slider.description.surface=Attaches the slider to a surface.
 
 # Lock Block
+entities.lockBlock.name.wood=Lock Block (Wood)
+entities.lockBlock.name.temple_a=Lock Block (Temple A)
+entities.lockBlock.name.temple_b=Lock Block (Temple B)
+entities.lockBlock.name.moon=Lock Block (Moon)
 entities.lockBlock.description.sprite=Changes the visual appearance of the locked door.
 entities.lockBlock.description.unlock_sfx=The sound to play when unlocking the door. Leave empty for default.
 entities.lockBlock.description.stepMusicProgress=Whether unlocking the door should increment the music progress by one.
@@ -416,7 +458,12 @@ entities.triggerSpikesOriginalRight.description.type=Changes the visual appearan
 # Coverup Wall
 entities.coverupWall.description.tiletype=Changes the visual appearance of the wall.
 
+# Fall Plateau
+entities.plateau.name.plateau=Plateau
+
 # Lamp
+entities.lamp.name.normal=Lamp
+entities.lamp.name.broken=Lamp (Broken)
 entities.lamp.description.broken=Changes the visual appearance of the lamp to be broken.
 
 # Falling Block
@@ -460,6 +507,12 @@ entities.templeGate.description.type=Determines what abilities the gate has.
 entities.templeMirror.description.reflectX=The horizontal offset for the reflection.
 entities.templeMirror.description.reflectY=The vertical offset for the reflection.
 
+# Temple Eye
+entities.templeEye.name.temple_eye=Temple Eye
+
+# Big Temple Eye
+entities.templeBigEyeball.name.temple_big_eyeball=Temple Big Eyeball
+
 # Sandwich Lava
 entities.sandwichLava.name.lava_sandwich=Lava Sandwich
 
@@ -472,15 +525,21 @@ entities.ridgeGate.description.strawberries=Determines when the gate will appear
 entities.ridgeGate.description.keys=Determines when the gate will appear, creating a block after certain keys are collected. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
 entities.ridgeGate.description.texture=The visual apparence of the gate. Defaults to "objects/ridgeGate".
 
+# Summit Cloud
+entities.summitcloud.name.summit_cloud=Summit Cloud
+
 # Summit Checkpoints
+entities.summitcheckpoint.name.summit_checkpoint=Summit Checkpoint
 entities.summitcheckpoint.description.number=Changes the number on the checkpoint card. (Max = 99)
 
 # Bird
+entities.bird.name.bird=Bird NPC
 entities.bird.description.mode=Determines what properties the bird has.
 entities.bird.description.onlyOnce=Determines whether the bird should only show itself once when in "MoveToNodes" mode.
 entities.bird.description.onlyIfPlayerLeft=The bird will only spawn if the player starts to the left of it.
 
 # Custom Tutorial Bird (Everest)
+entities.everest/customBirdTutorial.name.bird=Custom Bird Tutorial
 entities.everest/customBirdTutorial.description.birdId=The unique id of the bird when used in combination with Custom Tutorial Bird triggers. Useful for extra control over multiple birds in one room.
 entities.everest/customBirdTutorial.description.controls=The controls to display in the bubble, separated by commas. Each part can be:\n- a path to a texture in the Gui atlas (for example "tinyarrow")\n- a direction: Down, DownRight, Right, UpRight, Up, UpLeft, Left, DownLeft\n- a button: Jump, Dash, Grab, Talk, ESC, Pause, MenuLeft, MenuRight, MenuUp, MenuDown, MenuConfirm, MenuCancel, MenuJournal, QuickRestart\n- a dialog ID, if you prefix it with "dialog:" (for example, "dialog:TUTORIAL_DREAMJUMP")\n- plain text
 entities.everest/customBirdTutorial.description.info=The speech bubble title. Can either be a dialog ID or a path to a texture in the GUI atlas.
@@ -585,6 +644,7 @@ entities.floatySpaceBlock.description.tiletype=Determines the visual appearance 
 entities.floatySpaceBlock.description.disableSpawnOffset=Whether or not the entity should spawn without the random offset.
 
 # Plyback Tutorial
+entities.playbackTutorial.name.playback=Ghost Player Playback
 entities.playbackTutorial.description.tutorial=Determines which tutorial ghost is played.\nFilename is relative to the `Tutorials` folder, and without the .bin extension.
 
 # Crumble Wall On Rumble
@@ -593,6 +653,7 @@ entities.crumbleWallOnRumble.description.tiletype=Determines the visual appearan
 entities.crumbleWallOnRumble.description.persistent=Once broken, the block will remain that way, even if the player dies.
 
 # Bird Path
+entities.birdPath.name.bird_path=Bird Path
 entities.birdPath.description.only_once=If the bird will only fly the path once, and not come back on death or room transitions.
 entities.birdPath.description.onlyIfLeft=The bird will only fly if the player is to the left of the entity.
 entities.birdPath.description.speedMult=Speed multiplier for the flight speed.
@@ -601,16 +662,20 @@ entities.birdPath.description.speedMult=Speed multiplier for the flight speed.
 entities.fakeHeart.description.color=Which colour to use for the heart.\nNormal - Blue\nBSide - Red\nCSide - Yellow
 
 # Lightning
+entities.lightning.name.lightning=Lightning
 entities.lightning.description.moveTime=The time it takes to move from the base position to the node position.
 entities.lightning.description.perLevel=Whether the lightning ignores the global disabling flag set by breaker boxes with the flag attribute set.
 
 # Fling Bird
+entities.flingBird.name.fling_bird=Fling Bird
 entities.flingBird.description.waiting=Whether the bird should visually look like it is tired and waiting to grab the player.
 
 # Fling Bird Intro
+entities.flingBirdIntro.name.fling_bird=Fling Bird Intro
 entities.flingBirdIntro.description.crashes=Determines which cutscene is played after the bird is caught.
 
 # Lightning Breaker Box
+entities.lightningBlock.name.breaker_box=Lightning Breaker Box
 entities.lightningBlock.description.music_session=Whether the music should be stored in session when box is broken.
 entities.lightningBlock.description.flipX=Whether the sprite should be vertically mirrored.
 entities.lightningBlock.description.flag=Whether the breaker box should disable all lightning entities without the perLevel attribute set when loading a new room. 

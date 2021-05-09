@@ -86,11 +86,11 @@ end
 function debugUtils.reloadEverything()
     print("! Reloading everything")
 
+    debugUtils.reloadLanguageFiles()
     debugUtils.reloadEntities()
     debugUtils.reloadTriggers()
     debugUtils.reloadTools()
     debugUtils.reloadScenes()
-    debugUtils.reloadLanguageFiles()
     debugUtils.redrawMap()
     debugUtils.reloadUI()
 end

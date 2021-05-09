@@ -99,11 +99,9 @@ function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
         local width = trigger.width or 16
         local height = trigger.height or 16
 
-        local fillRectangle = drawableRectangle.fromRectangle("fill", colors.triggerColor, x, y, width, height)
-        local borderRectangle = drawableRectangle.fromRectangle("line", colors.triggerColor, x, y, width, height)
+        local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, colors.triggerColor, colors.triggerColor)
 
-        batch:addFromDrawable(fillRectangle)
-        batch:addFromDrawable(borderRectangle)
+        batch:addFromDrawable(borderedRectangle)
 
         if i % yieldRate == 0 then
             coroutine.yield(batch)

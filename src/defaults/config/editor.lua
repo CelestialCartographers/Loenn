@@ -33,5 +33,6 @@ return {
     historyEntryLimit = false,
 
     -- Debug
-    displayFPS = false
+    displayFPS = false,
+    warnOnMissingTexture = false
 }

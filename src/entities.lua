@@ -11,6 +11,8 @@ local drawableSprite = require("structs.drawable_sprite")
 local drawableFunction = require("structs.drawable_function")
 local drawableRectangle = require("structs.drawable_rectangle")
 
+local missingTextureName = modHandler.internalModContent .. "/missing_image"
+
 local colors = require("colors")
 
 local entities = {}
@@ -70,6 +72,43 @@ function entities.getDefaultDepth(name, handler, room, entity, viewport)
     return utils.callIfFunction(handler.depth, room, entity, viewport) or 0
 end
 
+local function addAutomaticDrawableFields(handler, drawable, room, entity)
+    if handler.justification then
+        if type(handler.justification) == "function" then
+            drawable:setJustification(handler.justification(room, entity))
+
+        else
+            drawable:setJustification(unpack(handler.justification))
+        end
+    end
+
+    if handler.scale then
+        if type(handler.scale) == "function" then
+            drawable:setScale(handler.scale(room, entity))
+
+        else
+            drawable:setScale(unpack(handler.scale))
+        end
+    end
+
+    if handler.offset then
+        if type(handler.offset) == "function" then
+            drawable:setOffset(handler.offset(room, entity))
+
+        else
+            drawable:setOffset(unpack(handler.offset))
+        end
+    end
+
+    if handler.rotation then
+        drawable.rotation = utils.callIfFunction(handler.rotation, room, entity)
+    end
+
+    if handler.color then
+        drawable.color = utils.callIfFunction(handler.color, room, entity)
+    end
+end
+
 -- Returns drawable, depth
 function entities.getDrawable(name, handler, room, entity, viewport)
     handler = handler or entities.registeredEntities[name]
@@ -90,20 +129,15 @@ function entities.getDrawable(name, handler, room, entity, viewport)
         local texture = utils.callIfFunction(handler.texture, room, entity)
         local drawable = drawableSprite.spriteFromTexture(texture, entity)
 
-        if handler.justification then
-            drawable:setJustification(unpack(handler.justification))
-        end
+        if drawable then
+            addAutomaticDrawableFields(handler, drawable, room, entity)
 
-        if handler.scale then
-            drawable:setScale(unpack(handler.scale))
-        end
+        else
+            drawable = drawableSprite.spriteFromTexture(missingTextureName, entity)
 
-        if handler.offset then
-            drawable:setOffset(unpack(handler.offset))
-        end
-
-        if handler.rotation then
-            drawable.rotation = handler.rotation
+            if configs.editor.warnOnMissingTexture then
+                print(string.format("Could not find texture '%s' for entity '%s' in room '%s'", texture, entity._name, room.name))
+            end
         end
 
         return drawable
@@ -123,12 +157,9 @@ function entities.getDrawable(name, handler, room, entity, viewport)
 
         -- If both fillColor and borderColor is specified then make a rectangle with these
         if handler.fillColor and handler.borderColor then
-            local drawableFill = drawableRectangle.fromRectangle("fill", handler.fillColor, rectangle):getDrawableSprite()
-            local drawableBorder = drawableRectangle.fromRectangle("line", handler.borderColor, rectangle):getDrawableSprite()
+            local drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, handler.fillColor, handler.borderColor):getDrawableSprite()
 
-            table.insert(drawableBorder, 1, drawableFill)
-
-            return drawableBorder
+            return drawableSprites
 
         else
             local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)
@@ -263,11 +294,13 @@ function entities.getSelection(room, entity, viewport)
         local drawable = entities.getDrawable(name, handler, room, entity)
         local nodeRectangles = entities.getNodeRectangles(room, entity)
 
-        if #drawable == 0 and drawable.getRectangle then
-            return drawable:getRectangle(), nodeRectangles
+        if drawable then
+            if #drawable == 0 and drawable.getRectangle then
+                return drawable:getRectangle(), nodeRectangles
 
-        else
-            return getSpriteRectangle(drawable), nodeRectangles
+            else
+                return getSpriteRectangle(drawable), nodeRectangles
+            end
         end
     end
 end
@@ -588,7 +621,12 @@ function entities.canResize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.canResize then
-        return handler.canResize(room, entity)
+        if type(handler.canResize) == "function" then
+            return handler.canResize(room, entity)
+
+        else
+            return unpack(handler.canResize)
+        end
 
     else
         return entity.width ~= nil, entity.height ~= nil
@@ -600,7 +638,12 @@ function entities.minimumSize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.minimumSize then
-        return handler.minimumSize(room, entity)
+        if type(handler.minimumSize) == "function" then
+            return handler.minimumSize(room, entity)
+
+        else
+            return unpack(handler.minimumSize)
+        end
     end
 end
 
