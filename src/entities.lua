@@ -162,7 +162,7 @@ function entities.getDrawable(name, handler, room, entity, viewport)
             return drawableSprites
 
         else
-            local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", handler.color or colors.default, rectangle)
+            local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", rectangle, handler.color or colors.default)
 
             return drawable
         end
