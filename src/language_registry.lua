@@ -38,7 +38,7 @@ end
 function languageRegistry.loadExternalFiles()
     local filenames = modHandler.findLanguageFiles("lang")
 
-    pluginLoader.loadPlugins(filenames, nil, languageRegistry.loadLanguageFile, "lang")
+    pluginLoader.loadPlugins(filenames, nil, languageRegistry.loadLanguageFile, true, "lang")
 end
 
 return languageRegistry
