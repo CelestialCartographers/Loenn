@@ -231,6 +231,9 @@ entities.finalBoss.description.cameraLockY=Whether the camera should be locked v
 # Oshiro Boss
 entities.friendlyGhost.name.oshiro_boss=Oshiro Boss
 
+# Oshiro Door
+entities.oshirodoor.name.oshiro_door=Oshiro Door
+
 # Fire Ball
 entities.fireBall.name.fireball=Fireball
 entities.fireBall.description.amount=Determines the amount of fireballs on a track.
@@ -335,6 +338,7 @@ entities.fakeBlock.description.tiletype=Changes the visual appearance of the wal
 entities.fakeBlock.description.playTransitionReveal=Determines whether entering the block should play the reveal jingle.
 
 # Glass Block
+entities.glassBlock.name.glass_block=Glass Block
 entities.glassBlock.description.sinks=Whether the tile should sink when the player is on top.
 
 # Kevin's PC
