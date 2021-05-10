@@ -211,6 +211,9 @@ entities.bigSpinner.name.bumper=Bumper
 # Floating Debris
 entities.floatingDebris.name.floating_debris=Floating Debris
 
+# Foreground Debris
+entities.foregroundDebris.name.foreground_debris=Foreground Debris
+
 # Hanging Lamp
 entities.hanginglamp.name.hanging_lamp=Hanging Lamp
 
@@ -317,7 +320,11 @@ entities.wallBooster.description.notCoreMode=Determines whether the entity shoul
 entities.bounceBlock.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Dark Chaser
+entities.darkChaser.name.dark_chaser=Badeline Chaser
 entities.darkChaser.description.canChangeMusic=Whether the chaser should be able to change the music to the "chasing" track.
+
+# Dark Chaser Barrier
+entities.darkChaserEnd.name.barrier=Badeline Chaser Barrier
 
 # Final Boss
 entities.finalBoss.description.canChangeMusic=Whether the boss should be able to change the music to the boss track.
@@ -507,6 +514,9 @@ entities.templeGate.description.type=Determines what abilities the gate has.
 entities.templeMirror.description.reflectX=The horizontal offset for the reflection.
 entities.templeMirror.description.reflectY=The vertical offset for the reflection.
 
+# Temple Mirror Portal
+entities.templeMirrorPortal.name.temple_mirror_portal=Temple Mirror Portal
+
 # Temple Eye
 entities.templeEye.name.temple_eye=Temple Eye
 
@@ -638,6 +648,12 @@ entities.zipMover.description.theme=The visual theme of the zip mover.
 # Moon Creature
 entities.moonCreature.name.moon_creature=Moon Creature
 entities.moonCreature.description.number=How many moon creatures should spawn in the cluster.
+
+# Power Source Number
+entities.powerSourceNumber.name.power_source_number=Power Source Number
+entities.powerSourceNumber.description.number=Determines the visual apperance of the entity.
+entities.powerSourceNumber.description.strawberries=Determines when the entity will be lit up. If keys attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one berry or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
+entities.powerSourceNumber.description.keys=Determines when the entity will lit up. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
 
 # Floaty Space Block
 entities.floatySpaceBlock.description.tiletype=Determines the visual appearance of the wall.
