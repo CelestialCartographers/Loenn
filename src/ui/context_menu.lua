@@ -12,7 +12,7 @@ local contextMenuRoot
 local contextMenuHandler = {}
 local contextStack = {}
 
-local function createContextMenu(spawnedFrom, widget)
+local function createContextMenu(spawnedFrom, widget, options)
     local x, y = love.mouse.getPosition()
 
     local window = uiElements.panel(widget):with({
@@ -26,6 +26,7 @@ local function createContextMenu(spawnedFrom, widget)
     })
 
     window.spawnedFrom = spawnedFrom
+    window.visibilityMode = options.mode or "hovered"
 
     table.insert(contextStack, window)
     contextMenuRoot:layout()
@@ -42,11 +43,20 @@ function contextMenuHandler.contextWindowUpdate(orig, self, dt)
     orig(self, dt)
 
     local hovering = ui.hovering
+    local focusing = ui.focusing
 
     for i = #contextStack, 1, -1 do
-        local target = ui.hovering
+        local target
         local contextMenu = contextStack[i]
         local spawnedFrom = i > 1 and contextStack[i + 1] or targetElement
+        local visibilityMode = contextMenu.visibilityMode
+
+        if visibilityMode == "hovered" then
+            target = hovering
+
+        elseif visibilityMode == "focused" then
+            target = focusing
+        end
 
         while target do
             if target == contextMenu or target == spawnedFrom then
@@ -85,7 +95,7 @@ function contextMenuHandler.showContextMenu(widget, options)
         end
     end
 
-    createContextMenu(targetElement, widgetUtils.getSimpleOverlayWidget(widget))
+    createContextMenu(targetElement, widgetUtils.getSimpleOverlayWidget(widget), options)
 end
 
 function contextMenuHandler.getContextMenu()
