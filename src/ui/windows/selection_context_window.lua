@@ -193,6 +193,7 @@ function contextWindow.createContextMenu(selections)
                 for i, w in ipairs(activeWindows) do
                     if w == window then
                         table.remove(activeWindows, i)
+                        widgetUtils.focusMainEditor()
 
                         break
                     end

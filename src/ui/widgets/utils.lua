@@ -76,4 +76,9 @@ function widgetUtils.lerpWindowPosition(window, fromX, fromY, toX, toY, percent,
     widgetUtils.moveWindow(window, newX, newY, threshold, false, padding)
 end
 
+function widgetUtils.focusMainEditor()
+    ui.interactiveIterate(ui.focusing, "onUnfocus")
+    ui.focusing = false
+end
+
 return widgetUtils
