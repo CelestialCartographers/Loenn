@@ -24,7 +24,7 @@ local rockTextures = {
 function foregroundDebris.sprite(room, entity)
     utils.setSimpleCoordinateSeed(entity.x, entity.y)
 
-    local index = math.random(1, 2)
+    local index = math.random(1, #rockTextures)
     local sprites = {}
 
     for i, texture in ipairs(rockTextures[index]) do

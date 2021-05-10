@@ -199,6 +199,9 @@ entities.spikesLeft.description.type=Determines the visual appearance of the spi
 # Resort Lantern
 entities.resortLantern.name.lantern=Resort Lantern
 
+# Resort Roof Ending
+entities.resortRoofEnding.name.resort_roof_ending=Resort Roof Ending
+
 # Dream Block
 entities.dreamBlock.name.dream_block=Space Jam
 entities.dreamBlock.description.fastMoving=Changes the dream block between two speeds.
@@ -313,6 +316,8 @@ entities.towerviewer.description.summit=Whether the watch tower should zoom on t
 entities.towerviewer.description.onlyY=Whether the watch tower can only move vertically. If the watch tower has nodes it will still follow them.
 
 # Wall Booster
+entities.wallBooster.name.left=Wall Booster (Left)
+entities.wallBooster.name.right=Wall Booster (Right)
 entities.wallBooster.description.left=Whether the entity attaches to the left wall or not.
 entities.wallBooster.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
@@ -531,6 +536,7 @@ entities.risingLava.name.rising_lava=Rising Lava
 entities.risingLava.description.intro=Determines whether the lava rises up from below the bottom of the screen or starts already present near the bottom.
 
 # Ridge Gate
+entities.ridgeGate.name.ridge_gate=Ridge Gate
 entities.ridgeGate.description.strawberries=Determines when the gate will appear, creating a block after certain strawberries are collected. If keys attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one berry or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
 entities.ridgeGate.description.keys=Determines when the gate will appear, creating a block after certain keys are collected. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
 entities.ridgeGate.description.texture=The visual apparence of the gate. Defaults to "objects/ridgeGate".
