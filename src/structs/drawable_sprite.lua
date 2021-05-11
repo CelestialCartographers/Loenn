@@ -225,7 +225,7 @@ function drawableSpriteStruct.spriteFromMeta(meta, data)
     drawableSprite.depth = data.depth
 
     drawableSprite.meta = meta
-    drawableSprite.quad = meta and meta.quad
+    drawableSprite.quad = data.quad or meta and meta.quad
 
     if data.color then
         setColor(drawableSprite, data.color)

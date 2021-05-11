@@ -254,27 +254,40 @@ end
 
 local function drawInvalidTiles(batch, missingTiles, fg)
     if #missingTiles > 0 then
-        local color = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
+        if batch._canvas then
+            local color = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
 
-        local canvas = love.graphics.getCanvas()
-        local r, g, b, a = love.graphics.getColor()
+            local canvas = love.graphics.getCanvas()
+            local r, g, b, a = love.graphics.getColor()
 
-        love.graphics.setCanvas(batch._canvas)
-        love.graphics.setColor(color)
+            love.graphics.setCanvas(batch._canvas)
+            love.graphics.setColor(color)
 
-        for _, missing in ipairs(missingTiles) do
-            local x, y = missing[1], missing[2]
+            for _, missing in ipairs(missingTiles) do
+                local x, y = missing[1], missing[2]
 
-            love.graphics.rectangle("fill", x * 8 - 8, y * 8 - 8, 8, 8)
+                love.graphics.rectangle("fill", x * 8 - 8, y * 8 - 8, 8, 8)
+            end
+
+            love.graphics.setCanvas(canvas)
+            love.graphics.setColor(r, g, b, a)
         end
+    end
+end
 
-        love.graphics.setCanvas(canvas)
-        love.graphics.setColor(r, g, b, a)
+local function getTilesBatchFromMode(width, height, mode)
+    if mode == "canvasGrid" then
+        return smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8)
+
+    elseif mode == "table" then
+        return {}
     end
 end
 
 -- randomMatrix is for custom randomness, mostly to give the correct "slice" of the matrix when making fake tiles
-function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
+function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix, batchMode, shouldYield)
+    batchMode = batchMode or "canvasGrid"
+
     local tilesMatrix = tiles.matrix
 
     -- Getting upvalues
@@ -293,10 +306,8 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
     local defaultQuad = {{0, 0}}
     local defaultSprite = ""
 
-    local drawableSpriteType = "drawableSprite"
-
     local width, height = tilesMatrix:size()
-    local batch = smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8)
+    local batch = getTilesBatchFromMode(width, height, batchMode)
 
     local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, fg and "tilesFg" or "tilesBg")
 
@@ -322,7 +333,12 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
                         if spriteMeta then
                             local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
 
-                            batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+                            if batchMode == "canvasGrid" then
+                                batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+
+                            elseif batchMode == "table" then
+                                table.insert(batch, {spriteMeta, quad, x * 8 - 8, y * 8 - 8})
+                            end
 
                         else
                             -- Missing texture, not found on disk
@@ -337,14 +353,18 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix)
             end
         end
 
-        tasks.yield()
+        if shouldYield ~= false then
+            tasks.yield()
+        end
     end
 
     drawInvalidTiles(batch, missingTiles, fg)
 
-    tasks.update(batch)
+    if shouldYield ~= false then
+        tasks.update(batch)
+    end
 
-    return batch
+    return batch, missingTiles
 end
 
 local function getRoomTileBatch(room, tiles, fg)
