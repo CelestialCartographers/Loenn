@@ -14,6 +14,7 @@ key.placements = {
     },
     {
         name = "with_return",
+        placementType = "point",
         data = {
             nodes = {
                 {x = 0, y = 0},
