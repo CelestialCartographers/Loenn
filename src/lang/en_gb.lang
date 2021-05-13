@@ -645,6 +645,7 @@ entities.colorSwitch.description.type=The colour of the switch.
 entities.finalBoss.description.cameraPastY=Locks the camera from vertically rising, and changes the bottom screen killbox plane to be under Badeline's current position.
 
 # Condition Block
+entities.conditionBlock.name.condition_block=Condition Block
 entities.conditionBlock.description.conditionID=Links the condition block to the ID of a key, strawberry, or button.\nFormat: (room:id)\nExample: "a-01:4"
 entities.conditionBlock.description.condition=Ties the activation to the collection or activation of a key, strawberry, or button.
 entities.conditionBlock.description.tileType=Determines the visual appearance of the condition block.
@@ -681,6 +682,7 @@ entities.playbackTutorial.name.playback=Ghost Player Playback
 entities.playbackTutorial.description.tutorial=Determines which tutorial ghost is played.\nFilename is relative to the `Tutorials` folder, and without the .bin extension.
 
 # Crumble Wall On Rumble
+entities.crumbleWallOnRumble.name.crumble_wall=Crumble Wall On Rumble
 entities.crumbleWallOnRumble.description.blendin=Blends the block in with the walls it touches, making it less apparent.
 entities.crumbleWallOnRumble.description.tiletype=Determines the visual appearance of the wall.
 entities.crumbleWallOnRumble.description.persistent=Once broken, the block will remain that way, even if the player dies.
