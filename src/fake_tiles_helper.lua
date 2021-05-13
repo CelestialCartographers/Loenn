@@ -64,8 +64,7 @@ function fakeTilesHelper.generateFakeTiles(room, x, y, material, layer, blendIn)
     return fakeTiles
 end
 
-function fakeTilesHelper.getMaterialMatrix(entity, materialKey)
-    local material = entity[materialKey]
+function fakeTilesHelper.getMaterialMatrix(entity, material)
     local materialType = utils.typeof(material)
 
     if materialType == "string" then
@@ -133,6 +132,51 @@ function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, 
     end
 
     return sprites
+end
+
+-- Material key might be a material itself
+local function getEntityMaterialFromKey(entity, materialKey)
+    local materialKeyType = utils.typeof(materialKey)
+    local fromKey = entity[materialKey]
+
+    if type(fromKey) == "string" and #fromKey == 1 then
+        return fakeTilesHelper.getMaterialMatrix(entity, fromKey)
+
+    elseif materialKeyType == "string" and #materialKey == 1 then
+        return fakeTilesHelper.getMaterialMatrix(entity, materialKey)
+
+    elseif materialKeyType == "matrix" then
+        return materialKey
+    end
+
+    return "3"
+end
+
+-- Blend mode key can also be a boolean
+local function getEntityBlendMode(entity, blendModeKey)
+    if type(blendModeKey) == "string" then
+        return entity[blendModeKey]
+    end
+
+    return blendModeKey
+end
+
+function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer)
+    layer = layer or "tilesFg"
+
+    return function(room, entity)
+        local x, y = entity.x or 0, entity.y or 0
+        local tileX, tileY = math.floor(x / 8) + 1, math.floor(y / 8) + 1
+        local onGridX, onGridY = tileX * 8 - 8, tileY * 8 - 8
+
+        local material = getEntityMaterialFromKey(entity, materialKey)
+        local blend = getEntityBlendMode(entity, blendKey)
+
+        local fakeTiles = fakeTilesHelper.generateFakeTiles(room, tileX, tileY, material, layer, blend)
+        local fakeTilesSprites = fakeTilesHelper.generateFakeTilesSprites(room, tileX, tileY, fakeTiles, layer, onGridX, onGridY)
+
+        return fakeTilesSprites
+    end
 end
 
 return fakeTilesHelper
