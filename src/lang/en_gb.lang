@@ -479,6 +479,7 @@ entities.lamp.name.broken=Lamp (Broken)
 entities.lamp.description.broken=Changes the visual appearance of the lamp to be broken.
 
 # Falling Block
+entities.fallingBlock.name.falling_block=Falling Block
 entities.fallingBlock.description.climbFall=After a delay, the block will physically fall down until it comes into contact with another block.
 entities.fallingBlock.description.tiletype=Changes the visual appearance of the falling block.
 entities.fallingBlock.description.behind=Whether the block should visually be further behind in the scene or not.
@@ -491,10 +492,12 @@ entities.spinner.description.color=Changes the colour of the spinner.
 entities.spinner.description.dust=Changes the spinner into a dust sprite.
 
 # Intro Crusher
+entities.introCrusher.name.intro_crusher=Intro Crusher
 entities.introCrusher.description.tiletype=Determines the visual appearance of the wall.
 entities.introCrusher.description.flags=If any of the flags are set, the entity will rest at its end node instead.
 
 # Dash Block
+entities.dashBlock.name.dash_block=Dash Block
 entities.dashBlock.description.canDash=Whether the player can break the block by dashing into it.
 entities.dashBlock.description.blendin=Blends the block with the walls it touches, making it less apparent.
 entities.dashBlock.description.tiletype=Determines the visual appearance of the wall.
@@ -608,7 +611,11 @@ entities.hahaha.description.ifset=Only show up if the given flag is set, or alwa
 entities.hahaha.description.triggerLaughSfx=Whether the laugh should also play audio.
 
 # Badeline Boss Moving Block
+entities.finalBossMovingBlock.name.moving_block=Badeline Boss Moving Block
 entities.finalBossMovingBlock.description.nodeIndex=The node index of the Badeline boss this should fall down on.
+
+# Badeline Boss Falling Block
+entities.finalBossFallingBlock.name.falling_block=Badeline Boss Falling Block
 
 # Everest Core Message
 entities.everest/coreMessage.name.core_message=Core Message
