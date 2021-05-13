@@ -87,7 +87,7 @@ function fakeTilesHelper.generateFakeTilesBatch(room, x, y, fakeTiles, layer)
     return celesteRender.getTilesBatch(room, fakeTiles, tilerMeta, fg, randomSlice, "canvasGrid", false)
 end
 
-function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, offsetX, offsetY)
+function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, offsetX, offsetY, color)
     offsetX = offsetX or 0
     offsetY = offsetY or 0
 
@@ -112,7 +112,8 @@ function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, 
                 justificationY = 0.0,
                 x = tileX + offsetX - 16,
                 y = tileY + offsetY - 16,
-                quad = quad
+                quad = quad,
+                color = color
             })
 
             table.insert(sprites, sprite)
@@ -161,7 +162,7 @@ local function getEntityBlendMode(entity, blendModeKey)
     return blendModeKey
 end
 
-function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer)
+function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer, color)
     layer = layer or "tilesFg"
 
     return function(room, entity)
@@ -173,7 +174,7 @@ function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer)
         local blend = getEntityBlendMode(entity, blendKey)
 
         local fakeTiles = fakeTilesHelper.generateFakeTiles(room, tileX, tileY, material, layer, blend)
-        local fakeTilesSprites = fakeTilesHelper.generateFakeTilesSprites(room, tileX, tileY, fakeTiles, layer, onGridX, onGridY)
+        local fakeTilesSprites = fakeTilesHelper.generateFakeTilesSprites(room, tileX, tileY, fakeTiles, layer, onGridX, onGridY, color)
 
         return fakeTilesSprites
     end
