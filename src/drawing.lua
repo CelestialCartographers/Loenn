@@ -11,10 +11,10 @@ function drawing.getCurvePoint(start, stop, control, percent)
     local controlMul = 2 * (1 - percent) * percent
     local stopMul = percent^2
 
-    return {
-        start[1] * startMul + control[1] * controlMul + stop[1] * stopMul,
-        start[2] * startMul + control[2] * controlMul + stop[2] * stopMul,
-    }
+    local x = start[1] * startMul + control[1] * controlMul + stop[1] * stopMul
+    local y = start[2] * startMul + control[2] * controlMul + stop[2] * stopMul
+
+    return x, y
 end
 
 function drawing.getSimpleCurve(start, stop, control, resolution)
@@ -24,7 +24,10 @@ function drawing.getSimpleCurve(start, stop, control, resolution)
     local res = {}
 
     for i = 0, resolution do
-        table.insert(res, drawing.getCurvePoint(start, stop, control, i / resolution))
+        local x, y = drawing.getCurvePoint(start, stop, control, i / resolution)
+
+        table.insert(res, x)
+        table.insert(res, y)
     end
 
     return res
@@ -33,7 +36,7 @@ end
 function drawing.getRelativeQuad(spriteMeta, x, y, width, height, overflow)
     local image = spriteMeta.image
     local imageWidth, imageHeight = image:getDimensions()
-    local quadX, quadY, quadWidth, quadHeight = spriteMeta.quad:getViewport
+    local quadX, quadY, quadWidth, quadHeight = spriteMeta.quad:getViewport()
 
     -- Make sure the width/height doesn't go outside the original quad
     if overflow ~= false then
