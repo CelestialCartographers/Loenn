@@ -1,5 +1,6 @@
 local drawing = require("drawing")
 local utils = require("utils")
+local drawableLine = require("structs.drawable_line")
 
 local cobweb = {}
 
@@ -12,25 +13,27 @@ cobweb.fieldInformation = {
     }
 }
 
-local function drawFromMiddle(middle, target)
+local function spritesFromMiddle(middle, target, color)
     local coords = {target.x, target.y}
     local control = {
         (middle[1] + coords[1]) / 2,
         (middle[2] + coords[2]) / 2 + 4
     }
-    local points = drawing.getSimpleCurve(middle, coords, control)
+    local points = drawing.getSimpleCurve(coords, middle, control)
 
-    love.graphics.line(table.flatten(points))
+    return drawableLine.fromPoints(points, color, 1)
 end
 
-function cobweb.draw(room, entity)
-    local tr, tg, tb = 41 / 255, 42 / 255, 41 / 255
+local defaultColor = {41 / 255, 42 / 255, 41 / 255}
+
+function cobweb.sprite(room, entity)
+    local color = defaultColor
 
     if entity.color then
         local success, r, g, b = utils.parseHexColor(entity.color)
 
         if success then
-            tr, tg, tb = r, g, b
+            color = {r, g, b}
         end
     end
 
@@ -43,18 +46,17 @@ function cobweb.draw(room, entity)
         (start[1] + stop[1]) / 2,
         (start[2] + stop[2]) / 2 + 4
     }
-    local middle = drawing.getCurvePoint(start, stop, control, 0.5)
+    local middle = {drawing.getCurvePoint(start, stop, control, 0.5)}
+    local sprites = {}
 
-    drawing.callKeepOriginalColor(function()
-        love.graphics.setColor(tr, tg, tb)
+    for _, node in ipairs(nodes) do
+        table.insert(sprites, spritesFromMiddle(middle, node, color))
+    end
 
-        for _, node in ipairs(nodes) do
-            drawFromMiddle(middle, node)
-        end
+    -- Use entity rather than start since drawFromMiddle uses x and y
+    table.insert(sprites, spritesFromMiddle(middle, entity, color))
 
-        -- Use entity rather than start since drawFromMiddle uses x and y
-        drawFromMiddle(middle, entity)
-    end)
+    return table.flatten(sprites)
 end
 
 function cobweb.selection(room, entity)
