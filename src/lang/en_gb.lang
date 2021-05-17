@@ -399,14 +399,24 @@ entities.cliffside_flag.name.cliffside_flag=Cliffside Big Flag
 entities.cliffside_flag.description.index=Changes the visual appearance of the flag.
 
 # Dash Switch Horizontal
+entities.dashSwitchH.name.right_default=Dash Switch (Right) (Temple A)
+entities.dashSwitchH.name.right_mirror=Dash Switch (Right) (Temple B)
+entities.dashSwitchH.name.left_default=Dash Switch (Left) (Temple A)
+entities.dashSwitchH.name.left_mirror=Dash Switch (Left) (Temple B)
 entities.dashSwitchH.description.persistent=Once turned on, it will stay activated, even if the player dies.
 entities.dashSwitchH.description.sprite=Changes the visual appearance of the switch.
 entities.dashSwitchH.description.leftSide=Flips the switch entity horizontally so that it can be attached to wall surfaces facing right.
+entities.dashSwitchH.description.allGates=Whether or not the switch should open all temple gates or not.
 
 # Dash Switch Vertical
+entities.dashSwitchV.name.up_default=Dash Switch (Up) (Temple A)
+entities.dashSwitchV.name.up_mirror=Dash Switch (Up) (Temple B)
+entities.dashSwitchV.name.down_default=Dash Switch (Down) (Temple A)
+entities.dashSwitchV.name.down_mirror=Dash Switch (Down) (Temple B)
 entities.dashSwitchV.description.persistent=Once turned on, it will stay activated, even if the player dies.
-entities.dashSwitchV.description.ceiling=Flips the switch entity vertically so that it can be attached to ceiling surfaces.
 entities.dashSwitchV.description.sprite=Changes the visual appearance of the switch.
+entities.dashSwitchV.description.ceiling=Flips the switch entity vertically so that it can be attached to ceiling surfaces.
+entities.dashSwitchV.description.allGates=Whether or not the switch should open all temple gates or not.
 
 # Memorial
 entities.memorial.description.dreaming=Changes the memorial's text to the dream state from Old Site.
@@ -440,6 +450,7 @@ entities.everest/npc.description.approachDistance=How far away from the NPC Made
 entities.everest/npc.description.sprite=Which sprite to use. `player/idle` will use the full path `Graphics/Atlases/Gameplay/characters/player/idle00` and loop from 00 to 08.
 
 # Slider
+entities.slider.name.clockwise=Slider (Clockwise)
 entities.slider.description.clockwise=Whether the slider will run clockwise or counter-clockwise.
 entities.slider.description.surface=Attaches the slider to a surface.
 
@@ -611,6 +622,7 @@ entities.cutsceneNode.name.cutscene_node=Cutscene Node
 entities.cutsceneNode.description.nodeName=Name of node. Used to find the entity from code.
 
 # Hahaha
+entities.hahaha.name.hahaha=Hahaha
 entities.hahaha.description.ifset=Only show up if the given flag is set, or always if left empty.
 entities.hahaha.description.triggerLaughSfx=Whether the laugh should also play audio.
 
@@ -651,6 +663,8 @@ entities.conditionBlock.description.condition=Ties the activation to the collect
 entities.conditionBlock.description.tileType=Determines the visual appearance of the condition block.
 
 # Jellyfish (Glider)
+entities.glider.name.normal=Jellyfish
+entities.glider.name.floating=Jellyfish (Floating)
 entities.glider.description.bubble=Whether the entity should hover in the air before being grabbed.
 entities.glider.description.tutorial=Whether the entity should show the usage tutorial.
 
