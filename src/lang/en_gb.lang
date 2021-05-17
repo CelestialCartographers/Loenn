@@ -593,7 +593,28 @@ entities.coreModeToggle.description.onlyFire=Whether the switch can only turn th
 entities.coreModeToggle.description.persistent=Whether the core mode persists after death instead of resetting to initial room entry state.
 
 # Clutter Door
+entities.clutterDoor.name.yellow=Clutter Door (Boxes)
+entities.clutterDoor.name.red=Clutter Door (Laundry)
+entities.clutterDoor.name.green=Clutter Door (Books)
 entities.clutterDoor.description.type=Determines which clutter switch will activate the block, making it appear.
+
+# Clutter Cabinet
+entities.clutterCabinet.name.cabinet=Clutter Cabinet
+
+# Clutter Block Boxes
+entities.yellowBlocks.name.yellow=Clutter Block (Boxes)
+
+# Clutter Block Laundry
+entities.redBlocks.name.red=Clutter Block (Laundry)
+
+# Clutter Block Books
+entities.greenBlocks.name.green=Clutter Block (Books)
+
+# Colour Switch
+entities.colorSwitch.name.yellow=Color Switch (Boxes)
+entities.colorSwitch.name.red=Color Switch (Laundry)
+entities.colorSwitch.name.green=Color Switch (Books)
+entities.colorSwitch.description.type=The colour of the switch.
 
 # Temple Cracked Block
 entities.templeCrackedBlock.description.persistent=Once broken, the block will remain that way, even if the player dies.
@@ -649,9 +670,6 @@ entities.starClimbController.name.controller=Star Climb Controller
 entities.everest/starClimbGraphicsController.name.controller=Star Climb Graphics Controller
 entities.everest/starClimbGraphicsController.description.fgColor=The foreground colour of the Star Jump Block effect.
 entities.everest/starClimbGraphicsController.description.bgColor=The background colour of the Star Jump Block effect.
-
-# Colour Switch
-entities.colorSwitch.description.type=The colour of the switch.
 
 # Badeline Boss
 entities.finalBoss.description.cameraPastY=Locks the camera from vertically rising, and changes the bottom screen killbox plane to be under Badeline's current position.
