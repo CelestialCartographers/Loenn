@@ -379,6 +379,7 @@ entities.torch.name.torch=Torch
 entities.torch.description.startLit=Changes whether the light will start lit, or have the player's touch activate it.
 
 # Heart Door
+entities.heartGemDoor.name.door=Heart Door
 entities.heartGemDoor.description.requires=Determines the number of Crystal Hearts required to open the heart door. Everest keeps track of hearts collected within the level set.
 entities.heartGemDoor.description.startHidden=Whether the door should start hidden and come crashing down when the player approaches.\nWill destroy dash blocks as it crashes down.
 
