@@ -23,7 +23,7 @@ local spriteBatchSize = 1000
 function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
     local typ = utils.typeof(drawable)
 
-    if typ == "drawableRectangle" or typ == "drawableLine" then
+    if drawable.getDrawableSprite then
         local sprites = drawable:getDrawableSprite()
 
         if #sprites == 0 then
