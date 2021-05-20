@@ -322,6 +322,7 @@ entities.wallBooster.description.left=Whether the entity attaches to the left wa
 entities.wallBooster.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Bounce Block
+entities.bounceBlock.name.bounce_block=Bounce Block
 entities.bounceBlock.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Dark Chaser
@@ -621,6 +622,9 @@ entities.colorSwitch.description.type=The colour of the switch.
 entities.templeCrackedBlock.description.persistent=Once broken, the block will remain that way, even if the player dies.
 
 # Crush Block
+entities.crushBlock.name.both=Kevin (Both)
+entities.crushBlock.name.vertical=Kevin (Vertical)
+entities.crushBlock.name.horizontal=Kevin (Horizontal)
 entities.crushBlock.description.axes=Determines which sides of the Kevin block are hittable.
 entities.crushBlock.description.chillout=Whether the block should have the large face and get tired after being hit.
 
