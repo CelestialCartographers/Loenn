@@ -22,7 +22,7 @@ function flutterbird.sprite(room, entity)
     utils.setSimpleCoordinateSeed(entity.x, entity.y)
 
     local colorIndex = math.random(1, #colors)
-    local flutterbirdSprite = drawableSpriteStruct.spriteFromTexture(texture, entity)
+    local flutterbirdSprite = drawableSpriteStruct.fromTexture(texture, entity)
 
     flutterbirdSprite:setJustification(0.5, 1.0)
     flutterbirdSprite:setColor(colors[colorIndex])

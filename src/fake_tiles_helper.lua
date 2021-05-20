@@ -107,7 +107,7 @@ function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, 
 
         -- Filter out padding pieces for blending
         if tileX > 8 and tileX < width - 16 and tileY > 8 and tileY < height - 16 then
-            local sprite = drawableSprite.spriteFromMeta(meta, {
+            local sprite = drawableSprite.fromMeta(meta, {
                 justificationX = 0.0,
                 justificationY = 0.0,
                 x = tileX + offsetX - 16,

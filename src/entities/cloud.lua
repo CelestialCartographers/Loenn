@@ -37,7 +37,7 @@ end
 
 function cloud.sprite(room, entity)
     local texture = getTexture(entity)
-    local sprite = drawableSpriteStruct.spriteFromTexture(texture, entity)
+    local sprite = drawableSpriteStruct.fromTexture(texture, entity)
     local small = entity.small
     local scale = small and smallScale or normalScale
 

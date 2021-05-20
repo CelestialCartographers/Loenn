@@ -31,14 +31,14 @@ function resortRoofEnding.sprite(room, entity)
     local width = entity.width or 8
     local offset = 0
 
-    local startSprite = drawableSprite.spriteFromTexture(startTexture, entity)
+    local startSprite = drawableSprite.fromTexture(startTexture, entity)
 
     startSprite:addPosition(8, 4)
     table.insert(sprites, startSprite)
 
     while offset < width do
         local texture = centerTextures[math.random(1, #centerTextures)]
-        local middleSprite = drawableSprite.spriteFromTexture(texture, entity)
+        local middleSprite = drawableSprite.fromTexture(texture, entity)
 
         middleSprite:addPosition(offset + 8, 4)
         table.insert(sprites, middleSprite)
@@ -46,7 +46,7 @@ function resortRoofEnding.sprite(room, entity)
         offset += 16
     end
 
-    local endSprite = drawableSprite.spriteFromTexture(endTexture, entity)
+    local endSprite = drawableSprite.fromTexture(endTexture, entity)
 
     endSprite:addPosition(offset + 8, 4)
     table.insert(sprites, endSprite)

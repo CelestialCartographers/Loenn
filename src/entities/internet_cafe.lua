@@ -13,9 +13,9 @@ local leftTexture = "objects/wavedashtutorial/building_front_left"
 local rightTexture = "objects/wavedashtutorial/building_front_right"
 
 function internetCafe.sprite(room, entity)
-    local backSprite = drawableSprite.spriteFromTexture(backTexture, entity)
-    local leftSprite = drawableSprite.spriteFromTexture(leftTexture, entity)
-    local rightSprite = drawableSprite.spriteFromTexture(rightTexture, entity)
+    local backSprite = drawableSprite.fromTexture(backTexture, entity)
+    local leftSprite = drawableSprite.fromTexture(leftTexture, entity)
+    local rightSprite = drawableSprite.fromTexture(rightTexture, entity)
 
     backSprite:setJustification(0.5, 1.0)
     leftSprite:setJustification(0.5, 1.0)

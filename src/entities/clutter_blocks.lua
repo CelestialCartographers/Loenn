@@ -73,7 +73,7 @@ local function getClutterSprites(room, entity, color)
                     local spriteTileHeight = math.floor(choice.height / 8)
 
                     if choiceFits(needsDrawing, x, y, spriteTileWidth, spriteTileHeight) then
-                        local sprite = drawableSprite.spriteFromMeta(choice, entity)
+                        local sprite = drawableSprite.fromMeta(choice, entity)
 
                         sprite:setJustification(0.0, 0.0)
                         sprite:addPosition(x * 8 - 8, y * 8 - 8)

@@ -94,7 +94,7 @@ local function getSpikeSpritesFromTexture(entity, direction, variant, texture, s
             position[positionOffsetKey] -= step / 2
         end
 
-        local sprite = drawableSpriteStruct.spriteFromTexture(texture, position)
+        local sprite = drawableSpriteStruct.fromTexture(texture, position)
 
         sprite.depth = spikeDepth
         sprite.rotation = rotation

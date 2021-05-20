@@ -20,7 +20,7 @@ function summitCloud.sprite(room, entity)
     utils.setSimpleCoordinateSeed(entity.x, entity.y)
 
     local texture = cloudTextures[math.random(1, #cloudTextures)]
-    local sprite = drawableSprite.spriteFromTexture(texture, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
     local scaleX = math.random(0, 1) == 0 and -1 or 1
 
     sprite:setScale(scaleX, 1)

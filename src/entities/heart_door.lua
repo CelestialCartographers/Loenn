@@ -44,8 +44,8 @@ function heartDoor.sprite(room, entity)
     local roomWidth, roomHeight = room.width, room.height
     local hearts = entity.requires or 0
 
-    local edgeSpriteSample = drawableSprite.spriteFromTexture(edgeTexture, entity)
-    local heartSpriteSample = drawableSprite.spriteFromTexture(heartTexture, entity)
+    local edgeSpriteSample = drawableSprite.fromTexture(edgeTexture, entity)
+    local heartSpriteSample = drawableSprite.fromTexture(heartTexture, entity)
 
     local edgeWidth, edgeHeight = edgeSpriteSample.meta.width, edgeSpriteSample.meta.height
     local heartWidth, heartHeight = heartSpriteSample.meta.width, heartSpriteSample.meta.height
@@ -56,8 +56,8 @@ function heartDoor.sprite(room, entity)
     local sprites = {rectangleSprite}
 
     for i = 0, roomHeight - 1, edgeHeight do
-        local leftSprite = drawableSprite.spriteFromTexture(edgeTexture, position)
-        local rightSprite = drawableSprite.spriteFromTexture(edgeTexture, position)
+        local leftSprite = drawableSprite.fromTexture(edgeTexture, position)
+        local rightSprite = drawableSprite.fromTexture(edgeTexture, position)
 
         leftSprite:setJustification(0.5, 0.0)
         leftSprite:setScale(-1, 1)
@@ -85,7 +85,7 @@ function heartDoor.sprite(room, entity)
                 local drawX = startX + (col - 1) * (heartWidth + heartPadding) - heartPadding
                 local drawY = startY + row * (heartHeight + heartPadding) - heartPadding
 
-                local sprite = drawableSprite.spriteFromTexture(heartTexture, {
+                local sprite = drawableSprite.fromTexture(heartTexture, {
                     x = drawX,
                     y = drawY
                 })

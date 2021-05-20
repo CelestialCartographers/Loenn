@@ -24,7 +24,7 @@ local function getDrawableSpriteForRectangle(x, y, width, height, color)
 
     data.color = utils.getColor(color)
 
-    return drawableSprite.spriteFromInternalTexture(drawableRectangle.tintingPixelTexture, data)
+    return drawableSprite.fromInternalTexture(drawableRectangle.tintingPixelTexture, data)
 end
 
 

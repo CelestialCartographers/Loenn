@@ -24,7 +24,7 @@ function hahaha.sprite(room, entity)
     local sprites = {}
 
     for _, offset in ipairs(spriteOffsets) do
-        local sprite = drawableSprite.spriteFromTexture(texture, entity)
+        local sprite = drawableSprite.fromTexture(texture, entity)
 
         sprite:addPosition(offset[1], offset[2])
         table.insert(sprites, sprite)

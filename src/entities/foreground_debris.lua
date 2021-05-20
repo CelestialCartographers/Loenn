@@ -28,7 +28,7 @@ function foregroundDebris.sprite(room, entity)
     local sprites = {}
 
     for i, texture in ipairs(rockTextures[index]) do
-        local sprite = drawableSprite.spriteFromTexture(texture, entity)
+        local sprite = drawableSprite.fromTexture(texture, entity)
 
         sprites[i] = sprite
     end

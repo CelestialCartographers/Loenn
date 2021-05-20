@@ -15,10 +15,10 @@ local torchTexture = "objects/temple/portal/portaltorch00"
 local torchOffset = 90
 
 function templeMirrorPortal.sprite(room, entity)
-    local frameSprite = drawableSprite.spriteFromTexture(frameTexture, entity)
-    local curtainSprite = drawableSprite.spriteFromTexture(curtainTexture, entity)
-    local torchSpriteLeft = drawableSprite.spriteFromTexture(torchTexture, entity)
-    local torchSpriteRight = drawableSprite.spriteFromTexture(torchTexture, entity)
+    local frameSprite = drawableSprite.fromTexture(frameTexture, entity)
+    local curtainSprite = drawableSprite.fromTexture(curtainTexture, entity)
+    local torchSpriteLeft = drawableSprite.fromTexture(torchTexture, entity)
+    local torchSpriteRight = drawableSprite.fromTexture(torchTexture, entity)
 
     torchSpriteLeft:addPosition(-torchOffset, 0)
     torchSpriteLeft:setJustification(0.5, 0.75)

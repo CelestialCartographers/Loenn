@@ -13,7 +13,7 @@ local offsetY = -10
 local texture = "characters/theoCrystal/idle00"
 
 function theoCrystal.sprite(room, entity)
-    local sprite = drawableSprite.spriteFromTexture(texture, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
 
     sprite.y += offsetY
 

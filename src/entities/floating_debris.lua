@@ -12,7 +12,7 @@ floatingDebris.placements = {
 function floatingDebris.sprite(room, entity)
     utils.setSimpleCoordinateSeed(entity.x, entity.y)
 
-    local sprite = drawableSprite.spriteFromTexture("scenery/debris", entity)
+    local sprite = drawableSprite.fromTexture("scenery/debris", entity)
     local offsetX = math.random(0, 7) * 8
 
     -- Manually offset the sprite, otherwise it will justify with the original image size

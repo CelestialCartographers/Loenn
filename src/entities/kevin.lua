@@ -53,7 +53,7 @@ function kevin.sprite(room, entity)
     local ninePatch = drawableNinePatch.fromTexture(frameTexture, ninePatchOptions, x, y, width, height)
 
     local rectangle = drawableRectangle.fromRectangle("fill", x + 2, y + 2, width - 4, height - 4, kevinColor)
-    local faceSprite = drawableSprite.spriteFromTexture(faceTexture, entity)
+    local faceSprite = drawableSprite.fromTexture(faceTexture, entity)
 
     faceSprite:addPosition(math.floor(width / 2), math.floor(height / 2))
 

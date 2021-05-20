@@ -32,14 +32,14 @@ function glider.sprite(room, entity)
         local x, y = entity.x or 0, entity.y or 0
         local points = drawing.getSimpleCurve({x - 11, y - 1}, {x + 11, y - 1}, {x - 0, y - 6})
         local lineSprites = drawableLine.fromPoints(points):getDrawableSprite()
-        local jellySprite = drawableSprite.spriteFromTexture(texture, entity)
+        local jellySprite = drawableSprite.fromTexture(texture, entity)
 
         table.insert(lineSprites, 1, jellySprite)
 
         return lineSprites
 
     else
-        return drawableSprite.spriteFromTexture(texture, entity)
+        return drawableSprite.fromTexture(texture, entity)
     end
 end
 

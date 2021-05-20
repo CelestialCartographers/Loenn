@@ -40,7 +40,7 @@ function wallBooster.sprite(room, entity)
     local scaleX = left and 1 or -1
 
     for i = 2, tileHeight - 1 do
-        local middleSprite = drawableSprite.spriteFromTexture(middleTexture, entity)
+        local middleSprite = drawableSprite.fromTexture(middleTexture, entity)
 
         middleSprite:addPosition(offsetX, (i - 1) * 8)
         middleSprite:setScale(scaleX, 1)
@@ -49,8 +49,8 @@ function wallBooster.sprite(room, entity)
         table.insert(sprites, middleSprite)
     end
 
-    local topSprite = drawableSprite.spriteFromTexture(topTexture, entity)
-    local bottomSprite = drawableSprite.spriteFromTexture(bottomTexture, entity)
+    local topSprite = drawableSprite.fromTexture(topTexture, entity)
+    local bottomSprite = drawableSprite.fromTexture(bottomTexture, entity)
 
     topSprite:addPosition(offsetX, 0)
     topSprite:setScale(scaleX, 1)

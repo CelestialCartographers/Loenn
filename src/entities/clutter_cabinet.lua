@@ -12,7 +12,7 @@ clutterCabinet.placements = {
 local texture = "objects/resortclutter/cabinet00"
 
 function clutterCabinet.sprite(room, entity)
-    local sprite = drawableSprite.spriteFromTexture(texture, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
 
     sprite:addPosition(8, 8)
 

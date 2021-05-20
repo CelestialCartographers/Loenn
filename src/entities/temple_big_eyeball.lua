@@ -34,8 +34,8 @@ function templeBigEyeball.draw(room, entity, viewport)
         y = entity.y + offsetY
     }
 
-    local bodySprite = drawableSpriteStruct.spriteFromTexture(bodyTexture, entity)
-    local pupilSprite = drawableSpriteStruct.spriteFromTexture(pupilTexture, pupilData)
+    local bodySprite = drawableSpriteStruct.fromTexture(bodyTexture, entity)
+    local pupilSprite = drawableSpriteStruct.fromTexture(pupilTexture, pupilData)
 
     bodySprite:draw()
     pupilSprite:draw()

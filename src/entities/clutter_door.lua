@@ -33,7 +33,7 @@ function clutterDoor.sprite(room, entity)
     local rectangle = utils.rectangle(entity.x, entity.y, width, height)
     local drawableRectangleSprites = drawableRectangle.fromRectangle("bordered", rectangle, fillColor, borderColor):getDrawableSprite()
     local doorTexture = string.format("objects/resortclutter/icon_%s", string.lower(variant))
-    local doorSprite = drawableSprite.spriteFromTexture(doorTexture, entity)
+    local doorSprite = drawableSprite.fromTexture(doorTexture, entity)
 
     doorSprite:addPosition(math.floor(width / 2), math.floor(height / 2))
 

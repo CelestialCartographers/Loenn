@@ -20,7 +20,7 @@ local oshiroColor = {1.0, 1.0, 1.0, 0.8}
 function oshiroDoor.sprite(room, entity)
     local rectangle = utils.rectangle(entity.x, entity.y, 32, 32)
     local drawableRectangleSprites = drawableRectangle.fromRectangle("bordered", rectangle, fillColor, borderColor):getDrawableSprite()
-    local oshiroSprite = drawableSprite.spriteFromTexture(oshiroTexture, entity)
+    local oshiroSprite = drawableSprite.fromTexture(oshiroTexture, entity)
 
     oshiroSprite:setColor(oshiroColor)
     oshiroSprite:addPosition(16, 16)

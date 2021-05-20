@@ -25,8 +25,8 @@ function clutterSwitch.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local variant = entity["type"] or "red"
 
-    local buttonSprite = drawableSprite.spriteFromTexture(buttonTexture, entity)
-    local clutterSprite = drawableSprite.spriteFromTexture(string.format(clutterTexture, string.lower(variant)), entity)
+    local buttonSprite = drawableSprite.fromTexture(buttonTexture, entity)
+    local clutterSprite = drawableSprite.fromTexture(string.format(clutterTexture, string.lower(variant)), entity)
 
     buttonSprite:setJustification(0.5, 1.0)
     buttonSprite:addPosition(16, 16)

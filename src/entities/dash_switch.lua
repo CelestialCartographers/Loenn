@@ -16,7 +16,7 @@ dashSwitchHorizontal.placements = {}
 function dashSwitchHorizontal.sprite(room, entity)
     local leftSide = entity.leftSide
     local texture = entity.sprite == "default" and textures["default"] or textures["mirror"]
-    local sprite = drawableSprite.spriteFromTexture(texture, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
 
     if leftSide then
         sprite:addPosition(0, 8)
@@ -41,7 +41,7 @@ dashSwitchVertical.placements = {}
 function dashSwitchVertical.sprite(room, entity)
     local ceiling = entity.ceiling
     local texture = entity.sprite == "default" and textures["default"] or textures["mirror"]
-    local sprite = drawableSprite.spriteFromTexture(texture, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
 
     if ceiling then
         sprite:addPosition(8, 0)

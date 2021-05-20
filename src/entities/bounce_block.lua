@@ -28,7 +28,7 @@ function bounceBlock.sprite(room, entity)
     local width, height = entity.width or 24, entity.height or 24
 
     local ninePatch = drawableNinePatch.fromTexture(blockTexture, ninePatchOptions, x, y, width, height)
-    local crystalSprite = drawableSprite.spriteFromTexture(crystalTexture, entity)
+    local crystalSprite = drawableSprite.fromTexture(crystalTexture, entity)
     local sprites = ninePatch:getDrawableSprite()
 
     crystalSprite:addPosition(math.floor(width / 2), math.floor(height / 2))

@@ -14,11 +14,11 @@ function introCar.sprite(room, entity)
     local sprites = {}
     local hasRoadAndBarriers = entity.hasRoadAndBarriers
 
-    local bodySprite = drawableSpriteStruct.spriteFromTexture(bodyTexture, entity)
+    local bodySprite = drawableSpriteStruct.fromTexture(bodyTexture, entity)
     bodySprite:setJustification(0.5, 1.0)
     bodySprite.depth = 1
 
-    local wheelSprite = drawableSpriteStruct.spriteFromTexture(wheelsTexture, entity)
+    local wheelSprite = drawableSpriteStruct.fromTexture(wheelsTexture, entity)
     wheelSprite:setJustification(0.5, 1.0)
     wheelSprite.depth = 3
 
@@ -26,12 +26,12 @@ function introCar.sprite(room, entity)
     table.insert(sprites, wheelSprite)
 
     if hasRoadAndBarriers then
-        local barrier1Sprite = drawableSpriteStruct.spriteFromTexture(barrierTexture, entity)
+        local barrier1Sprite = drawableSpriteStruct.fromTexture(barrierTexture, entity)
         barrier1Sprite:addPosition(32, 0)
         barrier1Sprite:setJustification(0.0, 1.0)
         barrier1Sprite.depth = -10
 
-        local barrier2Sprite = drawableSpriteStruct.spriteFromTexture(barrierTexture, entity)
+        local barrier2Sprite = drawableSpriteStruct.fromTexture(barrierTexture, entity)
         barrier2Sprite:addPosition(41, 0)
         barrier2Sprite:setJustification(0.0, 1.0)
         barrier2Sprite.depth = 5

@@ -17,8 +17,8 @@ local numberTexture = "scenery/powersource_numbers/1"
 local glowTexture = "scenery/powersource_numbers/1_glow"
 
 function powerSourceNumber.sprite(room, entity)
-    local numberSprite = drawableSprite.spriteFromTexture(numberTexture, entity)
-    local glowSprite = drawableSprite.spriteFromTexture(glowTexture, entity)
+    local numberSprite = drawableSprite.fromTexture(numberTexture, entity)
+    local glowSprite = drawableSprite.fromTexture(glowTexture, entity)
 
     local sprites = {
         numberSprite,

@@ -127,13 +127,13 @@ function entities.getDrawable(name, handler, room, entity, viewport)
 
     elseif handler.texture then
         local texture = utils.callIfFunction(handler.texture, room, entity)
-        local drawable = drawableSprite.spriteFromTexture(texture, entity)
+        local drawable = drawableSprite.fromTexture(texture, entity)
 
         if drawable then
             addAutomaticDrawableFields(handler, drawable, room, entity)
 
         else
-            drawable = drawableSprite.spriteFromTexture(missingTextureName, entity)
+            drawable = drawableSprite.fromTexture(missingTextureName, entity)
 
             if configs.editor.warnOnMissingTexture then
                 print(string.format("Could not find texture '%s' for entity '%s' in room '%s'", texture, entity._name, room.name))
@@ -186,7 +186,7 @@ function entities.getNodeDrawable(name, handler, room, entity, viewport)
 
     elseif handler.nodeTexture then
         local texture = utils.callIfFunction(handler.nodeTexture, room, entity)
-        local drawable = drawableSprite.spriteFromTexture(texture, entity)
+        local drawable = drawableSprite.fromTexture(texture, entity)
 
         if handler.nodeJustification then
             drawable:setJustification(unpack(handler.nodeJustification))

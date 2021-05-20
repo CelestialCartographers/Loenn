@@ -16,7 +16,7 @@ feather.placements = {
 }
 
 function feather.draw(room, entity, viewport)
-    local featherSprite = drawableSpriteStruct.spriteFromTexture("objects/flyFeather/idle00", entity)
+    local featherSprite = drawableSpriteStruct.fromTexture("objects/flyFeather/idle00", entity)
     local shielded = entity.shielded or false
 
     if shielded then

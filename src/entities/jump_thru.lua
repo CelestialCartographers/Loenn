@@ -51,7 +51,7 @@ function jumpthru.sprite(room, entity)
             quadX = 16
         end
 
-        local sprite = drawableSpriteStruct.spriteFromTexture(texture, entity)
+        local sprite = drawableSpriteStruct.fromTexture(texture, entity)
 
         sprite:setJustification(0, 0)
         sprite:addPosition(i * 8, 0)
