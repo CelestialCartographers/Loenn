@@ -154,6 +154,9 @@ entities.goldenBerry.description.winged=The strawberry attempts to vertically ri
 # Golden Strawberry (No Dash)
 entities.memorialTextController.name.golden_no_dash=Golden Strawberry (No Dash)
 
+# Golden Block
+entities.goldenBlock.name.golden_block=Golden Block
+
 # Springs
 entities.spring.name.up=Spring (Up)
 entities.spring.description.playerCanUse=Determines whether the player is able to interact with the spring.
@@ -393,6 +396,10 @@ entities.moveBlock.description.direction=Determines the direction the move block
 entities.whiteblock.name.white_block=White Block
 
 # Switch Gate
+entities.switchGate.name.block=Switch Gate (Stone)
+entities.switchGate.name.mirror=Switch Gate (Mirror)
+entities.switchGate.name.temple=Switch Gate (Temple)
+entities.switchGate.name.stars=Switch Gate (Moon)
 entities.switchGate.description.persistent=Will stay open once activated, even if the player dies.
 entities.switchGate.description.sprite=Changes the visual appearance of the switch gate.
 
@@ -619,6 +626,7 @@ entities.colorSwitch.name.green=Color Switch (Books)
 entities.colorSwitch.description.type=The colour of the switch.
 
 # Temple Cracked Block
+entities.templeCrackedBlock.name.temple_block=Temple Cracked Block
 entities.templeCrackedBlock.description.persistent=Once broken, the block will remain that way, even if the player dies.
 
 # Crush Block
