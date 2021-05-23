@@ -9,7 +9,7 @@ local drawableNinePatchMt = {}
 drawableNinePatchMt.__index = {}
 
 function drawableNinePatchMt.__index:cacheNinePatchMatrix()
-    local sprite = drawableSprite.spriteFromTexture(self.texture, {})
+    local sprite = drawableSprite.fromTexture(self.texture, {})
 
     if sprite and sprite.meta then
         if not sprite.meta.ninePatchMatrix then
@@ -40,7 +40,7 @@ function drawableNinePatchMt.__index:getMatrix()
 end
 
 local function getMatrixSprite(texture, x, y, matrix, quadX, quadY)
-    local sprite = drawableSprite.spriteFromTexture(texture, {x = x, y = y})
+    local sprite = drawableSprite.fromTexture(texture, {x = x, y = y})
 
     sprite:setJustification(0.0, 0.0)
     sprite.quad = matrix:get(quadX, quadY)
@@ -49,7 +49,7 @@ local function getMatrixSprite(texture, x, y, matrix, quadX, quadY)
 end
 
 local function getRelativeQuadSprite(texture, x, y, quadX, quadY, quadWidth, quadHeight)
-    local sprite = drawableSprite.spriteFromTexture(texture, {x = x, y = y})
+    local sprite = drawableSprite.fromTexture(texture, {x = x, y = y})
 
     sprite:setJustification(0.0, 0.0)
     sprite:useRelativeQuad(quadX, quadY, quadWidth, quadHeight)
@@ -188,7 +188,7 @@ function drawableNinePatchMt.__index:getDrawableSprite()
     local texture = self.texture
     local x, y = self.drawX, self.drawY
     local width, height = self.drawWidth, self.drawHeight
-    local dummySprite = drawableSprite.spriteFromTexture(self.texture, {})
+    local dummySprite = drawableSprite.fromTexture(self.texture, {})
     local spriteWidth, spriteHeight = dummySprite.meta.width, dummySprite.meta.height
 
     if not matrix then
