@@ -735,6 +735,8 @@ entities.eyebomb.description.right=The initial direction of the puffer.
 entities.swapBlock.description.theme=The visual theme of the swap block.
 
 # Zip Mover
+entities.zipMover.name.normal=Zip Mover (Normal)
+entities.zipMover.name.moon=Zip Mover (Moon)
 entities.zipMover.description.theme=The visual theme of the zip mover.
 
 # Moon Creature
