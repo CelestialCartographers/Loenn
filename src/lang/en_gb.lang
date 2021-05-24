@@ -339,9 +339,13 @@ entities.darkChaserEnd.name.barrier=Badeline Chaser Barrier
 entities.finalBoss.description.canChangeMusic=Whether the boss should be able to change the music to the boss track.
 
 # Moving Platform
+entities.movingPlatform.name.default=Platform (Moving, Default)
+entities.movingPlatform.name.cliffside=Platform (Moving, Cliffside)
 entities.movingPlatform.description.texture=What texture to use for the platform.
 
 # Sinking Platform
+entities.sinkingPlatform.name.default=Platform (Sinking, Default)
+entities.sinkingPlatform.name.cliffside=Platform (Sinking, Cliffside)
 entities.sinkingPlatform.description.texture=What texture to use for the platform.
 
 # Crumble Block
@@ -555,6 +559,12 @@ entities.cassetteBlock.description.index=The colour of the cassette block.
 entities.cassetteBlock.description.tempo=The tempo of the cassette blocks. The first non 1 tempo cassette block decides the tempo for all cassette blocks in the room.
 
 # Temple Gate
+entities.templeGate.name.default_holdingtheo=Temple Gate (Theo, Holding Theo)
+entities.templeGate.name.default_closebehindplayer=Temple Gate (Default, Close Behind)
+entities.templeGate.name.mirror_closebehindplayer=Temple Gate (Mirror, Close Behind)
+entities.templeGate.name.default_nearestswitch=Temple Gate (Default, Nearest Switch)
+entities.templeGate.name.mirror_nearestswitch=Temple Gate (Mirror, Nearest Switch)
+entities.templeGate.name.default_touchswitches=Temple Gate (Default, Touch Switches)
 entities.templeGate.description.sprite=Determines the visual appearance of the gate.
 entities.templeGate.description.type=Determines what abilities the gate has.
 
@@ -717,6 +727,8 @@ entities.glider.description.bubble=Whether the entity should hover in the air be
 entities.glider.description.tutorial=Whether the entity should show the usage tutorial.
 
 # Puffer (Eye Bomb)
+entities.eyebomb.name.right=Puffer (Right)
+entities.eyebomb.name.left=Puffer (Left)
 entities.eyebomb.description.right=The initial direction of the puffer.
 
 # Swap Block
