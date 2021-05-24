@@ -81,6 +81,7 @@ local movingPlatform = {}
 
 movingPlatform.name = "movingPlatform"
 movingPlatform.depth = 1
+movingPlatform.nodeLimits = {1, 1}
 movingPlatform.placements = {}
 
 for i, texture in ipairs(textures) do

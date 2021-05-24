@@ -35,6 +35,7 @@ local themes = {
 
 zipMover.name = "zipMover"
 zipMover.depth = -9999
+zipMover.nodeLimits = {1, 1}
 zipMover.placements = {}
 
 for i, theme in ipairs(themes) do
