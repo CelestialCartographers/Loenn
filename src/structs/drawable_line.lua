@@ -9,7 +9,7 @@ drawableLineMt.__index = {}
 
 local lineExtraWidth = 0.2
 
-local function getRotatedRectangleSprite(x1, y1, x2, y2, color, thickness, smooth, offsetX, offsetY, magnitudeOffset)
+local function getRotatedRectangleSprite(x1, y1, x2, y2, color, thickness, smooth, offsetX, offsetY, magnitudeOffset, depth)
     local theta = math.atan2(y2 - y1, x2 - x1)
     local magnitude = math.sqrt((x1 - x2)^2 + (y1 - y2)^2) + magnitudeOffset
 
@@ -22,6 +22,7 @@ local function getRotatedRectangleSprite(x1, y1, x2, y2, color, thickness, smoot
 
     sprite:setOffset(offsetX / magnitude, 0.5 / thickness + offsetY / thickness)
     sprite.rotation = theta
+    sprite.depth = depth
 
     return sprite
 end
@@ -32,13 +33,14 @@ function drawableLineMt.__index:getDrawableSprite()
     local thickness = self.thickness
     local offsetX, offsetY = self.offsetX, self.offsetY
     local magnitudeOffset = self.magnitudeOffset
+    local depth = self.depth
 
     local sprites = {}
 
     for i = 3, #points, 2 do
         local x1, y1, x2, y2 = points[i - 2], points[i - 1], points[i], points[i + 1]
 
-        table.insert(sprites, getRotatedRectangleSprite(x1, y1, x2, y2, color, thickness, true, offsetX, offsetY, magnitudeOffset))
+        table.insert(sprites, getRotatedRectangleSprite(x1, y1, x2, y2, color, thickness, true, offsetX, offsetY, magnitudeOffset, depth))
     end
 
     return sprites
