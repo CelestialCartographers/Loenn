@@ -415,6 +415,9 @@ entities.moveBlock.description.direction=Determines the direction the move block
 # White Block
 entities.whiteblock.name.white_block=White Block
 
+# Touch Switch
+entities.touchSwitch.name.touch_switch=Touch Switch
+
 # Switch Gate
 entities.switchGate.name.block=Switch Gate (Stone)
 entities.switchGate.name.mirror=Switch Gate (Mirror)
@@ -617,7 +620,11 @@ entities.everest/customBirdTutorial.description.faceLeft=Whether the bird should
 entities.everest/customBirdTutorial.description.caw=Whether the bird should caw upon displaying the speech bubble.
 entities.everest/customBirdTutorial.description.onlyOnce=Whether the bird should respawn after displaying the speech bubble and flying away.
 
+# Gondola
+entities.gondola.name.gondola=Gondola
+
 # Intro Car
+entities.introCar.name.intro_car=Intro Car
 entities.introCar.description.hasRoadAndBarriers=Determines whether the car should come with road and barriers.
 
 # Core Mode Toggle
