@@ -623,11 +623,29 @@ function celesteRender.getRoomBatches(room, viewport)
 
             if batches then
                 if depth then
-                    depthBatches[depth] = batches
+                    local batchTarget = depthBatches[depth]
+
+                    if batchTarget then
+                        for _, sprite in ipairs(batches) do
+                            table.insert(batchTarget, sprite)
+                        end
+
+                    else
+                        depthBatches[depth] = batches
+                    end
 
                 else
                     for d, batch in pairs(batches) do
-                        depthBatches[d] = batch
+                        local batchTarget = depthBatches[depth]
+
+                        if batchTarget then
+                            for _, sprite in ipairs(batch) do
+                                table.insert(batchTarget, sprite)
+                            end
+
+                        else
+                            depthBatches[d] = batch
+                        end
                     end
                 end
 
