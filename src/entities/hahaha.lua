@@ -4,6 +4,7 @@ local hahaha = {}
 
 hahaha.name = "hahaha"
 hahaha.depth = -10001
+hahaha.nodeLineRenderType = "line"
 hahaha.nodeLimits = {1, 1}
 hahaha.placements = {
     name = "hahaha",

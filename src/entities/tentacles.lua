@@ -3,6 +3,7 @@ local tentacles = {}
 tentacles.name = "tentacles"
 tentacles.depth = 0
 tentacles.texture = "@Internal@/tentacles"
+tentacles.nodeLineRenderType = "line"
 tentacles.nodeLimits = {1, -1}
 tentacles.placements = {
     name = "tentacles",
