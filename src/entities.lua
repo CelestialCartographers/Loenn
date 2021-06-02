@@ -290,6 +290,9 @@ function entities.getSelection(room, entity, viewport)
     elseif handler.rectangle then
         return handler.rectangle(room, entity), entities.getNodeRectangles(room, entity)
 
+    elseif entity.width and entity.height then
+        return utils.rectangle(entity.x or 0, entity.y or 0, entity.width, entity.height), entities.getNodeRectangles(room, entity)
+
     else
         local drawable = entities.getDrawable(name, handler, room, entity)
         local nodeRectangles = entities.getNodeRectangles(room, entity)
