@@ -72,45 +72,51 @@ function entities.getDefaultDepth(name, handler, room, entity, viewport)
     return utils.callIfFunction(handler.depth, room, entity, viewport) or 0
 end
 
-local function addAutomaticDrawableFields(handler, drawable, room, entity)
-    if handler.justification then
-        if type(handler.justification) == "function" then
-            drawable:setJustification(handler.justification(room, entity))
+local function addAutomaticDrawableFields(handler, drawable, room, entity, isNode)
+    local justificationKey = isNode and "nodeJustification" or "justification"
+    local scaleKey = isNode and "nodeScale" or "scale"
+    local offsetKey = isNode and "nodeOffset" or "offset"
+    local rotationKey = isNode and "nodeRotation" or "rotation"
+    local colorKey = isNode and "nodeColor" or "color"
+
+    if handler[justificationKey] then
+        if type(handler[justificationKey]) == "function" then
+            drawable:setJustification(handler[justificationKey](room, entity))
 
         else
-            drawable:setJustification(unpack(handler.justification))
+            drawable:setJustification(unpack(handler[justificationKey]))
         end
     end
 
-    if handler.scale then
-        if type(handler.scale) == "function" then
-            drawable:setScale(handler.scale(room, entity))
+    if handler[scaleKey] then
+        if type(handler[scaleKey]) == "function" then
+            drawable:setScale(handler[scaleKey](room, entity))
 
         else
-            drawable:setScale(unpack(handler.scale))
+            drawable:setScale(unpack(handler[scaleKey]))
         end
     end
 
-    if handler.offset then
-        if type(handler.offset) == "function" then
-            drawable:setOffset(handler.offset(room, entity))
+    if handler[offsetKey] then
+        if type(handler[offsetKey]) == "function" then
+            drawable:setOffset(handler[offsetKey](room, entity))
 
         else
-            drawable:setOffset(unpack(handler.offset))
+            drawable:setOffset(unpack(handler[offsetKey]))
         end
     end
 
-    if handler.rotation then
-        drawable.rotation = utils.callIfFunction(handler.rotation, room, entity)
+    if handler[rotationKey] then
+        drawable[rotationKey] = utils.callIfFunction(handler[rotationKey], room, entity)
     end
 
-    if handler.color then
-        drawable.color = utils.callIfFunction(handler.color, room, entity)
+    if handler[colorKey] then
+        drawable[colorKey] = utils.callIfFunction(handler[colorKey] or handler, room, entity)
     end
 end
 
 -- Returns drawable, depth
-function entities.getDrawable(name, handler, room, entity, viewport)
+function entities.getEntityDrawable(name, handler, room, entity, viewport)
     handler = handler or entities.registeredEntities[name]
 
     if handler.sprite then
@@ -130,7 +136,7 @@ function entities.getDrawable(name, handler, room, entity, viewport)
         local drawable = drawableSprite.fromTexture(texture, entity)
 
         if drawable then
-            addAutomaticDrawableFields(handler, drawable, room, entity)
+            addAutomaticDrawableFields(handler, drawable, room, entity, false)
 
         else
             drawable = drawableSprite.fromTexture(missingTextureName, entity)
@@ -169,11 +175,11 @@ function entities.getDrawable(name, handler, room, entity, viewport)
     end
 end
 
-function entities.getNodeDrawable(name, handler, room, entity, viewport)
+function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, viewport)
     handler = handler or entities.registeredEntities[name]
 
     if handler.nodeSprite then
-        local sprites = handler.nodeSprite(room, entity, viewport)
+        local sprites = handler.nodeSprite(room, entity, node, nodeIndex, viewport)
 
         if sprites then
             if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
@@ -185,33 +191,58 @@ function entities.getNodeDrawable(name, handler, room, entity, viewport)
         end
 
     elseif handler.nodeTexture then
-        local texture = utils.callIfFunction(handler.nodeTexture, room, entity)
-        local drawable = drawableSprite.fromTexture(texture, entity)
+        local texture = utils.callIfFunction(handler.nodeTexture, room, entity, node, nodeIndex, viewport)
+        local drawable = drawableSprite.fromTexture(texture, node)
 
-        if handler.nodeJustification then
-            drawable:setJustification(unpack(handler.nodeJustification))
-        end
-
-        if handler.nodeScale then
-            drawable:setScale(unpack(handler.nodeScale))
-        end
-
-        if handler.nodeOffset then
-            drawable:setOffset(unpack(handler.nodeOffset))
-        end
-
-        if handler.nodeRotation then
-            drawable.rotation = handler.nodeRotation
-        end
+        addAutomaticDrawableFields(handler, drawable, room, entity, true)
 
         return drawable
 
     elseif handler.nodeDraw then
-        return drawableFunction.fromFunction(handler.nodeDraw, room, entity, viewport)
+        return drawableFunction.fromFunction(handler.nodeDraw, room, entity, node, nodeIndex, viewport)
 
     else
-        return entities.getDrawable(name, handler, room, entity, viewport)
+        -- Make a copy of entity and change the position to the node
+        -- This makes it correctly render and select at the node rather than main entity
+
+        local entityCopy = table.shallowcopy(entity)
+
+        entityCopy.x = node.x
+        entityCopy.y = node.y
+
+        return entities.getDrawable(name, handler, room, entityCopy, viewport)
     end
+end
+
+function entities.getDrawable(name, handler, room, entity, viewport)
+    handler = handler or entities.registeredEntities[name]
+
+    local nodeVisibility = utils.callIfFunction(handler.nodeVisibility, room, entity) or "selected"
+    local entityDrawable, depth = entities.getEntityDrawable(name, handler, room, entity, viewport)
+
+    -- Add node drawable(s) if the entity asks for it
+    if entity.nodes and nodeVisibility == "always" then
+        if utils.typeof(entityDrawable) ~= "table" then
+            entityDrawable = {entityDrawable}
+        end
+
+        for i, node in ipairs(entity.nodes) do
+            local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i, viewport)
+
+            if nodeDrawable then
+                if utils.typeof(nodeDrawable) == "table" then
+                    for _, drawable in ipairs(nodeDrawable) do
+                        table.insert(entityDrawable, drawable)
+                    end
+
+                else
+                    table.insert(entityDrawable, nodeDrawable)
+                end
+            end
+        end
+    end
+
+    return entityDrawable, depth
 end
 
 local function getSpriteRectangle(drawables)
@@ -235,7 +266,6 @@ local function getSpriteRectangle(drawables)
     return utils.rectangle(x, y, width, height)
 end
 
--- TODO - Offset to node
 function entities.getNodeRectangles(room, entity, viewport)
     local name = entity._name
     local handler = entities.registeredEntities[name]
@@ -247,31 +277,25 @@ function entities.getNodeRectangles(room, entity, viewport)
 
     local rectangles = {}
 
-    local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, nil)
-    local nodeRectangle
+    local x, y = entity.x or 0, entity.y or 0
 
-    if nodeDrawable then
-        if #nodeDrawable > 0 then
-            nodeRectangle = getSpriteRectangle(nodeDrawable)
+    for i, node in ipairs(nodes) do
+        if handler.nodeRectangle then
+            rectangles[i] = handler.nodeRectangle(room, entity, node, i)
 
         else
-            nodeRectangle = nodeDrawable:getRectangle()
-        end
+            local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i)
+            local nodeRectangle
 
-        local x, y = entity.x or 0, entity.y or 0
-        local rectangleX, rectangleY = nodeRectangle.x, nodeRectangle.y
+            if nodeDrawable then
+                if #nodeDrawable > 0 then
+                    nodeRectangle = getSpriteRectangle(nodeDrawable)
 
-        for i, node in ipairs(nodes) do
-            if handler.nodeRectangle then
-                rectangles[i] = handler.nodeRectangle(room, entity, i)
+                else
+                    nodeRectangle = nodeDrawable:getRectangle()
+                end
 
-            else
-                local offsetX, offsetY = node.x - x, node.y - y
-
-                nodeRectangle.x = rectangleX + offsetX
-                nodeRectangle.y = rectangleY + offsetY
-
-                rectangles[i] = utils.deepcopy(nodeRectangle)
+                table.insert(rectangles, utils.deepcopy(nodeRectangle))
             end
         end
     end
@@ -294,7 +318,7 @@ function entities.getSelection(room, entity, viewport)
         return utils.rectangle(entity.x or 0, entity.y or 0, entity.width, entity.height), entities.getNodeRectangles(room, entity)
 
     else
-        local drawable = entities.getDrawable(name, handler, room, entity)
+        local drawable = entities.getEntityDrawable(name, handler, room, entity)
         local nodeRectangles = entities.getNodeRectangles(room, entity)
 
         if drawable then
@@ -324,56 +348,47 @@ function entities.drawSelected(room, layer, entity, color)
         local nodes = entity.nodes
 
         if nodes and #nodes > 0 then
-            local nodeLineRenderType = utils.callIfFunction(handler.nodeLineRenderType) or "none"
-            local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, nil)
+            local nodeVisibility = utils.callIfFunction(handler.nodeVisibility, room, entity) or "selected"
+            local nodeLineRenderType = utils.callIfFunction(handler.nodeLineRenderType, room, entity) or false
 
-            if nodeDrawable then
-                local entityRenderX, entityRenderY = x + halfWidth, y + halfHeight
-                local previousX, previousY = entityRenderX, entityRenderY
+            local entityRenderX, entityRenderY = x + halfWidth, y + halfHeight
+            local previousX, previousY = entityRenderX, entityRenderY
 
-                for _, node in ipairs(nodes) do
-                    local nodeX, nodeY = node.x or 0, node.y or 0
-                    local nodeRenderX, nodeRenderY = nodeX + halfWidth, nodeY + halfHeight
+            for i, node in ipairs(nodes) do
+                local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i)
 
-                    drawing.callKeepOriginalColor(function()
-                        love.graphics.setColor(color)
+                if nodeDrawable then
+                    if nodeLineRenderType then
+                        local nodeX, nodeY = node.x or 0, node.y or 0
+                        local nodeRenderX, nodeRenderY = nodeX + halfWidth, nodeY + halfHeight
 
-                        if nodeLineRenderType == "line" then
-                            love.graphics.line(previousX, previousY, nodeRenderX, nodeRenderY)
+                        drawing.callKeepOriginalColor(function()
+                            love.graphics.setColor(color)
 
-                        elseif nodeLineRenderType == "fan" then
-                            love.graphics.line(entityRenderX, entityRenderY, nodeX, nodeY)
-                        end
-                    end)
+                            if nodeLineRenderType == "line" then
+                                love.graphics.line(previousX, previousY, nodeRenderX, nodeRenderY)
 
-                    previousX = nodeRenderX
-                    previousY = nodeRenderY
-
-                    local offsetX, offsetY = nodeX - x, nodeY - y
-
-                    -- Reset offset so we can reuse this for next node
-                    if #nodeDrawable > 0 then
-                        for _, drawable in ipairs(nodeDrawable) do
-                            if drawable.x and drawable.y then
-                                drawable.x += offsetX
-                                drawable.y += offsetY
-
-                                drawable:draw()
-
-                                drawable.x -= offsetX
-                                drawable.y -= offsetY
+                            elseif nodeLineRenderType == "fan" then
+                                love.graphics.line(entityRenderX, entityRenderY, nodeX, nodeY)
                             end
-                        end
+                        end)
 
-                    else
-                        if nodeDrawable.x and nodeDrawable.y then
-                            nodeDrawable.x += offsetX
-                            nodeDrawable.y += offsetY
+                        previousX = nodeRenderX
+                        previousY = nodeRenderY
+                    end
 
-                            nodeDrawable:draw()
+                    if nodeVisibility == "selected" then
+                        if #nodeDrawable > 0 then
+                            for _, drawable in ipairs(nodeDrawable) do
+                                if drawable.x and drawable.y then
+                                    drawable:draw()
+                                end
+                            end
 
-                            nodeDrawable.x -= offsetX
-                            nodeDrawable.y -= offsetY
+                        else
+                            if nodeDrawable.x and nodeDrawable.y then
+                                nodeDrawable:draw()
+                            end
                         end
                     end
                 end
