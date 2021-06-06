@@ -14,9 +14,9 @@ local outerOffsetX = 2
 local outerOffsetY = 2
 local outerMagnitudeOffset = 0
 
-local function addPlatformSprites(sprites, entity, texture, x, y, width)
+local function addPlatformSprites(sprites, position, texture, width)
     for i = 8, width - 1, 8 do
-        local sprite = drawableSprite.fromTexture(texture, entity)
+        local sprite = drawableSprite.fromTexture(texture, position)
 
         sprite:addPosition(i - 8, 0)
         sprite:useRelativeQuad(8, 0, 8, 8)
@@ -25,9 +25,9 @@ local function addPlatformSprites(sprites, entity, texture, x, y, width)
         table.insert(sprites, sprite)
     end
 
-    local leftSprite = drawableSprite.fromTexture(texture, entity)
-    local rightSprite = drawableSprite.fromTexture(texture, entity)
-    local middleSprite = drawableSprite.fromTexture(texture, entity)
+    local leftSprite = drawableSprite.fromTexture(texture, position)
+    local rightSprite = drawableSprite.fromTexture(texture, position)
+    local middleSprite = drawableSprite.fromTexture(texture, position)
 
     leftSprite:useRelativeQuad(0, 0, 8, 8)
     leftSprite:setJustification(0, 0)
@@ -105,21 +105,19 @@ function movingPlatform.sprite(room, entity)
     local texture = "objects/woodPlatform/" .. variant
 
     addConnectorSprites(sprites, entity, x, y, nodeX, nodeY, width)
-    addPlatformSprites(sprites, entity, texture, x, y, width)
+    addPlatformSprites(sprites, entity, texture, width)
 
     return sprites
 end
 
-function movingPlatform.nodeSprite(room, entity)
+function movingPlatform.nodeSprite(room, entity, node)
     local sprites = {}
 
-    local nodes = entity.nodes or {{x = 0, y = 0}}
-    local nodeX, nodeY = nodes[1].x, nodes[1].y
     local width = entity.width or 16
     local variant = entity.texture or "default"
     local texture = "objects/woodPlatform/" .. variant
 
-    addPlatformSprites(sprites, entity, texture, nodeX, nodeY, width)
+    addPlatformSprites(sprites, node, texture, width)
 
     return sprites
 end
@@ -168,7 +166,7 @@ function sinkingPlatform.sprite(room, entity)
     end
 
     addConnectorSprites(sprites, entity, x, y, x, nodeY, width)
-    addPlatformSprites(sprites, entity, texture, x, y, width)
+    addPlatformSprites(sprites, entity, texture, width)
 
     return sprites
 end

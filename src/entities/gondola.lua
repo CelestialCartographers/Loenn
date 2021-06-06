@@ -6,6 +6,7 @@ local gondola = {}
 
 gondola.name = "gondola"
 gondola.depth = -10500
+gondola.nodeVisibility = "always"
 gondola.nodeLimits = {1, 1}
 gondola.placements = {
     {
@@ -56,11 +57,9 @@ function gondola.sprite(room, entity)
     leftSprite:setJustification(0.0, 1.0)
     leftSprite.depth = 8998
 
+    -- Only used to calculate wire position
     local rightSprite = drawableSprite.fromTexture(rightTexture, entity)
     rightSprite:addPosition(nodeX - x + 144, nodeY - y - 104)
-    rightSprite:setJustification(0.0, 0.5)
-    rightSprite:setScale(-1, 1)
-    rightSprite.depth = 8998
 
     local wireLeftX = leftSprite.x + 40
     local wireLeftY = leftSprite.y - 12
@@ -83,15 +82,13 @@ function gondola.sprite(room, entity)
     table.insert(sprites, leverSprite)
     table.insert(sprites, backSprite)
     table.insert(sprites, leftSprite)
-    table.insert(sprites, rightSprite)
 
     return sprites
 end
 
-function gondola.selection(room, entity)
+-- Define custom main entity rectangle otherwise the cable etc. is automatically considered part of it
+function gondola.rectangle(room, entity)
     local x, y = entity.x or 0, entity.y or 0
-    local nodes = entity.nodes or {{x = 0, y = 0}}
-    local nodeX, nodeY = nodes[1].x, nodes[1].y
 
     local frontSprite = drawableSprite.fromTexture(frontTexture, entity)
     frontSprite:addPosition(0, renderOffsetY)
@@ -101,20 +98,19 @@ function gondola.selection(room, entity)
     topSprite:addPosition(0, renderOffsetY)
     topSprite:setJustification(0.5, 0.0)
 
-    local rightSprite = drawableSprite.fromTexture(rightTexture, entity)
-    rightSprite:addPosition(nodeX - x + 144, nodeY - y - 104)
+    local spriteRectangles = {frontSprite:getRectangle(), topSprite:getRectangle()}
+
+    return utils.rectangle(utils.coverRectangles(spriteRectangles))
+end
+
+function gondola.nodeSprite(room, entity, node)
+    local rightSprite = drawableSprite.fromTexture(rightTexture, node)
+    rightSprite:addPosition(144, -104)
     rightSprite:setJustification(0.0, 0.5)
     rightSprite:setScale(-1, 1)
     rightSprite.depth = 8998
 
-    local mainRectangle = utils.rectangle(utils.coverRectangles({frontSprite:getRectangle(), topSprite:getRectangle()}))
-    local nodeRectangle = rightSprite:getRectangle()
-
-    return mainRectangle, {nodeRectangle}
-end
-
-function gondola.nodeSprite(room, entity)
-    -- Handled in main sprite function
+    return rightSprite
 end
 
 return gondola
