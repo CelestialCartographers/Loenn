@@ -412,8 +412,14 @@ entities.moveBlock.description.canSteer=Determines whether the move block can be
 entities.moveBlock.description.fast=Changes the move block between two speeds.
 entities.moveBlock.description.direction=Determines the direction the move block moves in upon activation.
 
+# Forsaken City Satellite
+entities.birdForsakenCityGem.name.satellite=Forsaken City Satellite
+
 # White Block
 entities.whiteblock.name.white_block=White Block
+
+# Reflection Heart Statue
+entities.reflectionHeartStatue.name.statue=Reflection Heart Statue
 
 # Touch Switch
 entities.touchSwitch.name.touch_switch=Touch Switch
