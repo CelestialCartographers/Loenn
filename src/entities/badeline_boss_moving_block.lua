@@ -1,3 +1,4 @@
+local utils = require("utils")
 local fakeTilesHelper = require("fake_tiles_helper")
 
 local movingBlock = {}
@@ -17,5 +18,9 @@ movingBlock.placements = {
 
 movingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("G", false)
 movingBlock.nodeSprite = fakeTilesHelper.getEntitySpriteFunction("g", false)
+
+function movingBlock.nodeRectangle(room, entity, node)
+    return utils.rectangle(node.x or 0, node.y or 0, entity.width or 8, entity.height or 8)
+end
 
 return movingBlock
