@@ -162,12 +162,15 @@ local function getEntityBlendMode(entity, blendModeKey)
     return blendModeKey
 end
 
-function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer, color)
+function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer, color, x, y)
     layer = layer or "tilesFg"
 
-    return function(room, entity)
-        local x, y = entity.x or 0, entity.y or 0
-        local tileX, tileY = math.floor(x / 8) + 1, math.floor(y / 8) + 1
+    return function(room, entity, node)
+        local isNode = utils.typeof(node) == "node"
+        local targetX = x or isNode and node.x or entity.x or 0
+        local targetY = y or isNode and node.y or entity.y or 0
+
+        local tileX, tileY = math.floor(targetX / 8) + 1, math.floor(targetY / 8) + 1
         local onGridX, onGridY = tileX * 8 - 8, tileY * 8 - 8
 
         local material = getEntityMaterialFromKey(entity, materialKey)
