@@ -36,6 +36,7 @@ function loadingScene:firstEnter()
     local toolHandler = require("tool_handler")
     local entities = require("entities")
     local triggers = require("triggers")
+    local libraries = require("libraries")
 
     local atlases = require("atlases")
 
@@ -64,6 +65,11 @@ function loadingScene:firstEnter()
             -- Internal scenes are already loaded, how else would we be here
             sceneHandler.loadExternalScenes()
 
+            languageRegistry.loadExternalFiles()
+
+            libraries.loadInternalLibraries()
+            libraries.loadExternalLibraries()
+
             entities.loadInternalEntities()
             entities.loadExternalEntities()
 
@@ -72,8 +78,6 @@ function loadingScene:firstEnter()
 
             toolHandler.loadInternalTools()
             toolHandler.loadExternalTools()
-
-            languageRegistry.loadExternalFiles()
 
             atlases.loadCelesteAtlases()
 
