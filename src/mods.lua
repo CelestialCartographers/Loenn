@@ -92,7 +92,9 @@ function modHandler.findPluginLoennFolder(mountPoint)
     end
 end
 
-function modHandler.readModEverestYaml(path, mountPoint, folderName)
+function modHandler.readModMetadata(path, mountPoint, folderName)
+    local result = {}
+
     local yamlFilename = mountPoint .. "/" .. modHandler.everestYamlFilename
     local content, size = love.filesystem.read(yamlFilename)
 
@@ -100,16 +102,16 @@ function modHandler.readModEverestYaml(path, mountPoint, folderName)
         local success, data = pcall(yaml.read, utils.stripByteOrderMark(content))
 
         if success then
-            data._mountPoint = mountPoint
-            data._mountPointLoenn = modHandler.findPluginLoennFolder(mountPoint)
-            data._path = path
-            data._folderName = folderName
-
-            return data
+            result = data
+            result._mountPointLoenn = modHandler.findPluginLoennFolder(mountPoint)
         end
     end
 
-    return {}
+    result._mountPoint = mountPoint
+    result._path = path
+    result._folderName = folderName
+
+    return result
 end
 
 function modHandler.findLoadedMod(name)
@@ -173,7 +175,7 @@ function modHandler.mountMod(path, force)
             love.filesystem.mountUnsandboxed(path, modHandler.commonModContent .. "/", 1)
             love.filesystem.mountUnsandboxed(utils.joinpath(directory, ".", filename), specificMountPoint, 1)
 
-            local modMetadata = modHandler.readModEverestYaml(path, specificMountPoint, modFolderName)
+            local modMetadata = modHandler.readModMetadata(path, specificMountPoint, modFolderName)
 
             modHandler.loadedMods[modFolderName] = true
             modHandler.modMetadata[modFolderName] = modMetadata
@@ -195,10 +197,14 @@ function modHandler.mountMods(directory, force)
     end
 end
 
-function modHandler.realDirectory(target)
-    -- TODO - Implement / Test
+function modHandler.getModForPath(path)
+    local mountPoint = love.filesystem.getRealDirectory(modHandler.commonModContent .. "/" .. path)
 
-    return love.filesystem.getRealDirectory(modHandler.commonModContent .. "/" .. target)
+    for modFolder, metadata in pairs(modHandler.modMetadata) do
+        if metadata._path == mountPoint then
+            return metadata
+        end
+    end
 end
 
 return modHandler
