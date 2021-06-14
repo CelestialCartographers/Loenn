@@ -516,6 +516,14 @@ function utils.deepcopy(v, copyMetatables)
     end
 end
 
+function utils.shuffle(t)
+    for i = #t, 2, -1 do
+        local j = math.random(i)
+
+        t[i], t[j] = t[j], t[i]
+    end
+end
+
 -- Shallow mode doesn't check table values recursively
 function utils.equals(lhs, rhs, shallow)
     if lhs == rhs then

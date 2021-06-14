@@ -86,7 +86,7 @@ function decals.getDrawable(texture, handler, room, decal, viewport)
     local scaleY = decal.scaleY or 1
 
     if meta then
-        local drawable = drawableSprite.spriteFromTexture(texture, decal)
+        local drawable = drawableSprite.fromTexture(texture, decal)
 
         drawable:setScale(scaleX, scaleY)
         drawable:setJustification(0, 0)

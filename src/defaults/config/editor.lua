@@ -34,5 +34,6 @@ return {
 
     -- Debug
     displayFPS = false,
-    warnOnMissingTexture = false
+    warnOnMissingTexture = false,
+    warnOnMissingEntityHandler = false
 }

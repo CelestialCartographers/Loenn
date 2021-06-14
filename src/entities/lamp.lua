@@ -25,7 +25,7 @@ local texture = "scenery/lamp"
 
 function lamp.sprite(room, entity)
     local broken = entity.broken
-    local sprite = drawableSprite.spriteFromTexture(texture, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
 
     -- Image is split in half, width is the width of one lamp pole
     local width = math.floor(sprite.meta.width / 2)
@@ -41,7 +41,7 @@ function lamp.sprite(room, entity)
 end
 
 function lamp.selection(room, entity)
-    local sprite = drawableSprite.spriteFromTexture(texture, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
 
     local width = math.floor(sprite.meta.width / 2)
     local halfWidth = math.floor(width / 2)

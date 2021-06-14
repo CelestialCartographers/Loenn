@@ -12,8 +12,8 @@ local computerTexture = "objects/kevinspc/pc"
 local spectogramTexture = "objects/kevinspc/spectogram"
 
 function kevinsPc.sprite(room, entity)
-    local computerSprite = drawableSprite.spriteFromTexture(computerTexture, entity)
-    local spectogramSprite = drawableSprite.spriteFromTexture(spectogramTexture, entity)
+    local computerSprite = drawableSprite.fromTexture(computerTexture, entity)
+    local spectogramSprite = drawableSprite.fromTexture(spectogramTexture, entity)
 
     computerSprite:setJustification(0.5, 1.0)
 

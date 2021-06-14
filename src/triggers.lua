@@ -47,18 +47,18 @@ function triggers.registerTrigger(filename, registerAt, verbose)
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
 
-function triggers.loadtriggers(path, registerAt)
+function triggers.loadTriggers(path, registerAt)
     pluginLoader.loadPlugins(path, registerAt, triggers.registerTrigger)
 end
 
 function triggers.loadInternalTriggers(registerAt)
-    return triggers.loadtriggers("triggers", registerAt)
+    return triggers.loadTriggers("triggers", registerAt)
 end
 
 function triggers.loadExternalTriggers(registerAt)
     local filenames = modHandler.findPlugins("triggers")
 
-    return triggers.loadtriggers(filenames, registerAt)
+    return triggers.loadTriggers(filenames, registerAt)
 end
 
 -- Returns drawable, depth

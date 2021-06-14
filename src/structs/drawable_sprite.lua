@@ -204,7 +204,7 @@ function drawableSpriteMt.__index:useRelativeQuad(x, y, width, height, overflow)
     self.quad = self:getRelativeQuad(x, y, width, height, overflow)
 end
 
-function drawableSpriteStruct.spriteFromMeta(meta, data)
+function drawableSpriteStruct.fromMeta(meta, data)
     data = data or {}
 
     local drawableSprite = {
@@ -225,7 +225,7 @@ function drawableSpriteStruct.spriteFromMeta(meta, data)
     drawableSprite.depth = data.depth
 
     drawableSprite.meta = meta
-    drawableSprite.quad = meta and meta.quad
+    drawableSprite.quad = data.quad or meta and meta.quad
 
     if data.color then
         setColor(drawableSprite, data.color)
@@ -234,17 +234,17 @@ function drawableSpriteStruct.spriteFromMeta(meta, data)
     return setmetatable(drawableSprite, drawableSpriteMt)
 end
 
-function drawableSpriteStruct.spriteFromTexture(texture, data)
+function drawableSpriteStruct.fromTexture(texture, data)
     local atlas = data and data.atlas or "Gameplay"
     local spriteMeta = atlases.getResource(texture, atlas)
 
     if spriteMeta then
-        return drawableSpriteStruct.spriteFromMeta(spriteMeta, data)
+        return drawableSpriteStruct.fromMeta(spriteMeta, data)
     end
 end
 
-function drawableSpriteStruct.spriteFromInternalTexture(texture, data)
-    return drawableSpriteStruct.spriteFromTexture(atlases.addInternalPrefix(texture), data)
+function drawableSpriteStruct.fromInternalTexture(texture, data)
+    return drawableSpriteStruct.fromTexture(atlases.addInternalPrefix(texture), data)
 end
 
 return drawableSpriteStruct

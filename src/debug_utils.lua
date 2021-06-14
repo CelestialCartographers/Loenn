@@ -1,5 +1,6 @@
 local entities = require("entities")
 local triggers = require("triggers")
+local libraries = require("libraries")
 local celesteRender = require("celeste_render")
 local toolHandler = require("tool_handler")
 local sceneHandler = require("scene_handler")
@@ -70,6 +71,15 @@ function debugUtils.reloadLanguageFiles()
     languageRegistry.setLanguage(languageRegistry.currentLanguageName)
 end
 
+function debugUtils.reloadLibraries()
+    print("! Reloading Libraries")
+
+    libraries.initDefaultRegistry()
+
+    libraries.loadInternalLibraries()
+    libraries.loadExternalLibraries()
+end
+
 function debugUtils.reloadUI()
     -- Unimplemented
     -- UI branch can choose to change this function
@@ -87,6 +97,7 @@ function debugUtils.reloadEverything()
     print("! Reloading everything")
 
     debugUtils.reloadLanguageFiles()
+    debugUtils.reloadLibraries()
     debugUtils.reloadEntities()
     debugUtils.reloadTriggers()
     debugUtils.reloadTools()

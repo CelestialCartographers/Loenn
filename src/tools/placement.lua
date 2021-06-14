@@ -295,8 +295,8 @@ local function updatePlacementNodes()
         -- Update node positions for point and rectangle placements
         if placementType ~= "line" then
             for i, node in ipairs(item.nodes) do
-                local widthOffset = item.width or 0
-                local nodeOffsetX = #item.nodes * 16
+                local widthOffset = i * (item.width or 0)
+                local nodeOffsetX = i * 16
 
                 node.x = item.x + widthOffset + nodeOffsetX
                 node.y = item.y

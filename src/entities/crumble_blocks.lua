@@ -1,4 +1,4 @@
-local drawableSprite = require("structs.drawable_sprite")
+local drawableNinePatch = require("structs.drawable_nine_patch")
 local utils = require("utils")
 
 local crumbleBlock = {}
@@ -21,43 +21,25 @@ for _, texture in ipairs(textures) do
     })
 end
 
--- Manual offsets and justifications of the sprites
-function crumbleBlock.sprite(room, entity)
-    local sprites = {}
+local ninePatchOptions = {
+    mode = "fill",
+    fillMode = "repeat",
+    border = 0
+}
 
+function crumbleBlock.sprite(room, entity)
+    local x, y = entity.x or 0, entity.y or 0
     local width = math.max(entity.width or 0, 8)
-    local renderOffset = 0
 
     local variant = entity.texture or "default"
     local texture = "objects/crumbleBlock/" .. variant
+    local ninePatch = drawableNinePatch.fromTexture(texture, ninePatchOptions, x, y, width, 8)
 
-    while width >= 32 do
-        local sprite = drawableSprite.spriteFromTexture(texture, entity)
-
-        sprite:setJustification(0, 0)
-        sprite:addPosition(renderOffset, 0)
-
-        table.insert(sprites, sprite)
-
-        width -= 32
-        renderOffset += 32
-    end
-
-    if width > 0 then
-        local sprite = drawableSprite.spriteFromTexture(texture, entity)
-
-        sprite:setJustification(0, 0)
-        sprite:addPosition(renderOffset, 0)
-        sprite:useRelativeQuad(0, 0, width, 8)
-
-        table.insert(sprites, sprite)
-    end
-
-    return sprites
+    return ninePatch
 end
 
 function crumbleBlock.selection(room, entity)
-    return utils.rectangle(entity.x, entity.y, math.max(entity.width or 0, 8), 8)
+    return utils.rectangle(entity.x or 0, entity.y or 0, math.max(entity.width or 0, 8), 8)
 end
 
 return crumbleBlock

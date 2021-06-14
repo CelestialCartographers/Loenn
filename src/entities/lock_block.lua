@@ -28,7 +28,7 @@ end
 function lockBlock.sprite(room, entity)
     local spriteName = entity.sprite or "wood"
     local texture = textures[spriteName] or textures["wood"]
-    local sprite = drawableSprite.spriteFromTexture(texture, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
 
     sprite:addPosition(16, 16)
 

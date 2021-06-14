@@ -20,11 +20,11 @@ function summitCheckpoint.sprite(room, entity)
     local digit1 = math.floor(number % 100 / 10)
     local digit2 = number % 10
 
-    local backSprite = drawableSprite.spriteFromTexture(backTexture, entity)
-    local backDigit1 = drawableSprite.spriteFromTexture(string.format(digitBackground, digit1), entity)
-    local frontDigit1 = drawableSprite.spriteFromTexture(string.format(digitForeground, digit1), entity)
-    local backDigit2 = drawableSprite.spriteFromTexture(string.format(digitBackground, digit2), entity)
-    local frontDigit2 = drawableSprite.spriteFromTexture(string.format(digitForeground, digit2), entity)
+    local backSprite = drawableSprite.fromTexture(backTexture, entity)
+    local backDigit1 = drawableSprite.fromTexture(string.format(digitBackground, digit1), entity)
+    local frontDigit1 = drawableSprite.fromTexture(string.format(digitForeground, digit1), entity)
+    local backDigit2 = drawableSprite.fromTexture(string.format(digitBackground, digit2), entity)
+    local frontDigit2 = drawableSprite.fromTexture(string.format(digitForeground, digit2), entity)
 
     backDigit1:addPosition(-2, 4)
     frontDigit1:addPosition(-2, 4)

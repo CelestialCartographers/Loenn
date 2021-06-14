@@ -1,5 +1,6 @@
 local drawing = require("drawing")
 local utils = require("utils")
+local drawableLine = require("structs.drawable_line")
 
 local wire = {}
 
@@ -15,15 +16,16 @@ function wire.depth(room, entity)
     return entity.above and -8500 or 2000
 end
 
-function wire.draw(room, entity)
-    local pr, pg, pb, pa = love.graphics.getColor()
-    local tr, tg, tb = 89 / 255, 88 / 255, 102 / 255
+local defaultColor = {89 / 255, 88 / 255, 102 / 255}
+
+function wire.sprite(room, entity)
+    local color = defaultColor
 
     if entity.color then
         local success, r, g, b = utils.parseHexColor(entity.color)
 
         if success then
-            tr, tg, tb = r, g, b
+            color = {r, g, b}
         end
     end
 
@@ -38,10 +40,7 @@ function wire.draw(room, entity)
 
     local points = drawing.getSimpleCurve(start, stop, control)
 
-    love.graphics.setColor(tr, tg, tb)
-    love.graphics.line(table.flatten(points))
-
-    love.graphics.setColor(pr, pg, pb, pa)
+    return drawableLine.fromPoints(points, color, 1)
 end
 
 function wire.selection(room, entity)

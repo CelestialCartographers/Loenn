@@ -48,8 +48,8 @@ function spinner.sprite(room, entity)
         local textureCenter = "danger/dustcreature/center00"
 
         return {
-            drawableSpriteStruct.spriteFromTexture(textureBase, entity),
-            drawableSpriteStruct.spriteFromTexture(textureCenter, entity),
+            drawableSpriteStruct.fromTexture(textureBase, entity),
+            drawableSpriteStruct.fromTexture(textureCenter, entity),
         }
 
     else
@@ -60,7 +60,7 @@ function spinner.sprite(room, entity)
         }
 
         local texture = "danger/crystal/fg_" .. string.lower(color) .. "00"
-        local sprite = drawableSpriteStruct.spriteFromTexture(texture, position)
+        local sprite = drawableSpriteStruct.fromTexture(texture, position)
 
         -- Check if texture color exists, otherwise use default color
         -- Needed because Rainbow and Core colors doesn't have textures
@@ -70,7 +70,7 @@ function spinner.sprite(room, entity)
         else
             texture = "danger/crystal/fg_" .. string.lower(unknownSpinnerColor) .. "00"
 
-            return drawableSpriteStruct.spriteFromTexture(texture, position)
+            return drawableSpriteStruct.fromTexture(texture, position)
         end
     end
 end

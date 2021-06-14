@@ -106,6 +106,7 @@ The Lönn logo has All Rights Reserved and may only be distributed with original
 
 Lönn contains and uses code from the following projects:
   * [dkjson](https://github.com/LuaDist/dkjson)
+  * [lua-yaml](https://github.com/exosite/lua-yaml)
   * [An ffi implementation](https://github.com/spacewander/luafilesystem) of [luafilesystem](https://github.com/keplerproject/luafilesystem)
   * [Selene](https://github.com/Vexatos/Selene)
   * [xml2lua](https://github.com/manoelcampos/Xml2Lua)

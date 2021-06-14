@@ -33,9 +33,9 @@ function templeEye.draw(room, entity, viewport)
 
     local layer = isBackground(room, entity) and "bg" or "fg"
 
-    local eyeSprite = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_eye", entity)
-    local lidSprite = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_lid00", entity)
-    local pupilSprite = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/" .. layer .. "_pupil", pupilData)
+    local eyeSprite = drawableSpriteStruct.fromTexture("scenery/temple/eye/" .. layer .. "_eye", entity)
+    local lidSprite = drawableSpriteStruct.fromTexture("scenery/temple/eye/" .. layer .. "_lid00", entity)
+    local pupilSprite = drawableSpriteStruct.fromTexture("scenery/temple/eye/" .. layer .. "_pupil", pupilData)
 
     eyeSprite:draw()
     lidSprite:draw()
@@ -44,7 +44,7 @@ end
 
 function templeEye.selection(room, entity)
     -- Same size, just need selection
-    local sprite = drawableSpriteStruct.spriteFromTexture("scenery/temple/eye/bg_eye", entity)
+    local sprite = drawableSpriteStruct.fromTexture("scenery/temple/eye/bg_eye", entity)
 
     return sprite:getRectangle()
 end

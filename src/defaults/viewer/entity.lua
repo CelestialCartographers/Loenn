@@ -1,5 +1,6 @@
 local colors = require("colors")
 local utils = require("utils")
+local configs = require("configs")
 
 local missing = {}
 
@@ -17,6 +18,10 @@ function missing.rectangle(room, entity)
     local drawY = height > 0 and y or y - 2
     local drawWidth = math.max(width, 5)
     local drawHeight = math.max(height, 5)
+
+    if configs.editor.warnOnMissingEntityHandler then
+        print(string.format("Missing entity definition for '%s' in room '%s' at (%d, %d)", entity._name, room.name, entity.x, entity.y))
+    end
 
     return utils.rectangle(drawX, drawY, drawWidth, drawHeight)
 end

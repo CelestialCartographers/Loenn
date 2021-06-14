@@ -15,8 +15,8 @@ function resortLantern.sprite(room, entity)
     local checkX, checkY = math.floor(entity.x / 8) + 2, math.floor(entity.y / 8)
     local connected = room.tilesFg.matrix:get(checkX, checkY, "0")
 
-    local holderSprite = drawableSprite.spriteFromTexture(holderTexture, entity)
-    local lanternSprite = drawableSprite.spriteFromTexture(lanternTexture, entity)
+    local holderSprite = drawableSprite.fromTexture(holderTexture, entity)
+    local lanternSprite = drawableSprite.fromTexture(lanternTexture, entity)
 
     if connected ~= "0" and connected ~= " " then
         holderSprite.scaleX = -1

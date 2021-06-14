@@ -17,7 +17,7 @@ function hangingLamp.sprite(room, entity)
     local sprites = {}
     local height = math.max(entity.height or 0, 16)
 
-    local topSprite = drawableSprite.spriteFromTexture("objects/hanginglamp", entity)
+    local topSprite = drawableSprite.fromTexture("objects/hanginglamp", entity)
 
     topSprite:setJustification(0, 0)
     topSprite:setOffset(0, 0)
@@ -26,7 +26,7 @@ function hangingLamp.sprite(room, entity)
     table.insert(sprites, topSprite)
 
     for i = 0, height - 16, 8 do
-        local middleSprite = drawableSprite.spriteFromTexture("objects/hanginglamp", entity)
+        local middleSprite = drawableSprite.fromTexture("objects/hanginglamp", entity)
 
         middleSprite:setJustification(0, 0)
         middleSprite:setOffset(0, 0)
@@ -36,7 +36,7 @@ function hangingLamp.sprite(room, entity)
         table.insert(sprites, middleSprite)
     end
 
-    local bottomSprite = drawableSprite.spriteFromTexture("objects/hanginglamp", entity)
+    local bottomSprite = drawableSprite.fromTexture("objects/hanginglamp", entity)
 
     bottomSprite:setJustification(0, 0)
     bottomSprite:setOffset(0, 0)

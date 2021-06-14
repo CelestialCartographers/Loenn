@@ -13,11 +13,11 @@ local glassTexture = "objects/mirror/glassbreak00"
 function dreamMirror.sprite(room, entity)
     local sprites = {}
 
-    local frameSprite = drawableSpriteStruct.spriteFromTexture(frameTexture, entity)
+    local frameSprite = drawableSpriteStruct.fromTexture(frameTexture, entity)
     frameSprite:setJustification(0.5, 1.0)
     frameSprite.depth = 9000
 
-    local glassSprite = drawableSpriteStruct.spriteFromTexture(glassTexture, entity)
+    local glassSprite = drawableSpriteStruct.fromTexture(glassTexture, entity)
     glassSprite:setJustification(0.5, 1.0)
     glassSprite.depth = 9500
 
