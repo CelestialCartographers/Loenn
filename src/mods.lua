@@ -6,7 +6,10 @@ local modHandler = {}
 
 modHandler.internalModContent = "@Internal@"
 modHandler.commonModContent = "@ModsCommon@"
-modHandler.everestYamlFilename = "everest.yaml"
+modHandler.everestYamlFilenames = {
+    "everest.yaml",
+    "everest.yml"
+}
 modHandler.specificModContent = "$%s$"
 modHandler.pluginFolderNames = {
     fileLocations.loennSimpleFolderName,
@@ -92,18 +95,31 @@ function modHandler.findPluginLoennFolder(mountPoint)
     end
 end
 
+function modHandler.findEverestYaml(mountPoint)
+    for _, filename in ipairs(modHandler.everestYamlFilenames) do
+        local yamlTestPath = mountPoint .. "/" .. filename
+        local info = love.filesystem.getInfo(yamlTestPath)
+
+        if info and info.type == "file" then
+            return yamlTestPath
+        end
+    end
+end
+
 function modHandler.readModMetadata(path, mountPoint, folderName)
     local result = {}
+    local yamlFilename = modHandler.findEverestYaml(mountPoint)
 
-    local yamlFilename = mountPoint .. "/" .. modHandler.everestYamlFilename
-    local content, size = love.filesystem.read(yamlFilename)
+    if yamlFilename then
+        local content, size = love.filesystem.read(yamlFilename)
 
-    if content then
-        local success, data = pcall(yaml.read, utils.stripByteOrderMark(content))
+        if content then
+            local success, data = pcall(yaml.read, utils.stripByteOrderMark(content))
 
-        if success then
-            result = data
-            result._mountPointLoenn = modHandler.findPluginLoennFolder(mountPoint)
+            if success then
+                result = data
+                result._mountPointLoenn = modHandler.findPluginLoennFolder(mountPoint)
+            end
         end
     end
 
