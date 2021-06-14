@@ -1,10 +1,12 @@
 local utils = require("utils")
 local fileLocations = require("file_locations")
+local yaml = require("yaml")
 
 local modHandler = {}
 
 modHandler.internalModContent = "@Internal@"
 modHandler.commonModContent = "@ModsCommon@"
+modHandler.everestYamlFilename = "everest.yaml"
 modHandler.specificModContent = "$%s$"
 modHandler.pluginFolderNames = {
     fileLocations.loennSimpleFolderName,
@@ -14,6 +16,7 @@ modHandler.pluginFolderNames = {
 }
 
 modHandler.loadedMods = {}
+modHandler.modMetadata = {}
 
 function modHandler.findFiletype(startFolder, filetype)
     local filenames = {}
@@ -78,6 +81,84 @@ function modHandler.getEntityModPrefix(name)
     return name:match("^(.-)/")
 end
 
+function modHandler.findPluginLoennFolder(mountPoint)
+    for _, folderName in ipairs(modHandler.pluginFolderNames) do
+        local folderTestPath = mountPoint .. "/" .. folderName
+        local folderInfo = love.filesystem.getInfo(folderTestPath)
+
+        if folderInfo and folderInfo.type == "directory" then
+            return mountPoint .. "." .. folderName
+        end
+    end
+end
+
+function modHandler.readModEverestYaml(path, mountPoint, folderName)
+    local yamlFilename = mountPoint .. "/" .. modHandler.everestYamlFilename
+    local content, size = love.filesystem.read(yamlFilename)
+
+    if content then
+        local success, data = pcall(yaml.read, utils.stripByteOrderMark(content))
+
+        if success then
+            data._mountPoint = mountPoint
+            data._mountPointLoenn = modHandler.findPluginLoennFolder(mountPoint)
+            data._path = path
+            data._folderName = folderName
+
+            return data
+        end
+    end
+
+    return {}
+end
+
+function modHandler.findLoadedMod(name)
+    for modFolderName, metadata in pairs(modHandler.modMetadata) do
+        for _, info in ipairs(metadata) do
+            if info.Name == name then
+                return info, metadata
+            end
+        end
+    end
+end
+
+function modHandler.hasLoadedMod(name)
+    local info, metadata = modHandler.findLoadedMod(name)
+
+    return info ~= nil
+end
+
+-- Defaults to current mod directory
+function modHandler.requireFromPlugin(lib, modName)
+    local libPrefix
+
+    if modName then
+        local modInfo, pluginInfo = modHandler.findLoadedMod(modName)
+
+        if modInfo then
+            libPrefix = pluginInfo._mountPointLoenn
+        end
+
+    else
+        local info = debug.getinfo(2)
+        local source = info.source
+        local parts = string.split(source, "/")()
+
+        libPrefix = table.concat(parts, ".", 1, 2)
+    end
+
+    if lib and libPrefix then
+        local success, result = utils.tryrequire(libPrefix .. "." .. lib)
+
+        if success then
+            return result
+        end
+
+    else
+        -- TODO - Add warning
+    end
+end
+
 function modHandler.mountMod(path, force)
     local loaded = modHandler.loadedMods[path]
 
@@ -86,13 +167,16 @@ function modHandler.mountMod(path, force)
             -- Replace "." in ".zip" to prevent require from getting confused
             local directory, filename = utils.dirname(path), utils.filename(path)
             local modFolderName = filename:gsub("%.", "_")
-            local specificMountPoint = string.format(modHandler.specificModContent, modFolderName) .. "/"
+            local specificMountPoint = string.format(modHandler.specificModContent, modFolderName)
 
             -- Can't mount the same path twice, trick physfs into loading both
             love.filesystem.mountUnsandboxed(path, modHandler.commonModContent .. "/", 1)
             love.filesystem.mountUnsandboxed(utils.joinpath(directory, ".", filename), specificMountPoint, 1)
 
+            local modMetadata = modHandler.readModEverestYaml(path, specificMountPoint, modFolderName)
+
             modHandler.loadedMods[modFolderName] = true
+            modHandler.modMetadata[modFolderName] = modMetadata
         end
     end
 
