@@ -217,7 +217,7 @@ end
 function entities.getDrawable(name, handler, room, entity, viewport)
     handler = handler or entities.registeredEntities[name]
 
-    local nodeVisibility = utils.callIfFunction(handler.nodeVisibility, room, entity) or "selected"
+    local nodeVisibility = entities.nodeVisibility("entities", entity)
     local entityDrawable, depth = entities.getEntityDrawable(name, handler, room, entity, viewport)
 
     -- Add node drawable(s) if the entity asks for it
@@ -348,8 +348,8 @@ function entities.drawSelected(room, layer, entity, color)
         local nodes = entity.nodes
 
         if nodes and #nodes > 0 then
-            local nodeVisibility = utils.callIfFunction(handler.nodeVisibility, room, entity) or "selected"
-            local nodeLineRenderType = utils.callIfFunction(handler.nodeLineRenderType, room, entity) or false
+            local nodeVisibility = entities.nodeVisibility(layer, entity)
+            local nodeLineRenderType = entities.nodeLineRenderType(layer, entity)
 
             local entityRenderX, entityRenderY = x + halfWidth, y + halfHeight
             local previousX, previousY = entityRenderX, entityRenderY
@@ -679,6 +679,30 @@ function entities.nodeLimits(room, layer, entity)
 
     else
         return 0, 0
+    end
+end
+
+function entities.nodeLineRenderType(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.nodeLineRenderType then
+        return utils.callIfFunction(handler.nodeLineRenderType, entity)
+
+    else
+        return false
+    end
+end
+
+function entities.nodeVisibility(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.nodeVisibility then
+        return utils.callIfFunction(handler.nodeVisibility, entity)
+
+    else
+        return "selected"
     end
 end
 
