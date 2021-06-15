@@ -210,7 +210,7 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
         entityCopy.x = node.x
         entityCopy.y = node.y
 
-        return entities.getDrawable(name, handler, room, entityCopy, viewport)
+        return entities.getEntityDrawable(name, handler, room, entityCopy, viewport)
     end
 end
 
