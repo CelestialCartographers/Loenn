@@ -392,22 +392,22 @@ entities.heartGemDoor.description.requires=Determines the number of Crystal Hear
 entities.heartGemDoor.description.startHidden=Whether the door should start hidden and come crashing down when the player approaches.\nWill destroy dash blocks as it crashes down.
 
 # Move Block
-entities.moveBlock.name.up_steer_fast=Move Block(Up, Steerable, Fast)
-entities.moveBlock.name.up_steer_slow=Move Block(Up, Steerable, Slow)
-entities.moveBlock.name.up_nosteer_fast=Move Block(Up, Fast)
-entities.moveBlock.name.up_nosteer_slow=Move Block(Up, Slow)
-entities.moveBlock.name.down_steer_fast=Move Block(Down, Steerable, Fast)
-entities.moveBlock.name.down_steer_slow=Move Block(Down, Steerable, Slow)
-entities.moveBlock.name.down_nosteer_fast=Move Block(Down, Fast)
-entities.moveBlock.name.down_nosteer_slow=Move Block(Down, Slow)
-entities.moveBlock.name.right_steer_fast=Move Block(Right, Steerable, Fast)
-entities.moveBlock.name.right_steer_slow=Move Block(Right, Steerable, Slow)
-entities.moveBlock.name.right_nosteer_fast=Move Block(Right, Fast)
-entities.moveBlock.name.right_nosteer_slow=Move Block(Right, Slow)
-entities.moveBlock.name.left_steer_fast=Move Block(Left, Steerable, Fast)
-entities.moveBlock.name.left_steer_slow=Move Block(Left, Steerable, Slow)
-entities.moveBlock.name.left_nosteer_fast=Move Block(Left, Fast)
-entities.moveBlock.name.left_nosteer_slow=Move Block(Left, Slow)
+entities.moveBlock.name.up_steer_fast=Move Block (Up, Steerable, Fast)
+entities.moveBlock.name.up_steer_slow=Move Block (Up, Steerable, Slow)
+entities.moveBlock.name.up_nosteer_fast=Move Block (Up, Fast)
+entities.moveBlock.name.up_nosteer_slow=Move Block (Up, Slow)
+entities.moveBlock.name.down_steer_fast=Move Block (Down, Steerable, Fast)
+entities.moveBlock.name.down_steer_slow=Move Block (Down, Steerable, Slow)
+entities.moveBlock.name.down_nosteer_fast=Move Block (Down, Fast)
+entities.moveBlock.name.down_nosteer_slow=Move Block (Down, Slow)
+entities.moveBlock.name.right_steer_fast=Move Block (Right, Steerable, Fast)
+entities.moveBlock.name.right_steer_slow=Move Block (Right, Steerable, Slow)
+entities.moveBlock.name.right_nosteer_fast=Move Block (Right, Fast)
+entities.moveBlock.name.right_nosteer_slow=Move Block (Right, Slow)
+entities.moveBlock.name.left_steer_fast=Move Block (Left, Steerable, Fast)
+entities.moveBlock.name.left_steer_slow=Move Block (Left, Steerable, Slow)
+entities.moveBlock.name.left_nosteer_fast=Move Block (Left, Fast)
+entities.moveBlock.name.left_nosteer_slow=Move Block (Left, Slow)
 entities.moveBlock.description.canSteer=Determines whether the move block can be moved by the player.
 entities.moveBlock.description.fast=Changes the move block between two speeds.
 entities.moveBlock.description.direction=Determines the direction the move block moves in upon activation.
@@ -568,7 +568,7 @@ entities.cassetteBlock.description.index=The colour of the cassette block.
 entities.cassetteBlock.description.tempo=The tempo of the cassette blocks. The first non 1 tempo cassette block decides the tempo for all cassette blocks in the room.
 
 # Temple Gate
-entities.templeGate.name.default_holdingtheo=Temple Gate (Theo, Holding Theo)
+entities.templeGate.name.theo_holdingtheo=Temple Gate (Theo, Holding Theo)
 entities.templeGate.name.default_closebehindplayer=Temple Gate (Default, Close Behind)
 entities.templeGate.name.mirror_closebehindplayer=Temple Gate (Mirror, Close Behind)
 entities.templeGate.name.default_nearestswitch=Temple Gate (Default, Nearest Switch)
