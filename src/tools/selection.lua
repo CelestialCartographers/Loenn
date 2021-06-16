@@ -448,7 +448,7 @@ local function pasteItemsHotkey()
         local clipboard = love.system.getClipboardText()
 
         if validateClipboard(clipboard) then
-            local success, fromClipboard = utils.unserialize(clipboard)
+            local success, fromClipboard = utils.unserialize(clipboard, true, 3)
 
             if success then
                 newPreviews = fromClipboard

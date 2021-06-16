@@ -32,6 +32,8 @@ end
 function loadingScene:firstEnter()
     local tasks = require("task")
 
+    local sandboxUtils = require("sandbox_utils")
+
     local sceneHandler = require("scene_handler")
     local toolHandler = require("tool_handler")
     local entities = require("entities")
@@ -56,6 +58,9 @@ function loadingScene:firstEnter()
     local language = languageRegistry.getLanguage()
 
     self:setText(language.scenes.loading.loading)
+
+    -- Microbenchmark to estimate instructions per second
+    sandboxUtils.calcIpsAndHookInterval()
 
     -- Load assets and entity, trigger, effect etc modules
     tasks.newTask(

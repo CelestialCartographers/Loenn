@@ -1,6 +1,8 @@
 -- TODO - Allow passing around settings table instead of using args?
 -- Makes it easier to have "profiles" for serializing
 
+local sandboxUtils = require("sandbox_utils")
+
 local serialize = {}
 
 local keywords = {
@@ -270,14 +272,14 @@ function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, succ
     return success, "{" .. newline .. content.. newline .. closingPadding .. "}"
 end
 
-function serialize.unserialize(s, safe)
+function serialize.unserialize(s, safe, timeout)
     local func = assert(loadstring("return " .. s))
 
     if safe ~= false then
         setfenv(func, {})
     end
 
-    return pcall(func)
+    return sandboxUtils.pcallWithTimeout(func, timeout)
 end
 
 return serialize
