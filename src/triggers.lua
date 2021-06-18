@@ -394,7 +394,7 @@ function triggers.nodeLimits(room, layer, trigger)
             return handler.nodeLimits(room, trigger)
 
         else
-            return unpack(handler.node)
+            return unpack(handler.nodeLimits)
         end
 
     else
