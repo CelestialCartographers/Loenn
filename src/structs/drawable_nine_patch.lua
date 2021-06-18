@@ -1,5 +1,6 @@
 local utils = require("utils")
 local drawing = require("drawing")
+local atlases = require("atlases")
 local drawableSprite = require("structs.drawable_sprite")
 local matrixLib = require("matrix")
 
@@ -39,8 +40,8 @@ function drawableNinePatchMt.__index:getMatrix()
     return self:cacheNinePatchMatrix()
 end
 
-local function getMatrixSprite(texture, x, y, matrix, quadX, quadY)
-    local sprite = drawableSprite.fromTexture(texture, {x = x, y = y})
+local function getMatrixSprite(atlas, texture, x, y, matrix, quadX, quadY)
+    local sprite = drawableSprite.fromTexture(texture, {x = x, y = y, atlas = atlas})
 
     sprite:setJustification(0.0, 0.0)
     sprite.quad = matrix:get(quadX, quadY)
@@ -48,8 +49,8 @@ local function getMatrixSprite(texture, x, y, matrix, quadX, quadY)
     return sprite
 end
 
-local function getRelativeQuadSprite(texture, x, y, quadX, quadY, quadWidth, quadHeight)
-    local sprite = drawableSprite.fromTexture(texture, {x = x, y = y})
+local function getRelativeQuadSprite(atlas, texture, x, y, quadX, quadY, quadWidth, quadHeight)
+    local sprite = drawableSprite.fromTexture(texture, {x = x, y = y, atlas = atlas})
 
     sprite:setJustification(0.0, 0.0)
     sprite:useRelativeQuad(quadX, quadY, quadWidth, quadHeight)
@@ -57,33 +58,33 @@ local function getRelativeQuadSprite(texture, x, y, quadX, quadY, quadWidth, qua
     return sprite
 end
 
-function drawableNinePatchMt.__index:addCornerQuads(sprites, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
+function drawableNinePatchMt.__index:addCornerQuads(sprites, atlas, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
     local borderLeft, borderRight, borderTop, borderBottom = self.borderLeft, self.borderRight, self.borderTop, self.borderBottom
     local offsetX = self.drawWidth - borderRight
     local offsetY = self.drawHeight - borderBottom
 
     -- Top Left
     if width > 0 and height > 0 and borderLeft > 0 and borderTop > 0 then
-        table.insert(sprites, getRelativeQuadSprite(texture, x, y, 0, 0, borderLeft, borderTop))
+        table.insert(sprites, getRelativeQuadSprite(atlas, texture, x, y, 0, 0, borderLeft, borderTop))
     end
 
     -- Top Right
     if width > borderLeft and height >= 0 and borderRight > 0 and borderTop > 0 then
-        table.insert(sprites, getRelativeQuadSprite(texture, x + offsetX, y, spriteWidth - borderRight, 0, borderRight, borderTop))
+        table.insert(sprites, getRelativeQuadSprite(atlas, texture, x + offsetX, y, spriteWidth - borderRight, 0, borderRight, borderTop))
     end
 
     -- Bottom Left
     if width > 0 and height > borderBottom then
-        table.insert(sprites, getRelativeQuadSprite(texture, x, y + offsetY, 0, spriteHeight - borderBottom, borderLeft, borderBottom))
+        table.insert(sprites, getRelativeQuadSprite(atlas, texture, x, y + offsetY, 0, spriteHeight - borderBottom, borderLeft, borderBottom))
     end
 
     -- Bottom Right
     if width > borderRight and height > borderBottom then
-        table.insert(sprites, getRelativeQuadSprite(texture, x + offsetX, y + offsetY, spriteWidth - borderRight, spriteHeight - borderBottom, borderLeft, borderBottom))
+        table.insert(sprites, getRelativeQuadSprite(atlas, texture, x + offsetX, y + offsetY, spriteWidth - borderRight, spriteHeight - borderBottom, borderLeft, borderBottom))
     end
 end
 
-function drawableNinePatchMt.__index:addEdgeQuads(sprites, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
+function drawableNinePatchMt.__index:addEdgeQuads(sprites, atlas, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
     local borderLeft, borderRight, borderTop, borderBottom = self.borderLeft, self.borderRight, self.borderTop, self.borderBottom
     local oppositeOffsetX = width - borderRight
     local oppositeOffsetY = height - borderBottom
@@ -98,16 +99,16 @@ function drawableNinePatchMt.__index:addEdgeQuads(sprites, texture, x, y, width,
         for ty = 2, heightInTiles - 1 do
             local offsetY = (ty - 1) * tileHeight
 
-            table.insert(sprites, getMatrixSprite(texture, x, y + offsetY, matrix, 1, math.random(2, matrixHeight - 1)))
-            table.insert(sprites, getMatrixSprite(texture, x + oppositeOffsetX, y + offsetY, matrix, matrixWidth, math.random(2, matrixHeight - 1)))
+            table.insert(sprites, getMatrixSprite(atlas, texture, x, y + offsetY, matrix, 1, math.random(2, matrixHeight - 1)))
+            table.insert(sprites, getMatrixSprite(atlas, texture, x + oppositeOffsetX, y + offsetY, matrix, matrixWidth, math.random(2, matrixHeight - 1)))
         end
 
         -- Horizontal
         for tx = 2, widthInTiles - 1 do
             local offsetX = (tx - 1) * tileWidth
 
-            table.insert(sprites, getMatrixSprite(texture, x + offsetX, y, matrix, math.random(2, matrixWidth - 1), 1))
-            table.insert(sprites, getMatrixSprite(texture, x + offsetX, y + oppositeOffsetY, matrix, math.random(2, matrixHeight - 1), matrixHeight))
+            table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y, matrix, math.random(2, matrixWidth - 1), 1))
+            table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y + oppositeOffsetY, matrix, math.random(2, matrixHeight - 1), matrixHeight))
         end
 
     elseif repeatMode == "repeat" then
@@ -117,8 +118,8 @@ function drawableNinePatchMt.__index:addEdgeQuads(sprites, texture, x, y, width,
         -- Vertical
         while processedY < height - borderRight do
             local quadHeight = math.min(height - borderBottom - processedY, heightNoBorder)
-            local spriteLeft = getRelativeQuadSprite(texture, x, y + processedY, 0, borderTop, borderLeft, quadHeight)
-            local spriteRight = getRelativeQuadSprite(texture, x + oppositeOffsetX, y + processedY, spriteWidth - borderRight, borderBottom, borderRight, quadHeight)
+            local spriteLeft = getRelativeQuadSprite(atlas, texture, x, y + processedY, 0, borderTop, borderLeft, quadHeight)
+            local spriteRight = getRelativeQuadSprite(atlas, texture, x + oppositeOffsetX, y + processedY, spriteWidth - borderRight, borderBottom, borderRight, quadHeight)
 
             table.insert(sprites, spriteLeft)
             table.insert(sprites, spriteRight)
@@ -129,8 +130,8 @@ function drawableNinePatchMt.__index:addEdgeQuads(sprites, texture, x, y, width,
         -- Horizontal
         while processedX < width - borderBottom do
             local quadWidth = math.min(width - borderRight - processedX, widthNoBorder)
-            local spriteTop = getRelativeQuadSprite(texture, x + processedX, y, borderLeft, 0, quadWidth, borderTop)
-            local spriteBottom = getRelativeQuadSprite(texture, x + processedX, y + oppositeOffsetY, borderRight, spriteHeight - borderBottom, quadWidth, borderBottom)
+            local spriteTop = getRelativeQuadSprite(atlas, texture, x + processedX, y, borderLeft, 0, quadWidth, borderTop)
+            local spriteBottom = getRelativeQuadSprite(atlas, texture, x + processedX, y + oppositeOffsetY, borderRight, spriteHeight - borderBottom, quadWidth, borderBottom)
 
             table.insert(sprites, spriteTop)
             table.insert(sprites, spriteBottom)
@@ -140,7 +141,7 @@ function drawableNinePatchMt.__index:addEdgeQuads(sprites, texture, x, y, width,
     end
 end
 
-function drawableNinePatchMt.__index:addMiddleQuads(sprites, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
+function drawableNinePatchMt.__index:addMiddleQuads(sprites, atlas, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
     local repeatMode = self.fillMode
 
     if repeatMode == "random" then
@@ -153,7 +154,7 @@ function drawableNinePatchMt.__index:addMiddleQuads(sprites, texture, x, y, widt
                 local offsetX = (tx - 1) * tileWidth
                 local offsetY = (ty - 1) * tileHeight
 
-                table.insert(sprites, getMatrixSprite(texture, x + offsetX, y + offsetY, matrix, math.random(2, matrixWidth - 1), math.random(2, matrixHeight - 1)))
+                table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y + offsetY, matrix, math.random(2, matrixWidth - 1), math.random(2, matrixHeight - 1)))
             end
         end
 
@@ -168,7 +169,7 @@ function drawableNinePatchMt.__index:addMiddleQuads(sprites, texture, x, y, widt
             while processedX < width - borderRight do
                 local quadWidth = math.min(width - borderRight - processedX, widthNoBorder)
                 local quadHeight = math.min(height - borderBottom - processedY, heightNoBorder)
-                local sprite = getRelativeQuadSprite(texture, x + processedX, y + processedY, borderLeft, borderTop, quadWidth, quadHeight)
+                local sprite = getRelativeQuadSprite(atlas, texture, x + processedX, y + processedY, borderLeft, borderTop, quadWidth, quadHeight)
 
                 table.insert(sprites, sprite)
 
@@ -186,9 +187,10 @@ function drawableNinePatchMt.__index:getDrawableSprite()
 
     local matrix = self:getMatrix()
     local texture = self.texture
+    local atlas = self.atlas
     local x, y = self.drawX, self.drawY
     local width, height = self.drawWidth, self.drawHeight
-    local dummySprite = drawableSprite.fromTexture(self.texture, {})
+    local dummySprite = drawableSprite.fromTexture(self.texture, {atlas = self.atlas})
     local spriteWidth, spriteHeight = dummySprite.meta.width, dummySprite.meta.height
 
     if not matrix then
@@ -199,12 +201,12 @@ function drawableNinePatchMt.__index:getDrawableSprite()
     local drawMiddle = self.mode == "fill"
 
     if drawBorder then
-        self:addCornerQuads(sprites, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
-        self:addEdgeQuads(sprites, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
+        self:addCornerQuads(sprites, atlas, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
+        self:addEdgeQuads(sprites, atlas, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
     end
 
     if drawMiddle then
-        self:addMiddleQuads(sprites, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
+        self:addMiddleQuads(sprites, atlas, texture, x, y, width, height, matrix, spriteWidth, spriteHeight)
     end
 
     return sprites
@@ -231,6 +233,14 @@ function drawableNinePatch.fromTexture(texture, options, drawX, drawY, drawWidth
         }
     end
 
+    local atlas = options.atlas or "Gameplay"
+    local spriteMeta = atlases.getResource(texture, atlas)
+
+    if not spriteMeta then
+        return
+    end
+
+    ninePatch.atlas = atlas
     ninePatch.texture = texture
     ninePatch.mode = options.mode or "fill"
     ninePatch.borderMode = options.borderMode or "repeat"

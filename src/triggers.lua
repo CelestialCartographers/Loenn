@@ -165,18 +165,15 @@ end
 function triggers.drawSelected(room, layer, trigger, color)
     color = color or colors.selectionCompleteNodeLineColor
 
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
-
     local x, y = trigger.x or 0, trigger.y or 0
     local width, height = trigger.width or 0, trigger.height or 0
     local halfWidth, halfHeight = width / 2, height / 2
     local nodes = trigger.nodes
 
     if nodes and #nodes > 0 then
-        local nodeLineRenderType = utils.callIfFunction(handler.nodeLineRenderType) or "line"
         local triggerRenderX, triggerRenderY = x + halfWidth, y + halfHeight
         local previousX, previousY = triggerRenderX, triggerRenderY
+        local nodeLineRenderType = triggers.nodeLineRenderType(layer, trigger)
 
         drawing.callKeepOriginalColor(function()
             for _, node in ipairs(nodes) do
@@ -397,7 +394,7 @@ function triggers.nodeLimits(room, layer, trigger)
             return handler.nodeLimits(room, trigger)
 
         else
-            return unpack(handler.node)
+            return unpack(handler.nodeLimits)
         end
 
     else
@@ -426,6 +423,18 @@ function triggers.fieldOrder(layer, trigger)
 
     else
         return {"x", "y", "width", "height"}
+    end
+end
+
+function triggers.nodeLineRenderType(layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.nodeLineRenderType then
+        return utils.callIfFunction(handler.nodeLineRenderType, trigger)
+
+    else
+        return "line"
     end
 end
 
