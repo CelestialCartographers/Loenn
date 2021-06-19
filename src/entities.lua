@@ -183,10 +183,10 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
 
         if sprites then
             if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
-                return sprites, sprites.depth
+                return sprites, sprites.depth, false
 
             else
-                return sprites, nil
+                return sprites, nil, false
             end
         end
 
@@ -196,7 +196,7 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
 
         addAutomaticDrawableFields(handler, drawable, room, entity, true)
 
-        return drawable
+        return drawable, nil, false
 
     elseif handler.nodeDraw then
         return drawableFunction.fromFunction(handler.nodeDraw, room, entity, node, nodeIndex, viewport)
@@ -210,7 +210,7 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
         entityCopy.x = node.x
         entityCopy.y = node.y
 
-        return entities.getEntityDrawable(name, handler, room, entityCopy, viewport)
+        return entities.getEntityDrawable(name, handler, room, entityCopy, viewport), nil, true
     end
 end
 
@@ -284,11 +284,24 @@ function entities.getNodeRectangles(room, entity, viewport)
             rectangles[i] = handler.nodeRectangle(room, entity, node, i)
 
         else
-            local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i)
+            local nodeDrawable, nodeDepth, usedMainEntityDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i, viewport)
             local nodeRectangle
 
             if nodeDrawable then
-                if #nodeDrawable > 0 then
+                -- Some extra logic if the drawable is from the entity rather than node functions
+                if usedMainEntityDrawable then
+                    if handler.rectangle then
+                        nodeRectangle = handler.rectangle(room, entity)
+
+                        -- Offset to node position rather than entity
+                        nodeRectangle.x = x - node.x
+                        nodeRectangle.y = y - node.y
+
+                    elseif entity.width and entity.height then
+                        nodeRectangle = utils.rectangle(node.x or 0, node.y or 0, entity.width, entity.height)
+                    end
+
+                elseif #nodeDrawable > 0 then
                     nodeRectangle = getSpriteRectangle(nodeDrawable)
 
                 else
