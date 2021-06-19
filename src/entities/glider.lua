@@ -43,4 +43,10 @@ function glider.sprite(room, entity)
     end
 end
 
+function glider.rectangle(room, entity)
+    local sprite = drawableSprite.fromTexture(texture, entity)
+
+    return sprite:getRectangle()
+end
+
 return glider
