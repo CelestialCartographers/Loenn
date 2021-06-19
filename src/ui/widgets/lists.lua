@@ -35,15 +35,17 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
     -- If target is defined attempt to select this instead of the first item
 
     local selectedTarget = false
+    local selectedIndex = 1
     local previousSelection = list.selected and list.selected.data
 
     list.selected = list.children[1]
 
     if target then
-        for _, item in ipairs(list.children) do
+        for i, item in ipairs(list.children) do
             if item == target or item.data == target or item.text == target then
                 list.selected = item
                 selectedTarget = true
+                selectedIndex = i
 
                 break
             end
@@ -61,10 +63,10 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
         end
     end
 
-    return selectedTarget
+    return selectedTarget, selectedIndex
 end
 
-function listWidgets.updateItems(list, items, fromFilter, preventCallback, callbackRequiresChange)
+function listWidgets.updateItems(list, items, target, fromFilter, preventCallback, callbackRequiresChange)
     local previousSelection = list.selected and list.selected.data
     local newSelection = nil
 
@@ -89,7 +91,7 @@ function listWidgets.updateItems(list, items, fromFilter, preventCallback, callb
     list.children = processedItems
 
     ui.runLate(function()
-        listWidgets.setSelection(list, newSelection, preventCallback, callbackRequiresChange)
+        listWidgets.setSelection(list, target or newSelection, preventCallback, callbackRequiresChange)
     end)
 
     list:reflow()
@@ -104,7 +106,7 @@ local function filterList(list, search)
     local unfilteredItems = list.unfilteredItems
     local filteredItems = filterItems(unfilteredItems, search)
 
-    listWidgets.updateItems(list, filteredItems, true, false, true)
+    listWidgets.updateItems(list, filteredItems, nil, true, false, true)
 end
 
 local function searchFieldChanged(element, new, old)

@@ -169,7 +169,7 @@ local function saveRoomCallback(room, editing)
             celesteRender.invalidateRoomCache(targetRoom)
             celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
 
-            sceneHandler.sendEvent("uiRoomWindowRoomChanged", room)
+            sceneHandler.sendEvent("uiRoomWindowRoomChanged", targetRoom)
 
         else
             local map = loadedState.map

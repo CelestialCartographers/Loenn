@@ -14,7 +14,7 @@ local roomList = {}
 local function cleanRoomName(name)
     -- Remove "lvl_" prefix
 
-    local nameWithoutPrefix = name:match("lvl_(.*)")
+    local nameWithoutPrefix = name:match("^lvl_(.*)")
 
     return nameWithoutPrefix or name
 end
@@ -28,18 +28,17 @@ local function getRoomItems()
 
         table.insert(roomItems, uiElements.listItem({
             text = name,
-            data = name
+            data = room.name
         }))
     end
 
     return roomItems
 end
 
-local function updateList(list)
+local function updateList(list, target)
     local roomItems = getRoomItems()
 
-    listWidgets.setSelection(list, 1, true)
-    listWidgets.updateItems(list, roomItems, false, true, false)
+    listWidgets.updateItems(list, roomItems, target)
 end
 
 function roomList.roomSelectedCallback(element, item)
@@ -82,21 +81,21 @@ function roomList:editorMapNew()
     end
 end
 
-function roomList:editorRoomDeleted(room)
-    return function()
-        updateList(self)
+function roomList:editorRoomDeleted()
+    return function(list, room)
+        updateList(self, 1)
     end
 end
 
-function roomList:editorRoomAdded(room)
-    return function()
-        updateList(self)
+function roomList:editorRoomAdded()
+    return function(list, room)
+        updateList(self, room.name)
     end
 end
 
-function roomList:uiRoomWindowRoomChanged(room)
-    return function()
-        updateList(self)
+function roomList:uiRoomWindowRoomChanged()
+    return function(list, room)
+        updateList(self, room.name)
     end
 end
 
