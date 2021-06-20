@@ -171,10 +171,9 @@ local function drawSelectionRectangles(room)
     end
 end
 
-local function moveItems(room, layer, previews, offsetX, offsetY)
-    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
+local function getMoveCallback(room, layer, previews, offsetX, offsetY)
+    return function()
         local redraw = false
-        local selectionsBefore = utils.deepcopy(selectionPreviews)
 
         for _, item in ipairs(previews) do
             local moved = selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
@@ -184,8 +183,14 @@ local function moveItems(room, layer, previews, offsetX, offsetY)
             end
         end
 
-        return redraw, selectionsBefore
-    end, room, layer, "Selection Moved")
+        return redraw
+    end
+end
+
+local function moveItems(room, layer, previews, offsetX, offsetY)
+    local forward = getMoveCallback(room, layer, previews, offsetX, offsetY)
+    local backward = getMoveCallback(room, layer, previews, -offsetX, -offsetY)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved")
 
     return snapshot, redraw
 end

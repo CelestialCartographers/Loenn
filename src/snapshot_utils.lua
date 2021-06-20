@@ -49,6 +49,40 @@ function snapshotUtils.roomLayerSnapshot(callback, room, layer, description)
     return getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter), unpack(res)
 end
 
+function snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, description, callForward)
+    local function snapshotForward(data)
+        local targetRoom = state.getRoomByName(data.room)
+
+        if targetRoom then
+            forward(targetRoom, layer)
+
+            toolUtils.redrawTargetLayer(targetRoom, layer)
+        end
+    end
+
+    local function snapshotBackward(data)
+        local targetRoom = state.getRoomByName(data.room)
+
+        if targetRoom then
+            backward(targetRoom, layer)
+
+            toolUtils.redrawTargetLayer(targetRoom, layer)
+        end
+    end
+
+    local data = {
+        room = room.name
+    }
+
+    local res
+
+    if callForward ~= false then
+        res = {forward()}
+    end
+
+    return snapshot.create(description, data, snapshotBackward, snapshotForward), unpack(res)
+end
+
 function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, tilesAfter)
     local function forward(data)
         local targetRoom = state.getRoomByName(data.room)
