@@ -13,11 +13,21 @@ function selectionItemUtils.drawSelected(room, layer, item, color)
     return false
 end
 
-function selectionItemUtils.moveSelection(room, layer, item, x, y)
+function selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
     local handler = layerHandlers.getHandler(layer)
 
     if room and handler and handler.moveSelection then
-        return handler.moveSelection(room, layer, item, x, y)
+        return handler.moveSelection(room, layer, item, offsetX, offsetY)
+    end
+
+    return false
+end
+
+function selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, grow)
+    local handler = layerHandlers.getHandler(layer)
+
+    if room and handler and handler.resizeSelection then
+        return handler.resizeSelection(room, layer, item, offsetX, offsetY, grow)
     end
 
     return false

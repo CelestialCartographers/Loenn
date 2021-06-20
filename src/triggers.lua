@@ -199,12 +199,12 @@ function triggers.drawSelected(room, layer, trigger, color)
     end
 end
 
-function triggers.moveSelection(room, layer, selection, x, y)
+function triggers.moveSelection(room, layer, selection, offsetX, offsetY)
     local trigger, node = selection.item, selection.node
 
     if node == 0 then
-        trigger.x += x
-        trigger.y += y
+        trigger.x += offsetX
+        trigger.y += offsetY
 
     else
         local nodes = trigger.nodes
@@ -212,15 +212,67 @@ function triggers.moveSelection(room, layer, selection, x, y)
         if nodes and node <= #nodes then
             local target = nodes[node]
 
-            target.x += x
-            target.y += y
+            target.x += offsetX
+            target.y += offsetY
         end
     end
 
-    selection.x += x
-    selection.y += y
+    selection.x += offsetX
+    selection.y += offsetY
 
     return true
+end
+
+-- Negative offsets means we are growing up/left, should move the selection as well as changing size
+function triggers.resizeSelection(room, layer, selection, offsetX, offsetY, grow)
+    local trigger, node = selection.item, selection.node
+
+    if node ~= 0 or offsetX == 0 and offsetY == 0 then
+        return false
+    end
+
+    local canHorizontal, canVertical = triggers.canResize(room, layer, trigger)
+    local minimumWidth, minimumHeight = triggers.minimumSize(room, layer, trigger)
+    local maximumWidth, maximumHeight = triggers.maximumSize(room, layer, trigger)
+
+    local oldWidth, oldHeight = trigger.width or 0, trigger.height or 0
+    local newWidth, newHeight = oldWidth, oldHeight
+    local multiplier = grow and 1 or -1
+    local madeChanges = false
+
+    if offsetX ~= 0 and canHorizontal then
+        newWidth += math.abs(offsetX) * multiplier
+
+        if minimumWidth <= newWidth and newWidth <= maximumWidth then
+            trigger.width = newWidth
+            selection.width = newWidth
+
+            if offsetX < 0 then
+                trigger.x += offsetX * multiplier
+                selection.x += offsetX * multiplier
+            end
+
+            madeChanges = true
+        end
+    end
+
+    if offsetY ~= 0 and canVertical then
+        newHeight += math.abs(offsetY) * multiplier
+
+        if minimumHeight <= newHeight and newHeight <= maximumHeight then
+            trigger.height = newHeight
+            selection.height = newHeight
+
+            if offsetY < 0 then
+                trigger.y += offsetY * multiplier
+                selection.y += offsetY * multiplier
+            end
+
+            madeChanges = true
+        end
+    end
+
+    return madeChanges
 end
 
 function triggers.deleteSelection(room, layer, selection)
@@ -383,6 +435,10 @@ end
 
 function triggers.minimumSize(room, layer, trigger)
     return 8, 8
+end
+
+function triggers.maximumSize(room, layer, trigger)
+    return math.huge, math.huge
 end
 
 function triggers.nodeLimits(room, layer, trigger)

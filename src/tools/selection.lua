@@ -45,6 +45,17 @@ local selectionMovementKeys = {
     {"itemMoveDown", 0, 1},
 }
 
+local selectionResizeKeys = {
+    {"itemResizeLeftGrow", -1, 0, true},
+    {"itemResizeRightGrow", 1, 0, true},
+    {"itemResizeUpGrow", 0, -1, true},
+    {"itemResizeDownGrow", 0, 1, true},
+    {"itemResizeLeftShrink", -1, 0, false},
+    {"itemResizeRightShrink", 1, 0, false},
+    {"itemResizeUpShrink", 0, -1, false},
+    {"itemResizeDownShrink", 0, 1, false}
+}
+
 function tool.unselect()
     selectionPreviews = nil
 end
@@ -187,10 +198,34 @@ local function getMoveCallback(room, layer, previews, offsetX, offsetY)
     end
 end
 
+local function getResizeCallback(room, layer, previews, offsetX, offsetY, grow)
+    return function()
+        local redraw = false
+
+        for _, item in ipairs(previews) do
+            local moved = selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, grow)
+
+            if moved then
+                redraw = true
+            end
+        end
+
+        return redraw
+    end
+end
+
 local function moveItems(room, layer, previews, offsetX, offsetY)
     local forward = getMoveCallback(room, layer, previews, offsetX, offsetY)
     local backward = getMoveCallback(room, layer, previews, -offsetX, -offsetY)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved")
+
+    return snapshot, redraw
+end
+
+local function resizeItems(room, layer, previews, offsetX, offsetY, grow)
+    local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, grow)
+    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, not grow)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
 
     return snapshot, redraw
 end
@@ -343,6 +378,35 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
 
         if targetKey == key then
             local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, offsetX, offsetY)
+
+            if redraw then
+                history.addSnapshot(snapshot)
+                toolUtils.redrawTargetLayer(room, tool.layer)
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
+local function handleItemResizeKeys(room, key, scancode, isrepeat)
+    if not selectionPreviews then
+        return
+    end
+
+    for _, resizeData in ipairs(selectionResizeKeys) do
+        local configKey, offsetX, offsetY, grow = resizeData[1], resizeData[2], resizeData[3], resizeData[4]
+        local targetKey = configs.editor[configKey]
+
+        if not keyboardHelper.modifierHeld(configs.editor.precisionModifier) then
+            offsetX *= 8
+            offsetY *= 8
+        end
+
+        if targetKey == key then
+            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, grow)
 
             if redraw then
                 history.addSnapshot(snapshot)
@@ -547,6 +611,7 @@ function tool.keypressed(key, scancode, isrepeat)
     end
 
     handleItemMovementKeys(room, key, scancode, isrepeat)
+    handleItemResizeKeys(room, key, scancode, isrepeat)
     handleItemDeletionKey(room, key, scancode, isrepeat)
     handleNodeAddKey(room, key, scancode, isrepeat)
 end
