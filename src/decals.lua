@@ -123,6 +123,20 @@ function decals.moveSelection(room, layer, selection, x, y)
     return true
 end
 
+function decals.flipSelection(room, layer, selection, horizontal, vertical)
+    local decal = selection.item
+
+    if horizontal then
+        decal.scaleX *= -1
+    end
+
+    if vertical then
+        decal.scaleY *= -1
+    end
+
+    return horizontal or vertical
+end
+
 function decals.deleteSelection(room, layer, selection)
     local targets = decals.getRoomItems(room, layer)
     local target = selection.item

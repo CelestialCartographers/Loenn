@@ -27,6 +27,12 @@ return {
     itemResizeUpShrink = false,
     itemResizeDownShrink = "a",
 
+    itemRotateLeft = "l",
+    itemRotateRight = "r",
+
+    itemFlipVertical = "v",
+    itemFlipHorizontal = "h",
+
     itemDelete = "delete",
 
     itemAddNode = "n",

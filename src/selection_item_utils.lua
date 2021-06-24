@@ -33,6 +33,26 @@ function selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY,
     return false
 end
 
+function selectionItemUtils.rotateSelection(room, layer, item, direction)
+    local handler = layerHandlers.getHandler(layer)
+
+    if room and handler and handler.rotateSelection then
+        return handler.rotateSelection(room, layer, item, direction)
+    end
+
+    return false
+end
+
+function selectionItemUtils.flipSelection(room, layer, item, horizontal, vertical)
+    local handler = layerHandlers.getHandler(layer)
+
+    if room and handler and handler.flipSelection then
+        return handler.flipSelection(room, layer, item, horizontal, vertical)
+    end
+
+    return false
+end
+
 function selectionItemUtils.deleteSelection(room, layer, item)
     local handler = layerHandlers.getHandler(layer)
 
