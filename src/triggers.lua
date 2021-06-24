@@ -161,7 +161,6 @@ function triggers.getSelection(room, trigger)
     return mainRectangle, nodeRectangles
 end
 
--- TODO - Implement in more performant way?
 function triggers.drawSelected(room, layer, trigger, color)
     color = color or colors.selectionCompleteNodeLineColor
 
@@ -174,28 +173,36 @@ function triggers.drawSelected(room, layer, trigger, color)
         local triggerRenderX, triggerRenderY = x + halfWidth, y + halfHeight
         local previousX, previousY = triggerRenderX, triggerRenderY
         local nodeLineRenderType = triggers.nodeLineRenderType(layer, trigger)
+        local nodeVisibility = triggers.nodeVisibility(layer, trigger)
+        local renderNodes = nodeVisibility == "selected"
 
-        drawing.callKeepOriginalColor(function()
-            for _, node in ipairs(nodes) do
-                local nodeX, nodeY = node.x or 0, node.y or 0
+        if nodeLineRenderType or renderNodes then
+            drawing.callKeepOriginalColor(function()
+                for _, node in ipairs(nodes) do
+                    local nodeX, nodeY = node.x or 0, node.y or 0
 
-                love.graphics.setColor(color)
+                    if nodeLineRenderType then
+                        love.graphics.setColor(color)
 
-                if nodeLineRenderType == "line" then
-                    love.graphics.line(previousX, previousY, nodeX, nodeY)
+                        if nodeLineRenderType == "line" then
+                            love.graphics.line(previousX, previousY, nodeX, nodeY)
 
-                elseif nodeLineRenderType == "fan" then
-                    love.graphics.line(triggerRenderX, triggerRenderY, nodeX, nodeY)
+                        elseif nodeLineRenderType == "fan" then
+                            love.graphics.line(triggerRenderX, triggerRenderY, nodeX, nodeY)
+                        end
+                    end
+
+                    if renderNodes then
+                        love.graphics.setColor(colors.triggerColor)
+                        love.graphics.rectangle("fill", nodeX - 2, nodeY - 2, 5, 5)
+                        love.graphics.rectangle("line", nodeX - 2, nodeY - 2, 5, 5)
+                    end
+
+                    previousX = nodeX
+                    previousY = nodeY
                 end
-
-                love.graphics.setColor(colors.triggerColor)
-                love.graphics.rectangle("fill", nodeX - 2, nodeY - 2, 5, 5)
-                love.graphics.rectangle("line", nodeX - 2, nodeY - 2, 5, 5)
-
-                previousX = nodeX
-                previousY = nodeY
-            end
-        end)
+            end)
+        end
     end
 end
 
@@ -458,6 +465,30 @@ function triggers.nodeLimits(room, layer, trigger)
     end
 end
 
+function triggers.nodeLineRenderType(layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.nodeLineRenderType then
+        return utils.callIfFunction(handler.nodeLineRenderType, trigger)
+
+    else
+        return "line"
+    end
+end
+
+function triggers.nodeVisibility(layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.nodeVisibility then
+        return utils.callIfFunction(handler.nodeVisibility, trigger)
+
+    else
+        return "selected"
+    end
+end
+
 function triggers.ignoredFields(layer, trigger)
     local name = trigger._name
     local handler = triggers.registeredTriggers[name]
@@ -479,18 +510,6 @@ function triggers.fieldOrder(layer, trigger)
 
     else
         return {"x", "y", "width", "height"}
-    end
-end
-
-function triggers.nodeLineRenderType(layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
-
-    if handler and handler.nodeLineRenderType then
-        return utils.callIfFunction(handler.nodeLineRenderType, trigger)
-
-    else
-        return "line"
     end
 end
 
