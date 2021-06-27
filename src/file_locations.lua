@@ -53,4 +53,8 @@ function fileLocations.getCelesteDir()
     return config.readConfig(fileLocations.getSettingsPath()).celesteGameDirectory
 end
 
+function fileLocations.getPluginsPath()
+    return filesystem.joinpath(fileLocations.getStorageDir(), "Plugins")
+end
+
 return fileLocations

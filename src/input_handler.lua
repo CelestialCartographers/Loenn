@@ -92,7 +92,7 @@ function love.directorydropped(path)
 end
 
 function love.quit()
-    local handled, preventQuit = sceneHandler.sendEvent("quit")
+    local handled, preventQuit = sceneHandler.quit()
 
     return preventQuit
 end

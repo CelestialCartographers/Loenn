@@ -66,11 +66,17 @@ function sceneHandler.update(dt)
 end
 
 function sceneHandler.quit()
-    local scene = sceneHandler.getCurrentScene()
+    local handled, preventQuit = sceneHandler.sendEvent("quit")
 
-    if scene then
-        scene:exit(false)
+    if not preventQuit then
+        local scene = sceneHandler.getCurrentScene()
+
+        if scene then
+            scene:exit(false)
+        end
     end
+
+    return handled, preventQuit
 end
 
 -- Use inputsceneMt if no other metatable is already set for the scene
