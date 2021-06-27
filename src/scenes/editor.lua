@@ -1,10 +1,18 @@
 local editorScene = {}
 
+local config = require("config")
+local persistence = require("persistence")
 local configs = require("configs")
 
 editorScene.name = "Editor"
 
 editorScene._displayWipe = true
+
+local function updateRunningStatus(status)
+    persistence.currentlyRunning = status
+
+    config.writeConfig(persistence, true)
+end
 
 function editorScene:firstEnter()
     self.viewerState = require("loaded_state")
@@ -29,6 +37,12 @@ function editorScene:firstEnter()
     inputDevice.newInputDevice(self.inputDevices, roomResizeDevice)
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
     inputDevice.newInputDevice(self.inputDevices, quitHandlerDevice)
+
+    updateRunningStatus(true)
+end
+
+function editorScene:exit(from)
+    updateRunningStatus(false)
 end
 
 function editorScene:draw()

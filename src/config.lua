@@ -112,7 +112,7 @@ function config.writeConfig(conf, force)
     local mtime = rawget(conf, "mtime") or 0
     local bufferTime = rawget(conf, "bufferTime") or -1
 
-    if bufferTime <= 0 or mtime + bufferTime < os.time() then
+    if force or bufferTime <= 0 or mtime + bufferTime < os.time() then
         local filename = rawget(conf, "filename")
         local pretty = rawget(conf, "pretty")
         local data = rawget(conf, "data")

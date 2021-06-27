@@ -33,3 +33,7 @@ function love.update(dt)
     sceneHandler.update(dt)
     threadHandler.update(dt)
 end
+
+function love.quit()
+    sceneHandler.quit()
+end
