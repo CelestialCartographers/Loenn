@@ -65,6 +65,20 @@ function sceneHandler.update(dt)
     return sceneHandler.sendEvent("update", dt)
 end
 
+function sceneHandler.quit()
+    local handled, preventQuit = sceneHandler.sendEvent("quit")
+
+    if not preventQuit then
+        local scene = sceneHandler.getCurrentScene()
+
+        if scene then
+            scene:exit(false)
+        end
+    end
+
+    return handled, preventQuit
+end
+
 -- Use inputsceneMt if no other metatable is already set for the scene
 function sceneHandler.addScene(scene)
     local scenes = sceneHandler.scenes

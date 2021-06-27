@@ -1,10 +1,21 @@
 local editorScene = {}
 
+local config = require("config")
+local persistence = require("persistence")
 local configs = require("configs")
+local mods = require("mods")
+local history = require("history")
+local sceneHandler = require("scene_handler")
 
 editorScene.name = "Editor"
 
 editorScene._displayWipe = true
+
+local function updateRunningStatus(status)
+    persistence.currentlyRunning = status
+
+    config.writeConfig(persistence, true)
+end
 
 function editorScene:firstEnter()
     self.viewerState = require("loaded_state")
@@ -20,7 +31,6 @@ function editorScene:firstEnter()
     local mapLoaderDevice = require("input_devices.map_loader")
     local roomResizeDevice = require("input_devices.room_resizer")
     local toolHandlerDevice = require("input_devices.tool_device")
-    local quitHandlerDevice = require("input_devices.prevent_quit")
 
     inputDevice.newInputDevice(self.inputDevices, userInterfaceDevice)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
@@ -28,7 +38,19 @@ function editorScene:firstEnter()
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)
     inputDevice.newInputDevice(self.inputDevices, roomResizeDevice)
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
-    inputDevice.newInputDevice(self.inputDevices, quitHandlerDevice)
+
+    updateRunningStatus(true)
+end
+
+function editorScene:quit()
+    if history.madeChanges then
+        sceneHandler.sendEvent("editorQuitWithChanges")
+
+        return true
+    end
+
+    updateRunningStatus(false)
+    mods.writeModPersistences()
 end
 
 function editorScene:draw()

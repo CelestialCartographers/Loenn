@@ -183,10 +183,10 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
 
         if sprites then
             if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
-                return sprites, sprites.depth
+                return sprites, sprites.depth, false
 
             else
-                return sprites, nil
+                return sprites, nil, false
             end
         end
 
@@ -196,7 +196,7 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
 
         addAutomaticDrawableFields(handler, drawable, room, entity, true)
 
-        return drawable
+        return drawable, nil, false
 
     elseif handler.nodeDraw then
         return drawableFunction.fromFunction(handler.nodeDraw, room, entity, node, nodeIndex, viewport)
@@ -210,7 +210,7 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
         entityCopy.x = node.x
         entityCopy.y = node.y
 
-        return entities.getEntityDrawable(name, handler, room, entityCopy, viewport)
+        return entities.getEntityDrawable(name, handler, room, entityCopy, viewport), nil, true
     end
 end
 
@@ -284,11 +284,24 @@ function entities.getNodeRectangles(room, entity, viewport)
             rectangles[i] = handler.nodeRectangle(room, entity, node, i)
 
         else
-            local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i)
+            local nodeDrawable, nodeDepth, usedMainEntityDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i, viewport)
             local nodeRectangle
 
             if nodeDrawable then
-                if #nodeDrawable > 0 then
+                -- Some extra logic if the drawable is from the entity rather than node functions
+                if usedMainEntityDrawable then
+                    if handler.rectangle then
+                        nodeRectangle = handler.rectangle(room, entity)
+
+                        -- Offset to node position rather than entity
+                        nodeRectangle.x = x - node.x
+                        nodeRectangle.y = y - node.y
+
+                    elseif entity.width and entity.height then
+                        nodeRectangle = utils.rectangle(node.x or 0, node.y or 0, entity.width, entity.height)
+                    end
+
+                elseif #nodeDrawable > 0 then
                     nodeRectangle = getSpriteRectangle(nodeDrawable)
 
                 else
@@ -397,24 +410,24 @@ function entities.drawSelected(room, layer, entity, color)
     end
 end
 
-function entities.moveSelection(room, layer, selection, x, y)
+function entities.moveSelection(room, layer, selection, offsetX, offsetY)
     local entity, node = selection.item, selection.node
     local name = entity._name
     local handler = entities.registeredEntities[name]
 
     -- Notify movement
     if handler.onMove then
-        handler.onMove(room, entity, node, x, y)
+        handler.onMove(room, entity, node, offsetX, offsetY)
     end
 
     -- Custom entity movement
     if handler.move then
-        handler.move(room, entity, node, x, y)
+        handler.move(room, entity, node, offsetX, offsetY)
 
     else
         if node == 0 then
-            entity.x += x
-            entity.y += y
+            entity.x += offsetX
+            entity.y += offsetY
 
         else
             local nodes = entity.nodes
@@ -422,22 +435,99 @@ function entities.moveSelection(room, layer, selection, x, y)
             if nodes and node <= #nodes then
                 local target = nodes[node]
 
-                target.x += x
-                target.y += y
+                target.x += offsetX
+                target.y += offsetY
             end
         end
     end
 
     -- Custom selection movement if needed after custom move
-    if handler.updateSelection then
-        handler.updateSelection(room, entity, node, selection, x, y, selection.width, selection.height)
+    if handler.updateMoveSelection then
+        handler.updateMoveSelection(room, entity, node, selection, offsetX, offsetY)
 
     else
-        selection.x += x
-        selection.y += y
+        selection.x += offsetX
+        selection.y += offsetY
     end
 
     return true
+end
+
+-- Negative offsets means we are growing up/left, should move the selection as well as changing size
+function entities.resizeSelection(room, layer, selection, offsetX, offsetY, grow)
+    local entity, node = selection.item, selection.node
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if node ~= 0 or offsetX == 0 and offsetY == 0 then
+        return false
+    end
+
+    -- Notify resize
+    if handler.onResize then
+        handler.onResize(room, entity, offsetX, offsetY, grow)
+    end
+
+    local entityOffsetX = 0
+    local entityOffsetY = 0
+    local madeChanges = false
+
+    if handler.resize then
+        madeChanges = handler.resize(room, entity, offsetX, offsetY, grow)
+
+    else
+        local canHorizontal, canVertical = entities.canResize(room, layer, entity)
+        local minimumWidth, minimumHeight = entities.minimumSize(room, layer, entity)
+        local maximumWidth, maximumHeight = entities.maximumSize(room, layer, entity)
+
+        local oldWidth, oldHeight = entity.width or 0, entity.height or 0
+        local newWidth, newHeight = oldWidth, oldHeight
+        local multiplier = grow and 1 or -1
+
+        if offsetX ~= 0 and canHorizontal then
+            newWidth += math.abs(offsetX) * multiplier
+
+            if minimumWidth <= newWidth and newWidth <= maximumWidth then
+                entity.width = newWidth
+
+                if offsetX < 0 then
+                    entityOffsetX = offsetX * multiplier
+                    entity.x += entityOffsetX
+                end
+
+                madeChanges = true
+            end
+        end
+
+        if offsetY ~= 0 and canVertical then
+            newHeight += math.abs(offsetY) * multiplier
+
+            if minimumHeight <= newHeight and newHeight <= maximumHeight then
+                entity.height = newHeight
+
+                if offsetY < 0 then
+                    entityOffsetY = offsetY * multiplier
+                    entity.y += entityOffsetY
+                end
+
+                madeChanges = true
+            end
+        end
+    end
+
+    -- Custom selection resize if needed after custom resize
+    if handler.updateResizeSelection then
+        handler.updateResizeSelection(room, entity, node, selection, offsetX, offsetY, grow)
+
+    else
+        selection.x += entityOffsetX
+        selection.y += entityOffsetY
+
+        selection.width = entity.width or selection.width
+        selection.height = entity.height or selection.height
+    end
+
+    return madeChanges
 end
 
 function entities.deleteSelection(room, layer, selection)
@@ -663,6 +753,24 @@ function entities.minimumSize(room, layer, entity)
             return unpack(handler.minimumSize)
         end
     end
+
+    return 8, 8
+end
+
+function entities.maximumSize(room, layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler.maximumSize then
+        if type(handler.maximumSize) == "function" then
+            return handler.maximumSize(room, entity)
+
+        else
+            return unpack(handler.maximumSize)
+        end
+    end
+
+    return math.huge, math.huge
 end
 
 function entities.nodeLimits(room, layer, entity)

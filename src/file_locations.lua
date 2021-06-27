@@ -45,8 +45,16 @@ function fileLocations.getSettingsPath()
     return filesystem.joinpath(fileLocations.getStorageDir(), "settings.conf")
 end
 
+function fileLocations.getPersistencePath()
+    return filesystem.joinpath(fileLocations.getStorageDir(), "persistence.conf")
+end
+
 function fileLocations.getCelesteDir()
     return config.readConfig(fileLocations.getSettingsPath()).celesteGameDirectory
+end
+
+function fileLocations.getPluginsPath()
+    return filesystem.joinpath(fileLocations.getStorageDir(), "Plugins")
 end
 
 return fileLocations

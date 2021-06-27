@@ -5,7 +5,8 @@ local switchGate = {}
 
 switchGate.name = "switchGate"
 switchGate.depth = 0
-switchGate.nodeLimit = {1, 1}
+switchGate.nodeLimits = {1, 1}
+switchGate.nodeLineRenderType = "line"
 switchGate.placements = {}
 
 local textures = {

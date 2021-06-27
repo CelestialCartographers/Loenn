@@ -551,9 +551,11 @@ function utils.equals(lhs, rhs, shallow)
                 return false
             end
         end
+
+        return true
     end
 
-    return true
+    return false
 end
 
 function utils.clamp(value, min, max)

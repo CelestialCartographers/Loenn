@@ -3,7 +3,7 @@ local drawing = require("drawing")
 local utils = require("utils")
 
 -- For future use I guess?
-local textures = {"wood", "dream", "temple", "templeB", "cliffside", "reflection", "core"}
+local textures = {"wood", "dream", "temple", "templeB", "cliffside", "reflection", "core", "moon"}
 
 local function getTexture(entity)
     return entity.texture and entity.texture ~= "default" and entity.texture or "wood"

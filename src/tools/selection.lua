@@ -45,6 +45,27 @@ local selectionMovementKeys = {
     {"itemMoveDown", 0, 1},
 }
 
+local selectionResizeKeys = {
+    {"itemResizeLeftGrow", -1, 0, true},
+    {"itemResizeRightGrow", 1, 0, true},
+    {"itemResizeUpGrow", 0, -1, true},
+    {"itemResizeDownGrow", 0, 1, true},
+    {"itemResizeLeftShrink", -1, 0, false},
+    {"itemResizeRightShrink", 1, 0, false},
+    {"itemResizeUpShrink", 0, -1, false},
+    {"itemResizeDownShrink", 0, 1, false}
+}
+
+local selectionFlipKeys = {
+    {"itemFlipHorizontal", true, false},
+    {"itemFlipVertical", false, true}
+}
+
+local selectionRotationKeys = {
+    {"itemRotateLeft", -1},
+    {"itemRotateRight", 1}
+}
+
 function tool.unselect()
     selectionPreviews = nil
 end
@@ -171,10 +192,9 @@ local function drawSelectionRectangles(room)
     end
 end
 
-local function moveItems(room, layer, previews, offsetX, offsetY)
-    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
+local function getMoveCallback(room, layer, previews, offsetX, offsetY)
+    return function()
         local redraw = false
-        local selectionsBefore = utils.deepcopy(selectionPreviews)
 
         for _, item in ipairs(previews) do
             local moved = selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
@@ -184,8 +204,87 @@ local function moveItems(room, layer, previews, offsetX, offsetY)
             end
         end
 
-        return redraw, selectionsBefore
-    end, room, layer, "Selection Moved")
+        return redraw
+    end
+end
+
+local function getResizeCallback(room, layer, previews, offsetX, offsetY, grow)
+    return function()
+        local redraw = false
+
+        for _, item in ipairs(previews) do
+            local resized = selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, grow)
+
+            if resized then
+                redraw = true
+            end
+        end
+
+        return redraw
+    end
+end
+
+local function getRotationCallback(room, layer, previews, direction)
+    return function()
+        local redraw = false
+
+        for _, item in ipairs(previews) do
+            local rotated = selectionItemUtils.rotateSelection(room, layer, item, direction)
+
+            if rotated then
+                redraw = true
+            end
+        end
+
+        return redraw
+    end
+end
+
+local function getFlipCallback(room, layer, previews, horizontal, vertical)
+    return function()
+        local redraw = false
+
+        for _, item in ipairs(previews) do
+            local flipped = selectionItemUtils.flipSelection(room, layer, item, horizontal, vertical)
+
+            if flipped then
+                redraw = true
+            end
+        end
+
+        return redraw
+    end
+end
+
+local function moveItems(room, layer, previews, offsetX, offsetY)
+    local forward = getMoveCallback(room, layer, previews, offsetX, offsetY)
+    local backward = getMoveCallback(room, layer, previews, -offsetX, -offsetY)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved")
+
+    return snapshot, redraw
+end
+
+local function resizeItems(room, layer, previews, offsetX, offsetY, grow)
+    local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, grow)
+    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, not grow)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
+
+    return snapshot, redraw
+end
+
+
+local function rotateItems(room, layer, previews, direction)
+    local forward = getRotationCallback(room, layer, previews, direction)
+    local backward = getRotationCallback(room, layer, previews, -direction)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
+
+    return snapshot, redraw
+end
+
+local function flipItems(room, layer, previews, horizontal, vertical)
+    local forward = getFlipCallback(room, layer, previews, horizontal, vertical)
+    local backward = getFlipCallback(room, layer, previews, horizontal, vertical)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
 
     return snapshot, redraw
 end
@@ -338,6 +437,83 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
 
         if targetKey == key then
             local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, offsetX, offsetY)
+
+            if redraw then
+                history.addSnapshot(snapshot)
+                toolUtils.redrawTargetLayer(room, tool.layer)
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
+local function handleItemResizeKeys(room, key, scancode, isrepeat)
+    if not selectionPreviews then
+        return
+    end
+
+    for _, resizeData in ipairs(selectionResizeKeys) do
+        local configKey, offsetX, offsetY, grow = resizeData[1], resizeData[2], resizeData[3], resizeData[4]
+        local targetKey = configs.editor[configKey]
+
+        if not keyboardHelper.modifierHeld(configs.editor.precisionModifier) then
+            offsetX *= 8
+            offsetY *= 8
+        end
+
+        if targetKey == key then
+            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, grow)
+
+            if redraw then
+                history.addSnapshot(snapshot)
+                toolUtils.redrawTargetLayer(room, tool.layer)
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
+local function handleItemRotateKeys(room, key, scancode, isrepeat)
+    if not selectionPreviews then
+        return
+    end
+
+    for _, rotationData in ipairs(selectionRotationKeys) do
+        local configKey, direction = rotationData[1], rotationData[2]
+        local targetKey = configs.editor[configKey]
+
+        if targetKey == key then
+            local snapshot, redraw = rotateItems(room, tool.layer, selectionPreviews, direction)
+
+            if redraw then
+                history.addSnapshot(snapshot)
+                toolUtils.redrawTargetLayer(room, tool.layer)
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
+local function handleItemFlipKeys(room, key, scancode, isrepeat)
+    if not selectionPreviews then
+        return
+    end
+
+    for _, flipData in ipairs(selectionFlipKeys) do
+        local configKey, horizontal, vertical = flipData[1], flipData[2], flipData[3]
+        local targetKey = configs.editor[configKey]
+
+        if targetKey == key then
+            local snapshot, redraw = flipItems(room, tool.layer, selectionPreviews, horizontal, vertical)
 
             if redraw then
                 history.addSnapshot(snapshot)
@@ -542,6 +718,9 @@ function tool.keypressed(key, scancode, isrepeat)
     end
 
     handleItemMovementKeys(room, key, scancode, isrepeat)
+    handleItemResizeKeys(room, key, scancode, isrepeat)
+    handleItemRotateKeys(room, key, scancode, isrepeat)
+    handleItemFlipKeys(room, key, scancode, isrepeat)
     handleItemDeletionKey(room, key, scancode, isrepeat)
     handleNodeAddKey(room, key, scancode, isrepeat)
 end

@@ -161,7 +161,6 @@ function triggers.getSelection(room, trigger)
     return mainRectangle, nodeRectangles
 end
 
--- TODO - Implement in more performant way?
 function triggers.drawSelected(room, layer, trigger, color)
     color = color or colors.selectionCompleteNodeLineColor
 
@@ -174,37 +173,45 @@ function triggers.drawSelected(room, layer, trigger, color)
         local triggerRenderX, triggerRenderY = x + halfWidth, y + halfHeight
         local previousX, previousY = triggerRenderX, triggerRenderY
         local nodeLineRenderType = triggers.nodeLineRenderType(layer, trigger)
+        local nodeVisibility = triggers.nodeVisibility(layer, trigger)
+        local renderNodes = nodeVisibility == "selected"
 
-        drawing.callKeepOriginalColor(function()
-            for _, node in ipairs(nodes) do
-                local nodeX, nodeY = node.x or 0, node.y or 0
+        if nodeLineRenderType or renderNodes then
+            drawing.callKeepOriginalColor(function()
+                for _, node in ipairs(nodes) do
+                    local nodeX, nodeY = node.x or 0, node.y or 0
 
-                love.graphics.setColor(color)
+                    if nodeLineRenderType then
+                        love.graphics.setColor(color)
 
-                if nodeLineRenderType == "line" then
-                    love.graphics.line(previousX, previousY, nodeX, nodeY)
+                        if nodeLineRenderType == "line" then
+                            love.graphics.line(previousX, previousY, nodeX, nodeY)
 
-                elseif nodeLineRenderType == "fan" then
-                    love.graphics.line(triggerRenderX, triggerRenderY, nodeX, nodeY)
+                        elseif nodeLineRenderType == "fan" then
+                            love.graphics.line(triggerRenderX, triggerRenderY, nodeX, nodeY)
+                        end
+                    end
+
+                    if renderNodes then
+                        love.graphics.setColor(colors.triggerColor)
+                        love.graphics.rectangle("fill", nodeX - 2, nodeY - 2, 5, 5)
+                        love.graphics.rectangle("line", nodeX - 2, nodeY - 2, 5, 5)
+                    end
+
+                    previousX = nodeX
+                    previousY = nodeY
                 end
-
-                love.graphics.setColor(colors.triggerColor)
-                love.graphics.rectangle("fill", nodeX - 2, nodeY - 2, 5, 5)
-                love.graphics.rectangle("line", nodeX - 2, nodeY - 2, 5, 5)
-
-                previousX = nodeX
-                previousY = nodeY
-            end
-        end)
+            end)
+        end
     end
 end
 
-function triggers.moveSelection(room, layer, selection, x, y)
+function triggers.moveSelection(room, layer, selection, offsetX, offsetY)
     local trigger, node = selection.item, selection.node
 
     if node == 0 then
-        trigger.x += x
-        trigger.y += y
+        trigger.x += offsetX
+        trigger.y += offsetY
 
     else
         local nodes = trigger.nodes
@@ -212,15 +219,67 @@ function triggers.moveSelection(room, layer, selection, x, y)
         if nodes and node <= #nodes then
             local target = nodes[node]
 
-            target.x += x
-            target.y += y
+            target.x += offsetX
+            target.y += offsetY
         end
     end
 
-    selection.x += x
-    selection.y += y
+    selection.x += offsetX
+    selection.y += offsetY
 
     return true
+end
+
+-- Negative offsets means we are growing up/left, should move the selection as well as changing size
+function triggers.resizeSelection(room, layer, selection, offsetX, offsetY, grow)
+    local trigger, node = selection.item, selection.node
+
+    if node ~= 0 or offsetX == 0 and offsetY == 0 then
+        return false
+    end
+
+    local canHorizontal, canVertical = triggers.canResize(room, layer, trigger)
+    local minimumWidth, minimumHeight = triggers.minimumSize(room, layer, trigger)
+    local maximumWidth, maximumHeight = triggers.maximumSize(room, layer, trigger)
+
+    local oldWidth, oldHeight = trigger.width or 0, trigger.height or 0
+    local newWidth, newHeight = oldWidth, oldHeight
+    local multiplier = grow and 1 or -1
+    local madeChanges = false
+
+    if offsetX ~= 0 and canHorizontal then
+        newWidth += math.abs(offsetX) * multiplier
+
+        if minimumWidth <= newWidth and newWidth <= maximumWidth then
+            trigger.width = newWidth
+            selection.width = newWidth
+
+            if offsetX < 0 then
+                trigger.x += offsetX * multiplier
+                selection.x += offsetX * multiplier
+            end
+
+            madeChanges = true
+        end
+    end
+
+    if offsetY ~= 0 and canVertical then
+        newHeight += math.abs(offsetY) * multiplier
+
+        if minimumHeight <= newHeight and newHeight <= maximumHeight then
+            trigger.height = newHeight
+            selection.height = newHeight
+
+            if offsetY < 0 then
+                trigger.y += offsetY * multiplier
+                selection.y += offsetY * multiplier
+            end
+
+            madeChanges = true
+        end
+    end
+
+    return madeChanges
 end
 
 function triggers.deleteSelection(room, layer, selection)
@@ -385,6 +444,10 @@ function triggers.minimumSize(room, layer, trigger)
     return 8, 8
 end
 
+function triggers.maximumSize(room, layer, trigger)
+    return math.huge, math.huge
+end
+
 function triggers.nodeLimits(room, layer, trigger)
     local name = trigger._name
     local handler = triggers.registeredTriggers[name]
@@ -399,6 +462,30 @@ function triggers.nodeLimits(room, layer, trigger)
 
     else
         return 0, 0
+    end
+end
+
+function triggers.nodeLineRenderType(layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.nodeLineRenderType then
+        return utils.callIfFunction(handler.nodeLineRenderType, trigger)
+
+    else
+        return "line"
+    end
+end
+
+function triggers.nodeVisibility(layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.nodeVisibility then
+        return utils.callIfFunction(handler.nodeVisibility, trigger)
+
+    else
+        return "selected"
     end
 end
 
@@ -423,18 +510,6 @@ function triggers.fieldOrder(layer, trigger)
 
     else
         return {"x", "y", "width", "height"}
-    end
-end
-
-function triggers.nodeLineRenderType(layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
-
-    if handler and handler.nodeLineRenderType then
-        return utils.callIfFunction(handler.nodeLineRenderType, trigger)
-
-    else
-        return "line"
     end
 end
 

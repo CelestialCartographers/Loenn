@@ -119,6 +119,13 @@ function roomStruct.directionalResize(room, side, amount)
         for _, target in ipairs(targets) do
             target.x += offsetX
             target.y += offsetY
+
+            if target.nodes then
+                for _, node in ipairs(target.nodes) do
+                    node.x += offsetX
+                    node.y += offsetY
+                end
+            end
         end
     end
 end

@@ -604,6 +604,29 @@ function celesteRender.forceRoomBatchRender(room, viewport)
     end
 end
 
+local function addBatch(depthBatches, depth, batches)
+    local batchTarget = depthBatches[depth]
+
+    if batchTarget then
+        if #batches > 0 then
+            for _, sprite in ipairs(batches) do
+                table.insert(batchTarget, sprite)
+            end
+
+        else
+            table.insert(batchTarget, batches)
+        end
+
+    else
+        if #batches > 0 then
+            depthBatches[depth] = batches
+
+        else
+            depthBatches[depth] = {batches}
+        end
+    end
+end
+
 function celesteRender.getRoomBatches(room, viewport)
     local roomName = room.name
     local cache = roomCache[roomName]
@@ -623,29 +646,11 @@ function celesteRender.getRoomBatches(room, viewport)
 
             if batches then
                 if depth then
-                    local batchTarget = depthBatches[depth]
-
-                    if batchTarget then
-                        for _, sprite in ipairs(batches) do
-                            table.insert(batchTarget, sprite)
-                        end
-
-                    else
-                        depthBatches[depth] = batches
-                    end
+                    addBatch(depthBatches, depth, batches)
 
                 else
                     for d, batch in pairs(batches) do
-                        local batchTarget = depthBatches[depth]
-
-                        if batchTarget then
-                            for _, sprite in ipairs(batch) do
-                                table.insert(batchTarget, sprite)
-                            end
-
-                        else
-                            depthBatches[d] = batch
-                        end
+                        addBatch(depthBatches, d, batch)
                     end
                 end
 
@@ -685,7 +690,9 @@ local function drawRoomFromBatches(room, viewport, selected)
 
     if orderedBatches then
         for depth, batch in ipairs(orderedBatches) do
-            batch:draw()
+            for _, drawable in ipairs(batch) do
+                drawable:draw()
+            end
         end
     end
 end
@@ -709,7 +716,9 @@ local function getRoomCanvas(room, viewport, selected)
 
                 canvas:renderTo(function()
                     for depth, batch in ipairs(orderedBatches) do
-                        batch:draw()
+                        for _, drawable in ipairs(batch) do
+                            drawable:draw()
+                        end
                     end
                 end)
 

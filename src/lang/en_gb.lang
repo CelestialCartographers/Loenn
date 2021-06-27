@@ -119,6 +119,7 @@ entities.jumpThru.name.templeB=Jump Through (Temple B)
 entities.jumpThru.name.cliffside=Jump Through (Cliffside)
 entities.jumpThru.name.reflection=Jump Through (Reflection)
 entities.jumpThru.name.core=Jump Through (Core)
+entities.jumpThru.name.moon=Jump Through (Moon)
 entities.jumpThru.description.texture=Changes the appearance of the platform.
 entities.jumpThru.description.surfaceIndex=Footstep sound when walking on the platform.\nLeave at Default for game to decide automatically based on texture.
 

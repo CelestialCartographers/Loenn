@@ -6,6 +6,7 @@ local missing = {}
 
 missing.mode = "fill"
 missing.color = colors.entityMissingColor
+missing.nodeLineRenderType = "line"
 
 function missing.rectangle(room, entity)
     local x = entity.x or 0

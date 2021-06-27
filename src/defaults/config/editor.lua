@@ -18,6 +18,21 @@ return {
     itemMoveUp = "up",
     itemMoveDown = "down",
 
+    itemResizeLeftGrow = false,
+    itemResizeRightGrow = "e",
+    itemResizeUpGrow = false,
+    itemResizeDownGrow = "d",
+    itemResizeLeftShrink = false,
+    itemResizeRightShrink = "q",
+    itemResizeUpShrink = false,
+    itemResizeDownShrink = "a",
+
+    itemRotateLeft = "l",
+    itemRotateRight = "r",
+
+    itemFlipVertical = "v",
+    itemFlipHorizontal = "h",
+
     itemDelete = "delete",
 
     itemAddNode = "n",
