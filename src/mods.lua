@@ -1,6 +1,8 @@
 local utils = require("utils")
 local fileLocations = require("file_locations")
 local yaml = require("yaml")
+local config = require("config")
+local filesystem = require("filesystem")
 
 local modHandler = {}
 
@@ -10,6 +12,7 @@ modHandler.everestYamlFilenames = {
     "everest.yaml",
     "everest.yml"
 }
+modHandler.specificModContentSymbol = "$"
 modHandler.specificModContent = "$%s$"
 modHandler.pluginFolderNames = {
     fileLocations.loennSimpleFolderName,
@@ -20,6 +23,10 @@ modHandler.pluginFolderNames = {
 
 modHandler.loadedMods = {}
 modHandler.modMetadata = {}
+modHandler.modSettings = {}
+modHandler.modPersistence = {}
+
+modHandler.persistenceBufferTime = 300
 
 function modHandler.findFiletype(startFolder, filetype)
     local filenames = {}
@@ -174,6 +181,92 @@ function modHandler.requireFromPlugin(lib, modName)
 
     else
         -- TODO - Add warning
+    end
+end
+
+local function createModSettingDirectory(modName)
+    -- Exit early if the requested mod isn't loaded
+    -- No need to create folders for a mod that potentially doesn't exist
+    if modHandler.hasLoadedMod(modName) then
+        return false
+    end
+
+    local pluginsPath = fileLocations.getPluginsPath()
+    local pluginsModPath = utils.joinpath(pluginsPath, modName)
+
+    if not filesystem.isDirectory(pluginsPath) then
+        filesystem.mkdir(pluginsPath)
+    end
+
+    if not filesystem.isDirectory(pluginsModPath) then
+        filesystem.mkdir(pluginsModPath)
+    end
+
+    return true
+end
+
+-- Work our way up the stack to find the first plugin related source
+-- This makes sure the function can be used from anywhere
+function modHandler.getCurrentModName(maxDepth)
+    maxDepth = maxDepth or 10
+
+    for i = 2, maxDepth do
+        local info = debug.getinfo(i)
+        local source = info.source
+
+        if utils.startsWith(source, modHandler.specificModContentSymbol) then
+            local parts = string.split(source, "/")()
+            local specificName = parts[1]
+
+            -- Match the specific name to a loaded mod's mount point
+            for modFolderName, metadata in pairs(modHandler.modMetadata) do
+                if metadata._mountPoint == specificName then
+                    if metadata[1] then
+                        return metadata[1].Name
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Defaults to current mod
+function modHandler.getModSettings(modName)
+    modName = modName or modHandler.getCurrentModName()
+
+    if modName then
+        if not modHandler.modSettings[modName] then
+            local pluginsPath = fileLocations.getPluginsPath()
+            local settingsPath = utils.joinpath(pluginsPath, modName, "settings.conf")
+
+            createModSettingDirectory(modName)
+
+            modHandler.modSettings[modName] = config.readConfig(settingsPath)
+        end
+
+        return modHandler.modSettings[modName]
+    end
+end
+
+-- Defaults to current mod
+function modHandler.getModPersistence(modName)
+    modName = modName or modHandler.getCurrentModName()
+
+    if not modHandler.modPersistence[modName] then
+        local pluginsPath = fileLocations.getPluginsPath()
+        local persistencePath = utils.joinpath(pluginsPath, modName, "persistence.conf")
+
+        createModSettingDirectory(modName)
+
+        modHandler.modPersistence[modName] = config.readConfig(persistencePath, modHandler.persistenceBufferTime)
+    end
+
+    return modHandler.modPersistence[modName]
+end
+
+function modHandler.writeModPersistences()
+    for _, persistence in pairs(modHandler.modPersistence) do
+        config.writeConfig(persistence, true)
     end
 end
 

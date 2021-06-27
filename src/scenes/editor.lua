@@ -3,6 +3,7 @@ local editorScene = {}
 local config = require("config")
 local persistence = require("persistence")
 local configs = require("configs")
+local mods = require("mods")
 local history = require("history")
 local sceneHandler = require("scene_handler")
 
@@ -49,6 +50,7 @@ function editorScene:quit()
     end
 
     updateRunningStatus(false)
+    mods.writeModPersistences()
 end
 
 function editorScene:draw()
