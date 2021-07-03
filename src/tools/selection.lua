@@ -46,14 +46,14 @@ local selectionMovementKeys = {
 }
 
 local selectionResizeKeys = {
-    {"itemResizeLeftGrow", -1, 0, true},
-    {"itemResizeRightGrow", 1, 0, true},
-    {"itemResizeUpGrow", 0, -1, true},
-    {"itemResizeDownGrow", 0, 1, true},
-    {"itemResizeLeftShrink", -1, 0, false},
-    {"itemResizeRightShrink", 1, 0, false},
-    {"itemResizeUpShrink", 0, -1, false},
-    {"itemResizeDownShrink", 0, 1, false}
+    {"itemResizeLeftGrow", 1, 0, -1, 0},
+    {"itemResizeRightGrow", 1, 0, 1, 0},
+    {"itemResizeUpGrow", 0, 1, 0, -1},
+    {"itemResizeDownGrow", 0, 1, 0, 1},
+    {"itemResizeLeftShrink", -1, 0, -1, 0},
+    {"itemResizeRightShrink", -1, 0, 1, 0},
+    {"itemResizeUpShrink", 0, -1, 0, -1},
+    {"itemResizeDownShrink", 0, -1, 0, 1}
 }
 
 local selectionFlipKeys = {
@@ -208,12 +208,12 @@ local function getMoveCallback(room, layer, previews, offsetX, offsetY)
     end
 end
 
-local function getResizeCallback(room, layer, previews, offsetX, offsetY, grow)
+local function getResizeCallback(room, layer, previews, offsetX, offsetY, directionX, directionY)
     return function()
         local redraw = false
 
         for _, item in ipairs(previews) do
-            local resized = selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, grow)
+            local resized = selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, directionX, directionY)
 
             if resized then
                 redraw = true
@@ -264,9 +264,9 @@ local function moveItems(room, layer, previews, offsetX, offsetY)
     return snapshot, redraw
 end
 
-local function resizeItems(room, layer, previews, offsetX, offsetY, grow)
-    local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, grow)
-    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, not grow)
+local function resizeItems(room, layer, previews, offsetX, offsetY, directionX, directionY)
+    local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, directionX, directionY)
+    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, -directionX, -directionY)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
 
     return snapshot, redraw
@@ -456,7 +456,7 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
     end
 
     for _, resizeData in ipairs(selectionResizeKeys) do
-        local configKey, offsetX, offsetY, grow = resizeData[1], resizeData[2], resizeData[3], resizeData[4]
+        local configKey, offsetX, offsetY, directionX, directionY = resizeData[1], resizeData[2], resizeData[3], resizeData[4], resizeData[5]
         local targetKey = configs.editor[configKey]
 
         if not keyboardHelper.modifierHeld(configs.editor.precisionModifier) then
@@ -465,7 +465,7 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
         end
 
         if targetKey == key then
-            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, grow)
+            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, directionX, directionY)
 
             if redraw then
                 history.addSnapshot(snapshot)

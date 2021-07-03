@@ -23,11 +23,11 @@ function selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
     return false
 end
 
-function selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, grow)
+function selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, directionX, directionY)
     local handler = layerHandlers.getHandler(layer)
 
     if room and handler and handler.resizeSelection then
-        return handler.resizeSelection(room, layer, item, offsetX, offsetY, grow)
+        return handler.resizeSelection(room, layer, item, offsetX, offsetY, directionX, directionY)
     end
 
     return false
