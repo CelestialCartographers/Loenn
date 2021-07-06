@@ -7,12 +7,13 @@ local filesystem = require("filesystem")
 local fileLocations = require("file_locations")
 local utils = require("utils")
 local history = require("history")
+local persistence = require("persistence")
 
 local sideStruct = require("structs.side")
 
 local state = {}
 
-local function updateSideState(side, filename, eventName)
+local function updateSideState(side, roomName, filename, eventName)
     eventName = eventName or "editorMapLoaded"
 
     celesteRender.invalidateRoomCache()
@@ -26,14 +27,27 @@ local function updateSideState(side, filename, eventName)
 
     history.reset()
 
-    state.selectItem(state.map and state.map.rooms[1])
+    local initialRoom = state.map and state.map.rooms[1]
+
+    if roomName then
+        local roomByName = state.getRoomByName(roomName)
+
+        if roomByName then
+            initialRoom = roomByName
+        end
+    end
+
+    state.selectItem(initialRoom)
+
+    persistence.lastLoadedFilename = filename
+    persistence.lastSelectedRoomName = state.selectedItem and state.selectedItem.name
 
     sceneHandler.changeScene("Editor")
 
     sceneHandler.sendEvent(eventName, filename)
 end
 
-function state.loadFile(filename)
+function state.loadFile(filename, roomName)
     if not filename then
         return
     end
@@ -53,7 +67,7 @@ function state.loadFile(filename)
                 tasks.newTask(
                     (-> sideStruct.decodeTaskable(binTask.result)),
                     function(decodeTask)
-                        updateSideState(decodeTask.result, filename, "editorMapLoaded")
+                        updateSideState(decodeTask.result, roomName, filename, "editorMapLoaded")
                     end
                 )
 
@@ -100,6 +114,12 @@ function state.saveFile(filename, addExtIfMissing)
 end
 
 function state.selectItem(item, add)
+    local itemType = utils.typeof(item)
+
+    if itemType == "room" then
+        persistence.lastSelectedRoomName = item.name
+    end
+
     if add then
         if state.selectedItemType ~= "table" then
             state.selectedItem = {
@@ -110,14 +130,14 @@ function state.selectItem(item, add)
         end
 
         if not state.selectedItem[item] then
-            state.selectedItem[item] = utils.typeof(item)
+            state.selectedItem[item] = itemType
 
             sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType, add)
         end
 
     else
         state.selectedItem = item
-        state.selectedItemType = utils.typeof(item)
+        state.selectedItemType = itemType
 
         sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType, add)
     end
@@ -148,7 +168,7 @@ function state.newMap()
 
     local newSide = sideStruct.decode({})
 
-    updateSideState(newSide, nil, "editorMapNew")
+    updateSideState(newSide, nil, nil, "editorMapNew")
 end
 
 function state.saveAsCurrentMap()
