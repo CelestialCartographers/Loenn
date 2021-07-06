@@ -56,10 +56,21 @@ function cursorUtils.useResizeCursor(directionX, directionY)
     cursorUtils.setCursor(cursorUtils.getResizeCursor(directionX, directionY))
 end
 
-function cursorUtils.setCursor(cursor)
-    cursorUtils.previousCursor = cursor
+-- previousCursor can be used to prevent updating cursor when the user thinks it is correct
+-- Prevents fighting between two users of setCursor
+function cursorUtils.setCursor(cursor, previousCursor, force)
+    if cursor ~= previousCursor then
+        if force or cursor ~= cursorUtils.previousCursor then
+            love.mouse.setCursor(love.mouse.getSystemCursor(cursor))
 
-    return love.mouse.setCursor(love.mouse.getSystemCursor(cursor))
+            cursorUtils.previousCursor = cursor
+        end
+
+        return cursor
+
+    else
+        return previousCursor
+    end
 end
 
 return cursorUtils

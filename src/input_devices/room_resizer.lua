@@ -22,6 +22,7 @@ local itemPosition
 local madeChanges
 local itemBeforeMove
 local targetType
+local previousCursor
 
 local triangleColor = colors.resizeTriangleColor
 local triangleHeight = 16
@@ -126,7 +127,7 @@ local function updateCursor()
         cursor = cursorUtils.getResizeCursor(directionX, directionY)
     end
 
-    cursorUtils.setCursor(cursor)
+    previousCursor = cursorUtils.setCursor(cursor, previousCursor)
 end
 
 local function getItemStruct(itemType)

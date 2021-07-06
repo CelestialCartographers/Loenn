@@ -49,6 +49,8 @@ local movementActive = false
 local movementLastOffsetX = nil
 local movementLastOffsetY = nil
 
+local previousCursor = nil
+
 local copyPreviews = nil
 
 local selectionMovementKeys = {
@@ -713,7 +715,7 @@ local function updateCursor()
         cursor = cursorUtils.getMoveCursor()
     end
 
-    cursorUtils.setCursor(cursor)
+    previousCursor = cursorUtils.setCursor(cursor, previousCursor)
 end
 
 local function updateSelectionPreviews(cursorX, cursorY)
