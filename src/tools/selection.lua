@@ -1,5 +1,4 @@
--- TODO - Add history to mouse based resize
--- TODO - Better logic separation for love2d callbacks when mouse based moved comes in
+-- TODO - Add history to mouse based resize and movement
 
 local state = require("loaded_state")
 local utils = require("utils")
@@ -45,6 +44,10 @@ local resizeDirection = nil
 local resizeDirectionPreview = nil
 local resizeLastOffsetX = nil
 local resizeLastOffsetY = nil
+
+local movementActive = false
+local movementLastOffsetX = nil
+local movementLastOffsetY = nil
 
 local copyPreviews = nil
 
@@ -136,6 +139,34 @@ local function resizeFinished()
     resizeDirectionPreview = nil
     resizeLastOffsetX = nil
     resizeLastOffsetY = nil
+end
+
+local function movementAttemptToActivate(cursorX, cursorY)
+    if selectionPreviews and #selectionPreviews > 0 and not movementActive then
+        local cursorRectangle = utils.rectangle(cursorX - 1, cursorY - 1, 3, 3)
+
+        -- Can only start moving with cursor if we are currently over a existing selection
+        for _, preview in ipairs(selectionPreviews) do
+            if utils.aabbCheck(cursorRectangle, preview) then
+                movementActive = true
+
+                return true
+            end
+        end
+    end
+
+    return movementActive
+end
+
+local function movementStarted(x, y)
+    dragStartX = x
+    dragStartY = y
+end
+
+local function movementFinished()
+    movementActive = false
+    movementLastOffsetX = nil
+    movementLastOffsetY = nil
 end
 
 local function drawSelectionArea(room)
@@ -677,16 +708,17 @@ local function updateCursor()
         local horizontalDirection, verticalDirection = unpack(cursorResizeDirection)
 
         cursor = cursorUtils.getResizeCursor(horizontalDirection, verticalDirection)
+
+    elseif movementActive then
+        cursor = cursorUtils.getMoveCursor()
     end
 
     cursorUtils.setCursor(cursor)
 end
 
 local function updateSelectionPreviews(cursorX, cursorY)
-    -- TODO - Check if the target can be resized at all
     if selectionPreviews then
         local couldResize = #selectionPreviews == 1
-        local couldMove = #selectionPreviews > 1
 
         if couldResize then
              -- TODO - Put sensitivity in config?
@@ -723,16 +755,18 @@ function tool.mousepressed(x, y, button, istouch, presses)
 
         -- Set up in this order: resize, move, select
         if cursorX and cursorY then
+            movementAttemptToActivate(cursorX, cursorY)
+
             if resizeDirectionPreview then
                 resizeDirection = resizeDirectionPreview
 
-                selectionFinished()
-
                 resizeStarted(cursorX, cursorY)
 
-            else
-                resizeFinished()
+            elseif movementActive then
+                updateCursor()
+                movementStarted(cursorX, cursorY)
 
+            else
                 selectionStarted(cursorX, cursorY)
             end
         end
@@ -786,6 +820,38 @@ local function mouseMovedResize(cursorX, cursorY)
     end
 end
 
+-- TODO - Precise
+local function mouseMovedMovement(cursorX, cursorY)
+    local room = state.getSelectedRoom()
+
+    if room and cursorX and cursorY and dragStartX and dragStartY then
+        local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+        local startX, startY = dragStartX, dragStartY
+
+        if not precise then
+            cursorX = utils.round(cursorX / 8) * 8
+            cursorY = utils.round(cursorY / 8) * 8
+
+            startX = utils.round(startX / 8) * 8
+            startY = utils.round(startY / 8) * 8
+        end
+
+        local deltaX = (cursorX - (movementLastOffsetX or cursorX))
+        local deltaY = (cursorY - (movementLastOffsetY or cursorY))
+
+        movementLastOffsetX = cursorX
+        movementLastOffsetY = cursorY
+
+        if deltaX ~= 0 or deltaY ~= 0 then
+            local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, deltaX, deltaY)
+
+            if redraw then
+                toolUtils.redrawTargetLayer(room, tool.layer)
+            end
+        end
+    end
+end
+
 function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
     local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
@@ -794,6 +860,9 @@ function tool.mousemoved(x, y, dx, dy, istouch)
         -- Try in this order: resize, move, select
         if resizeDirection then
             mouseMovedResize(cursorX, cursorY)
+
+        elseif movementActive then
+            mouseMovedMovement(cursorX, cursorY)
 
         else
             mouseMovedSelection(cursorX, cursorY)
@@ -812,6 +881,7 @@ function tool.mousereleased(x, y, button, istouch, presses)
     if button == actionButton then
         selectionFinished()
         resizeFinished()
+        movementFinished()
 
         updateCursor()
     end
@@ -827,7 +897,10 @@ function tool.mouseclicked(x, y, button, istouch, presses)
 
         if cursorX and cursorY then
             selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
+
             selectionFinished()
+            resizeFinished()
+            movementFinished()
         end
 
     elseif button == contextMenuButton then
