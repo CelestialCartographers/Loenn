@@ -1,4 +1,5 @@
 return {
     githubAuthor = "CelestialCartographers",
-    githubRepository = "Loenn"
+    githubRepository = "Loenn",
+    checkOnStartup = true
 }

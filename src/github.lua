@@ -32,12 +32,14 @@ local function getUrlJsonData(url, force)
     if code == 200 then
         local data = json.decode(body)
 
-        github._cache[url] = {
-            time = os.time(),
-            data = data
-        }
+        if type(data) == "table" then
+            github._cache[url] = {
+                time = os.time(),
+                data = data
+            }
 
-        return data
+            return data
+        end
     end
 
     return nil

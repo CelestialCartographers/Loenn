@@ -1,7 +1,11 @@
 local filesystem = require("filesystem")
 local github = require("github")
 local configs = require("configs")
+local persistence = require("persistence")
 local utils = require("utils")
+local meta = require("meta")
+local versionParser = require("version_parser")
+local sceneHandler = require("scene_handler")
 
 -- TODO - Prompt to restart the program afterwards
 
@@ -12,53 +16,96 @@ function updater.canUpdate()
     return love.filesystem.isFused() or filesystem.fileExtension(love.filesystem.getSource()) == "love"
 end
 
-function updater.getAvailableUpdates()
+function updater.getAvailableVersions(sort)
     local releases = github.getReleases(configs.updater.githubAuthor, configs.updater.githubRepository)
     local res = {}
 
-    for i, release <- releases or {} do
+    for i, release in ipairs(releases or {}) do
         if release.tag_name then
-            table.insert(res, release.tag_name)
+            table.insert(res, versionParser(release.tag_name))
         end
+    end
+
+    -- Newest first
+    if sort ~= false then
+        table.sort(res, function(lhs, rhs) return lhs > rhs end)
     end
 
     return res
 end
 
-function updater.getRelevantRelease(target)
+-- Check if we are up to date or not
+-- Assume we are up to date if we don't have any available versions
+function updater.isLatestVersion()
+    local current = meta.version
+    local availableVersions = updater.getAvailableVersions()
+
+    if availableVersions and #availableVersions > 0 then
+        local latest = availableVersions[1]
+
+        return latest == current, latest
+    end
+
+    return true
+end
+
+function updater.getRelevantRelease(tagName)
     local releases = github.getReleases(configs.updater.githubAuthor, configs.updater.githubRepository)
-    local tagName = target or (releases and #releases > 0 and releases[1].tag_name)
 
     if tagName then
-        for i, release <- releases do
+        for _, release in ipairs(releases or {}) do
             if release.tag_name == tagName then
                 return release
             end
         end
-    end
 
-    return nil
+    else
+        return releases[1]
+    end
 end
 
 function updater.getRelevantReleaseAsset(tagName, targetOS)
     local release = updater.getRelevantRelease(tagName)
     local userOS = targetOS or love.system.getOS()
+    local userOSLower = userOS:lower()
 
     if release then
-        for i, asset <- release.assets do
+        for _, asset in ipairs(release.assets) do
             local assetOS = asset.name:match("-([A-Za-z0-9_]+)%.zip$")
 
-            if assetOS:lower() == userOS:lower() or assetOS:lower():gsub("_", " ") == userOS:lower() then
-                return asset
+            if assetOS then
+                local assetOSLower = assetOS:lower()
+
+                if assetOSLower == userOSLower or assetOSLower:gsub("_", " ") == userOSLower then
+                    return asset
+                end
             end
         end
     end
-
-    return nil
 end
 
--- TODO - Test
--- Make sure this works on at least Windows and Linux, assume that Linux code would work on OS X as well
+function updater.openDownloadPage(tagNameOrAsset)
+    local asset = tagNameOrAsset
+
+    if type(tagNameOrAsset) == "string" then
+        asset = updater.getRelevantReleaseAsset(tagNameOrAsset)
+    end
+
+    if asset then
+        local url = asset.browser_download_url
+        local name = asset.name
+
+        love.system.openURL(url)
+
+        return true
+    end
+
+    return false
+end
+
+-- For now this should just start the download in the browser
+-- Make it more sane for the user later on
+-- Keep the if statements for now, they are pointless for this use case but sane for the future
 function updater.update(tagName)
     if updater.canUpdate() then
         local asset = updater.getRelevantReleaseAsset(tagName)
@@ -71,35 +118,37 @@ function updater.update(tagName)
             local userOS = love.system.getOS()
 
             if userOS == "Windows" then
-                -- TODO - Tell user to do stuff themselves
-                love.system.openURL(url)
-
-                return true
+                return updater.openDownloadPage(asset)
 
             elseif userOS == "Linux" then
-                -- TODO - Sanitize this
-                -- Move current files into .old or equivalent
-                -- Download and extract files, and then delete .old
-
-                local zipPath = filesystem.joinpath(appDir, name)
-                local downloaded = filesystem.downloadURL(url, zipPath)
-
-                if downloaded then
-                    filesystem.unzip(zipPath, appDir)
-                    filesystem.remove(zipPath)
-
-                    return true
-                end
+                return updater.openDownloadPage(asset)
 
             elseif userOS == "OS X" then
-                -- TODO
-
-                return false
+                return updater.openDownloadPage(asset)
             end
         end
     end
 
     return false
+end
+
+-- Check for updates and queue up related events
+function updater.checkForUpdates()
+    if updater.canUpdate() then
+        sceneHandler.sendEvent("updaterCheckingForUpdates")
+
+        local isLatest, latestVersion = updater.isLatestVersion()
+
+        if not isLatest then
+            sceneHandler.sendEvent("updaterUpdateAvailable", latestVersion, meta.version)
+        end
+    end
+end
+
+function updater.startupUpdateCheck()
+    if configs.updater.checkOnStartup then
+        updater.checkForUpdates()
+    end
 end
 
 return updater
