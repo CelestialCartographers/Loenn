@@ -1,6 +1,7 @@
 local inputDevice = require("input_device")
 local utils = require("utils")
 local configs = require("configs")
+local persistence = require("persistence")
 
 local movementButton = configs.editor.canvasMoveButton
 
@@ -67,12 +68,26 @@ function viewportHandler.pixelToTileCoordinates(x, y)
     return math.floor(x / 8), math.floor(y / 8)
 end
 
+function viewportHandler.persistCamera()
+    persistence.cameraPositionX = viewport.x
+    persistence.cameraPositionY = viewport.y
+    persistence.cameraPositionScale = viewport.scale
+end
+
+function viewportHandler.cameraFromPersistence()
+    viewport.x = persistence.cameraPositionX or 0
+    viewport.y = persistence.cameraPositionY or 0
+    viewport.scale = persistence.cameraPositionScale or 1
+end
+
 function viewportHandler.zoomIn()
     local mouseX, mouseY = viewportHandler.getMousePosition()
 
     viewport.scale *= 2
     viewport.x = viewport.x * 2 + mouseX
     viewport.y = viewport.y * 2 + mouseY
+
+    viewportHandler.persistCamera()
 end
 
 function viewportHandler.zoomOut()
@@ -81,6 +96,8 @@ function viewportHandler.zoomOut()
     viewport.scale /= 2
     viewport.x = (viewport.x - mouseX) / 2
     viewport.y = (viewport.y - mouseY) / 2
+
+    viewportHandler.persistCamera()
 end
 
 function viewportHandler.moveToPosition(x, y, scale, centered)
@@ -98,6 +115,8 @@ function viewportHandler.moveToPosition(x, y, scale, centered)
         viewport.x = x * viewport.scale
         viewport.y = y * viewport.scale
     end
+
+    viewportHandler.persistCamera()
 end
 
 function viewportHandler.enable()
@@ -125,6 +144,8 @@ function viewportDevice.mousedragmoved(dx, dy, button, istouch)
         viewport.x -= dx
         viewport.y -= dy
 
+        viewportHandler.persistCamera()
+
         return true
     end
 end
@@ -133,6 +154,8 @@ function viewportDevice.mousemoved(x, y, dx, dy, istouch)
     if istouch then
         viewport.x -= dx
         viewport.y -= dy
+
+        viewportHandler.persistCamera()
 
         return true
     end

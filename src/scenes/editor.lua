@@ -24,6 +24,7 @@ function editorScene:firstEnter()
 
     local inputDevice = require("input_device")
     local standardHotkeys = require("standard_hotkeys")
+    local updater = require("updater")
 
     local viewportHandler = require("viewport_handler")
     local hotkeyHandler = require("hotkey_handler")
@@ -39,6 +40,7 @@ function editorScene:firstEnter()
     inputDevice.newInputDevice(self.inputDevices, roomResizeDevice)
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
 
+    updater.startupUpdateCheck()
     updateRunningStatus(true)
 end
 

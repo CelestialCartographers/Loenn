@@ -454,7 +454,7 @@ function entities.moveSelection(room, layer, selection, offsetX, offsetY)
 end
 
 -- Negative offsets means we are growing up/left, should move the selection as well as changing size
-function entities.resizeSelection(room, layer, selection, offsetX, offsetY, grow)
+function entities.resizeSelection(room, layer, selection, offsetX, offsetY, directionX, directionY)
     local entity, node = selection.item, selection.node
     local name = entity._name
     local handler = entities.registeredEntities[name]
@@ -465,7 +465,7 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, grow
 
     -- Notify resize
     if handler.onResize then
-        handler.onResize(room, entity, offsetX, offsetY, grow)
+        handler.onResize(room, entity, offsetX, offsetY, directionX, directionY)
     end
 
     local entityOffsetX = 0
@@ -473,7 +473,7 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, grow
     local madeChanges = false
 
     if handler.resize then
-        madeChanges = handler.resize(room, entity, offsetX, offsetY, grow)
+        madeChanges = handler.resize(room, entity, offsetX, offsetY, directionX, directionY)
 
     else
         local canHorizontal, canVertical = entities.canResize(room, layer, entity)
@@ -482,17 +482,16 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, grow
 
         local oldWidth, oldHeight = entity.width or 0, entity.height or 0
         local newWidth, newHeight = oldWidth, oldHeight
-        local multiplier = grow and 1 or -1
 
         if offsetX ~= 0 and canHorizontal then
-            newWidth += math.abs(offsetX) * multiplier
+            newWidth += offsetX * math.abs(directionX)
 
             if minimumWidth <= newWidth and newWidth <= maximumWidth then
                 entity.width = newWidth
 
-                if offsetX < 0 then
-                    entityOffsetX = offsetX * multiplier
-                    entity.x += entityOffsetX
+                if directionX < 0 then
+                    entityOffsetX = -offsetX
+                    entity.x -= offsetX
                 end
 
                 madeChanges = true
@@ -500,14 +499,14 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, grow
         end
 
         if offsetY ~= 0 and canVertical then
-            newHeight += math.abs(offsetY) * multiplier
+            newHeight += offsetY * math.abs(directionY)
 
             if minimumHeight <= newHeight and newHeight <= maximumHeight then
                 entity.height = newHeight
 
-                if offsetY < 0 then
-                    entityOffsetY = offsetY * multiplier
-                    entity.y += entityOffsetY
+                if directionY < 0 then
+                    entityOffsetY = -offsetY
+                    entity.y -= offsetY
                 end
 
                 madeChanges = true
@@ -517,7 +516,7 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, grow
 
     -- Custom selection resize if needed after custom resize
     if handler.updateResizeSelection then
-        handler.updateResizeSelection(room, entity, node, selection, offsetX, offsetY, grow)
+        handler.updateResizeSelection(room, entity, node, selection, offsetX, offsetY, directionX, directionY)
 
     else
         selection.x += entityOffsetX

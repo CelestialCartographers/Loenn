@@ -1,6 +1,8 @@
 local fonts = require("fonts")
 local utils = require("utils")
 local languageRegistry = require("language_registry")
+local persistence = require("persistence")
+local viewportHandler = require("viewport_handler")
 
 local loadingScene = {}
 
@@ -98,8 +100,12 @@ function loadingScene:firstEnter()
         end
     )
 
-    local mapFile = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
-    viewerState.loadFile(mapFile)
+    local defaultMapFilename = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
+    local lastMapFilename = persistence.lastLoadedFilename
+    local lastRoomName = persistence.lastSelectedRoomName
+
+    viewerState.loadFile(lastMapFilename or defaultMapFilename, lastRoomName)
+    viewportHandler.cameraFromPersistence()
 end
 
 function loadingScene:draw()

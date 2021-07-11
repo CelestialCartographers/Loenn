@@ -231,7 +231,7 @@ function triggers.moveSelection(room, layer, selection, offsetX, offsetY)
 end
 
 -- Negative offsets means we are growing up/left, should move the selection as well as changing size
-function triggers.resizeSelection(room, layer, selection, offsetX, offsetY, grow)
+function triggers.resizeSelection(room, layer, selection, offsetX, offsetY, directionX, directionY)
     local trigger, node = selection.item, selection.node
 
     if node ~= 0 or offsetX == 0 and offsetY == 0 then
@@ -244,19 +244,18 @@ function triggers.resizeSelection(room, layer, selection, offsetX, offsetY, grow
 
     local oldWidth, oldHeight = trigger.width or 0, trigger.height or 0
     local newWidth, newHeight = oldWidth, oldHeight
-    local multiplier = grow and 1 or -1
     local madeChanges = false
 
     if offsetX ~= 0 and canHorizontal then
-        newWidth += math.abs(offsetX) * multiplier
+        newWidth += offsetX * math.abs(directionX)
 
         if minimumWidth <= newWidth and newWidth <= maximumWidth then
             trigger.width = newWidth
             selection.width = newWidth
 
-            if offsetX < 0 then
-                trigger.x += offsetX * multiplier
-                selection.x += offsetX * multiplier
+            if directionX < 0 then
+                trigger.x -= offsetX
+                selection.x -= offsetX
             end
 
             madeChanges = true
@@ -264,15 +263,15 @@ function triggers.resizeSelection(room, layer, selection, offsetX, offsetY, grow
     end
 
     if offsetY ~= 0 and canVertical then
-        newHeight += math.abs(offsetY) * multiplier
+        newHeight += offsetY * math.abs(directionY)
 
         if minimumHeight <= newHeight and newHeight <= maximumHeight then
             trigger.height = newHeight
             selection.height = newHeight
 
-            if offsetY < 0 then
-                trigger.y += offsetY * multiplier
-                selection.y += offsetY * multiplier
+            if directionY < 0 then
+                trigger.y -= offsetY
+                selection.y -= offsetY
             end
 
             madeChanges = true

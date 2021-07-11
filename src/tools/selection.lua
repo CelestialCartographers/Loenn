@@ -1,3 +1,5 @@
+-- TODO - Add history to mouse based resize and movement
+
 local state = require("loaded_state")
 local utils = require("utils")
 local configs = require("configs")
@@ -13,6 +15,7 @@ local snapshotUtils = require("snapshot_utils")
 local hotkeyStruct = require("structs.hotkey")
 local layerHandlers = require("layer_handlers")
 local placementUtils = require("placement_utils")
+local cursorUtils = require("cursor_utils")
 
 local tool = {}
 
@@ -29,12 +32,24 @@ tool.validLayers = {
     "decalsBg"
 }
 
+local dragStartX, dragStartY = nil, nil
+
 local selectionRectangle = nil
 local selectionCompleted = false
-local selectionStartX, selectionStartY = nil ,nil
 local selectionPreviews = nil
 local selectionCycleTargets = {}
 local selectionCycleIndex = 1
+
+local resizeDirection = nil
+local resizeDirectionPreview = nil
+local resizeLastOffsetX = nil
+local resizeLastOffsetY = nil
+
+local movementActive = false
+local movementLastOffsetX = nil
+local movementLastOffsetY = nil
+
+local previousCursor = nil
 
 local copyPreviews = nil
 
@@ -46,14 +61,14 @@ local selectionMovementKeys = {
 }
 
 local selectionResizeKeys = {
-    {"itemResizeLeftGrow", -1, 0, true},
-    {"itemResizeRightGrow", 1, 0, true},
-    {"itemResizeUpGrow", 0, -1, true},
-    {"itemResizeDownGrow", 0, 1, true},
-    {"itemResizeLeftShrink", -1, 0, false},
-    {"itemResizeRightShrink", 1, 0, false},
-    {"itemResizeUpShrink", 0, -1, false},
-    {"itemResizeDownShrink", 0, 1, false}
+    {"itemResizeLeftGrow", 1, 0, -1, 0},
+    {"itemResizeRightGrow", 1, 0, 1, 0},
+    {"itemResizeUpGrow", 0, 1, 0, -1},
+    {"itemResizeDownGrow", 0, 1, 0, 1},
+    {"itemResizeLeftShrink", -1, 0, -1, 0},
+    {"itemResizeRightShrink", -1, 0, 1, 0},
+    {"itemResizeUpShrink", 0, -1, 0, -1},
+    {"itemResizeDownShrink", 0, -1, 0, 1}
 }
 
 local selectionFlipKeys = {
@@ -68,15 +83,6 @@ local selectionRotationKeys = {
 
 function tool.unselect()
     selectionPreviews = nil
-end
-
-local function selectionStarted(x, y)
-    selectionRectangle = utils.rectangle(x, y, 0, 0)
-    selectionPreviews = nil
-    selectionCompleted = false
-
-    selectionStartX = x
-    selectionStartY = y
 end
 
 local function selectionChanged(x, y, width, height, fromClick)
@@ -109,13 +115,64 @@ local function selectionChanged(x, y, width, height, fromClick)
     end
 end
 
+local function selectionStarted(x, y)
+    selectionRectangle = utils.rectangle(x, y, 0, 0)
+    selectionPreviews = nil
+    selectionCompleted = false
+    resizeDirection = nil
+    resizeDirectionPreview = nil
+
+    dragStartX = x
+    dragStartY = y
+end
+
 local function selectionFinished()
     selectionRectangle = false
     selectionCompleted = true
 end
 
+local function resizeStarted(x, y)
+    dragStartX = x
+    dragStartY = y
+end
+
+local function resizeFinished()
+    resizeDirection = nil
+    resizeDirectionPreview = nil
+    resizeLastOffsetX = nil
+    resizeLastOffsetY = nil
+end
+
+local function movementAttemptToActivate(cursorX, cursorY)
+    if selectionPreviews and #selectionPreviews > 0 and not movementActive then
+        local cursorRectangle = utils.rectangle(cursorX - 1, cursorY - 1, 3, 3)
+
+        -- Can only start moving with cursor if we are currently over a existing selection
+        for _, preview in ipairs(selectionPreviews) do
+            if utils.aabbCheck(cursorRectangle, preview) then
+                movementActive = true
+
+                return true
+            end
+        end
+    end
+
+    return movementActive
+end
+
+local function movementStarted(x, y)
+    dragStartX = x
+    dragStartY = y
+end
+
+local function movementFinished()
+    movementActive = false
+    movementLastOffsetX = nil
+    movementLastOffsetY = nil
+end
+
 local function drawSelectionArea(room)
-    if selectionRectangle then
+    if selectionRectangle and not resizeDirection then
         -- Don't render if selection rectangle is too small, weird visuals
         if selectionRectangle.width >= 1 and selectionRectangle.height >= 1 then
             viewportHandler.drawRelativeTo(room.x, room.y, function()
@@ -208,12 +265,12 @@ local function getMoveCallback(room, layer, previews, offsetX, offsetY)
     end
 end
 
-local function getResizeCallback(room, layer, previews, offsetX, offsetY, grow)
+local function getResizeCallback(room, layer, previews, offsetX, offsetY, directionX, directionY)
     return function()
         local redraw = false
 
         for _, item in ipairs(previews) do
-            local resized = selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, grow)
+            local resized = selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, directionX, directionY)
 
             if resized then
                 redraw = true
@@ -264,9 +321,9 @@ local function moveItems(room, layer, previews, offsetX, offsetY)
     return snapshot, redraw
 end
 
-local function resizeItems(room, layer, previews, offsetX, offsetY, grow)
-    local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, grow)
-    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, not grow)
+local function resizeItems(room, layer, previews, offsetX, offsetY, directionX, directionY)
+    local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, directionX, directionY)
+    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, -directionX, -directionY)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
 
     return snapshot, redraw
@@ -456,7 +513,7 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
     end
 
     for _, resizeData in ipairs(selectionResizeKeys) do
-        local configKey, offsetX, offsetY, grow = resizeData[1], resizeData[2], resizeData[3], resizeData[4]
+        local configKey, offsetX, offsetY, directionX, directionY = resizeData[1], resizeData[2], resizeData[3], resizeData[4], resizeData[5]
         local targetKey = configs.editor[configKey]
 
         if not keyboardHelper.modifierHeld(configs.editor.precisionModifier) then
@@ -465,7 +522,7 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
         end
 
         if targetKey == key then
-            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, grow)
+            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, directionX, directionY)
 
             if redraw then
                 history.addSnapshot(snapshot)
@@ -645,6 +702,47 @@ local function pasteItemsHotkey()
     end
 end
 
+local function updateCursor()
+    local cursor = cursorUtils.getDefaultCursor()
+    local cursorResizeDirection = resizeDirection or resizeDirectionPreview
+
+    if cursorResizeDirection then
+        local horizontalDirection, verticalDirection = unpack(cursorResizeDirection)
+
+        cursor = cursorUtils.getResizeCursor(horizontalDirection, verticalDirection)
+
+    elseif movementActive then
+        cursor = cursorUtils.getMoveCursor()
+    end
+
+    previousCursor = cursorUtils.setCursor(cursor, previousCursor)
+end
+
+local function updateSelectionPreviews(cursorX, cursorY)
+    if selectionPreviews then
+        local couldResize = #selectionPreviews == 1
+
+        if couldResize then
+             -- TODO - Put sensitivity in config?
+
+            local viewport = viewportHandler.viewport
+            local cameraZoom = viewport.scale
+            local borderThreshold = 4 / cameraZoom
+
+            local point = utils.point(cursorX, cursorY)
+            local rectangle = selectionPreviews[1]
+            local onBorder, horizontalDirection, verticalDirection = utils.onRectangleBorder(point, rectangle, borderThreshold)
+
+            if onBorder then
+                resizeDirectionPreview = {horizontalDirection, verticalDirection}
+
+            else
+                resizeDirectionPreview = nil
+            end
+        end
+    end
+end
+
 local toolHotkeys = {
     hotkeyStruct.createHotkey(configs.hotkeys.itemsCopy, copyItemsHotkey),
     hotkeyStruct.createHotkey(configs.hotkeys.itemsPaste, pasteItemsHotkey),
@@ -657,24 +755,126 @@ function tool.mousepressed(x, y, button, istouch, presses)
     if button == actionButton then
         local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
+        -- Set up in this order: resize, move, select
         if cursorX and cursorY then
-            selectionStarted(cursorX, cursorY)
+            movementAttemptToActivate(cursorX, cursorY)
+
+            if resizeDirectionPreview then
+                resizeDirection = resizeDirectionPreview
+
+                resizeStarted(cursorX, cursorY)
+
+            elseif movementActive then
+                updateCursor()
+                movementStarted(cursorX, cursorY)
+
+            else
+                selectionStarted(cursorX, cursorY)
+            end
+        end
+
+        updateCursor()
+    end
+end
+
+local function mouseMovedSelection(cursorX, cursorY)
+    if not selectionCompleted then
+        if cursorX and cursorY and dragStartX and dragStartY then
+            local width, height = cursorX - dragStartX, cursorY - dragStartY
+
+            selectionChanged(dragStartX, dragStartY, width, height)
+        end
+    end
+end
+
+local function mouseMovedResize(cursorX, cursorY)
+    local room = state.getSelectedRoom()
+
+    if room and cursorX and cursorY and dragStartX and dragStartY then
+        local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+        local directionX, directionY = unpack(resizeDirection)
+
+        local width = (cursorX - dragStartX)
+        local height = (cursorY - dragStartY)
+
+        if not precise then
+            width = utils.round(width / 8) * 8
+            height = utils.round(height / 8) * 8
+        end
+
+        if not resizeLastOffsetX or not resizeLastOffsetY then
+            resizeLastOffsetX = width
+            resizeLastOffsetY = height
+        end
+
+        if width ~= resizeLastOffsetX or height ~= resizeLastOffsetY then
+            local deltaX, deltaY = width - resizeLastOffsetX, height - resizeLastOffsetY
+
+            resizeLastOffsetX = width
+            resizeLastOffsetY = height
+
+            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, deltaX * directionX, deltaY * directionY, directionX, directionY)
+
+            if redraw then
+                toolUtils.redrawTargetLayer(room, tool.layer)
+            end
+        end
+    end
+end
+
+-- TODO - Precise
+local function mouseMovedMovement(cursorX, cursorY)
+    local room = state.getSelectedRoom()
+
+    if room and cursorX and cursorY and dragStartX and dragStartY then
+        local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+        local startX, startY = dragStartX, dragStartY
+
+        if not precise then
+            cursorX = utils.round(cursorX / 8) * 8
+            cursorY = utils.round(cursorY / 8) * 8
+
+            startX = utils.round(startX / 8) * 8
+            startY = utils.round(startY / 8) * 8
+        end
+
+        local deltaX = (cursorX - (movementLastOffsetX or cursorX))
+        local deltaY = (cursorY - (movementLastOffsetY or cursorY))
+
+        movementLastOffsetX = cursorX
+        movementLastOffsetY = cursorY
+
+        if deltaX ~= 0 or deltaY ~= 0 then
+            local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, deltaX, deltaY)
+
+            if redraw then
+                toolUtils.redrawTargetLayer(room, tool.layer)
+            end
         end
     end
 end
 
 function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
+    local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-    if not selectionCompleted and love.mouse.isDown(actionButton) then
-        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
+    if love.mouse.isDown(actionButton) then
+        -- Try in this order: resize, move, select
+        if resizeDirection then
+            mouseMovedResize(cursorX, cursorY)
 
-        if cursorX and cursorY and selectionStartX and selectionStartY then
-            local width, height = cursorX - selectionStartX, cursorY - selectionStartY
+        elseif movementActive then
+            mouseMovedMovement(cursorX, cursorY)
 
-            selectionChanged(selectionStartX, selectionStartY, width, height)
+        else
+            mouseMovedSelection(cursorX, cursorY)
         end
+
+    else
+        updateSelectionPreviews(cursorX, cursorY)
     end
+
+    updateCursor()
 end
 
 function tool.mousereleased(x, y, button, istouch, presses)
@@ -682,6 +882,10 @@ function tool.mousereleased(x, y, button, istouch, presses)
 
     if button == actionButton then
         selectionFinished()
+        resizeFinished()
+        movementFinished()
+
+        updateCursor()
     end
 end
 
@@ -695,7 +899,10 @@ function tool.mouseclicked(x, y, button, istouch, presses)
 
         if cursorX and cursorY then
             selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
+
             selectionFinished()
+            resizeFinished()
+            movementFinished()
         end
 
     elseif button == contextMenuButton then

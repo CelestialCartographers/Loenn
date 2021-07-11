@@ -66,6 +66,38 @@ function utils.aabbCheckInline(x1, y1, w1, h1, x2, y2, w2, h2)
     return not (x2 >= x1 + w1 or x2 + w2 <= x1 or y2 >= y1 + h1 or y2 + h2 <= y1)
 end
 
+function utils.onRectangleBorder(point, rect, threshold)
+    return utils.onRectangleBorderInline(point.x, point.y, rect.x, rect.y, rect.width, rect.height, threshold)
+end
+
+function utils.onRectangleBorderInline(px, py, rx, ry, rw, rh, threshold)
+    threshold = threshold or 0
+
+    local onHorizontal = rx - threshold <= px and px <= rx + rw + threshold
+    local onVertical = ry - threshold <= py and py <= ry + rh + threshold
+
+    local onTop = ry - threshold <= py and py <= ry + threshold
+    local onBottom = ry + rh - threshold <= py and py <= ry + rh + threshold
+    local onLeft = rx - threshold <= px and px <= rx + threshold
+    local onRight = rx + rw - threshold <= px and px <= rx + rw + threshold
+
+    local directionHorizontal = 0
+    local directionVertical = 0
+
+    if onHorizontal then
+        directionVertical = (onTop and -1) or (onBottom and 1) or 0
+    end
+
+    if onVertical then
+        directionHorizontal = (onLeft and -1) or (onRight and 1) or 0
+    end
+
+    local horizontalMatch = onHorizontal
+    local verticalMatch = onVertical
+
+    return directionHorizontal ~= 0 or directionVertical ~= 0, directionHorizontal, directionVertical
+end
+
 function utils.intersection(r1, r2)
     local x = math.max(r1.x, r2.x)
     local y = math.max(r1.y, r2.y)

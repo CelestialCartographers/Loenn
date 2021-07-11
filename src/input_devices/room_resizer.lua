@@ -1,5 +1,6 @@
 local roomResizer = {_enabled = true, _type = "device"}
 
+local cursorUtils = require("cursor_utils")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
 local loadedState = require("loaded_state")
@@ -21,6 +22,7 @@ local itemPosition
 local madeChanges
 local itemBeforeMove
 local targetType
+local previousCursor
 
 local triangleColor = colors.resizeTriangleColor
 local triangleHeight = 16
@@ -51,15 +53,15 @@ local widthHeightMultipliers = {
 }
 
 -- Starting at top, going clockwise
-local resizeCursorNames = {
-    "sizens",
-    "sizenesw",
-    "sizewe",
-    "sizenwse",
-    "sizens",
-    "sizenesw",
-    "sizewe",
-    "sizenwse"
+local resizeCursorDirections = {
+    {0, -1},
+    {1, -1},
+    {1, 0},
+    {1, 1},
+    {0, 1},
+    {-1, 1},
+    {-1, 0},
+    {-1, -1},
 }
 
 local function getTrianglePoints(x, y, width, height, scale)
@@ -117,13 +119,15 @@ local function getResizeDirections(side)
 end
 
 local function updateCursor()
-    local cursor = "arrow"
+    local cursor = cursorUtils.getDefaultCursor()
 
     if draggingPreview then
-        cursor = resizeCursorNames[draggingPreview]
+        local directionX, directionY = unpack(resizeCursorDirections[draggingPreview])
+
+        cursor = cursorUtils.getResizeCursor(directionX, directionY)
     end
 
-    love.mouse.setCursor(love.mouse.getSystemCursor(cursor))
+    previousCursor = cursorUtils.setCursor(cursor, previousCursor)
 end
 
 local function getItemStruct(itemType)
