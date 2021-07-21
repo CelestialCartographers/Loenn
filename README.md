@@ -108,6 +108,7 @@ Lönn contains and uses code from the following projects:
   * [dkjson](https://github.com/LuaDist/dkjson)
   * [lua-yaml](https://github.com/exosite/lua-yaml)
   * [An ffi implementation](https://github.com/spacewander/luafilesystem) of [luafilesystem](https://github.com/keplerproject/luafilesystem)
+  * [A fork](https://github.com/Vexatos/luajit-request) of [luajit-request](https://github.com/LPGhatguy/luajit-request)
   * [Selene](https://github.com/Vexatos/Selene)
   * [xml2lua](https://github.com/manoelcampos/Xml2Lua)
 
