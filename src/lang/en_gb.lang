@@ -5,6 +5,8 @@
 # scenes.sceneName.*
 scenes.loading.loading=Loading
 
+scenes.editor.no_map_loaded=No map loaded
+
 
 # -- Layers --
 # layers.name.layerName
