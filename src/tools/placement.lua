@@ -146,7 +146,9 @@ local function getPlacementOffset()
 end
 
 local function updatePlacementDrawable()
-    if placementTemplate then
+    local room = state.getSelectedRoom()
+
+    if room and placementTemplate then
         local target = placementTemplate.item._name or placementTemplate.item.texture
         local drawable = placementUtils.getDrawable(tool.layer, target, state.getSelectedRoom(), placementTemplate.item)
 
