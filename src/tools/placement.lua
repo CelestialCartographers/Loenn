@@ -112,6 +112,7 @@ local function dragFinished()
     end
 
     placementDragCompleted = true
+    placementRectangle = nil
 end
 
 local function mouseMoved(x, y)
@@ -307,7 +308,7 @@ local function updatePlacementNodes()
     end
 end
 
-local function updatePlacement()
+local function updatePlacement(force)
     if placementTemplate and placementTemplate.item then
         local placementType = getCurrentPlacementType()
         local placementUpdater = placementUpdaters[placementType]
@@ -317,7 +318,7 @@ local function updatePlacement()
 
         local needsUpdate = placementUpdater and placementUpdater(placementTemplate, item, itemX, itemY)
 
-        if needsUpdate then
+        if needsUpdate or force then
             updatePlacementNodes()
             updatePlacementDrawable()
         end
@@ -393,10 +394,15 @@ function tool.getMaterials()
 end
 
 -- Offset the placement correctly for the new room
-function tool.editorMapTargetChanged()
+function tool.editorMapTargetChanged(item, itemType)
     local px, py = toolUtils.getCursorPositionInRoom(placementMouseX, placementMouseY)
 
+    dragFinished()
     mouseMoved(px, py)
+
+    if itemType == "room" then
+        updatePlacement(true)
+    end
 end
 
 function tool.mousepressed(x, y, button, istouch, presses)
