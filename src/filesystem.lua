@@ -81,12 +81,15 @@ filesystem.rmdir = lfs.rmdir
 filesystem.remove = os.remove
 
 -- Use Unix paths
-local function findRecursive(filenames, path, recursive, predicate, useYields)
-    for i, filename in ipairs(love.filesystem.getDirectoryItems(path)) do
+local function findRecursive(filenames, path, recursive, predicate, useYields, counter)
+    counter = counter or 0
+
+    for _, filename in ipairs(love.filesystem.getDirectoryItems(path)) do
         local fullPath = path .. "/" .. filename
+
         local fileInfo = love.filesystem.getInfo(fullPath)
 
-        if useYields and i % 25 == 0 then
+        if useYields and counter % 100 == 0 then
             coroutine.yield()
         end
 
@@ -99,9 +102,11 @@ local function findRecursive(filenames, path, recursive, predicate, useYields)
                     table.insert(filenames, fullPath)
                 end
 
+                counter += 1
+
             else
                 if recursive then
-                    findRecursive(filenames, fullPath, recursive, predicate, useYields)
+                    findRecursive(filenames, fullPath, recursive, predicate, useYields, counter)
                 end
             end
         end

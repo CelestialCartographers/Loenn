@@ -6,6 +6,7 @@ local mods = require("mods")
 local decals = {}
 
 local decalsPrefix = "decals/"
+local decalFolderPath = "/Graphics/Atlases/Gameplay/decals"
 
 -- A frame should only be kept if it has no trailing number
 -- Or if the trailing number is 0, 00, 000, ... etc
@@ -32,10 +33,6 @@ local function keepFrame(name, removeAnimationFrames)
     return true
 end
 
-local function hasPngExt(filename)
-    return utils.fileExtension(filename) == "png"
-end
-
 function decals.getDecalNames(removeAnimationFrames, yield)
     removeAnimationFrames = removeAnimationFrames ~= false
     yield = yield ~= false
@@ -48,6 +45,7 @@ function decals.getDecalNames(removeAnimationFrames, yield)
         if utils.startsWith(name, decalsPrefix) then
             if keepFrame(name, removeAnimationFrames) then
                 added[name] = true
+                added[sprite.meta.filename] = true
 
                 table.insert(res, name)
             end
@@ -56,20 +54,27 @@ function decals.getDecalNames(removeAnimationFrames, yield)
 
     -- Mod content sprites
     -- Some of these might have already been loaded
-    local modCommonPath = mods.commonModContent .. "/Graphics/Atlases/Gameplay/decals"
+    local modCommonPath = mods.commonModContent .. decalFolderPath
     local modCommonPathLength = #modCommonPath
+    local filenames = mods.findModFiletype(decalFolderPath, "png")
 
-    for i, name in ipairs(utils.getFilenames(modCommonPath, true, {}, hasPngExt)) do
-        -- Remove mod common path, keep decals/ prefix
-        local nameNoExt = utils.stripExtension(name)
-        local resourceName = nameNoExt:sub(modCommonPathLength - 5)
+    for i, name in ipairs(filenames) do
+        if not added[name] then
+            local nameNoExt, ext = utils.stripExtension(name)
+            local shouldKeepFrame = keepFrame(nameNoExt, removeAnimationFrames)
 
-        if not added[resourceName] and keepFrame(resourceName, removeAnimationFrames) then
-            table.insert(res, resourceName)
-        end
+            if shouldKeepFrame then
+                -- Remove mod common path, keep decals/ prefix
+                local resourceName = nameNoExt:sub(modCommonPathLength - 5)
 
-        if yield and i % 100 == 0 then
-            coroutine.yield()
+                if not added[resourceName] then
+                    table.insert(res, resourceName)
+                end
+            end
+
+            if yield and i % 100 == 0 then
+                coroutine.yield()
+            end
         end
     end
 
