@@ -1,6 +1,6 @@
 local utils = require("utils")
 local json = require("dkjson")
-local hasHttps, https = utils.tryrequire("https")
+local hasRequest, request = utils.tryrequire("luajit-request.luajit-request")
 
 local github = {}
 
@@ -10,8 +10,13 @@ github._cacheTime = 300
 github._baseUrl = "https://api.github.com"
 github._baseReleasesUrl = github._baseUrl .. "/repos/%s/%s/releases"
 
+local headers = {
+    ["User-Agent"] = "curl/7.64.1",
+    ["Accept"] = "*/*"
+}
+
 local function getUrlJsonData(url, force)
-    if not hasHttps then
+    if not hasRequest then
         return nil
     end
 
@@ -23,26 +28,24 @@ local function getUrlJsonData(url, force)
         end
     end
 
-    local code, body = https.request(url, {
-        headers = {
-            ["User-Agent"] = "curl/7.58.0"
-        }
-    })
+    local response = request.send(url, {headers = headers})
 
-    if code == 200 then
-        local data = json.decode(body)
+    if response then
+        local code, body = response.code, response.body
 
-        if type(data) == "table" then
-            github._cache[url] = {
-                time = os.time(),
-                data = data
-            }
+        if code == 200 then
+            local data = json.decode(body)
 
-            return data
+            if type(data) == "table" then
+                github._cache[url] = {
+                    time = os.time(),
+                    data = data
+                }
+
+                return data
+            end
         end
     end
-
-    return nil
 end
 
 function github.getReleases(author, repo)

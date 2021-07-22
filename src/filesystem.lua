@@ -4,7 +4,7 @@ local physfs = require("physfs")
 local requireUtils = require("require_utils")
 local threadHandler = require("thread_handler")
 
-local hasHttps, https = requireUtils.tryrequire("https")
+local hasRequest, request = requireUtils.tryrequire("luajit-request.luajit-request")
 
 local filesystem = {}
 
@@ -228,32 +228,40 @@ function filesystem.openDialog(path, filter, callback)
 end
 
 function filesystem.downloadURL(url, filename, headers)
-    if not hasHttps then
+    if not hasRequest then
         return false, nil
     end
 
-    local code, body, requestHeaders = https.request(url, {
+    local response = request.send(url, {
         headers = headers or {
-            ["User-Agent"] = "curl/7.58.0",
+            ["User-Agent"] = "curl/7.64.1",
             ["Accept"] = "*/*"
         }
     })
 
-    if body and code == 200 then
-        filesystem.mkdir(filesystem.dirname(filename))
-        local fh = io.open(filename, "wb")
+    if response then
+        local body, code = response.body, response.code
 
-        if fh then
-            fh:write(body)
-            fh:close()
+        if body and code == 200 then
+            filesystem.mkdir(filesystem.dirname(filename))
+            local fh = io.open(filename, "wb")
 
-            return true
+            if fh then
+                fh:write(body)
+                fh:close()
+
+                return true
+            end
+
+        elseif code >= 300 and code <= 399 then
+            local responseHeaders = response.headers
+            local redirect = (responseHeaders["location"] or responseHeaders["Location"]):match("^%s*(.*)%s*$")
+            local newHeaders = table.shallowcopy(headers)
+
+            newHeaders["Referer"] = url
+
+            return filesystem.downloadURL(redirect, filename, newHeaders)
         end
-
-    elseif code >= 300 and code <= 399 then
-        local redirect = requestHeaders["Location"]:match("^%s*(.*)%s*$")
-
-        return filesystem.downloadURL(redirect, filename, headers)
     end
 
     return false
