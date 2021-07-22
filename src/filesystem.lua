@@ -234,7 +234,7 @@ function filesystem.downloadURL(url, filename, headers)
 
     local response = request.send(url, {
         headers = headers or {
-            ["User-Agent"] = "curl/7.64.1",
+            ["User-Agent"] = "curl/7.78.0",
             ["Accept"] = "*/*"
         }
     })

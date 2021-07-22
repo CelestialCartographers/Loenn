@@ -11,7 +11,7 @@ github._baseUrl = "https://api.github.com"
 github._baseReleasesUrl = github._baseUrl .. "/repos/%s/%s/releases"
 
 local headers = {
-    ["User-Agent"] = "curl/7.64.1",
+    ["User-Agent"] = "curl/7.78.0",
     ["Accept"] = "*/*"
 }
 

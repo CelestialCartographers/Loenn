@@ -115,6 +115,6 @@ Lönn contains and uses code from the following projects:
 Lönn also depends on the following projects:
   * [LÖVE](https://love2d.org/)
   * [A fork](https://github.com/Vexatos/nativefiledialog/tree/master/lua) of [lua bindings](https://github.com/Alloyed/nativefiledialog/tree/master/lua) for [nativefiledialog](https://github.com/mlabbe/nativefiledialog)
-  * [lua-https](https://bitbucket.org/bartbes/lua-https)
+  * [libcurl](https://curl.se/libcurl/)
 
 Many thanks go to these projects.
