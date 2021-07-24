@@ -151,7 +151,7 @@ local function updatePlacementDrawable()
 
     if room and placementTemplate then
         local target = placementTemplate.item._name or placementTemplate.item.texture
-        local drawable = placementUtils.getDrawable(tool.layer, target, state.getSelectedRoom(), placementTemplate.item)
+        local drawable = placementUtils.getDrawable(tool.layer, target, room, placementTemplate.item)
 
         placementTemplate.drawable = drawable
     end
@@ -325,18 +325,22 @@ local function updatePlacement(force)
     end
 end
 
+local function setPlacement(placement)
+    placementTemplate = {
+        item = utils.deepcopy(placement.itemTemplate),
+        placement = placement,
+    }
+
+    updatePlacementNodes()
+    updatePlacementDrawable()
+
+    toolUtils.sendMaterialEvent(tool, tool.layer, placement.displayName)
+end
+
 local function selectPlacement(name, index)
     for i, placement in ipairs(placementsAvailable) do
         if i == index or placement.displayName == name or placement.name == name then
-            placementTemplate = {
-                item = utils.deepcopy(placement.itemTemplate),
-                placement = placement,
-            }
-
-            updatePlacementNodes()
-            updatePlacementDrawable()
-
-            toolUtils.sendMaterialEvent(tool, tool.layer, placement.displayName)
+            setPlacement(placement)
 
             return true
         end
@@ -369,6 +373,25 @@ local function drawPlacement(room)
     end
 end
 
+local function cloneSelection(selections)
+    local target = (selections or {})[1]
+
+    if not target then
+        return false
+    end
+
+    local room = state.getSelectedRoom()
+    local clonePlacement = placementUtils.cloneItem(room, target.layer, target.item)
+
+    if clonePlacement then
+        setPlacement(clonePlacement)
+
+        return true
+    end
+
+    return false
+end
+
 function tool.setLayer(layer)
     if layer ~= tool.layer or not placementsAvailable then
         tool.layer = layer
@@ -381,7 +404,12 @@ function tool.setLayer(layer)
 end
 
 function tool.setMaterial(material)
-    if type(material) == "number" then
+    local materialType = type(material)
+
+    if materialType == "table" then
+        setPlacement(material)
+
+    elseif materialType == "number" then
         selectPlacement(nil, material)
 
     else
@@ -419,15 +447,21 @@ end
 
 function tool.mouseclicked(x, y, button, istouch, presses)
     local contextMenuButton = configs.editor.contextMenuButton
+    local objectCloneButton = configs.editor.objectCloneButton
+    local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-    if button == contextMenuButton then
-        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
-
-        if cursorX and cursorY then
+    if cursorX and cursorY then
+        if button == contextMenuButton then
             local room = state.getSelectedRoom()
             local contextTargets = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY)
 
             selectionUtils.sendContextMenuEvent(contextTargets)
+
+        elseif button == objectCloneButton then
+            local room = state.getSelectedRoom()
+            local selections = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY)
+
+            cloneSelection(selections)
         end
     end
 end

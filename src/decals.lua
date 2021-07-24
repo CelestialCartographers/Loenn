@@ -162,7 +162,7 @@ function decals.getPlacements(layer)
     local names = decals.getDecalNames()
 
     for i, name in ipairs(names) do
-        local nameNoDecalsPrefix = name:sub(8, #name)
+        local nameNoDecalsPrefix = name:sub(8)
 
         res[i] = {
             name = name,
@@ -182,6 +182,21 @@ function decals.getPlacements(layer)
     end
 
     return res
+end
+
+function decals.cloneItem(room, layer, item)
+    local texture = item.texture
+    local textureNoDecalPrefix = texture:sub(8)
+
+    local placement = {
+        name = texture,
+        displayName = textureNoDecalPrefix,
+        layer = layer,
+        placementType = "point",
+        itemTemplate = utils.deepcopy(item)
+    }
+
+    return placement
 end
 
 function decals.placeItem(room, layer, item)
