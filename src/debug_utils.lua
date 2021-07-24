@@ -106,6 +106,10 @@ function debugUtils.reloadEverything()
     debugUtils.reloadUI()
 end
 
+function debugUtils.restartLuaInstance()
+    love.event.quit("restart")
+end
+
 function debugUtils.debug()
     debug.debug()
 end
