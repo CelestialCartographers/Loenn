@@ -139,8 +139,15 @@ end
 local function getEntityMaterialFromKey(entity, materialKey)
     local materialKeyType = utils.typeof(materialKey)
     local fromKey = entity[materialKey]
+    local fromKeyType = type(fromKey)
 
-    if type(fromKey) == "string" and #fromKey == 1 then
+    -- Vanilla maps might have tileset ids stored as integers
+    if fromKeyType == "number" and utils.isInteger(fromKey) then
+        fromKeyType = "string"
+        fromKey = tostring(fromKey)
+    end
+
+    if fromKeyType == "string" and #fromKey == 1 then
         return fakeTilesHelper.getMaterialMatrix(entity, fromKey)
 
     elseif materialKeyType == "string" and #materialKey == 1 then
