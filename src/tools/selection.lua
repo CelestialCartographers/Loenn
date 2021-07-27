@@ -720,24 +720,28 @@ end
 
 local function updateSelectionPreviews(cursorX, cursorY)
     if selectionPreviews then
-        local couldResize = #selectionPreviews == 1
+        local couldResize = #selectionPreviews > 0
 
         if couldResize then
              -- TODO - Put sensitivity in config?
+
+            resizeDirectionPreview = nil
 
             local viewport = viewportHandler.viewport
             local cameraZoom = viewport.scale
             local borderThreshold = 4 / cameraZoom
 
             local point = utils.point(cursorX, cursorY)
-            local rectangle = selectionPreviews[1]
-            local onBorder, horizontalDirection, verticalDirection = utils.onRectangleBorder(point, rectangle, borderThreshold)
 
-            if onBorder then
-                resizeDirectionPreview = {horizontalDirection, verticalDirection}
+            -- Find first selection where we are on the border
+            for _, preview in ipairs(selectionPreviews) do
+                local onBorder, horizontalDirection, verticalDirection = utils.onRectangleBorder(point, preview, borderThreshold)
 
-            else
-                resizeDirectionPreview = nil
+                if onBorder then
+                    resizeDirectionPreview = {horizontalDirection, verticalDirection}
+
+                    break
+                end
             end
         end
     end
