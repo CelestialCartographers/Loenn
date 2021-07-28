@@ -6,7 +6,7 @@ local mods = require("mods")
 local decals = {}
 
 local decalsPrefix = "decals/"
-local decalFolderPath = "/Graphics/Atlases/Gameplay/decals"
+local decalsPath = "Graphics/Atlases/Gameplay/decals"
 
 -- A frame should only be kept if it has no trailing number
 -- Or if the trailing number is 0, 00, 000, ... etc
@@ -54,9 +54,8 @@ function decals.getDecalNames(removeAnimationFrames, yield)
 
     -- Mod content sprites
     -- Some of these might have already been loaded
-    local modCommonPath = mods.commonModContent .. decalFolderPath
-    local modCommonPathLength = #modCommonPath
-    local filenames = mods.findModFiletype(decalFolderPath, "png")
+    local filenames = mods.findModFiletype(decalsPath, "png")
+    local decalPathLength = #decalsPath
 
     for i, name in ipairs(filenames) do
         if not added[name] then
@@ -64,8 +63,9 @@ function decals.getDecalNames(removeAnimationFrames, yield)
             local shouldKeepFrame = keepFrame(nameNoExt, removeAnimationFrames)
 
             if shouldKeepFrame then
-                -- Remove mod common path, keep decals/ prefix
-                local resourceName = nameNoExt:sub(modCommonPathLength - 5)
+                -- Remove mod specific path, keep decals/ prefix
+                local firstSlashIndex = utils.findCharacter(nameNoExt, "/")
+                local resourceName = nameNoExt:sub(firstSlashIndex + decalPathLength - 5)
 
                 if not added[resourceName] then
                     table.insert(res, resourceName)

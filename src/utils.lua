@@ -204,6 +204,16 @@ function utils.startsWith(s, start)
     return s:sub(1, #start) == start
 end
 
+function utils.findCharacter(string, character)
+    local byte = character:byte(1, 1)
+
+    for i = 1, #string do
+        if string:byte(i, i) == byte then
+            return i
+        end
+    end
+end
+
 function utils.humanizeVariableName(name)
     local res = name
 
