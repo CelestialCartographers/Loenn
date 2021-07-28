@@ -6,6 +6,7 @@ local utils = require("utils")
 local meta = require("meta")
 local versionParser = require("version_parser")
 local sceneHandler = require("scene_handler")
+local threadHandler = require("thread_handler")
 
 -- TODO - Prompt to restart the program afterwards
 
@@ -53,8 +54,12 @@ function updater.getRelevantRelease(tagName)
     local releases = github.getReleases(configs.updater.githubAuthor, configs.updater.githubRepository)
 
     if tagName then
+        local targetVersion = versionParser(tagName)
+
         for _, release in ipairs(releases or {}) do
-            if release.tag_name == tagName then
+            local releaseVersion = versionParser(release.tag_name)
+
+            if targetVersion == releaseVersion then
                 return release
             end
         end
@@ -134,15 +139,33 @@ end
 
 -- Check for updates and queue up related events
 function updater.checkForUpdates()
-    if updater.canUpdate() then
-        sceneHandler.sendEvent("updaterCheckingForUpdates")
+    local code = [[
+        require("selene").load()
+        require("selene/selene/wrappers/searcher/love2d/searcher").load()
+        require("love.system")
 
-        local isLatest, latestVersion = updater.isLatestVersion()
+        local args = {...}
+        local channelName = unpack(args)
+        local channel = love.thread.getChannel(channelName)
 
-        if not isLatest then
-            sceneHandler.sendEvent("updaterUpdateAvailable", latestVersion, meta.version)
+        local updater = require("updater")
+        local meta = require("meta")
+
+        if updater.canUpdate() then
+            channel:push({"updaterCheckingForUpdates"})
+
+            local isLatest, latestVersion = updater.isLatestVersion()
+
+            if not isLatest then
+                -- Metatables are lost over channels
+                channel:push({"updaterUpdateAvailable", tostring(latestVersion), tostring(meta.version)})
+            end
         end
-    end
+    ]]
+
+    return threadHandler.createStartWithCallback(code, function(event)
+        sceneHandler.sendEvent(unpack(event))
+    end)
 end
 
 function updater.startupUpdateCheck()

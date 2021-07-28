@@ -108,12 +108,13 @@ Lönn contains and uses code from the following projects:
   * [dkjson](https://github.com/LuaDist/dkjson)
   * [lua-yaml](https://github.com/exosite/lua-yaml)
   * [An ffi implementation](https://github.com/spacewander/luafilesystem) of [luafilesystem](https://github.com/keplerproject/luafilesystem)
+  * [A fork](https://github.com/Vexatos/luajit-request) of [luajit-request](https://github.com/LPGhatguy/luajit-request)
   * [Selene](https://github.com/Vexatos/Selene)
   * [xml2lua](https://github.com/manoelcampos/Xml2Lua)
 
 Lönn also depends on the following projects:
   * [LÖVE](https://love2d.org/)
   * [A fork](https://github.com/Vexatos/nativefiledialog/tree/master/lua) of [lua bindings](https://github.com/Alloyed/nativefiledialog/tree/master/lua) for [nativefiledialog](https://github.com/mlabbe/nativefiledialog)
-  * [lua-https](https://bitbucket.org/bartbes/lua-https)
+  * [libcurl](https://curl.se/libcurl/)
 
 Many thanks go to these projects.

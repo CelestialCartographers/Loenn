@@ -649,14 +649,14 @@ local function guessPlacementType(name, handler, placement)
     return "point"
 end
 
-local function addPlacement(placement, res, name, handler, language)
-    local placementType = placement.placementType or guessPlacementType(name, handler, placement)
+local function getPlacement(placementInfo, name, handler, language)
+    local placementType = placementInfo.placementType or guessPlacementType(name, handler, placementInfo)
     local modPrefix = modHandler.getEntityModPrefix(name)
-    local simpleName = string.format("%s#%s", name, placement.name)
-    local displayName = placement.name
+    local simpleName = string.format("%s#%s", name, placementInfo.name)
+    local displayName = placementInfo.name
     local tooltipText
-    local displayNameLanguage = language.entities[name].name[placement.name]
-    local tooltipTextLanguage = language.entities[name].description[placement.name]
+    local displayNameLanguage = language.entities[name].name[placementInfo.name]
+    local tooltipTextLanguage = language.entities[name].description[placementInfo.name]
 
     if displayNameLanguage._exists then
         displayName = tostring(displayNameLanguage)
@@ -679,8 +679,8 @@ local function addPlacement(placement, res, name, handler, language)
         _id = 0
     }
 
-    if placement.data then
-        for k, v in pairs(placement.data) do
+    if placementInfo.data then
+        for k, v in pairs(placementInfo.data) do
             itemTemplate[k] = v
         end
     end
@@ -688,14 +688,34 @@ local function addPlacement(placement, res, name, handler, language)
     itemTemplate.x = itemTemplate.x or 0
     itemTemplate.y = itemTemplate.y or 0
 
-    table.insert(res, {
+    local placement = {
         name = simpleName,
         displayName = displayName,
         tooltipText = tooltipText,
         layer = "entities",
         placementType = placementType,
         itemTemplate = itemTemplate
-    })
+    }
+
+    return placement
+end
+
+local function addPlacement(placementInfo, res, name, handler, language)
+    table.insert(res, getPlacement(placementInfo, name, handler, language))
+end
+
+-- TODO - Make more sophisticated? Works for now
+local function guessPlacementFromData(item, name, handler)
+    local placements = utils.callIfFunction(handler.placements)
+
+    if placements then
+        if #placements > 0 then
+            return placements[1]
+
+        else
+            return placements
+        end
+    end
 end
 
 function entities.getPlacements(layer)
@@ -713,6 +733,24 @@ function entities.getPlacements(layer)
     end
 
     return res
+end
+
+-- We don't know which placement this is from, but getPlacement does most of the job for us
+function entities.cloneItem(room, layer, item)
+    local name = item._name
+    local handler = entities.registeredEntities[name]
+    local language = languageRegistry.getLanguage()
+
+    if handler.cloneItem then
+        return handler.cloneItem(room, layer, item)
+    end
+
+    local guessedPlacement = guessPlacementFromData(item, name, handler) or {}
+    local placement = getPlacement(guessedPlacement, name, handler, language)
+
+    placement.itemTemplate = utils.deepcopy(item)
+
+    return placement
 end
 
 function entities.placeItem(room, layer, item)

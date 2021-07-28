@@ -42,5 +42,6 @@ return {
     debugRedrawMap = "f6",
     debugReloadTools = "f7",
     debugReloadEverything = "ctrl + f5",
+    debugReloadLuaInstance = "ctrl + shift + f5",
     debugMode = "ctrl + shift + j",
 }

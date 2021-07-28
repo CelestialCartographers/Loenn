@@ -24,20 +24,31 @@ function threadHandler.release(channelName)
     end
 end
 
+local function runFunctionOnData(channel, func)
+    while true do
+        local res = channel:pop()
+
+        if res then
+            func(res)
+
+        else
+            break
+        end
+    end
+end
+
 function threadHandler.update(dt)
     local removed = {}
 
     for channelName, data <- threadHandler._threads do
         local thread = data.thread
-        local callback = data.callback
+        local callback = data.callback or function() end
+        local channel = love.thread.getChannel(channelName)
+
+        runFunctionOnData(channel, callback)
 
         if not thread:isRunning() then
-            local channel = love.thread.getChannel(channelName)
-            local res = channel:pop()
-
             table.insert(removed, channelName)
-
-            callback(res)
         end
     end
 

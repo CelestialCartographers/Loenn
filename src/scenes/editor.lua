@@ -6,6 +6,8 @@ local configs = require("configs")
 local mods = require("mods")
 local history = require("history")
 local sceneHandler = require("scene_handler")
+local drawing = require("drawing")
+local languageRegistry = require("language_registry")
 
 editorScene.name = "Editor"
 
@@ -63,6 +65,13 @@ function editorScene:draw()
         if configs.editor.displayFPS then
             love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
         end
+
+    else
+        local windowWidth, windowHeight = self.viewerState.viewport.width, self.viewerState.viewport.height
+        local language = languageRegistry.getLanguage()
+        local message = tostring(language.scenes.editor.no_map_loaded)
+
+        drawing.printCenteredText(message, 0, 0, windowWidth, windowHeight, self.fonts.font, self.fonts.fontScale * 2)
     end
 
     self:propagateEvent("draw")

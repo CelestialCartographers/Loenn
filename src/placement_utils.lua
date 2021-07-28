@@ -86,6 +86,16 @@ function placementUtils.placeItem(room, layer, item)
     return false
 end
 
+function placementUtils.cloneItem(room, layer, item)
+    local handler = layerHandlers.getHandler(layer)
+
+    if handler and handler.cloneItem then
+        return handler.cloneItem(room, layer, item)
+    end
+
+    return false
+end
+
 function placementUtils.canResize(room, layer, target)
     local handler = layerHandlers.getHandler(layer)
 

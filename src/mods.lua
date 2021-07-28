@@ -28,20 +28,50 @@ modHandler.modPersistence = {}
 
 modHandler.persistenceBufferTime = 300
 
-function modHandler.findFiletype(startFolder, filetype)
+-- Finds files in all folders that are recognized as plugin folders
+function modHandler.findPluginFiletype(startFolder, filetype)
     local filenames = {}
 
     for _, folderName in ipairs(modHandler.pluginFolderNames) do
-        for modFolderName in pairs(modHandler.loadedMods) do
+        for modFolderName, _ in pairs(modHandler.loadedMods) do
             local path = utils.convertToUnixPath(utils.joinpath(
                 string.format(modHandler.specificModContent, modFolderName),
                 folderName,
                 startFolder
             ))
 
+            if filetype then
+                utils.getFilenames(path, true, filenames, function(filename)
+                    return utils.fileExtension(filename) == filetype
+                end)
+
+            else
+                utils.getFilenames(path, true, filenames)
+            end
+        end
+    end
+
+    return filenames
+end
+
+-- Finds files relative to the root of every loaded mod
+-- This is more performant than using the common mount point when looking for files recursively
+function modHandler.findModFiletype(startFolder, filetype)
+    local filenames = {}
+
+    for modFolderName, _ in pairs(modHandler.loadedMods) do
+        local path = utils.convertToUnixPath(utils.joinpath(
+            string.format(modHandler.specificModContent, modFolderName),
+            startFolder
+        ))
+
+        if filetype then
             utils.getFilenames(path, true, filenames, function(filename)
                 return utils.fileExtension(filename) == filetype
             end)
+
+        else
+            utils.getFilenames(path, true, filenames)
         end
     end
 
@@ -49,13 +79,13 @@ function modHandler.findFiletype(startFolder, filetype)
 end
 
 function modHandler.findPlugins(pluginType)
-    return modHandler.findFiletype(pluginType, "lua")
+    return modHandler.findPluginFiletype(pluginType, "lua")
 end
 
 function modHandler.findLanguageFiles(startPath)
     startPath = startPath or "lang"
 
-    return modHandler.findFiletype(startPath, "lang")
+    return modHandler.findPluginFiletype(startPath, "lang")
 end
 
 function modHandler.mountable(path)

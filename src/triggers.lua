@@ -358,14 +358,14 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
-local function addPlacement(placement, res, name, handler, language)
+local function getPlacement(placementInfo, name, handler, language)
     local placementType = "rectangle"
     local modPrefix = modHandler.getEntityModPrefix(name)
-    local simpleName = string.format("%s#%s", name, placement.name)
-    local displayName = placement.name
+    local simpleName = string.format("%s#%s", name, placementInfo.name)
+    local displayName = placementInfo.name
     local tooltipText
-    local displayNameLanguage = language.triggers[name].name[placement.name]
-    local tooltipTextLanguage = language.triggers[name].description[placement.name]
+    local displayNameLanguage = language.triggers[name].name[placementInfo.name]
+    local tooltipTextLanguage = language.triggers[name].description[placementInfo.name]
 
     if displayNameLanguage._exists then
         displayName = tostring(displayNameLanguage)
@@ -388,8 +388,8 @@ local function addPlacement(placement, res, name, handler, language)
         _id = 0
     }
 
-    if placement.data then
-        for k, v in pairs(placement.data) do
+    if placementInfo.data then
+        for k, v in pairs(placementInfo.data) do
             itemTemplate[k] = v
         end
     end
@@ -400,14 +400,34 @@ local function addPlacement(placement, res, name, handler, language)
     itemTemplate.width = itemTemplate.width or 16
     itemTemplate.height = itemTemplate.height or 16
 
-    table.insert(res, {
+    local placement = {
         name = simpleName,
         displayName = displayName,
         tooltipText = tooltipText,
         layer = "triggers",
         placementType = placementType,
         itemTemplate = itemTemplate
-    })
+    }
+
+    return placement
+end
+
+local function addPlacement(placementInfo, res, name, handler, language)
+    table.insert(res, getPlacement(placementInfo, name, handler, language))
+end
+
+-- TODO - Make more sophisticated? Works for now
+local function guessPlacementFromData(item, name, handler)
+    local placements = utils.callIfFunction(handler.placements)
+
+    if placements then
+        if #placements > 0 then
+            return placements[1]
+
+        else
+            return placements
+        end
+    end
 end
 
 function triggers.getPlacements(layer)
@@ -425,6 +445,19 @@ function triggers.getPlacements(layer)
     end
 
     return res
+end
+
+-- We don't know which placement this is from, but getPlacement does most of the job for us
+function triggers.cloneItem(room, layer, item)
+    local name = item._name
+    local handler = triggers.registeredTriggers[name]
+    local language = languageRegistry.getLanguage()
+    local guessedPlacement = guessPlacementFromData(item, name, handler) or {}
+    local placement = getPlacement(guessedPlacement, name, handler, language)
+
+    placement.itemTemplate = utils.deepcopy(item)
+
+    return placement
 end
 
 function triggers.placeItem(room, layer, item)
