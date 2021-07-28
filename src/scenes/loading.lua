@@ -52,11 +52,6 @@ function loadingScene:firstEnter()
 
     local userInterfaceDevice = require("ui.ui_device")
 
-    -- Load internal language first
-    -- External language files aren't needed during loading
-    languageRegistry.loadInternalFiles()
-    languageRegistry.setLanguage(configs.general.language)
-
     local language = languageRegistry.getLanguage()
 
     self:setText(language.scenes.loading.loading)

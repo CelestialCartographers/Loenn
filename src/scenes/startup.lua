@@ -3,30 +3,27 @@ local sceneHandler = require("scene_handler")
 local filesystem = require("filesystem")
 local threadHandler = require("thread_handler")
 local drawing = require("drawing")
+local languageRegistry = require("language_registry")
+local configs = require("configs")
 
 local startupScene = {}
 
 local drawnOnce = false
 local startedDialog = false
 
--- TODO - Move to language file
-local messageThreadsSupported = [[
-Please select Celeste.exe in the dialog or drag the file into the window.
-If you drag Celeste.exe in you will to manually close the dialog.
-]]
-
-local messageThreadsNotSupported = [[
-Please select Celeste.exe or Celeste.app in the dialog.
-]]
-
 startupScene.name = "Startup"
-startupScene._dialogChannel, startupScene._dialogThread = nil
+startupScene._alreadyConfigured = false
+startupScene._performedGameScan = false
+startupScene._dialogChannel = nil
+startupScene._dialogThread = nil
 startupScene._nextScene = "Loading"
-startupScene._message = filesystem.supportWindowsInThreads and messageThreadsSupported or messageThreadsNotSupported
+startupScene._messageKey = filesystem.supportWindowsInThreads and "threads_supported" or "threads_not_supported"
 
 -- Save the path to config and then change to the loading scene
 local function saveGotoLoading(path)
     startup.savePath(path)
+
+    startupScene._alreadyConfigured = true
 
     if startupScene._dialogThread and startupScene._dialogThread:isRunning() then
         threadHandler.release(startupScene._dialogChannel)
@@ -53,9 +50,22 @@ local function checkDialog(path)
 end
 
 function startupScene:firstEnter()
+    -- Load language file for all other scenes
+    languageRegistry.loadInternalFiles()
+    languageRegistry.setLanguage(configs.general.language)
+
+    -- Skip this scene if Celeste directory is already configured
     if not startup.requiresInit() then
-        sceneHandler.changeScene(startupScene._nextScene)
+        self._alreadyConfigured = true
+
+        sceneHandler.changeScene(self._nextScene)
+
+        return
     end
+
+    local language = languageRegistry.getLanguage()
+
+    self._message = tostring(language.scenes.startup[self._messageKey])
 end
 
 function startupScene:filedropped(file)
@@ -75,11 +85,11 @@ function startupScene:directorydropped(path)
 end
 
 function startupScene:draw()
-    local r, g, b, a = love.graphics.getColor()
-
-    love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
-    drawing.printCenteredText(startupScene._message, 0, 0, love.graphics.getWidth(), love.graphics.getHeight(), love.graphics.getFont(), 4)
-    love.graphics.setColor(r, g, b, a)
+    if not self._alreadyConfigured and self._performedGameScan then
+        drawing.callKeepOriginalColor(function()
+            drawing.printCenteredText(self._message, 0, 0, love.graphics.getWidth(), love.graphics.getHeight(), love.graphics.getFont(), 4)
+        end)
+    end
 
     drawnOnce = true
 end
@@ -95,6 +105,7 @@ function startupScene:update(dt)
             checkDialog(path)
         end
 
+        self._performedGameScan = true
         startedDialog = true
     end
 end
