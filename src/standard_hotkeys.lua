@@ -4,12 +4,14 @@ local debugUtils = require("debug_utils")
 local viewportHandler = require("viewport_handler")
 local history = require("history")
 local roomHotkeyUtils = require("room_hotkey_utils")
+local windowUtils = require("window_utils")
 
 local hotkeyStruct = require("structs.hotkey")
 
 -- TODO - Language file
 -- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
 -- TODO - Support hotswapping hotkey activators
+-- TODO - Use language file
 local rawHotkeys = {
     {configs.hotkeys.redo, history.redo, "Redo last action"},
     {configs.hotkeys.undo, history.undo, "Undo last action"},
@@ -53,6 +55,9 @@ local rawHotkeys = {
     -- Camera
     {configs.hotkeys.cameraZoomIn, viewportHandler.zoomIn, "Zoom in"},
     {configs.hotkeys.cameraZoomOut, viewportHandler.zoomOut, "Zoom out"},
+
+    -- Window
+    {configs.hotkeys.toggleFullscreen, windowUtils.toggleFullscreen, "Toggle fullscreen"}
 }
 
 local hotkeys = {}

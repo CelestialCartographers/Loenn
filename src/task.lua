@@ -94,6 +94,7 @@ function tasksHandler.processTask(task, time)
 
         else
             print("! Task Failed:", status)
+            print(debug.traceback(task.coroutine))
 
             task.done = true
             task.success = false

@@ -44,4 +44,7 @@ return {
     debugReloadEverything = "ctrl + f5",
     debugReloadLuaInstance = "ctrl + shift + f5",
     debugMode = "ctrl + shift + j",
+
+    -- Window
+    toggleFullscreen = "f11"
 }

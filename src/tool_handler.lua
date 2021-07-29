@@ -12,14 +12,19 @@ toolHandler.currentToolName = nil
 
 function toolHandler.selectTool(name)
     local handler = toolHandler.tools[name]
+    local currentTool = toolHandler.currentTool
 
-    if handler and toolHandler.currentTool ~= handler then
-        if toolHandler.currentTool and toolHandler.currentTool.unselect then
-            toolHandler.currentTool.unselect(name)
+    if handler and currentTool ~= handler then
+        if currentTool and currentTool.unselected then
+            currentTool.unselected(name)
         end
 
         toolHandler.currentTool = handler
         toolHandler.currentToolName = name
+
+        if handler and handler.selected then
+            handler.selected()
+        end
 
         toolUtils.sendToolEvent(handler)
     end
@@ -39,6 +44,10 @@ function toolHandler.loadTool(filename)
     end
 
     toolHandler.tools[name] = handler
+
+    if handler and handler.load then
+        handler.load()
+    end
 
     if not toolHandler.currentTool then
         toolHandler.selectTool(name)
