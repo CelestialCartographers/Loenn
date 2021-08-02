@@ -217,7 +217,7 @@ end
 local function createModSettingDirectory(modName)
     -- Exit early if the requested mod isn't loaded
     -- No need to create folders for a mod that potentially doesn't exist
-    if modHandler.hasLoadedMod(modName) then
+    if not modHandler.hasLoadedMod(modName) then
         return false
     end
 
