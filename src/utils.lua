@@ -240,11 +240,20 @@ end
 function utils.parseHexColor(color)
     color := match("^#?([0-9a-fA-F]+)$")
 
-    if color and #color == 6 then
-        local number = tonumber(color, 16)
-        local r, g, b = math.floor(number / 256^2) % 256, math.floor(number / 256) % 256, math.floor(number) % 256
+    if color then
+        if #color == 6 then
+            local number = tonumber(color, 16)
+            local r, g, b = math.floor(number / 256^2) % 256, math.floor(number / 256) % 256, math.floor(number) % 256
 
-        return true, r / 255, g / 255, b / 255
+            return true, r / 255, g / 255, b / 255
+
+        elseif #color == 8 then
+            local number = tonumber(color, 16)
+            local r, g, b = math.floor(number / 256^3) % 256, math.floor(number / 256^2) % 256, math.floor(number / 256) % 256
+            local a = math.floor(number) % 256
+
+            return true, r / 255, g / 255, b / 255, a / 255
+        end
     end
 
     return false, 0, 0, 0
