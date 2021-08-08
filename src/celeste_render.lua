@@ -733,6 +733,21 @@ local function getRoomCanvas(room, viewport, selected)
     return cache.canvas and cache.canvas.result
 end
 
+-- Force the rooms canvas cache to be rendered
+function celesteRender.forceRoomCanvasRender(room, viewport, selected)
+    local task, canvas = getRoomCanvas(room, viewport, selected)
+
+    if task and not canvas then
+        tasks.processTask(task)
+    end
+end
+
+function celesteRender.forceRedrawRoom(room, viewport, selected)
+    celesteRender.invalidateRoomCache(room)
+    celesteRender.forceRoomBatchRender(room, viewport)
+    celesteRender.forceRoomCanvasRender(room, viewport, selected)
+end
+
 function celesteRender.drawRooms(rooms, viewport, selectedItem, selectedItemType)
     for _, room in ipairs(rooms) do
         local roomVisible = viewportHandler.roomVisible(room, viewport)
@@ -773,10 +788,6 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
             end)
 
             if redrawRoom then
-                -- Invalidate the canvas, so it is updated properly when the selected room changes
-                -- TODO - Move into code responsible for changing selected room?
-
-                celesteRender.invalidateRoomCache(room.name, "canvas")
                 drawRoomFromBatches(room, viewport, selected)
 
             else
