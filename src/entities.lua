@@ -300,12 +300,15 @@ function entities.getNodeRectangles(room, entity, viewport)
                     elseif entity.width and entity.height then
                         nodeRectangle = utils.rectangle(node.x or 0, node.y or 0, entity.width, entity.height)
                     end
+                end
 
-                elseif #nodeDrawable > 0 then
-                    nodeRectangle = getSpriteRectangle(nodeDrawable)
+                if not nodeRectangle then
+                    if #nodeDrawable > 0 then
+                        nodeRectangle = getSpriteRectangle(nodeDrawable)
 
-                else
-                    nodeRectangle = nodeDrawable:getRectangle()
+                    else
+                        nodeRectangle = nodeDrawable:getRectangle()
+                    end
                 end
 
                 table.insert(rectangles, utils.deepcopy(nodeRectangle))
