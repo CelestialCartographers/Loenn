@@ -33,8 +33,8 @@ function spriteLoader.loadDataImage(fn)
                     local alpha = reader:readByte()
 
                     if alpha > 0 then
-                        b, g, r = reader:readByte() / 255, reader:readByte() / 255, reader:readByte() / 255
                         a = alpha / 255
+                        b, g, r = reader:readByte() / 255 / a, reader:readByte() / 255 / a, reader:readByte() / 255 / a
 
                     else
                         r, g, b, a = 0, 0, 0, 0
@@ -69,6 +69,18 @@ function spriteLoader.getCachedDataImage(dataFile)
 
     if filesystem.isFile(path) then
         return utils.newImage(path, false)
+    end
+end
+
+function spriteLoader.saveCachedDataImage(dataFile, image, imageData)
+    local storageDir = fileLocations.getStorageDir()
+    local path = utils.joinpath(storageDir, "Cache", "Data", dataFile .. ".png")
+
+    local fh = io.open(path, "wb")
+
+    if fh then
+        fh:write(imageData:encode("png"):getString())
+        fh:close()
     end
 end
 
@@ -189,6 +201,10 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
 
         if not spritesImage then
             spritesImage, spritesImageData = spriteLoader.loadDataImage(dataFilePath)
+
+            if useCache then
+                spriteLoader.saveCachedDataImage(dataFile, spritesImage, spritesImageData)
+            end
         end
 
         local spritesWidth, spritesHeight = spritesImage:getDimensions()
