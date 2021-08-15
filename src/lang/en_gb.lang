@@ -136,6 +136,18 @@ entities.wire.name.wire=Wire
 entities.wire.description.above=Determines whether the wire is placed in the foreground or background.
 entities.wire.description.color=Determines the colour of the wire.
 
+# Cliff Side Flagline
+entities.cliffflag.name.cliffflag=Cliffside Flagline
+
+# Clothesline
+entities.clothesline.name.clothesline=Clothes Line
+
+# Bridge
+entities.bridge.name.bridge=Bridge
+
+# Bridge Fixed
+entities.bridgeFixed.name.bridge_fixed=Bridge (Fixed)
+
 # Crystal Heart
 entities.blackGem.name.crystal_heart=Crystal Heart
 entities.blackGem.description.fake=Whether the heart is fake and should visually be grey. Triggers the Farewell fake heart cutscene.
