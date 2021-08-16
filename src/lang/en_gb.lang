@@ -391,6 +391,7 @@ entities.cobweb.name.cobweb=Cobweb
 entities.cobweb.description.color=Determines the colour of the cobweb.
 
 # Lightbeam
+entities.lightbeam.name.lightbeam=Lightbeam
 entities.lightbeam.description.rotation=Determines the rotation of the lightbeam.
 entities.lightbeam.description.flag=Only show up if the given flag is set, or always if left empty.
 
