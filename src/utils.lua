@@ -58,6 +58,18 @@ function utils.coverTriangle(x1, y1, x2, y2, x3, y3)
     return tlx, tly, brx - tlx, bry - tly
 end
 
+-- Using counter clockwise rotation matrix since the Y axis is mirrored
+function utils.rotate(x, y, theta)
+    return math.cos(theta) * x - y * math.sin(theta), math.sin(theta) * x + math.cos(theta) * y
+end
+
+-- Using counter clockwise rotation matrix since the Y axis is mirrored
+function utils.rotatePoint(point, theta)
+    local x, y = point.x, point.y
+
+    return math.cos(theta) * x - y * math.sin(theta), math.sin(theta) * x + math.cos(theta) * y
+end
+
 function utils.aabbCheck(r1, r2)
     return not (r2.x >= r1.x + r1.width or r2.x + r2.width <= r1.x or r2.y >= r1.y + r1.height or r2.y + r2.height <= r1.y)
 end
