@@ -158,7 +158,7 @@ function drawableSpriteMt.__index:draw()
     end
 end
 
-function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, overflow)
+function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, hideOverflow, realSize)
     local imageMeta = self.meta
 
     if imageMeta then
@@ -167,6 +167,8 @@ function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, overflow)
         if type(x) == "table" then
             quadTable = x
             x, y, width, height = x[1], x[2], x[3], x[4]
+            hideOverflow = y
+            realSize = width
 
         else
             quadTable = {x, y, width, height}
@@ -182,20 +184,24 @@ function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, overflow)
         local value = utils.getPath(quadCache, quadTable, false, true)
 
         if value then
-            return value
+            return unpack(value)
 
         else
-            local quad = drawing.getRelativeQuad(imageMeta, x, y, width, height, overflow)
+            local quad, offsetX, offsetY = drawing.getRelativeQuad(imageMeta, x, y, width, height, hideOverflow, realSize)
 
-            quadCache[x][y][width][height] = quad
+            quadCache[x][y][width][height] = {quad, offsetX, offsetY}
 
-            return quad
+            return quad, offsetX, offsetY
         end
     end
 end
 
-function drawableSpriteMt.__index:useRelativeQuad(x, y, width, height, overflow)
-    self.quad = self:getRelativeQuad(x, y, width, height, overflow)
+function drawableSpriteMt.__index:useRelativeQuad(x, y, width, height, hideOverflow, realSize)
+    local quad, offsetX, offsetY = self:getRelativeQuad(x, y, width, height, hideOverflow, realSize)
+
+    self.quad = quad
+    self.offsetX = (self.offsetX or 0) + offsetX
+    self.offsetY = (self.offsetY or 0) + offsetY
 end
 
 function drawableSpriteStruct.fromMeta(meta, data)
