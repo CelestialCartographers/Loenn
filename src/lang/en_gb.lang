@@ -764,6 +764,8 @@ entities.eyebomb.name.left=Puffer (Left)
 entities.eyebomb.description.right=The initial direction of the puffer.
 
 # Swap Block
+entities.swapBlock.name.normal=Swap Block (Normal)
+entities.swapBlock.name.moon=Swap Block (Moon)
 entities.swapBlock.description.theme=The visual theme of the swap block.
 
 # Zip Mover
