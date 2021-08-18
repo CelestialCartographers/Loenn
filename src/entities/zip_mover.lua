@@ -35,6 +35,7 @@ local themes = {
 
 zipMover.name = "zipMover"
 zipMover.depth = -9999
+zipMover.nodeVisibility = "never"
 zipMover.nodeLimits = {1, 1}
 zipMover.placements = {}
 
@@ -116,10 +117,6 @@ function zipMover.sprite(room, entity)
     addBlockSprites(sprites, entity, themeData.block, themeData.lights, x, y, width, height)
 
     return sprites
-end
-
-function zipMover.nodeSprite(room, entity)
-    -- Disable node sprite, we already use it in the main sprite function
 end
 
 function zipMover.selection(room, entity)
