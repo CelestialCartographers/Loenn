@@ -972,6 +972,15 @@ triggers.everest/smoothCameraOffsetTrigger.description.onlyOnce=If checked, the 
 triggers.everest/smoothCameraOffsetTrigger.description.xOnly=Whether the trigger should only update the horizontal offset, keeping the current vertical offset.
 triggers.everest/smoothCameraOffsetTrigger.description.yOnly=Whether the trigger should only update the vertical offset, keeping the current horizontal offset.
 
+# Custom Height Display (Everest)
+triggers.everest/CustomHeightDisplayTrigger.name.custom_height_display=Custom Height Display
+triggers.everest/CustomHeightDisplayTrigger.description.vanilla=Whether this trigger should use the vanilla height display. The vanilla one only uses the target attribute.
+triggers.everest/CustomHeightDisplayTrigger.description.target=The new meter count.
+triggers.everest/CustomHeightDisplayTrigger.description.from=The previous meter count.
+triggers.everest/CustomHeightDisplayTrigger.description.progressAudio=Whether the trigger should increment audio progress.
+triggers.everest/CustomHeightDisplayTrigger.description.displayOnTransition=Whether the trigger should wait for a room transition to occur before displaying the counter.
+triggers.everest/CustomHeightDisplayTrigger.description.text=The text of the counter. The meter count specified in target is substituted in for {x}.\nExample: "Currently at {x} meters".
+
 # Golden Berry Collection
 triggers.goldenBerryCollectTrigger.name.golden_berry_collection=Golden Berry Collection
 
