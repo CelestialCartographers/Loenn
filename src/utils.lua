@@ -455,6 +455,28 @@ function utils.concat(...)
     return res
 end
 
+function utils.filter(predicate, data)
+    local res = {}
+
+    for _, v in ipairs(data) do
+        if predicate(v) then
+            table.insert(res, v)
+        end
+    end
+
+    return res
+end
+
+function utils.contains(value, data)
+    for _, dataValue in pairs(data) do
+        if value == dataValue then
+            return true
+        end
+    end
+
+    return false
+end
+
 function utils.getPath(data, path, default, createIfMissing)
     local target = data
 
