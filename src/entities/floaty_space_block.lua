@@ -1,4 +1,5 @@
 local fakeTilesHelper = require("fake_tiles_helper")
+local connectedEntities = require("helpers.connected_entities")
 local utils = require("utils")
 local matrixLib = require("matrix")
 
@@ -26,6 +27,9 @@ end
 function floatySpaceBlock.sprite(room, entity)
     local searchPredicate = getSearchPredicate(entity)
     local relevantBlocks = utils.filter(getSearchPredicate(entity), room.entities)
+
+    connectedEntities.appendIfMissing(relevantBlocks, entity)
+
     local firstEntity = relevantBlocks[1] == entity
 
     if firstEntity then
