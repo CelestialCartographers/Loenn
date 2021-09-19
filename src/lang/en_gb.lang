@@ -699,7 +699,12 @@ entities.crushBlock.name.horizontal=Kevin (Horizontal)
 entities.crushBlock.description.axes=Determines which sides of the Kevin block are hittable.
 entities.crushBlock.description.chillout=Whether the block should have the large face and get tired after being hit.
 
+# Waterfall
+entities.waterfall.name.waterfall=Waterfall
+
 # Big Waterfall
+entities.bigWaterfall.name.foreground=Big Waterfall (Foreground)
+entities.bigWaterfall.name.background=Big Waterfall (Background)
 entities.bigWaterfall.description.layer=Where the waterfall should render.\nFG is in the foreground.\nBG is in the background and parallaxes.
 
 # Sound Source
