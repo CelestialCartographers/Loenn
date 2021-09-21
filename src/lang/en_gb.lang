@@ -325,7 +325,16 @@ entities.spinner.name.core=Crystal Spinner (Core)
 entities.spinner.name.rainbow=Crystal Spinner (Rainbow)
 entities.spinner.description.attachToSolid=The spinner attaches to the surface of the entity or block, and can be moved by them.
 
-# TrackSpinner
+# Track Spinner
+entities.trackSpinner.name.blade_slow=Track Spinner (Blade, Slow)
+entities.trackSpinner.name.blade_normal=Track Spinner (Blade, Normal)
+entities.trackSpinner.name.blade_fast=Track Spinner (Blade, Fast)
+entities.trackSpinner.name.dust_slow=Track Spinner (Dust, Slow)
+entities.trackSpinner.name.dust_normal=Track Spinner (Dust, Normal)
+entities.trackSpinner.name.dust_fast=Track Spinner (Dust, Fast)
+entities.trackSpinner.name.starfish_slow=Track Spinner (Star, Slow)
+entities.trackSpinner.name.starfish_normal=Track Spinner (Star, Normal)
+entities.trackSpinner.name.starfish_fast=Track Spinner (Star, Fast)
 entities.trackSpinner.description.speed=Changes the speed of the spinner's rotation.
 entities.trackSpinner.description.startCenter=The spinner will start at the end of the track.
 entities.trackSpinner.description.dust=Turns the visual appearance of the blade into a dust sprite.
