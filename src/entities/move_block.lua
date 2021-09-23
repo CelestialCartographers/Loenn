@@ -59,6 +59,10 @@ local steeringFrameTextures = {
     down = "objects/moveBlock/base_v"
 }
 
+-- How far the button peeks out of the block and offset to keep it in the "socket"
+local buttonPopout = 3
+local buttonOffset = 3
+
 function moveBlock.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local width, height = entity.width or 24, entity.height or 24
@@ -86,10 +90,10 @@ function moveBlock.sprite(room, entity)
 
     arrowSprite:addPosition(math.floor(width / 2), math.floor(height / 2))
 
-    local sprites = ninePatch:getDrawableSprite()
+    local sprites = {}
 
-    table.insert(sprites, 1, highlightRectangle:getDrawableSprite())
-    table.insert(sprites, 2, midRectangle:getDrawableSprite())
+    table.insert(sprites, highlightRectangle:getDrawableSprite())
+    table.insert(sprites, midRectangle:getDrawableSprite())
 
     if canSteer then
         if buttonsOnSide then
@@ -100,12 +104,12 @@ function moveBlock.sprite(room, entity)
                 local spriteRight = drawableSprite.fromTexture(buttonTexture, entity)
 
                 spriteLeft.rotation = -math.pi / 2
-                spriteLeft:addPosition(0, oy - 8)
+                spriteLeft:addPosition(-buttonPopout, oy + buttonOffset)
                 spriteLeft:useRelativeQuad(leftQuadX, 0, 8, 8)
                 spriteLeft:setColor(buttonColor)
 
                 spriteRight.rotation = math.pi / 2
-                spriteRight:addPosition(width, oy + 8)
+                spriteRight:addPosition(width + buttonPopout, oy - buttonOffset)
                 spriteRight:useRelativeQuad(rightQuadX, 0, 8, 8)
                 spriteRight:setColor(buttonColor)
 
@@ -118,13 +122,17 @@ function moveBlock.sprite(room, entity)
                 local quadX = (ox == 4 and 0 or (ox == width - 4 and 16 or 8))
                 local sprite = drawableSprite.fromTexture(buttonTexture, entity)
 
-                sprite:addPosition(ox + 8, 0)
+                sprite:addPosition(ox - buttonOffset, -buttonPopout)
                 sprite:useRelativeQuad(quadX, 0, 8, 8)
                 sprite:setColor(buttonColor)
 
                 table.insert(sprites, sprite)
             end
         end
+    end
+
+    for _, sprite in ipairs(ninePatch:getDrawableSprite()) do
+        table.insert(sprites, sprite)
     end
 
     table.insert(sprites, arrowRectangle:getDrawableSprite())
