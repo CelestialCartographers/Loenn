@@ -389,7 +389,12 @@ function entities.drawSelected(room, layer, entity, color)
                                 love.graphics.line(previousX, previousY, nodeRenderX, nodeRenderY)
 
                             elseif nodeLineRenderType == "fan" then
-                                love.graphics.line(entityRenderX, entityRenderY, nodeX, nodeY)
+                                love.graphics.line(entityRenderX, entityRenderY, nodeRenderX, nodeRenderY)
+
+                            elseif nodeLineRenderType == "circle" then
+                                local distance = math.sqrt((nodeRenderX - entityRenderX)^2 + (nodeRenderY - entityRenderY)^2)
+
+                                love.graphics.circle("line", nodeRenderX, nodeRenderY, distance)
                             end
                         end)
 
