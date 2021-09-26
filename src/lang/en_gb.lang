@@ -312,6 +312,12 @@ entities.checkpoint.description.allowOrigin=Whether the Checkpoint shouldn't be 
 entities.checkpoint.description.bg=Image to use for the Checkpoint background.\nValue "9" will give the full path of "objects/checkpoint/bg/9.png", leave blank for no image.
 
 # Rotate Spinner
+entities.rotateSpinner.name.blade_clockwise=Rotating Spinner (Blade, Clockwise)
+entities.rotateSpinner.name.blade_counter_clockwise=Rotating Spinner (Blade, Counter Clockwise)
+entities.rotateSpinner.name.dust_clockwise=Rotating Spinner (Dust, Clockwise)
+entities.rotateSpinner.name.dust_counter_clockwise=Rotating Spinner (Dust, Counter Clockwise)
+entities.rotateSpinner.name.starfish_clockwise=Rotating Spinner (Starfish, Clockwise)
+entities.rotateSpinner.name.starfish_counter_clockwise=Rotating Spinner (Starfish, Counter Clockwise)
 entities.rotateSpinner.description.clockwise=The spinning blade will run clockwise.
 entities.rotateSpinner.description.dust=Changes the appearance of the blade to be a dust sprite.
 entities.rotateSpinner.description.star=Changes the appearance of the blade to be a star.
