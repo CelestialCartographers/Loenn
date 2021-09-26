@@ -539,11 +539,39 @@ entities.payphone.name.payphone=Payphone
 # Pico Console
 entities.picoconsole.name.pico_console=Pico Console
 
-# Trigger Spikes Originals
-entities.triggerSpikesOriginalLeft.description.type=Changes the visual appearance of the spikes.
-entities.triggerSpikesOriginalUp.description.type=Changes the visual appearance of the spikes.
-entities.triggerSpikesOriginalDown.description.type=Changes the visual appearance of the spikes.
-entities.triggerSpikesOriginalRight.description.type=Changes the visual appearance of the spikes.
+# Trigger Spikes Up
+entities.triggerSpikesOriginalUp.name.up_default=Trigger Spikes (Up, Default)
+entities.triggerSpikesOriginalUp.name.up_outline=Trigger Spikes (Up, Outline)
+entities.triggerSpikesOriginalUp.name.up_cliffside=Trigger Spikes (Up, Cliffside)
+entities.triggerSpikesOriginalUp.name.up_reflection=Trigger Spikes (Up, Reflection)
+entities.triggerSpikesOriginalUp.description.type=Determines the visual appearance of the spike.
+
+# Trigger Spikes Right
+entities.triggerSpikesOriginalRight.name.right_default=Trigger Spikes (Right, Default)
+entities.triggerSpikesOriginalRight.name.right_outline=Trigger Spikes (Right, Outline)
+entities.triggerSpikesOriginalRight.name.right_cliffside=Trigger Spikes (Right, Cliffside)
+entities.triggerSpikesOriginalRight.name.right_reflection=Trigger Spikes (Right, Reflection)
+entities.triggerSpikesOriginalRight.description.type=Determines the visual appearance of the spike.
+
+# Trigger Spikes Down
+entities.triggerSpikesOriginalDown.name.down_default=Trigger Spikes (Down, Default)
+entities.triggerSpikesOriginalDown.name.down_outline=Trigger Spikes (Down, Outline)
+entities.triggerSpikesOriginalDown.name.down_cliffside=Trigger Spikes (Down, Cliffside)
+entities.triggerSpikesOriginalDown.name.down_reflection=Trigger Spikes (Down, Reflection)
+entities.triggerSpikesOriginalDown.description.type=Determines the visual appearance of the spike.
+
+# Trigger Spikes Left
+entities.triggerSpikesOriginalLeft.name.left_default=Trigger Spikes (Left, Default)
+entities.triggerSpikesOriginalLeft.name.left_outline=Trigger Spikes (Left, Outline)
+entities.triggerSpikesOriginalLeft.name.left_cliffside=Trigger Spikes (Left, Cliffside)
+entities.triggerSpikesOriginalLeft.name.left_reflection=Trigger Spikes (Left, Reflection)
+entities.triggerSpikesOriginalLeft.description.type=Determines the visual appearance of the spike.
+
+# Trigger Spikes Dust
+entities.triggerSpikesUp.name.up=Trigger Spikes (Up, Dust)
+entities.triggerSpikesDown.name.down=Trigger Spikes (Down, Dust)
+entities.triggerSpikesRight.name.right=Trigger Spikes (Right, Dust)
+entities.triggerSpikesLeft.name.left=Trigger Spikes (Left, dust)
 
 # Coverup Wall
 entities.coverupWall.name.coverup_wall=Coverup Wall
