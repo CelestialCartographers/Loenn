@@ -71,7 +71,7 @@ function filesystem.stripExtension(path)
 end
 
 function filesystem.mkdir(path, mode)
-    return lfs.mkdir(path, mode or 436) -- octal mode 664
+    return lfs.mkdir(path, mode or 493) -- octal mode 755
 end
 
 filesystem.chdir = lfs.chdir
