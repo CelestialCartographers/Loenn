@@ -577,7 +577,7 @@ entities.triggerSpikesOriginalLeft.description.type=Determines the visual appear
 entities.triggerSpikesUp.name.up=Trigger Spikes (Up, Dust)
 entities.triggerSpikesDown.name.down=Trigger Spikes (Down, Dust)
 entities.triggerSpikesRight.name.right=Trigger Spikes (Right, Dust)
-entities.triggerSpikesLeft.name.left=Trigger Spikes (Left, dust)
+entities.triggerSpikesLeft.name.left=Trigger Spikes (Left, Dust)
 
 # Coverup Wall
 entities.coverupWall.name.coverup_wall=Coverup Wall
