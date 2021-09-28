@@ -166,7 +166,6 @@ local function toolModeChangedCallback(self, tool, mode)
     listWidgets.setSelection(toolWindow.modeList, mode, true)
 end
 
-
 local function updateToolModeList(name)
     local items = getModeItems(name)
 
@@ -233,6 +232,10 @@ local function toolChangedCallback(self, tool)
     updateToolModeList(tool.name)
 end
 
+local function editorMapLoadedCallback(list, filename)
+    listWidgets.updateItems(toolWindow.layerList, getLayerItems())
+end
+
 function toolWindow.getWindow()
     local materialListOptions = {
         searchBarLocation = "below"
@@ -280,6 +283,7 @@ function toolWindow.getWindow()
         editorToolLayerChanged = toolLayerChangedCallback,
         editorToolMaterialChanged = toolMaterialChangedCallback,
         editorToolModeChanged = toolModeChangedCallback,
+        editorMapLoaded = editorMapLoadedCallback,
 
         interactive = 0
     })
