@@ -136,6 +136,18 @@ entities.wire.name.wire=Wire
 entities.wire.description.above=Determines whether the wire is placed in the foreground or background.
 entities.wire.description.color=Determines the colour of the wire.
 
+# Cliff Side Flagline
+entities.cliffflag.name.cliffflag=Cliffside Flagline
+
+# Clothesline
+entities.clothesline.name.clothesline=Clothes Line
+
+# Bridge
+entities.bridge.name.bridge=Bridge
+
+# Bridge Fixed
+entities.bridgeFixed.name.bridge_fixed=Bridge (Fixed)
+
 # Crystal Heart
 entities.blackGem.name.crystal_heart=Crystal Heart
 entities.blackGem.description.fake=Whether the heart is fake and should visually be grey. Triggers the Farewell fake heart cutscene.
@@ -300,6 +312,12 @@ entities.checkpoint.description.allowOrigin=Whether the Checkpoint shouldn't be 
 entities.checkpoint.description.bg=Image to use for the Checkpoint background.\nValue "9" will give the full path of "objects/checkpoint/bg/9.png", leave blank for no image.
 
 # Rotate Spinner
+entities.rotateSpinner.name.blade_clockwise=Rotating Spinner (Blade, Clockwise)
+entities.rotateSpinner.name.blade_counter_clockwise=Rotating Spinner (Blade, Counter Clockwise)
+entities.rotateSpinner.name.dust_clockwise=Rotating Spinner (Dust, Clockwise)
+entities.rotateSpinner.name.dust_counter_clockwise=Rotating Spinner (Dust, Counter Clockwise)
+entities.rotateSpinner.name.starfish_clockwise=Rotating Spinner (Starfish, Clockwise)
+entities.rotateSpinner.name.starfish_counter_clockwise=Rotating Spinner (Starfish, Counter Clockwise)
 entities.rotateSpinner.description.clockwise=The spinning blade will run clockwise.
 entities.rotateSpinner.description.dust=Changes the appearance of the blade to be a dust sprite.
 entities.rotateSpinner.description.star=Changes the appearance of the blade to be a star.
@@ -313,7 +331,16 @@ entities.spinner.name.core=Crystal Spinner (Core)
 entities.spinner.name.rainbow=Crystal Spinner (Rainbow)
 entities.spinner.description.attachToSolid=The spinner attaches to the surface of the entity or block, and can be moved by them.
 
-# TrackSpinner
+# Track Spinner
+entities.trackSpinner.name.blade_slow=Track Spinner (Blade, Slow)
+entities.trackSpinner.name.blade_normal=Track Spinner (Blade, Normal)
+entities.trackSpinner.name.blade_fast=Track Spinner (Blade, Fast)
+entities.trackSpinner.name.dust_slow=Track Spinner (Dust, Slow)
+entities.trackSpinner.name.dust_normal=Track Spinner (Dust, Normal)
+entities.trackSpinner.name.dust_fast=Track Spinner (Dust, Fast)
+entities.trackSpinner.name.starfish_slow=Track Spinner (Star, Slow)
+entities.trackSpinner.name.starfish_normal=Track Spinner (Star, Normal)
+entities.trackSpinner.name.starfish_fast=Track Spinner (Star, Fast)
 entities.trackSpinner.description.speed=Changes the speed of the spinner's rotation.
 entities.trackSpinner.description.startCenter=The spinner will start at the end of the track.
 entities.trackSpinner.description.dust=Turns the visual appearance of the blade into a dust sprite.
@@ -379,6 +406,7 @@ entities.cobweb.name.cobweb=Cobweb
 entities.cobweb.description.color=Determines the colour of the cobweb.
 
 # Lightbeam
+entities.lightbeam.name.lightbeam=Lightbeam
 entities.lightbeam.description.rotation=Determines the rotation of the lightbeam.
 entities.lightbeam.description.flag=Only show up if the given flag is set, or always if left empty.
 
@@ -517,11 +545,39 @@ entities.payphone.name.payphone=Payphone
 # Pico Console
 entities.picoconsole.name.pico_console=Pico Console
 
-# Trigger Spikes Originals
-entities.triggerSpikesOriginalLeft.description.type=Changes the visual appearance of the spikes.
-entities.triggerSpikesOriginalUp.description.type=Changes the visual appearance of the spikes.
-entities.triggerSpikesOriginalDown.description.type=Changes the visual appearance of the spikes.
-entities.triggerSpikesOriginalRight.description.type=Changes the visual appearance of the spikes.
+# Trigger Spikes Up
+entities.triggerSpikesOriginalUp.name.up_default=Trigger Spikes (Up, Default)
+entities.triggerSpikesOriginalUp.name.up_outline=Trigger Spikes (Up, Outline)
+entities.triggerSpikesOriginalUp.name.up_cliffside=Trigger Spikes (Up, Cliffside)
+entities.triggerSpikesOriginalUp.name.up_reflection=Trigger Spikes (Up, Reflection)
+entities.triggerSpikesOriginalUp.description.type=Determines the visual appearance of the spike.
+
+# Trigger Spikes Right
+entities.triggerSpikesOriginalRight.name.right_default=Trigger Spikes (Right, Default)
+entities.triggerSpikesOriginalRight.name.right_outline=Trigger Spikes (Right, Outline)
+entities.triggerSpikesOriginalRight.name.right_cliffside=Trigger Spikes (Right, Cliffside)
+entities.triggerSpikesOriginalRight.name.right_reflection=Trigger Spikes (Right, Reflection)
+entities.triggerSpikesOriginalRight.description.type=Determines the visual appearance of the spike.
+
+# Trigger Spikes Down
+entities.triggerSpikesOriginalDown.name.down_default=Trigger Spikes (Down, Default)
+entities.triggerSpikesOriginalDown.name.down_outline=Trigger Spikes (Down, Outline)
+entities.triggerSpikesOriginalDown.name.down_cliffside=Trigger Spikes (Down, Cliffside)
+entities.triggerSpikesOriginalDown.name.down_reflection=Trigger Spikes (Down, Reflection)
+entities.triggerSpikesOriginalDown.description.type=Determines the visual appearance of the spike.
+
+# Trigger Spikes Left
+entities.triggerSpikesOriginalLeft.name.left_default=Trigger Spikes (Left, Default)
+entities.triggerSpikesOriginalLeft.name.left_outline=Trigger Spikes (Left, Outline)
+entities.triggerSpikesOriginalLeft.name.left_cliffside=Trigger Spikes (Left, Cliffside)
+entities.triggerSpikesOriginalLeft.name.left_reflection=Trigger Spikes (Left, Reflection)
+entities.triggerSpikesOriginalLeft.description.type=Determines the visual appearance of the spike.
+
+# Trigger Spikes Dust
+entities.triggerSpikesUp.name.up=Trigger Spikes (Up, Dust)
+entities.triggerSpikesDown.name.down=Trigger Spikes (Down, Dust)
+entities.triggerSpikesRight.name.right=Trigger Spikes (Right, Dust)
+entities.triggerSpikesLeft.name.left=Trigger Spikes (Left, Dust)
 
 # Coverup Wall
 entities.coverupWall.name.coverup_wall=Coverup Wall
@@ -570,6 +626,10 @@ entities.exitBlock.description.playTransitionReveal=Determines whether revealing
 entities.cassette.name.cassette=Cassette
 
 # Cassette Block
+entities.cassetteBlock.name.cassette_block_0=Cassette Block (0 - Blue)
+entities.cassetteBlock.name.cassette_block_1=Cassette Block (1 - Rose)
+entities.cassetteBlock.name.cassette_block_2=Cassette Block (2 - Bright Sun)
+entities.cassetteBlock.name.cassette_block_3=Cassette Block (3 - Malachite)
 entities.cassetteBlock.description.index=The colour of the cassette block.
 entities.cassetteBlock.description.tempo=The tempo of the cassette blocks. The first non 1 tempo cassette block decides the tempo for all cassette blocks in the room.
 
@@ -682,7 +742,12 @@ entities.crushBlock.name.horizontal=Kevin (Horizontal)
 entities.crushBlock.description.axes=Determines which sides of the Kevin block are hittable.
 entities.crushBlock.description.chillout=Whether the block should have the large face and get tired after being hit.
 
+# Waterfall
+entities.waterfall.name.waterfall=Waterfall
+
 # Big Waterfall
+entities.bigWaterfall.name.foreground=Big Waterfall (Foreground)
+entities.bigWaterfall.name.background=Big Waterfall (Background)
 entities.bigWaterfall.description.layer=Where the waterfall should render.\nFG is in the foreground.\nBG is in the background and parallaxes.
 
 # Sound Source
@@ -720,6 +785,7 @@ entities.everest/coreMessage.description.dialog=The dialogue key to use.
 entities.everest/coreMessage.description.outline=Whether the text has a black outline or not.
 
 # Star Jump Block
+entities.starJumpBlock.name.star_jump_block=Star Jump Block
 entities.starJumpBlock.description.sinks=Whether the block sinks when the player stands on it.
 
 # Star Jump Controller
@@ -751,6 +817,8 @@ entities.eyebomb.name.left=Puffer (Left)
 entities.eyebomb.description.right=The initial direction of the puffer.
 
 # Swap Block
+entities.swapBlock.name.normal=Swap Block (Normal)
+entities.swapBlock.name.moon=Swap Block (Moon)
 entities.swapBlock.description.theme=The visual theme of the swap block.
 
 # Zip Mover
@@ -769,12 +837,16 @@ entities.powerSourceNumber.description.strawberries=Determines when the entity w
 entities.powerSourceNumber.description.keys=Determines when the entity will lit up. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
 
 # Floaty Space Block
+entities.floatySpaceBlock.name.floaty_space_block=Floaty Space Block
 entities.floatySpaceBlock.description.tiletype=Determines the visual appearance of the wall.
 entities.floatySpaceBlock.description.disableSpawnOffset=Whether or not the entity should spawn without the random offset.
 
-# Plyback Tutorial
+# Playback Tutorial
 entities.playbackTutorial.name.playback=Ghost Player Playback
 entities.playbackTutorial.description.tutorial=Determines which tutorial ghost is played.\nFilename is relative to the `Tutorials` folder, and without the .bin extension.
+
+# Playback Tutorial
+entities.playbackBillboard.name.playback_billboard=Playback Billboard
 
 # Crumble Wall On Rumble
 entities.crumbleWallOnRumble.name.crumble_wall=Crumble Wall On Rumble
@@ -957,6 +1029,15 @@ triggers.everest/smoothCameraOffsetTrigger.description.onlyOnce=If checked, the 
 triggers.everest/smoothCameraOffsetTrigger.description.xOnly=Whether the trigger should only update the horizontal offset, keeping the current vertical offset.
 triggers.everest/smoothCameraOffsetTrigger.description.yOnly=Whether the trigger should only update the vertical offset, keeping the current horizontal offset.
 
+# Custom Height Display (Everest)
+triggers.everest/CustomHeightDisplayTrigger.name.custom_height_display=Custom Height Display
+triggers.everest/CustomHeightDisplayTrigger.description.vanilla=Whether this trigger should use the vanilla height display. The vanilla one only uses the target attribute.
+triggers.everest/CustomHeightDisplayTrigger.description.target=The new meter count.
+triggers.everest/CustomHeightDisplayTrigger.description.from=The previous meter count.
+triggers.everest/CustomHeightDisplayTrigger.description.progressAudio=Whether the trigger should increment audio progress.
+triggers.everest/CustomHeightDisplayTrigger.description.displayOnTransition=Whether the trigger should wait for a room transition to occur before displaying the counter.
+triggers.everest/CustomHeightDisplayTrigger.description.text=The text of the counter. The meter count specified in target is substituted in for {x}.\nExample: "Currently at {x} meters".
+
 # Golden Berry Collection
 triggers.goldenBerryCollectTrigger.name.golden_berry_collection=Golden Berry Collection
 
@@ -1086,6 +1167,6 @@ room.description.delayAltMusicFade=Delay the alternative music fade.
 room.description.music=What song should be playing in the room, uses previous if left empty.
 room.description.altMusic=What alternative song should be playing. It is unsure what this means, as it seems to not be hooked up in the game anymore.
 room.description.windPattern=The type of wind in the room.
-room.description.color=The colour of the room in the debug map viewer.
+room.description.color=The colour of the room border. Can also be seen in the game's debug map viewer.\n0 - White\n1 - Red\n2 - Green\n3 - Light Blue\n4 - Dark Blue\n5 - Purple\n6 - Pink
 room.description.cameraOffsetX=Global horizontal offset of camera in room.
 room.description.cameraOffsetY=Global vertical offset of camera in room.

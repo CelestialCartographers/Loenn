@@ -22,7 +22,7 @@ function placementUtils.getDrawable(layer, name, room, data)
         return handler.getDrawable(name, nil, room, data, nil)
     end
 
-    return {}
+    return nil
 end
 
 -- Add unique ID to trigger/entity

@@ -727,6 +727,7 @@ local function updateSelectionPreviews(cursorX, cursorY)
 
             resizeDirectionPreview = nil
 
+            local room = state.getSelectedRoom()
             local viewport = viewportHandler.viewport
             local cameraZoom = viewport.scale
             local borderThreshold = 4 / cameraZoom
@@ -735,9 +736,18 @@ local function updateSelectionPreviews(cursorX, cursorY)
 
             -- Find first selection where we are on the border
             for _, preview in ipairs(selectionPreviews) do
+                local resizeHorizontal, resizeVertical = selectionItemUtils.canResizeItem(room, tool.layer, preview)
                 local onBorder, horizontalDirection, verticalDirection = utils.onRectangleBorder(point, preview, borderThreshold)
 
-                if onBorder then
+                if not resizeHorizontal then
+                    horizontalDirection = 0
+                end
+
+                if not resizeVertical then
+                    verticalDirection = 0
+                end
+
+                if onBorder and (horizontalDirection ~= 0 or verticalDirection ~= 0) then
                     resizeDirectionPreview = {horizontalDirection, verticalDirection}
 
                     break

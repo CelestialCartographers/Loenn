@@ -41,4 +41,10 @@ function templeBigEyeball.draw(room, entity, viewport)
     pupilSprite:draw()
 end
 
+function templeBigEyeball.selection(room, entity)
+    local sprite = drawableSpriteStruct.fromTexture(bodyTexture, entity)
+
+    return sprite:getRectangle()
+end
+
 return templeBigEyeball

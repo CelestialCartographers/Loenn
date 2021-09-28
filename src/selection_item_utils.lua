@@ -3,6 +3,20 @@ local utils = require("utils")
 
 local selectionItemUtils = {}
 
+function selectionItemUtils.canResize(room, layer, target)
+    local handler = layerHandlers.getHandler(layer)
+
+    if room and handler and handler.canResize then
+        return handler.canResize(room, layer, target)
+    end
+
+    return false, false
+end
+
+function selectionItemUtils.canResizeItem(room, layer, item)
+    return selectionItemUtils.canResize(room, layer, item.item)
+end
+
 function selectionItemUtils.drawSelected(room, layer, item, color)
     local handler = layerHandlers.getHandler(layer)
 

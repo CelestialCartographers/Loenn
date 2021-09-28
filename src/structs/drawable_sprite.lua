@@ -87,32 +87,26 @@ function drawableSpriteMt.__index:getRectangleRaw()
     local drawWidth = width * math.abs(scaleX)
     local drawHeight = height * math.abs(scaleY)
 
-    -- Assume only 90 degree angles
-    -- Using counter clockwise rotation matrix since the Y axis is mirrored
     if rotation and rotation ~= 0 then
-        local drawOffsetX = drawX - x
-        local drawOffsetY = drawY - y
+        -- Shorthand for each corner
+        -- Remove x and y before rotation, otherwise we rotate around the wrong origin
+        local tlx, tly = drawX - x, drawY - y
+        local trx, try = drawX - x + drawWidth, drawY - y
+        local blx, bly = drawX - x, drawY - y + drawHeight
+        local brx, bry = drawX - x + drawWidth, drawY - y + drawHeight
 
-        local drawOffsetXRotated = drawOffsetX * math.cos(rotation) - drawOffsetY * math.sin(rotation)
-        local drawOffsetYRotated = drawOffsetX * math.sin(rotation) + drawOffsetY * math.cos(rotation)
-        local widthRotated = drawWidth * math.cos(rotation) - drawHeight * math.sin(rotation)
-        local heightRotated = drawWidth * math.sin(rotation) + drawHeight * math.cos(rotation)
+        -- Apply rotation
+        tlx, tly = utils.rotate(tlx, tly, rotation)
+        trx, try = utils.rotate(trx, try, rotation)
+        blx, bly = utils.rotate(blx, bly, rotation)
+        brx, bry = utils.rotate(brx, bry, rotation)
 
-        drawX = x + drawOffsetXRotated
-        drawY = y + drawOffsetYRotated
+        -- Find the best point for top left and bottom right
+        local bestTlx, bestTly = math.min(tlx, trx, blx, brx), math.min(tly, try, bly, bry)
+        local bestBrx, bestBry = math.max(tlx, trx, blx, brx), math.max(tly, try, bly, bry)
 
-        if widthRotated < 0 then
-            drawX += widthRotated
-            widthRotated = -widthRotated
-        end
-
-        if heightRotated < 0 then
-            drawY += heightRotated
-            heightRotated = -heightRotated
-        end
-
-        drawWidth = widthRotated
-        drawHeight = heightRotated
+        drawX, drawY = utils.round(x + bestTlx), utils.round(y + bestTly)
+        drawWidth, drawHeight = utils.round(bestBrx - bestTlx), utils.round(bestBry - bestTly)
     end
 
     return drawX, drawY, drawWidth, drawHeight
@@ -164,7 +158,7 @@ function drawableSpriteMt.__index:draw()
     end
 end
 
-function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, overflow)
+function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, hideOverflow, realSize)
     local imageMeta = self.meta
 
     if imageMeta then
@@ -173,6 +167,8 @@ function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, overflow)
         if type(x) == "table" then
             quadTable = x
             x, y, width, height = x[1], x[2], x[3], x[4]
+            hideOverflow = y
+            realSize = width
 
         else
             quadTable = {x, y, width, height}
@@ -188,20 +184,24 @@ function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, overflow)
         local value = utils.getPath(quadCache, quadTable, false, true)
 
         if value then
-            return value
+            return unpack(value)
 
         else
-            local quad = drawing.getRelativeQuad(imageMeta, x, y, width, height, overflow)
+            local quad, offsetX, offsetY = drawing.getRelativeQuad(imageMeta, x, y, width, height, hideOverflow, realSize)
 
-            quadCache[x][y][width][height] = quad
+            quadCache[x][y][width][height] = {quad, offsetX, offsetY}
 
-            return quad
+            return quad, offsetX, offsetY
         end
     end
 end
 
-function drawableSpriteMt.__index:useRelativeQuad(x, y, width, height, overflow)
-    self.quad = self:getRelativeQuad(x, y, width, height, overflow)
+function drawableSpriteMt.__index:useRelativeQuad(x, y, width, height, hideOverflow, realSize)
+    local quad, offsetX, offsetY = self:getRelativeQuad(x, y, width, height, hideOverflow, realSize)
+
+    self.quad = quad
+    self.offsetX = (self.offsetX or 0) + offsetX
+    self.offsetY = (self.offsetY or 0) + offsetY
 end
 
 function drawableSpriteStruct.fromMeta(meta, data)

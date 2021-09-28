@@ -190,4 +190,52 @@ function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer, c
     end
 end
 
+local function getMaterialCorners(entities)
+    local tlx, tly = math.huge, math.huge
+    local brx, bry = -math.huge, -math.huge
+
+    for _, entity in ipairs(entities) do
+        tlx = math.min(tlx, entity.x)
+        tly = math.min(tly, entity.y)
+        brx = math.max(brx, entity.x + entity.width)
+        bry = math.max(bry, entity.y + entity.height)
+    end
+
+    return tlx, tly, brx, bry
+end
+
+function fakeTilesHelper.getCombinedMaterialMatrix(entities, materialKey, default)
+    local tlx, tly, brx, bry = getMaterialCorners(entities)
+    local materialWidth, materialHeight = math.ceil((brx - tlx) / 8), math.ceil((bry - tly) / 8)
+    local materialMatrix = matrix.filled(default or "0", materialWidth, materialHeight)
+    local fakeEntity = {
+        x = tlx,
+        y = tly
+    }
+
+    for _, entity in ipairs(entities) do
+        local x, y = math.floor((entity.x - tlx) / 8), math.floor((entity.y - tly) / 8)
+        local width, height = math.ceil(entity.width / 8), math.ceil(entity.height / 8)
+
+        -- Vanilla maps might have tileset ids stored as integers
+        local material = tostring(entity[materialKey] or "3")
+
+        for i = 1, width do
+            for j = 1, height do
+                materialMatrix:set(x + i, y + j, material)
+            end
+        end
+    end
+
+    return materialMatrix, fakeEntity
+end
+
+function fakeTilesHelper.getCombinedEntitySpriteFunction(entities, materialKey, blendIn, layer, color, x, y)
+    local materialMatrix, fakeEntity = fakeTilesHelper.getCombinedMaterialMatrix(entities, materialKey)
+
+    return function(room)
+        return fakeTilesHelper.getEntitySpriteFunction(materialMatrix, blendIn, layer, color, x, y)(room, fakeEntity)
+    end
+end
+
 return fakeTilesHelper

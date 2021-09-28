@@ -71,15 +71,6 @@ local function checkPadding(tiles, x, y, airTile, emptyTile)
     return getTile(tiles, x - 2, y, emptyTile) == airTile or getTile(tiles, x + 2, y, emptyTile) == airTile or getTile(tiles, x, y - 2, emptyTile) == airTile or getTile(tiles, x, y + 2, emptyTile) == airTile
 end
 
-local function sortByScore(masks)
-    local res = masks
-
-    -- TODO - TBI
-    -- Is this needed?
-
-    return res
-end
-
 local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
     if checkPadding(tiles, x, y, airTile, emptyTile) then
         local padding = meta.padding[tile]
@@ -235,9 +226,6 @@ function autotiler.loadTilesetXML(fn)
 
     local lshift = bit.lshift
 
-    -- TODO - sort tilesets that copy others to the end?
-    -- Is this needed?
-
     for i, tileset in ipairs(handler.root.Data.Tileset) do
         local id = tileset._attr.id
         local path = tileset._attr.path
@@ -287,7 +275,7 @@ function autotiler.loadTilesetXML(fn)
         end
 
         if #currentMasks > 0 then
-            masks[id] = sortByScore(currentMasks)
+            masks[id] = currentMasks
         end
     end
 

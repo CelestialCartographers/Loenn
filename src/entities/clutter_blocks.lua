@@ -49,8 +49,6 @@ local function markChoiceComplete(needsDrawing, x, y, width, height)
 end
 
 local function getClutterSprites(room, entity, color)
-    local entityX, entityY = entity.x or 0, entity.y or 0
-
     local width, height = entity.width or 32, entity.height or 32
     local tileWidth, tileHeight = math.ceil(width / 8), math.ceil(height / 8)
     local needsDrawing = matrixLib.filled(true, tileWidth, tileHeight)

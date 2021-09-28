@@ -8,10 +8,19 @@ local history = require("history")
 local sceneHandler = require("scene_handler")
 local drawing = require("drawing")
 local languageRegistry = require("language_registry")
+local celesteRender = require("celeste_render")
 
 editorScene.name = "Editor"
 
 editorScene._displayWipe = true
+
+local function checkForUncleanStartup()
+    -- Program didn't close down as expected
+    -- Could be a hard crash or killed process
+    if persistence.currentlyRunning then
+        sceneHandler.sendEvent("editorUncleanStartup")
+    end
+end
 
 local function updateRunningStatus(status)
     persistence.currentlyRunning = status
@@ -43,6 +52,7 @@ function editorScene:firstEnter()
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
 
     updater.startupUpdateCheck()
+    checkForUncleanStartup()
     updateRunningStatus(true)
 end
 
@@ -84,6 +94,14 @@ function editorScene:update(dt)
     end
 
     self:propagateEvent("update", dt)
+end
+
+function editorScene:editorMapTargetChanged(item, itemType, previousItem, previousItemType)
+    if previousItemType == "room" then
+        -- Create a new canvas for the previous selected room and rerender it instantly
+        -- If we let it be lazily rerendered it will cause flashes after a few frames
+        celesteRender.forceRedrawRoom(previousItem, self.viewerState.viewport, false)
+    end
 end
 
 return editorScene

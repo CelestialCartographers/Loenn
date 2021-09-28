@@ -115,6 +115,8 @@ end
 
 function state.selectItem(item, add)
     local itemType = utils.typeof(item)
+    local previousItem = state.selectedItem
+    local previousItemType = state.selectedItemType
 
     if itemType == "room" then
         persistence.lastSelectedRoomName = item.name
@@ -132,14 +134,14 @@ function state.selectItem(item, add)
         if not state.selectedItem[item] then
             state.selectedItem[item] = itemType
 
-            sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType, add)
+            sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType, previousItem, previousItemType, add)
         end
 
     else
         state.selectedItem = item
         state.selectedItemType = itemType
 
-        sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType, add)
+        sceneHandler.sendEvent("editorMapTargetChanged", state.selectedItem, state.selectedItemType, previousItem, previousItemType, add)
     end
 end
 

@@ -58,16 +58,23 @@ function matrixMt.__index:size()
     return self._width, self._height
 end
 
--- TODO - Test, inlining might have broken it
 function matrixMt.__index:getSlice(x1, y1, x2, y2, default)
-    local res = matrix.filled(default, math.abs(x2 - x1) + 1, math.abs(y2 - y1) + 1)
+    local sliceWidth = math.abs(x2 - x1) + 1
+    local sliceHeight = math.abs(y2 - y1) + 1
+    local res = matrix.filled(default, sliceWidth, sliceHeight)
 
     local startX, endX = math.min(x1, x2), math.max(x1, x2)
     local startY, endY = math.min(y1, y2), math.max(y1, y2)
 
-    for x = startX, endX do
-        for y = startY, endY do
-            self[(x - startX) + (y - startY) * self._width + 1] = self:get(x, y, default)
+    for y = math.max(1, startY), math.min(self._height, endY) do
+        for x = math.max(1, startX), math.min(self._width, endX) do
+            local resultX = x - startX
+            local resultY = y - startY
+
+            -- This check is 0 index based, not 1 index based
+            if resultX >= 0 and resultX < sliceWidth and resultY >= 0 and resultY < sliceHeight then
+                res[resultX + resultY * sliceWidth + 1] = self:get(x, y, default)
+            end
         end
     end
 

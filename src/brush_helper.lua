@@ -81,7 +81,6 @@ end
 -- needsUpdate set up as {x1, y1, x2, y2, ..., xn, yn} for performance reasons, less table creation than {{x1, y1}, ...}
 -- In the material, "0" is considered the tile air, while " " is considered "no change"
 -- Does not use placeTilesRaw for performance reasons, and because we explicitly need to track what changed
--- TODO - Check for rendering oddities with matrix brushes
 function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local fg = layer == "tilesFg"
 

@@ -181,7 +181,6 @@ end
 
 taskMt.__index.process = tasksHandler.processTask
 
--- TODO - Unwrap lambda properly
 -- TODO - Make arguments more sane?
 function tasksHandler.newTask(func, callback, tasks, data)
     tasks = tasks or globalTasks

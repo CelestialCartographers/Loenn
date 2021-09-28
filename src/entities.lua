@@ -67,17 +67,13 @@ function entities.loadExternalEntities(registerAt)
     return entities.loadEntities(filenames, registerAt)
 end
 
--- Returns default depth
-function entities.getDefaultDepth(name, handler, room, entity, viewport)
-    return utils.callIfFunction(handler.depth, room, entity, viewport) or 0
-end
-
 local function addAutomaticDrawableFields(handler, drawable, room, entity, isNode)
     local justificationKey = isNode and "nodeJustification" or "justification"
     local scaleKey = isNode and "nodeScale" or "scale"
     local offsetKey = isNode and "nodeOffset" or "offset"
     local rotationKey = isNode and "nodeRotation" or "rotation"
     local colorKey = isNode and "nodeColor" or "color"
+    local depthKey = isNode and "nodeDepth" or "depth"
 
     if handler[justificationKey] then
         if type(handler[justificationKey]) == "function" then
@@ -107,11 +103,15 @@ local function addAutomaticDrawableFields(handler, drawable, room, entity, isNod
     end
 
     if handler[rotationKey] then
-        drawable[rotationKey] = utils.callIfFunction(handler[rotationKey], room, entity)
+        drawable.rotation = utils.callIfFunction(handler[rotationKey], room, entity)
     end
 
     if handler[colorKey] then
-        drawable[colorKey] = utils.callIfFunction(handler[colorKey] or handler, room, entity)
+        drawable.color = utils.callIfFunction(handler[colorKey], room, entity)
+    end
+
+    if handler[depthKey] then
+        drawable.depth = utils.callIfFunction(handler[depthKey], room, entity)
     end
 end
 
@@ -119,15 +119,17 @@ end
 function entities.getEntityDrawable(name, handler, room, entity, viewport)
     handler = handler or entities.registeredEntities[name]
 
+    local defaultDepth = utils.callIfFunction(handler.nodeDepth, room, entity, viewport)
+
     if handler.sprite then
         local sprites = handler.sprite(room, entity, viewport)
 
         if sprites then
             if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
-                return sprites, sprites.depth
+                return sprites, sprites.depth or defaultDepth
 
             else
-                return sprites, nil
+                return sprites, defaultDepth
             end
         end
 
@@ -178,15 +180,17 @@ end
 function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, viewport)
     handler = handler or entities.registeredEntities[name]
 
+    local defaultDepth = utils.callIfFunction(handler.nodeDepth, room, entity, node, nodeIndex, viewport)
+
     if handler.nodeSprite then
         local sprites = handler.nodeSprite(room, entity, node, nodeIndex, viewport)
 
         if sprites then
             if #sprites == 0 and utils.typeof(sprites) == "drawableSprite" then
-                return sprites, sprites.depth, false
+                return sprites, sprites.depth or defaultDepth, false
 
             else
-                return sprites, nil, false
+                return sprites, defaultDepth, false
             end
         end
 
@@ -196,7 +200,7 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
 
         addAutomaticDrawableFields(handler, drawable, room, entity, true)
 
-        return drawable, nil, false
+        return drawable, defaultDepth, false
 
     elseif handler.nodeDraw then
         return drawableFunction.fromFunction(handler.nodeDraw, room, entity, node, nodeIndex, viewport)
@@ -300,12 +304,15 @@ function entities.getNodeRectangles(room, entity, viewport)
                     elseif entity.width and entity.height then
                         nodeRectangle = utils.rectangle(node.x or 0, node.y or 0, entity.width, entity.height)
                     end
+                end
 
-                elseif #nodeDrawable > 0 then
-                    nodeRectangle = getSpriteRectangle(nodeDrawable)
+                if not nodeRectangle then
+                    if #nodeDrawable > 0 then
+                        nodeRectangle = getSpriteRectangle(nodeDrawable)
 
-                else
-                    nodeRectangle = nodeDrawable:getRectangle()
+                    else
+                        nodeRectangle = nodeDrawable:getRectangle()
+                    end
                 end
 
                 table.insert(rectangles, utils.deepcopy(nodeRectangle))
@@ -382,7 +389,12 @@ function entities.drawSelected(room, layer, entity, color)
                                 love.graphics.line(previousX, previousY, nodeRenderX, nodeRenderY)
 
                             elseif nodeLineRenderType == "fan" then
-                                love.graphics.line(entityRenderX, entityRenderY, nodeX, nodeY)
+                                love.graphics.line(entityRenderX, entityRenderY, nodeRenderX, nodeRenderY)
+
+                            elseif nodeLineRenderType == "circle" then
+                                local distance = math.sqrt((nodeRenderX - entityRenderX)^2 + (nodeRenderY - entityRenderY)^2)
+
+                                love.graphics.circle("line", nodeRenderX, nodeRenderY, distance)
                             end
                         end)
 
