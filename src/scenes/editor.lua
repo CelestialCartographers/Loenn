@@ -8,7 +8,6 @@ local history = require("history")
 local sceneHandler = require("scene_handler")
 local drawing = require("drawing")
 local languageRegistry = require("language_registry")
-local celesteRender = require("celeste_render")
 
 editorScene.name = "Editor"
 
@@ -100,7 +99,7 @@ function editorScene:editorMapTargetChanged(item, itemType, previousItem, previo
     if previousItemType == "room" then
         -- Create a new canvas for the previous selected room and rerender it instantly
         -- If we let it be lazily rerendered it will cause flashes after a few frames
-        celesteRender.forceRedrawRoom(previousItem, self.viewerState.viewport, false)
+        self.celesteRender.forceRedrawRoom(previousItem, self.viewerState.viewport, false)
     end
 end
 
