@@ -11,8 +11,6 @@ local drawableFunction = require("structs.drawable_function")
 local drawableRectangle = require("structs.drawable_rectangle")
 
 local colors = require("colors")
-
-local font = love.graphics.getFont()
 local triggerFontSize = 1
 
 local triggers = {}
@@ -90,6 +88,8 @@ end
 local humanizedNameCache = {}
 
 function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
+    local font = love.graphics.getFont()
+
     -- Add rectangles first, then batch draw all text
 
     for i, trigger in ipairs(targets) do

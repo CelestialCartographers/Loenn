@@ -107,11 +107,13 @@ function drawing.addCenteredText(batch, text, x, y, width, height, font, fontSiz
         text = utils.trim(text)
     end
 
+    local fontHeight = font:getHeight()
+    local fontLineHeight = font:getLineHeight()
     local longest, lines = font:getWrap(text, width / fontSize)
-    local textHeight = #lines * (font:getHeight() * font:getLineHeight())
+    local textHeight = (#lines - 1) * (fontHeight * fontLineHeight) + fontHeight
 
-    local offsetX = 0
-    local offsetY = math.floor((height - textHeight) / 2)
+    local offsetX = 1
+    local offsetY = math.floor((height - textHeight) / 2) + 1
     local wrapLimit = math.floor(width / fontSize)
 
     batch:addf(text, wrapLimit, "center", x + offsetX, y + offsetY, 0, fontSize, fontSize)
