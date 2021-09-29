@@ -176,15 +176,13 @@ function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer, c
         local isNode = utils.typeof(node) == "node"
         local targetX = x or isNode and node.x or entity.x or 0
         local targetY = y or isNode and node.y or entity.y or 0
-
         local tileX, tileY = math.floor(targetX / 8) + 1, math.floor(targetY / 8) + 1
-        local onGridX, onGridY = tileX * 8 - 8, tileY * 8 - 8
 
         local material = getEntityMaterialFromKey(entity, materialKey)
         local blend = getEntityBlendMode(entity, blendKey)
 
         local fakeTiles = fakeTilesHelper.generateFakeTiles(room, tileX, tileY, material, layer, blend)
-        local fakeTilesSprites = fakeTilesHelper.generateFakeTilesSprites(room, tileX, tileY, fakeTiles, layer, onGridX, onGridY, color)
+        local fakeTilesSprites = fakeTilesHelper.generateFakeTilesSprites(room, tileX, tileY, fakeTiles, layer, targetX, targetY, color)
 
         return fakeTilesSprites
     end
