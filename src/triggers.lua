@@ -99,7 +99,7 @@ function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
         local width = trigger.width or 16
         local height = trigger.height or 16
 
-        local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, colors.triggerColor, colors.triggerColor)
+        local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, colors.triggerColor, colors.triggerBorderColor)
 
         batch:addFromDrawable(borderedRectangle)
 
