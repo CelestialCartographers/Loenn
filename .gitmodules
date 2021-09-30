@@ -3,6 +3,6 @@
 	url = https://github.com/Vexatos/Selene.git
 	branch = lua5.1
 [submodule "luajit-request"]
-	path = src/luajit-request
+	path = src/lib/luajit-request
 	url = https://github.com/Vexatos/luajit-request.git
 	branch = master
