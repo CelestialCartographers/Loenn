@@ -1,4 +1,3 @@
-local utils = require("utils")
 local binfile = require("utils.binfile")
 local binaryReader = require("utils.binary_reader")
 local binaryWriter = require("utils.binary_writer")
@@ -265,11 +264,13 @@ function mapcoder.encodeFile(path, data, header)
 
     mapcoder.encodeTable(writer, data, lookupTable)
 
-    local fh = utils.getFileHandle(path, "wb")
+    local fh = io.open(path, "wb")
 
-    fh:write(writer:getString())
-    fh:close()
-    writer:close()
+    if fh then
+        fh:write(writer:getString())
+        fh:close()
+        writer:close()
+    end
 
     coroutine.yield()
 end
