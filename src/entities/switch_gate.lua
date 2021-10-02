@@ -37,7 +37,7 @@ function switchGate.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
     local width, height = entity.width or 24, entity.height or 24
 
-    local blockSprite = entity.sprite
+    local blockSprite = entity.sprite or "block"
     local frame = string.format(frameTexture, blockSprite)
 
     local ninePatch = drawableNinePatch.fromTexture(frame, ninePatchOptions, x, y, width, height)
