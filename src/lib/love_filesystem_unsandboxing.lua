@@ -1,4 +1,4 @@
-local physfs = require("physfs")
+local physfs = require("lib.physfs")
 
 love.filesystem.createDirectoryUnsandboxed = physfs.mkdir
 love.filesystem.mountUnsandboxed = physfs.mount

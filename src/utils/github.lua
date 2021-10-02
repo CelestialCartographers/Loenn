@@ -1,6 +1,6 @@
 local utils = require("utils")
-local json = require("dkjson")
-local hasRequest, request = utils.tryrequire("luajit-request.luajit-request")
+local json = require("lib.dkjson")
+local hasRequest, request = utils.tryrequire("lib.luajit-request.luajit-request")
 
 local github = {}
 

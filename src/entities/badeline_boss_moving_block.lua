@@ -1,5 +1,5 @@
 local utils = require("utils")
-local fakeTilesHelper = require("fake_tiles_helper")
+local fakeTilesHelper = require("helpers.fake_tiles")
 
 local movingBlock = {}
 

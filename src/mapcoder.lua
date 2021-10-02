@@ -1,7 +1,7 @@
 local utils = require("utils")
-local binfile = require("binfile")
-local binaryReader = require("binary_reader")
-local binaryWriter = require("binary_writer")
+local binfile = require("utils.binfile")
+local binaryReader = require("utils.binary_reader")
+local binaryWriter = require("utils.binary_writer")
 
 local mapcoder = {}
 

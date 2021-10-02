@@ -1,12 +1,12 @@
 local editorScene = {}
 
-local config = require("config")
+local config = require("utils.config")
 local persistence = require("persistence")
 local configs = require("configs")
 local mods = require("mods")
 local history = require("history")
 local sceneHandler = require("scene_handler")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local languageRegistry = require("language_registry")
 
 editorScene.name = "Editor"

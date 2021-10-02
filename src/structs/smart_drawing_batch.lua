@@ -1,6 +1,6 @@
 local utils = require("utils")
-local matrix = require("matrix")
-local drawing = require("drawing")
+local matrix = require("utils.matrix")
+local drawing = require("utils.drawing")
 
 local atlases = require("atlases")
 local runtimeAtlas = require("runtime_atlas")

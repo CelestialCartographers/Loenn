@@ -1,5 +1,5 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local utils = require("utils")
 
 local slider = {}

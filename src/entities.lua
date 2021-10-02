@@ -2,7 +2,7 @@ local utils = require("utils")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local nodeStruct = require("structs.node")
 
 local languageRegistry = require("language_registry")
@@ -13,7 +13,7 @@ local drawableRectangle = require("structs.drawable_rectangle")
 
 local missingTextureName = modHandler.internalModContent .. "/missing_image"
 
-local colors = require("colors")
+local colors = require("consts.colors")
 
 local entities = {}
 

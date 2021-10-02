@@ -1,5 +1,5 @@
-local filesystem = require("filesystem")
-local config = require("config")
+local filesystem = require("utils.filesystem")
+local config = require("utils.config")
 
 local fileLocations = {}
 

@@ -1,7 +1,7 @@
-local config = require("config")
+local config = require("utils.config")
 local fileLocations = require("file_locations")
 local utils = require("utils")
-local filesystem = require("filesystem")
+local filesystem = require("utils.filesystem")
 
 local settingsPath = fileLocations.getSettingsPath()
 

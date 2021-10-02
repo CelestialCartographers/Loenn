@@ -1,13 +1,13 @@
 local roomResizer = {_enabled = true, _type = "device"}
 
-local cursorUtils = require("cursor_utils")
+local cursorUtils = require("utils.cursor")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
 local loadedState = require("loaded_state")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local utils = require("utils")
 local configs = require("configs")
-local colors = require("colors")
+local colors = require("consts.colors")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 

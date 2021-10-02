@@ -1,4 +1,4 @@
-local xnaColors = require("xna_colors")
+local xnaColors = require("consts.xna_colors")
 local lightBlue = xnaColors.LightBlue
 
 local water = {}

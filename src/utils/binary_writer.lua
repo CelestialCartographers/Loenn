@@ -1,4 +1,4 @@
-local binfile = require("binfile")
+local binfile = require("utils.binfile")
 
 local binaryWriter = {}
 

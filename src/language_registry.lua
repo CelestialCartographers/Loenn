@@ -1,5 +1,5 @@
 local utils = require("utils")
-local language = require("lang")
+local language = require("utils.lang")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")

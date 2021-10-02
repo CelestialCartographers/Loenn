@@ -1,7 +1,7 @@
 local drawableSprite = require("structs.drawable_sprite")
 local drawableRectangle = require("structs.drawable_rectangle")
 local utils = require("utils")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 
 local heartDoor = {}
 

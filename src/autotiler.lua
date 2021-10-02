@@ -1,6 +1,6 @@
-local xml2lua = require("xml2lua.xml2lua")
+local xml2lua = require("lib.xml2lua.xml2lua")
 local utils = require("utils")
-local matrix = require("matrix")
+local matrix = require("utils.matrix")
 local bit = require("bit")
 
 local autotiler = {}
@@ -212,7 +212,7 @@ local function convertTileString(s)
 end
 
 function autotiler.loadTilesetXML(fn)
-    local handler = require("xml2lua.xmlhandler.tree")
+    local handler = require("lib.xml2lua.xmlhandler.tree")
     local parser = xml2lua.parser(handler)
     local xml = utils.stripByteOrderMark(utils.readAll(fn, "rb"))
 

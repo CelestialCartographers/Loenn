@@ -1,4 +1,4 @@
-local matrix = require("matrix")
+local matrix = require("utils.matrix")
 local tilesStruct = require("structs.tiles")
 
 local objectTilesStruct = {}

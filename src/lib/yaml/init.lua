@@ -1,4 +1,4 @@
-local reader = require("yaml.reader")
+local reader = require("lib.yaml.reader")
 
 local yaml = {}
 

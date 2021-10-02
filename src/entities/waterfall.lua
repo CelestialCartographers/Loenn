@@ -1,5 +1,5 @@
 local drawableRectangle = require("structs.drawable_rectangle")
-local xnaColors = require("xna_colors")
+local xnaColors = require("consts.xna_colors")
 local utils = require("utils")
 local connectedEntities = require("helpers.connected_entities")
 local waterfallHelper = require("helpers.waterfalls")

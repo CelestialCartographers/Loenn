@@ -3,7 +3,7 @@ local utils = require("utils")
 local toolUtils = require("tool_utils")
 local state = require("loaded_state")
 local snapshot = require("structs.snapshot")
-local matrix = require("matrix")
+local matrix = require("utils.matrix")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
 

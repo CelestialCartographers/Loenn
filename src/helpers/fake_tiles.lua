@@ -1,9 +1,9 @@
 local celesteRender = require("celeste_render")
 local utils = require("utils")
-local matrix = require("matrix")
+local matrix = require("utils.matrix")
 local drawableSprite = require("structs.drawable_sprite")
 local drawableRectangle = require("structs.rectangle")
-local colors = require("colors")
+local colors = require("consts.colors")
 
 local fakeTilesHelper = {}
 

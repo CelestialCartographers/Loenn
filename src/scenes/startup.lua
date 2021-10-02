@@ -1,8 +1,8 @@
 local startup = require("initial_startup")
 local sceneHandler = require("scene_handler")
-local filesystem = require("filesystem")
-local threadHandler = require("thread_handler")
-local drawing = require("drawing")
+local filesystem = require("utils.filesystem")
+local threadHandler = require("utils.threads")
+local drawing = require("utils.drawing")
 local languageRegistry = require("language_registry")
 local configs = require("configs")
 

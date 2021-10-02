@@ -3,14 +3,14 @@
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
 local configs = require("configs")
-local brushHelper = require("brush_helper")
-local colors = require("colors")
-local drawing = require("drawing")
+local brushHelper = require("brushes")
+local colors = require("consts.colors")
+local drawing = require("utils.drawing")
 local utils = require("utils")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local toolUtils = require("tool_utils")
-local matrixLib = require("matrix")
+local matrixLib = require("utils.matrix")
 
 local tool = {}
 

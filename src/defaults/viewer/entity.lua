@@ -1,4 +1,4 @@
-local colors = require("colors")
+local colors = require("consts.colors")
 local utils = require("utils")
 local configs = require("configs")
 

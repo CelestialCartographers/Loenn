@@ -6,11 +6,11 @@ local nodeStruct = require("structs.node")
 
 local languageRegistry = require("language_registry")
 
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local drawableFunction = require("structs.drawable_function")
 local drawableRectangle = require("structs.drawable_rectangle")
 
-local colors = require("colors")
+local colors = require("consts.colors")
 local triggerFontSize = 1
 
 local triggers = {}

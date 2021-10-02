@@ -1,5 +1,5 @@
 local atlases = require("atlases")
-local matrixLib = require("matrix")
+local matrixLib = require("utils.matrix")
 local utils = require("utils")
 local drawableSprite = require("structs.drawable_sprite")
 

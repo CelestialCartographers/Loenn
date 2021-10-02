@@ -2,7 +2,7 @@
 -- Should be easily accessible from code
 
 local utils = require("utils")
-local config = require("config")
+local config = require("utils.config")
 local fileLocations = require("file_locations")
 
 local defaultsPath = "defaults/config"
