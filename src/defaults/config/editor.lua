@@ -10,6 +10,7 @@ return {
 
     -- Modifier Keys
     selectionAddModifier = "shift",
+    movementAxisBoundModifier = "shift",
     precisionModifier = "ctrl",
 
     -- Item Movement

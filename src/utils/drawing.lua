@@ -143,4 +143,36 @@ function drawing.callKeepOriginalColor(func)
     love.graphics.setColor(pr, pg, pb, pa)
 end
 
+function drawing.getDashedLineSegments(x1, y1, x2, y2, dash, space)
+    dash = dash or 6
+    space = space or 4
+
+    local length = math.sqrt((x1 - x2)^2 + (y1 - y2)^2)
+    local progress = 0
+    local segments = {}
+
+    while progress < length do
+        local startPercent = progress / length
+        local stopPercent = math.min(length, progress + dash) / length
+        local startX = x1 + (x2 - x1) * startPercent
+        local startY = y1 + (y2 - y1) * startPercent
+        local stopX = x1 + (x2 - x1) * stopPercent
+        local stopY = y1 + (y2 - y1) * stopPercent
+
+        table.insert(segments, {startX, startY, stopX, stopY})
+
+        progress += dash + space
+    end
+
+    return segments
+end
+
+function drawing.drawDashedLine(x1, y1, x2, y2, dash, space)
+    local segments = drawing.getDashedLineSegments(x1, y1, x2, y2, dash, space)
+
+    for _, segment in ipairs(segments) do
+        love.graphics.line(segment)
+    end
+end
+
 return drawing

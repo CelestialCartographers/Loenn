@@ -54,6 +54,10 @@ colors.selectionCompleteBorderColor = {255 / 255, 0 / 255, 255 / 255, 153 / 255}
 colors.selectionCompleteFillColor = {255 / 255, 0 / 255, 255 / 255, 102 / 255}
 colors.selectionCompleteNodeLineColor = {255 / 255, 0 / 255, 255 / 255, 102 / 255}
 
+-- Selection tool axis bound movement
+colors.selectionAxisBoundMovementLines = {255 / 255, 255 / 255, 0 / 255, 153 / 255}
+colors.selectionAxisBoundSelectionBackground = {255 / 255, 0 / 255, 255 / 255, 102 / 255}
+
 -- Resize arrows device
 colors.resizeTriangleColor = {196 / 255, 196 / 255, 196 / 255}
 
