@@ -1,6 +1,6 @@
-local fakeTilesHelper = require("fake_tiles_helper")
+local fakeTilesHelper = require("helpers.fake_tiles")
 local utils = require("utils")
-local matrixLib = require("matrix")
+local matrixLib = require("utils.matrix")
 local drawableSprite = require("structs.drawable_sprite")
 local connectedEntities = require("helpers.connected_entities")
 

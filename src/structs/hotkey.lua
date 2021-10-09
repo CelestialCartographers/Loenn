@@ -1,4 +1,4 @@
-local keyboardHelper = require("keyboard_helper")
+local keyboardHelper = require("utils.keyboard")
 
 local specialKeyAliases = {
     plus = "+",

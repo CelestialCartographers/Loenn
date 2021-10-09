@@ -1,5 +1,5 @@
 local drawableRectangle = require("structs.drawable_rectangle")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local utils = require("utils")
 
 local drawableLine = {}

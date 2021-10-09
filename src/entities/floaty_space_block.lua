@@ -1,7 +1,7 @@
-local fakeTilesHelper = require("fake_tiles_helper")
+local fakeTilesHelper = require("helpers.fake_tiles")
 local connectedEntities = require("helpers.connected_entities")
 local utils = require("utils")
-local matrixLib = require("matrix")
+local matrixLib = require("utils.matrix")
 
 local floatySpaceBlock = {}
 

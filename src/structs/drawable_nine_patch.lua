@@ -1,8 +1,8 @@
 local utils = require("utils")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local atlases = require("atlases")
 local drawableSprite = require("structs.drawable_sprite")
-local matrixLib = require("matrix")
+local matrixLib = require("utils.matrix")
 
 local drawableNinePatch = {}
 

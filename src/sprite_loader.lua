@@ -1,10 +1,10 @@
 local utils = require("utils")
 local fileLocations = require("file_locations")
-local tasks = require("task")
-local filesystem = require("filesystem")
-local config = require("config")
-local threadHandler = require("thread_handler")
-local binaryReader = require("binary_reader")
+local tasks = require("utils.tasks")
+local filesystem = require("utils.filesystem")
+local config = require("utils.config")
+local threadHandler = require("utils.threads")
+local binaryReader = require("utils.binary_reader")
 local runtimeAtlas = require("runtime_atlas")
 
 local spriteLoader = {}

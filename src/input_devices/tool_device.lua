@@ -1,10 +1,10 @@
-local toolHandler = require("tool_handler")
+local toolHandler = require("tools")
 
 local state = require("loaded_state")
 local viewport = require("viewport_handler")
 local utils = require("utils")
 local configs = require("configs")
-local keyboardHelper = require("keyboard_helper")
+local keyboardHelper = require("utils.keyboard")
 
 local toolProxyMt = {
     __index = function(self, event)

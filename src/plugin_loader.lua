@@ -1,5 +1,5 @@
 local utils = require("utils")
-local tasks = require("task")
+local tasks = require("utils.tasks")
 
 local pluginLoader = {}
 

@@ -1,5 +1,5 @@
 local utils = require("utils")
-local version = require("version_parser")
+local version = require("utils.version_parser")
 
 local meta = {}
 

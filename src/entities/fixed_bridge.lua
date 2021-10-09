@@ -1,5 +1,5 @@
 local utils = require("utils")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local drawableSprite = require("structs.drawable_sprite")
 
 local bridgeSprite = "scenery/bridge_fixed"

@@ -2,7 +2,7 @@
 -- Stretches a 1x1 white pixel to achieve the same effect
 
 local utils = require("utils")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 local drawableSprite = require("structs.drawable_sprite")
 local spriteLoader = require("sprite_loader")
 
@@ -67,6 +67,7 @@ function drawableRectangleMt.__index:drawRectangle(mode, color, secondaryColor)
 end
 
 -- Gets a drawable sprite, using a stretched version of the 1x1 tintable
+-- Horizontal lines for "line" and "bordered" are offset to not overlap in the corners
 function drawableRectangleMt.__index:getDrawableSprite()
     local mode = self.mode or "fill"
 
@@ -75,20 +76,28 @@ function drawableRectangleMt.__index:getDrawableSprite()
 
     elseif mode == "line" then
         return {
-            getDrawableSpriteForRectangle(self.x, self.y, self.width, 1, self.color),
-            getDrawableSpriteForRectangle(self.x, self.y + self.height - 1, self.width, 1, self.color),
+            getDrawableSpriteForRectangle(self.x + 1, self.y, self.width - 2, 1, self.color),
+            getDrawableSpriteForRectangle(self.x + 1, self.y + self.height - 1, self.width - 2, 1, self.color),
             getDrawableSpriteForRectangle(self.x, self.y, 1, self.height, self.color),
             getDrawableSpriteForRectangle(self.x + self.width - 1, self.y, 1, self.height, self.color)
         }
 
     elseif mode == "bordered" then
-        return {
-            getDrawableSpriteForRectangle(self.x, self.y, self.width, self.height, self.color),
-            getDrawableSpriteForRectangle(self.x, self.y, self.width, 1, self.secondaryColor),
-            getDrawableSpriteForRectangle(self.x, self.y + self.height - 1, self.width, 1, self.secondaryColor),
-            getDrawableSpriteForRectangle(self.x, self.y, 1, self.height, self.secondaryColor),
-            getDrawableSpriteForRectangle(self.x + self.width - 1, self.y, 1, self.height, self.secondaryColor)
-        }
+        -- Simplified if only the border is visible
+        if self.width <= 2 or self.height <= 2 then
+            return {
+                getDrawableSpriteForRectangle(self.x, self.y, self.width, self.height, self.secondaryColor)
+            }
+
+        else
+            return {
+                getDrawableSpriteForRectangle(self.x + 1, self.y + 1, self.width - 2, self.height - 2, self.color),
+                getDrawableSpriteForRectangle(self.x + 1, self.y, self.width - 2, 1, self.secondaryColor),
+                getDrawableSpriteForRectangle(self.x + 1, self.y + self.height - 1, self.width - 2, 1, self.secondaryColor),
+                getDrawableSpriteForRectangle(self.x, self.y, 1, self.height, self.secondaryColor),
+                getDrawableSpriteForRectangle(self.x + self.width - 1, self.y, 1, self.height, self.secondaryColor)
+            }
+        end
     end
 end
 

@@ -13,11 +13,11 @@ local fonts = require("fonts")
 love.graphics.setFont(fonts.font)
 
 local sceneHandler = require("scene_handler")
-local threadHandler = require("thread_handler")
+local threadHandler = require("utils.threads")
 
-local tasks = require("task")
+local tasks = require("utils.tasks")
 
-require("love_filesystem_unsandboxing")
+require("lib.love_filesystem_unsandboxing")
 require("input_handler")
 
 sceneHandler.loadInternalScenes()

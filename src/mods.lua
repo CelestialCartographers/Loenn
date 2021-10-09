@@ -1,8 +1,8 @@
 local utils = require("utils")
 local fileLocations = require("file_locations")
-local yaml = require("yaml")
-local config = require("config")
-local filesystem = require("filesystem")
+local yaml = require("lib.yaml")
+local config = require("utils.config")
+local filesystem = require("utils.filesystem")
 
 local modHandler = {}
 

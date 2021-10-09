@@ -1,6 +1,6 @@
 local layerHandlers = require("layer_handlers")
 local utils = require("utils")
-local keyboardHelper = require("keyboard_helper")
+local keyboardHelper = require("utils.keyboard")
 local configs = require("configs")
 
 local placementUtils = {}

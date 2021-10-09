@@ -5,17 +5,17 @@ local utils = require("utils")
 local configs = require("configs")
 local viewportHandler = require("viewport_handler")
 local selectionUtils = require("selections")
-local drawing = require("drawing")
-local colors = require("colors")
+local drawing = require("utils.drawing")
+local colors = require("consts.colors")
 local selectionItemUtils = require("selection_item_utils")
-local keyboardHelper = require("keyboard_helper")
+local keyboardHelper = require("utils.keyboard")
 local toolUtils = require("tool_utils")
 local history = require("history")
 local snapshotUtils = require("snapshot_utils")
 local hotkeyStruct = require("structs.hotkey")
 local layerHandlers = require("layer_handlers")
 local placementUtils = require("placement_utils")
-local cursorUtils = require("cursor_utils")
+local cursorUtils = require("utils.cursor")
 
 local tool = {}
 
@@ -33,6 +33,8 @@ tool.validLayers = {
 }
 
 local dragStartX, dragStartY = nil, nil
+local coverStartX, coverStartY, coverStartWidth, coverStartyHeight = nil, nil, nil, nil
+local dragMovementTotalX, dragMovementTotalY = 0, 0
 
 local selectionRectangle = nil
 local selectionCompleted = false
@@ -163,12 +165,22 @@ end
 local function movementStarted(x, y)
     dragStartX = x
     dragStartY = y
+
+    coverStartX, coverStartY, coverStartWidth, coverStartyHeight = utils.coverRectangles(selectionPreviews)
+    dragMovementTotalX, dragMovementTotalY = 0, 0
 end
 
 local function movementFinished()
+    dragStartX = nil
+    dragStartY = nil
+
     movementActive = false
     movementLastOffsetX = nil
     movementLastOffsetY = nil
+
+    dragMovementTotalX, dragMovementTotalY = 0, 0
+
+    -- TODO - History
 end
 
 local function drawSelectionArea(room)
@@ -246,6 +258,74 @@ local function drawSelectionRectangles(room)
                 end
             end)
         end)
+    end
+end
+
+local function drawAxisBoundMovementLines(room)
+    viewportHandler.drawRelativeTo(room.x, room.y, function()
+        drawing.callKeepOriginalColor(function()
+            local roomWidth, roomHeight = room.width, room.height
+            local coverX, coverY, coverWidth, coverHeight = coverStartX, coverStartY, coverStartWidth, coverStartyHeight
+
+            -- Make length slightly shorter to prevent overlapping at the selection area
+            local lengthOffset = 1
+
+            love.graphics.setColor(colors.selectionAxisBoundMovementLines)
+
+            -- Draw from room borders towards selection
+            -- Left
+            if coverX >= 0 then
+                drawing.drawDashedLine(0, coverY, coverX - lengthOffset, coverY)
+                drawing.drawDashedLine(0, coverY + coverHeight, coverX - lengthOffset, coverY + coverHeight)
+            end
+
+            -- Right
+            if coverX + coverWidth <= roomWidth then
+                drawing.drawDashedLine(roomWidth, coverY, coverX + coverWidth + lengthOffset, coverY)
+                drawing.drawDashedLine(roomWidth, coverY + coverHeight, coverX + coverWidth + lengthOffset, coverY + coverHeight)
+            end
+
+            -- Top
+            if coverY >= 0 then
+                drawing.drawDashedLine(coverX, 0, coverX, coverY - lengthOffset)
+                drawing.drawDashedLine(coverX + coverWidth, 0, coverX + coverWidth, coverY - lengthOffset)
+            end
+
+            -- Bottom
+            if coverY + coverHeight <= roomHeight then
+                drawing.drawDashedLine(coverX, roomHeight, coverX, coverY + coverHeight + lengthOffset)
+                drawing.drawDashedLine(coverX + coverWidth, roomHeight, coverX + coverWidth, coverY + coverHeight + lengthOffset)
+            end
+        end)
+    end)
+end
+
+local function drawAxisBoundSelectionArea(room)
+    if selectionPreviews then
+        local fillColor = colors.selectionAxisBoundSelectionBackground
+
+        local areaX, areaY, areaWidth, areaHeight = utils.coverRectangles(selectionPreviews)
+
+        if #selectionPreviews > 1 then
+            viewportHandler.drawRelativeTo(room.x, room.y, function()
+                drawing.callKeepOriginalColor(function()
+                    love.graphics.setColor(fillColor)
+
+                    love.graphics.rectangle("fill", areaX, areaY, areaWidth, areaHeight)
+                end)
+            end)
+        end
+    end
+end
+
+local function drawAxisBoundMovement(room)
+    if room and selectionPreviews and not resizeDirectionPreview and movementActive then
+        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisLockModifier)
+
+        if axisBound then
+            drawAxisBoundMovementLines(room)
+            drawAxisBoundSelectionArea(room)
+        end
     end
 end
 
@@ -763,6 +843,14 @@ local toolHotkeys = {
     hotkeyStruct.createHotkey(configs.hotkeys.itemsCut, cutItemsHotkey)
 }
 
+-- Modifier keys that update behavior/visuals
+local behaviorUpdatingModifiersKey = {
+    configs.editor.precisionModifier,
+    configs.editor.movementAxisBoundModifier
+}
+
+local behaviorUpdatingModifiersKeyState = {}
+
 function tool.mousepressed(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
@@ -836,12 +924,12 @@ local function mouseMovedResize(cursorX, cursorY)
     end
 end
 
--- TODO - Precise
 local function mouseMovedMovement(cursorX, cursorY)
     local room = state.getSelectedRoom()
 
     if room and cursorX and cursorY and dragStartX and dragStartY then
         local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisLockModifier)
         local startX, startY = dragStartX, dragStartY
 
         if not precise then
@@ -852,11 +940,31 @@ local function mouseMovedMovement(cursorX, cursorY)
             startY = utils.round(startY / 8) * 8
         end
 
-        local deltaX = (cursorX - (movementLastOffsetX or cursorX))
-        local deltaY = (cursorY - (movementLastOffsetY or cursorY))
+        local deltaX = cursorX - (movementLastOffsetX or cursorX)
+        local deltaY = cursorY - (movementLastOffsetY or cursorY)
 
-        movementLastOffsetX = cursorX
-        movementLastOffsetY = cursorY
+        if axisBound then
+            local fullDeltaX = (cursorX - startX)
+            local fullDeltaY = (cursorY - startY)
+
+            if math.abs(fullDeltaX) >= math.abs(fullDeltaY) then
+                deltaY = -dragMovementTotalY
+                movementLastOffsetX = cursorX
+                movementLastOffsetY = startY
+
+            else
+                deltaX = -dragMovementTotalX
+                movementLastOffsetX = startX
+                movementLastOffsetY = cursorY
+            end
+
+        else
+            movementLastOffsetX = cursorX
+            movementLastOffsetY = cursorY
+        end
+
+        dragMovementTotalX += deltaX
+        dragMovementTotalY += deltaY
 
         if deltaX ~= 0 or deltaY ~= 0 then
             local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, deltaX, deltaY)
@@ -865,6 +973,31 @@ local function mouseMovedMovement(cursorX, cursorY)
                 toolUtils.redrawTargetLayer(room, tool.layer)
             end
         end
+    end
+end
+
+local function behaviorModifiersChanged()
+    local result = false
+
+    for _, modifier in ipairs(behaviorUpdatingModifiersKey) do
+        local held = keyboardHelper.modifierHeld(modifier)
+
+        if held ~= behaviorUpdatingModifiersKeyState[modifier] then
+            result = true
+            behaviorUpdatingModifiersKeyState[modifier] = held
+        end
+    end
+
+    return result
+end
+
+local function updateVisualsOnBehaviorChange()
+    if behaviorModifiersChanged() then
+        local x, y = viewportHandler.getMousePosition()
+
+        -- Send mousemoved event to update visuals
+        -- Using delta of (0, 0) to cause no actual change
+        tool.mousemoved(x, y, 0, 0, false)
     end
 end
 
@@ -931,12 +1064,18 @@ function tool.mouseclicked(x, y, button, istouch, presses)
     end
 end
 
+function tool.keyreleased(key, scancode)
+    updateVisualsOnBehaviorChange()
+end
+
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
 
     if not isrepeat then
         hotkeyStruct.callbackFirstActive(toolHotkeys)
     end
+
+    updateVisualsOnBehaviorChange()
 
     handleItemMovementKeys(room, key, scancode, isrepeat)
     handleItemResizeKeys(room, key, scancode, isrepeat)
@@ -951,8 +1090,17 @@ function tool.draw()
 
     if room then
         drawSelectionArea(room)
-        drawItemSelections(room)
-        drawSelectionRectangles(room)
+
+        -- TODO - Improve this?
+        -- Draw only border in axis drag mode?
+        -- Draw no selection rectangles in axis drag mode?
+        if movementActive and not resizeDirection and keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier) then
+            drawAxisBoundMovement(room)
+
+        else
+            drawItemSelections(room)
+            drawSelectionRectangles(room)
+        end
     end
 end
 

@@ -1,6 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local drawableLine = require("structs.drawable_line")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 
 local glider = {}
 

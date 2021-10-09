@@ -1,6 +1,6 @@
 local utils = require("utils")
 
-local tasksHandler = {}
+local taskUtils = {}
 
 local globalTasks = {}
 local waitingForTask = {}
@@ -42,24 +42,24 @@ local function addWaitingFor(task, waitingFor)
     end
 end
 
-function tasksHandler.waitFor(task)
+function taskUtils.waitFor(task)
     coroutine.yield("waitFor", task)
 end
 
 -- Added for consistency sake
-tasksHandler.yield = coroutine.yield
+taskUtils.yield = coroutine.yield
 
 -- Update the value in the task result
-function tasksHandler.update(...)
+function taskUtils.update(...)
     coroutine.yield("update", ...)
 end
 
-function tasksHandler.delayProcessing()
+function taskUtils.delayProcessing()
     coroutine.yield("delayProcessing")
 end
 
 -- Returns completion status, if the process needs to wait for a different process, and the time it spent processing
-function tasksHandler.processTask(task, time)
+function taskUtils.processTask(task, time)
     local timeSpent = 0
     local calcTime = time or math.huge
 
@@ -119,7 +119,7 @@ end
 
 -- Processes tasks from table for at around calcTime (default until done) and atmost maxTasks (default all)
 -- Returns processingStatus, timeSpent, tasksCompleted
-function tasksHandler.processTasks(time, maxTasks, customTasks)
+function taskUtils.processTasks(time, maxTasks, customTasks)
     local tasks = customTasks or globalTasks
 
     local timeSpent = 0
@@ -132,7 +132,7 @@ function tasksHandler.processTasks(time, maxTasks, customTasks)
 
     while #tasks > 0 and tasksDone < tasksAllowed and timeSpent < calcTime do
         local task = tasks[taskIndex]
-        local finished, delayProcessing, taskTime = tasksHandler.processTask(task, calcTime - timeSpent)
+        local finished, delayProcessing, taskTime = taskUtils.processTask(task, calcTime - timeSpent)
 
         timeSpent += taskTime
 
@@ -164,25 +164,25 @@ local taskMt = {}
 taskMt.__index = {}
 
 function taskMt.__index:update(value)
-    tasksHandler.update(value)
+    taskUtils.update(value)
 end
 
 function taskMt.__index:waitFor(waitingFor)
-    tasksHandler.waitFor(waitingFor)
+    taskUtils.waitFor(waitingFor)
 end
 
 function taskMt.__index:yield()
-    tasksHandler.yield()
+    taskUtils.yield()
 end
 
 function taskMt.__index:delayProcessing()
-    tasksHandler.delayProcessing()
+    taskUtils.delayProcessing()
 end
 
-taskMt.__index.process = tasksHandler.processTask
+taskMt.__index.process = taskUtils.processTask
 
 -- TODO - Make arguments more sane?
-function tasksHandler.newTask(func, callback, tasks, data)
+function taskUtils.newTask(func, callback, tasks, data)
     tasks = tasks or globalTasks
 
     local task = setmetatable({}, taskMt)
@@ -205,4 +205,4 @@ function tasksHandler.newTask(func, callback, tasks, data)
     return task
 end
 
-return tasksHandler
+return taskUtils

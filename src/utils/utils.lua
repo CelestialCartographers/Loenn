@@ -1,10 +1,10 @@
-local serialize = require("serialize")
-local filesystem = require("filesystem")
-local requireUtils = require("require_utils")
-local xnaColors = require("xna_colors")
+local serialize = require("utils.serialize")
+local filesystem = require("utils.filesystem")
+local requireUtils = require("utils.require")
+local xnaColors = require("consts.xna_colors")
 local bit = require("bit")
 
-local rectangles = require("structs/rectangle")
+local rectangles = require("structs.rectangle")
 
 local utils = {}
 
@@ -671,7 +671,7 @@ end
 
 -- Add filesystem specific helper methods
 local osFilename = love.system.getOS():lower():gsub(" ", "_")
-local hasOSHelper, osHelper = requireUtils.tryrequire("os_helpers." .. osFilename)
+local hasOSHelper, osHelper = requireUtils.tryrequire("utils.system." .. osFilename)
 
 function utils.getProcessId()
     return hasOSHelper and osHelper.getProcessId and osHelper.getProcessId()

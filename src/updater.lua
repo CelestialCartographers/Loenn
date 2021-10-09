@@ -1,12 +1,12 @@
-local filesystem = require("filesystem")
-local github = require("github")
+local filesystem = require("utils.filesystem")
+local github = require("utils.github")
 local configs = require("configs")
 local persistence = require("persistence")
 local utils = require("utils")
 local meta = require("meta")
-local versionParser = require("version_parser")
+local versionParser = require("utils.version_parser")
 local sceneHandler = require("scene_handler")
-local threadHandler = require("thread_handler")
+local threadHandler = require("utils.threads")
 
 -- TODO - Prompt to restart the program afterwards
 

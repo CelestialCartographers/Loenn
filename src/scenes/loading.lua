@@ -32,12 +32,12 @@ function loadingScene:loaded()
 end
 
 function loadingScene:firstEnter()
-    local tasks = require("task")
+    local tasks = require("utils.tasks")
 
-    local sandboxUtils = require("sandbox_utils")
+    local sandboxUtils = require("utils.sandbox")
 
     local sceneHandler = require("scene_handler")
-    local toolHandler = require("tool_handler")
+    local toolHandler = require("tools")
     local entities = require("entities")
     local triggers = require("triggers")
     local libraries = require("libraries")

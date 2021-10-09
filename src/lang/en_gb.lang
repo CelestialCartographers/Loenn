@@ -694,6 +694,7 @@ entities.everest/customBirdTutorial.description.onlyOnce=Whether the bird should
 
 # Gondola
 entities.gondola.name.gondola=Gondola
+entities.gondola.description.active=Whether the gondola is active or not. If the gondola is active it starts at the entity position, otherwise it starts at the node.
 
 # Intro Car
 entities.introCar.name.intro_car=Intro Car

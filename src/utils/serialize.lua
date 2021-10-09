@@ -1,7 +1,7 @@
 -- TODO - Allow passing around settings table instead of using args?
 -- Makes it easier to have "profiles" for serializing
 
-local sandboxUtils = require("sandbox_utils")
+local sandboxUtils = require("utils.sandbox")
 
 local serialize = {}
 

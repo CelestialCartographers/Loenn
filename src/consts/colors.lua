@@ -6,6 +6,7 @@ colors.tileBGMissingColor = {255 / 255, 195 / 255, 11 / 255}
 
 colors.entityMissingColor = {47 / 255, 114 / 255, 100 / 255, 0.75}
 colors.triggerColor = {47 / 255, 114 / 255, 100 / 255, 0.3}
+colors.triggerBorderColor = {38 / 255, 91 / 255, 80 / 255, 0.7}
 colors.triggerTextColor = {255 / 255, 255 / 255, 255 / 255}
 
 -- Room background colors
@@ -52,6 +53,10 @@ colors.selectionPreviewNodeLineColor = {255 / 255, 255 / 255, 0 / 255, 102 / 255
 colors.selectionCompleteBorderColor = {255 / 255, 0 / 255, 255 / 255, 153 / 255}
 colors.selectionCompleteFillColor = {255 / 255, 0 / 255, 255 / 255, 102 / 255}
 colors.selectionCompleteNodeLineColor = {255 / 255, 0 / 255, 255 / 255, 102 / 255}
+
+-- Selection tool axis bound movement
+colors.selectionAxisBoundMovementLines = {255 / 255, 255 / 255, 0 / 255, 153 / 255}
+colors.selectionAxisBoundSelectionBackground = {255 / 255, 0 / 255, 255 / 255, 102 / 255}
 
 -- Resize arrows device
 colors.resizeTriangleColor = {196 / 255, 196 / 255, 196 / 255}

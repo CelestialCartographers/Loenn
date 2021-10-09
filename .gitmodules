@@ -7,6 +7,6 @@
 	url = https://github.com/EverestAPI/OlympUI.git
 	branch = main
 [submodule "luajit-request"]
-	path = src/luajit-request
+	path = src/lib/luajit-request
 	url = https://github.com/Vexatos/luajit-request.git
 	branch = master

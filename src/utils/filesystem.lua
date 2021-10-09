@@ -1,10 +1,10 @@
-local lfs = require("lfs_ffi")
+local lfs = require("lib.lfs_ffi")
 local nfd = require("nfd")
-local physfs = require("physfs")
-local requireUtils = require("require_utils")
-local threadHandler = require("thread_handler")
+local physfs = require("lib.physfs")
+local requireUtils = require("utils.require")
+local threadHandler = require("utils.threads")
 
-local hasRequest, request = requireUtils.tryrequire("luajit-request.luajit-request")
+local hasRequest, request = requireUtils.tryrequire("lib.luajit-request.luajit-request")
 
 local filesystem = {}
 
@@ -71,7 +71,7 @@ function filesystem.stripExtension(path)
 end
 
 function filesystem.mkdir(path, mode)
-    return lfs.mkdir(path, mode or 436) -- octal mode 664
+    return lfs.mkdir(path, mode or 493) -- octal mode 755
 end
 
 filesystem.chdir = lfs.chdir

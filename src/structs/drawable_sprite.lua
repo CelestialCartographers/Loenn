@@ -1,6 +1,6 @@
 local atlases = require("atlases")
 local utils = require("utils")
-local drawing = require("drawing")
+local drawing = require("utils.drawing")
 
 local drawableSpriteStruct = {}
 

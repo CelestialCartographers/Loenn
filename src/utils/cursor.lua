@@ -1,5 +1,5 @@
 local utils = require("utils")
-local matrixLib = require("matrix")
+local matrixLib = require("utils.matrix")
 
 local resizeCursorMatrix = matrixLib.fromTable(
     {

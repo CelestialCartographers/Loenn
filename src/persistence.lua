@@ -2,7 +2,7 @@
 -- Should be easily accessible from code
 -- Used to store values between sessions, but not important enough to immediately flush to disk
 
-local config = require("config")
+local config = require("utils.config")
 local fileLocations = require("file_locations")
 
 local persistenceBufferTime = 300
