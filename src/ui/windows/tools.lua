@@ -9,7 +9,7 @@ local listWidgets = require("ui.widgets.lists")
 local simpleDocks = require("ui.widgets.simple_docks")
 
 local languageRegistry = require("language_registry")
-local toolHandler = require("tool_handler")
+local toolHandler = require("tools")
 
 local toolWindow = {}
 

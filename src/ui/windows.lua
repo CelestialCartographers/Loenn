@@ -3,7 +3,7 @@ local debugUtils = require("debug_utils")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
-local uiRoot = require("ui/ui_root")
+local uiRoot = require("ui.ui_root")
 
 local windows = {}
 
