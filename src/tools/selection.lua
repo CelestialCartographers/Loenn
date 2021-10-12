@@ -195,11 +195,13 @@ local function drawSelectionArea(room)
                     local borderColor = colors.selectionBorderColor
                     local fillColor = colors.selectionFillColor
 
+                    local lineWidth = love.graphics.getLineWidth()
+
                     love.graphics.setColor(fillColor)
                     love.graphics.rectangle("fill", x, y, width, height)
 
                     love.graphics.setColor(borderColor)
-                    love.graphics.rectangle("line", x, y, width, height)
+                    love.graphics.rectangle("line", x - lineWidth / 2, y - lineWidth / 2, width + lineWidth, height + lineWidth)
                 end)
             end)
         end
@@ -232,6 +234,8 @@ local function drawSelectionRectangles(room)
         local borderColor = preview and colors.selectionPreviewBorderColor or colors.selectionCompleteBorderColor
         local fillColor = preview and colors.selectionPreviewFillColor or colors.selectionCompleteFillColor
 
+        local lineWidth = love.graphics.getLineWidth()
+
         -- Draw all fills then borders
         -- Greatly reduces amount of setColor calls
         -- Potentially find a better solution?
@@ -254,7 +258,7 @@ local function drawSelectionRectangles(room)
                     local x, y = rectangle.x, rectangle.y
                     local width, height = rectangle.width, rectangle.height
 
-                    love.graphics.rectangle("line", x, y, width, height)
+                    love.graphics.rectangle("line", x - lineWidth / 2, y - lineWidth / 2, width + lineWidth, height + lineWidth)
                 end
             end)
         end)
