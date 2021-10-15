@@ -117,34 +117,6 @@ local function selectionChanged(x, y, width, height, fromClick)
     end
 end
 
-local function selectionStarted(x, y)
-    selectionRectangle = utils.rectangle(x, y, 0, 0)
-    selectionPreviews = nil
-    selectionCompleted = false
-    resizeDirection = nil
-    resizeDirectionPreview = nil
-
-    dragStartX = x
-    dragStartY = y
-end
-
-local function selectionFinished()
-    selectionRectangle = false
-    selectionCompleted = true
-end
-
-local function resizeStarted(x, y)
-    dragStartX = x
-    dragStartY = y
-end
-
-local function resizeFinished()
-    resizeDirection = nil
-    resizeDirectionPreview = nil
-    resizeLastOffsetX = nil
-    resizeLastOffsetY = nil
-end
-
 local function movementAttemptToActivate(cursorX, cursorY)
     if selectionPreviews and #selectionPreviews > 0 and not movementActive then
         local cursorRectangle = utils.rectangle(cursorX - 1, cursorY - 1, 3, 3)
@@ -160,27 +132,6 @@ local function movementAttemptToActivate(cursorX, cursorY)
     end
 
     return movementActive
-end
-
-local function movementStarted(x, y)
-    dragStartX = x
-    dragStartY = y
-
-    coverStartX, coverStartY, coverStartWidth, coverStartyHeight = utils.coverRectangles(selectionPreviews)
-    dragMovementTotalX, dragMovementTotalY = 0, 0
-end
-
-local function movementFinished()
-    dragStartX = nil
-    dragStartY = nil
-
-    movementActive = false
-    movementLastOffsetX = nil
-    movementLastOffsetY = nil
-
-    dragMovementTotalX, dragMovementTotalY = 0, 0
-
-    -- TODO - History
 end
 
 local function drawSelectionArea(room)
@@ -839,6 +790,82 @@ local function updateSelectionPreviews(cursorX, cursorY)
             end
         end
     end
+end
+
+local function selectionStarted(x, y)
+    selectionRectangle = utils.rectangle(x, y, 0, 0)
+    selectionPreviews = nil
+    selectionCompleted = false
+    resizeDirection = nil
+    resizeDirectionPreview = nil
+
+    dragStartX = x
+    dragStartY = y
+end
+
+local function selectionFinished()
+    selectionRectangle = false
+    selectionCompleted = true
+end
+
+local function resizeStarted(x, y)
+    dragStartX = x
+    dragStartY = y
+end
+
+local function resizeFinished()
+    if selectionPreviews and #selectionPreviews > 0 and resizeDirection and (resizeLastOffsetX ~= 0 or resizeLastOffsetY ~= 0) then
+        local room = state.getSelectedRoom()
+        local directionX, directionY = unpack(resizeDirection)
+        local deltaX, deltaY = resizeLastOffsetX, resizeLastOffsetY
+        local offsetX, offsetY = deltaX * directionX, deltaY * directionY
+
+        -- Don't call forward function, we have already resized the items
+        local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, directionX, directionY, false)
+
+        if snapshot then
+            history.addSnapshot(snapshot)
+        end
+
+        if redraw then
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
+    end
+
+    resizeDirection = nil
+    resizeDirectionPreview = nil
+    resizeLastOffsetX = nil
+    resizeLastOffsetY = nil
+end
+
+local function movementStarted(x, y)
+    dragStartX = x
+    dragStartY = y
+
+    coverStartX, coverStartY, coverStartWidth, coverStartyHeight = utils.coverRectangles(selectionPreviews)
+    dragMovementTotalX, dragMovementTotalY = 0, 0
+end
+
+local function movementFinished()
+    if selectionPreviews and #selectionPreviews > 0 and dragMovementTotalX ~= 0 or dragMovementTotalY ~= 0 then
+        -- Don't call forward function, we have already moved the items
+        local room = state.getSelectedRoom()
+        local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, dragMovementTotalX, dragMovementTotalY, false)
+
+        if snapshot then
+            history.addSnapshot(snapshot)
+        end
+
+        if redraw then
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
+    end
+
+    movementActive = false
+    movementLastOffsetX = nil
+    movementLastOffsetY = nil
+
+    dragMovementTotalX, dragMovementTotalY = 0, 0
 end
 
 local toolHotkeys = {
