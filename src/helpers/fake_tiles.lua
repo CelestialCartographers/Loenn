@@ -2,7 +2,7 @@ local celesteRender = require("celeste_render")
 local utils = require("utils")
 local matrix = require("utils.matrix")
 local drawableSprite = require("structs.drawable_sprite")
-local drawableRectangle = require("structs.rectangle")
+local drawableRectangle = require("structs.drawable_rectangle")
 local colors = require("consts.colors")
 
 local fakeTilesHelper = {}
@@ -126,7 +126,7 @@ function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, 
         -- Filter out padding pieces for blending
         if tileX > 1 and tileX < tileWidth - 2 and tileY > 1 and tileX < tileHeight - 2 then
             local drawX, drawY = tileX * 8 + offsetX - 16, tileY * 8 + offsetY - 16
-            local sprite = drawableRectangle.fromRectangle(drawX, drawY, 8, 8, missingColor)
+            local sprite = drawableRectangle.fromRectangle("fill", drawX, drawY, 8, 8, missingColor)
 
             table.insert(sprites, sprite)
         end
