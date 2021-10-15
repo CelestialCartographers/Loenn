@@ -397,35 +397,35 @@ local function getFlipCallback(room, layer, previews, horizontal, vertical)
     end
 end
 
-local function moveItems(room, layer, previews, offsetX, offsetY)
+local function moveItems(room, layer, previews, offsetX, offsetY, callForward)
     local forward = getMoveCallback(room, layer, previews, offsetX, offsetY)
     local backward = getMoveCallback(room, layer, previews, -offsetX, -offsetY)
-    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved")
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved", callForward)
 
     return snapshot, redraw
 end
 
-local function resizeItems(room, layer, previews, offsetX, offsetY, directionX, directionY)
+local function resizeItems(room, layer, previews, offsetX, offsetY, directionX, directionY, callForward)
     local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, directionX, directionY)
-    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, -directionX, -directionY)
-    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
+    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, directionX, directionY)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
 
 
-local function rotateItems(room, layer, previews, direction)
+local function rotateItems(room, layer, previews, direction, callForward)
     local forward = getRotationCallback(room, layer, previews, direction)
     local backward = getRotationCallback(room, layer, previews, -direction)
-    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
 
-local function flipItems(room, layer, previews, horizontal, vertical)
+local function flipItems(room, layer, previews, horizontal, vertical, callForward)
     local forward = getFlipCallback(room, layer, previews, horizontal, vertical)
     local backward = getFlipCallback(room, layer, previews, horizontal, vertical)
-    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
