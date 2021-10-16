@@ -814,7 +814,9 @@ local function resizeStarted(x, y)
 end
 
 local function resizeFinished()
-    if selectionPreviews and #selectionPreviews > 0 and resizeDirection and (resizeLastOffsetX ~= 0 or resizeLastOffsetY ~= 0) then
+    local hasResizeDelta = resizeLastOffsetX and resizeLastOffsetY and (resizeLastOffsetX ~= 0 or resizeLastOffsetY ~= 0)
+
+    if selectionPreviews and #selectionPreviews > 0 and resizeDirection and hasResizeDelta then
         local room = state.getSelectedRoom()
         local directionX, directionY = unpack(resizeDirection)
         local deltaX, deltaY = resizeLastOffsetX, resizeLastOffsetY
@@ -847,7 +849,9 @@ local function movementStarted(x, y)
 end
 
 local function movementFinished()
-    if selectionPreviews and #selectionPreviews > 0 and dragMovementTotalX ~= 0 or dragMovementTotalY ~= 0 then
+    local hasMovementDelta = dragMovementTotalX and dragMovementTotalY and (dragMovementTotalX ~= 0 or dragMovementTotalY ~= 0)
+
+    if selectionPreviews and #selectionPreviews > 0 and hasMovementDelta then
         -- Don't call forward function, we have already moved the items
         local room = state.getSelectedRoom()
         local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, dragMovementTotalX, dragMovementTotalY, false)
