@@ -753,7 +753,7 @@ local function updateCursor()
     previousCursor = cursorUtils.setCursor(cursor, previousCursor)
 end
 
-local function updateSelectionPreviews(cursorX, cursorY)
+local function updateSelectionPreviews(x, y)
     if selectionPreviews then
         local couldResize = #selectionPreviews > 0
 
@@ -767,7 +767,7 @@ local function updateSelectionPreviews(cursorX, cursorY)
             local cameraZoom = viewport.scale
             local borderThreshold = 4 / cameraZoom
 
-            local point = utils.point(cursorX, cursorY)
+            local point = utils.point(x, y)
 
             -- Find first selection where we are on the border
             for _, preview in ipairs(selectionPreviews) do
@@ -803,7 +803,7 @@ local function selectionStarted(x, y)
     dragStartY = y
 end
 
-local function selectionFinished()
+local function selectionFinished(x, y)
     selectionRectangle = false
     selectionCompleted = true
 end
@@ -813,7 +813,7 @@ local function resizeStarted(x, y)
     dragStartY = y
 end
 
-local function resizeFinished()
+local function resizeFinished(x, y)
     local hasResizeDelta = resizeLastOffsetX and resizeLastOffsetY and (resizeLastOffsetX ~= 0 or resizeLastOffsetY ~= 0)
 
     if selectionPreviews and #selectionPreviews > 0 and resizeDirection and hasResizeDelta then
@@ -838,6 +838,8 @@ local function resizeFinished()
     resizeDirectionPreview = nil
     resizeLastOffsetX = nil
     resizeLastOffsetY = nil
+
+    updateSelectionPreviews(x, y)
 end
 
 local function movementStarted(x, y)
@@ -848,7 +850,7 @@ local function movementStarted(x, y)
     dragMovementTotalX, dragMovementTotalY = 0, 0
 end
 
-local function movementFinished()
+local function movementFinished(x, y)
     local hasMovementDelta = dragMovementTotalX and dragMovementTotalY and (dragMovementTotalX ~= 0 or dragMovementTotalY ~= 0)
 
     if selectionPreviews and #selectionPreviews > 0 and hasMovementDelta then
@@ -1040,20 +1042,22 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
     local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-    if love.mouse.isDown(actionButton) then
-        -- Try in this order: resize, move, select
-        if resizeDirection then
-            mouseMovedResize(cursorX, cursorY)
+    if cursorX and cursorY then
+        if love.mouse.isDown(actionButton) then
+            -- Try in this order: resize, move, select
+            if resizeDirection then
+                mouseMovedResize(cursorX, cursorY)
 
-        elseif movementActive then
-            mouseMovedMovement(cursorX, cursorY)
+            elseif movementActive then
+                mouseMovedMovement(cursorX, cursorY)
+
+            else
+                mouseMovedSelection(cursorX, cursorY)
+            end
 
         else
-            mouseMovedSelection(cursorX, cursorY)
+            updateSelectionPreviews(cursorX, cursorY)
         end
-
-    else
-        updateSelectionPreviews(cursorX, cursorY)
     end
 
     updateCursor()
@@ -1063,12 +1067,17 @@ function tool.mousereleased(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
-        selectionFinished()
-        resizeFinished()
-        movementFinished()
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-        updateCursor()
+        if cursorX and cursorY then
+            selectionFinished(cursorX, cursorY)
+            resizeFinished(cursorX, cursorY)
+            movementFinished(cursorX, cursorY)
+
+        end
     end
+
+    updateCursor()
 end
 
 -- Special case
@@ -1082,9 +1091,9 @@ function tool.mouseclicked(x, y, button, istouch, presses)
         if cursorX and cursorY then
             selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
 
-            selectionFinished()
-            resizeFinished()
-            movementFinished()
+            selectionFinished(cursorX, cursorX)
+            resizeFinished(cursorX, cursorX)
+            movementFinished(cursorX, cursorX)
         end
 
     elseif button == contextMenuButton then
