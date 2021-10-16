@@ -74,43 +74,52 @@ function config.writeConfigData(filename, data, pretty)
     return success
 end
 
-function config.createConfig(filename, data, bufferTime, matchDisk, pretty)
+function config.createConfig(filename, data, writeBufferTime, readBufferTime, matchDisk, pretty)
     local conf = {
         __type = "config"
     }
 
     conf.filename = filename
     conf.data = data or {}
-    conf.bufferTime = bufferTime or -1
+    conf.writeBufferTime = writeBufferTime or -1
+    conf.readBufferTime = readBufferTime or 2.5
     conf.matchDisk = matchDisk == nil or matchDisk
     conf.pretty = pretty == nil or pretty
     conf.mtime = os.time()
+    conf.lastCheck = os.time()
 
     return setmetatable(conf, configMt)
 end
 
-function config.readConfig(filename, bufferTime, matchDisk, pretty)
-    return config.createConfig(filename, config.readConfigData(filename), bufferTime, matchDisk, pretty)
+function config.readConfig(filename, writeBufferTime, readBufferTime, matchDisk, pretty)
+    return config.createConfig(filename, config.readConfigData(filename), writeBufferTime, readBufferTime, matchDisk, pretty)
 end
 
-function config.updateConfig(conf)
+function config.updateConfig(conf, force)
     local matchDisk = rawget(conf, "matchDisk")
 
     if matchDisk then
-        local mtime = rawget(conf, "mtime") or 0
-        local filename = rawget(conf, "filename")
-        local attrs = utils.pathAttributes(filename)
+        local lastCheck = rawget(conf, "lastCheck") or 0
+        local bufferTime = rawget(conf, "readBufferTime") or 2.5
 
-        if attrs and attrs.modification > mtime then
-            rawset(conf, "data", config.readConfigData(filename))
-            rawset(conf, "mtime", os.time())
+        if force or bufferTime <= 0 or lastCheck + bufferTime < os.time() then
+            local mtime = rawget(conf, "mtime") or 0
+            local filename = rawget(conf, "filename")
+            local attrs = utils.pathAttributes(filename)
+
+            if attrs and attrs.modification > mtime then
+                rawset(conf, "data", config.readConfigData(filename))
+                rawset(conf, "mtime", os.time())
+            end
+
+            rawset(conf, "lastCheck", os.time())
         end
     end
 end
 
 function config.writeConfig(conf, force)
     local mtime = rawget(conf, "mtime") or 0
-    local bufferTime = rawget(conf, "bufferTime") or -1
+    local bufferTime = rawget(conf, "writeBufferTime") or -1
 
     if force or bufferTime <= 0 or mtime + bufferTime < os.time() then
         local filename = rawget(conf, "filename")
