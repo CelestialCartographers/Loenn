@@ -78,10 +78,10 @@ function loadingScene:firstEnter()
             triggers.loadInternalTriggers()
             triggers.loadExternalTriggers()
 
+            atlases.loadCelesteAtlases()
+
             toolHandler.loadInternalTools()
             toolHandler.loadExternalTools()
-
-            atlases.loadCelesteAtlases()
 
             if userInterfaceDevice.initializeDevice then
                 userInterfaceDevice.initializeDevice()
@@ -101,7 +101,6 @@ function loadingScene:firstEnter()
 
     viewerState.loadFile(lastMapFilename or defaultMapFilename, lastRoomName)
     viewportHandler.cameraFromPersistence()
-    toolHandler.loadFromPersistence()
 end
 
 function loadingScene:draw()

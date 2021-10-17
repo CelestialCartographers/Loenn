@@ -11,10 +11,6 @@ toolHandler.tools = {}
 toolHandler.currentTool = nil
 toolHandler.currentToolName = nil
 
-function toolHandler.getPersistenceKey(toolName, suffix)
-    return string.format("tool%s%s", utils.humanizeVariableName(toolName), suffix)
-end
-
 function toolHandler.selectTool(name)
     local handler = toolHandler.tools[name]
     local currentTool = toolHandler.currentTool
@@ -26,7 +22,6 @@ function toolHandler.selectTool(name)
 
         toolHandler.currentTool = handler
         toolHandler.currentToolName = name
-        persistence.toolName = name
 
         if handler.selected then
             handler.selected()
@@ -34,14 +29,10 @@ function toolHandler.selectTool(name)
 
         toolUtils.sendToolEvent(handler)
 
-        -- Load previous mode, layer and material from persistence
-        local modeKey = toolHandler.getPersistenceKey(name, "Mode")
-        local layerKey = toolHandler.getPersistenceKey(name, "Layer")
-        local materialKey = toolHandler.getPersistenceKey(name, "Material")
+        -- Load previous mode and layer from persistence
 
-        local modeValue = persistence[modeKey]
-        local layerValue = persistence[layerKey]
-        local materialValue = persistence[materialKey]
+        local modeValue = toolUtils.getPersistenceMode(name)
+        local layerValue = toolUtils.getPersistenceLayer(name)
 
         if modeValue then
             toolHandler.setMode(modeValue, name)
@@ -49,10 +40,6 @@ function toolHandler.selectTool(name)
 
         if layerValue then
             toolHandler.setLayer(layerValue, name)
-        end
-
-        if materialValue then
-            toolHandler.setMaterial(materialValue, name)
         end
     end
 
@@ -65,6 +52,9 @@ function toolHandler.loadTool(filename)
 
     local handler = utils.rerequire(pathNoExt)
     local name = handler.name or filenameNoExt
+
+    -- Make sure tools always have a name
+    handler.name = name
 
     if configs.debug.logPluginLoading then
         print("! Loaded tool '" .. name ..  "'")
@@ -106,9 +96,6 @@ function toolHandler.setMaterial(material, name)
 
     if handler then
         local oldMaterial = toolHandler.getMaterial(name)
-        local persistenceKey = toolHandler.getPersistenceKey(toolName, "Material")
-
-        persistence[persistenceKey] = material
 
         if handler.setMaterial then
             return handler.setMaterial(material, oldMaterial)
@@ -158,11 +145,7 @@ function toolHandler.setLayer(layer, name)
             return false
         end
 
-
         local oldLayer = toolHandler.getLayer(name)
-        local persistenceKey = toolHandler.getPersistenceKey(toolName, "Layer")
-
-        persistence[persistenceKey] = layer
 
         if handler.setLayer then
             return handler.setLayer(layer, oldLayer)
@@ -171,6 +154,12 @@ function toolHandler.setLayer(layer, name)
             handler.layer = layer
 
             toolUtils.sendLayerEvent(handler, layer)
+
+            local materialValue = toolUtils.getPersistenceMaterial(toolName, layer)
+
+            if materialValue then
+                toolHandler.setMaterial(materialValue, name)
+            end
         end
     end
 
@@ -218,9 +207,6 @@ function toolHandler.setMode(mode, name)
         end
 
         local oldMode = toolHandler.getMode(name)
-        local persistenceKey = toolHandler.getPersistenceKey(toolName, "Mode")
-
-        persistence[persistenceKey] = mode
 
         if handler.setMode then
             return handler.setMode(mode, oldMode)
@@ -270,10 +256,6 @@ function toolHandler.loadExternalTools()
     local filenames = modHandler.findPlugins("tools")
 
     pluginLoader.loadPlugins(filenames, nil, toolHandler.loadTool)
-end
-
-function toolHandler.loadFromPersistence()
-    toolHandler.selectTool(persistence.toolName)
 end
 
 return toolHandler

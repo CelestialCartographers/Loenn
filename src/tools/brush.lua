@@ -133,6 +133,12 @@ function tool.setLayer(layer)
 
     updateMaterialLookup()
     toolUtils.sendLayerEvent(tool, layer)
+
+    local persistenceMaterial = toolUtils.getPersistenceMaterial(tool.name, layer)
+
+    if persistenceMaterial then
+        tool.setMaterial(persistenceMaterial)
+    end
 end
 
 function tool.mouseclicked(x, y, button, istouch, pressed)

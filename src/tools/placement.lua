@@ -398,8 +398,13 @@ function tool.setLayer(layer)
         placementsAvailable = placementUtils.getPlacements(layer)
 
         selectPlacement(nil, 1)
-
         toolUtils.sendLayerEvent(tool, layer)
+
+        local persistenceMaterial = toolUtils.getPersistenceMaterial(tool.name, layer)
+
+        if persistenceMaterial then
+            tool.setMaterial(persistenceMaterial)
+        end
     end
 end
 

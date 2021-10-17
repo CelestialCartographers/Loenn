@@ -1,8 +1,10 @@
 local toolHandler = require("tools")
+local toolUtils = require("tool_utils")
 
 local state = require("loaded_state")
 local viewport = require("viewport_handler")
 local utils = require("utils")
+local persistence = require("persistence")
 local configs = require("configs")
 local keyboardHelper = require("utils.keyboard")
 
@@ -85,6 +87,28 @@ function device.mouseclicked(x, y, button, istouch, presses)
     if currentTool and currentTool.mouseclicked then
         currentTool.mouseclicked(x, y, button, istouch, presses)
     end
+end
+
+function device.editorToolChanged(tool)
+    persistence.toolName = tool.name
+end
+
+function device.editorToolModeChanged(tool, mode)
+    local persistenceKey = toolUtils.getPersistenceKey(tool.name, "mode")
+
+    persistence[persistenceKey] = mode
+end
+
+function device.editorToolLayerChanged(tool, layer)
+    local persistenceKey = toolUtils.getPersistenceKey(tool.name, "layer")
+
+    persistence[persistenceKey] = layer
+end
+
+function device.editorToolMaterialChanged(tool, layer, material)
+    local persistenceKey = toolUtils.getPersistenceKey(tool.name, layer, "material")
+
+    persistence[persistenceKey] = material
 end
 
 return device
