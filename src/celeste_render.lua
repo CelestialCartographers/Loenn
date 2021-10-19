@@ -132,8 +132,17 @@ function celesteRender.releaseBatch(roomName, key)
     if roomCache[roomName] and roomCache[roomName][key] and roomCache[roomName][key].result then
         local target = roomCache[roomName][key].result
 
-        if target.release then
-            target:release()
+        if utils.typeof(target) == "table" then
+            for depth, depthTarget in pairs(target) do
+                if depthTarget.release then
+                    depthTarget:release()
+                end
+            end
+
+        else
+            if target.release then
+                target:release()
+            end
         end
     end
 end
@@ -160,6 +169,10 @@ function celesteRender.invalidateRoomCache(roomName, key)
         end
 
     else
+        for name, _ in pairs(roomCache) do
+            celesteRender.invalidateRoomCache(name)
+        end
+
         roomCache = {}
     end
 end
