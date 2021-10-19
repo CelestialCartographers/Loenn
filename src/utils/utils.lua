@@ -226,6 +226,10 @@ function utils.findCharacter(string, character)
     end
 end
 
+function utils.titleCase(name)
+    return name:gsub("(%a)(%a*)", function(a, b) return string.upper(a) .. b end)
+end
+
 function utils.humanizeVariableName(name)
     local res = name
 

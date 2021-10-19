@@ -178,6 +178,12 @@ function tool.setLayer(layer)
 
     updateMaterialLookup()
     toolUtils.sendLayerEvent(tool, layer)
+
+    local persistenceMaterial = toolUtils.getPersistenceMaterial(tool.name, layer)
+
+    if persistenceMaterial then
+        tool.setMaterial(persistenceMaterial)
+    end
 end
 
 function tool.mouseclicked(x, y, button, istouch, pressed)
@@ -254,6 +260,12 @@ function tool.draw()
             drawing.callKeepOriginalColor(function()
                 love.graphics.setColor(colors.brushColor)
                 love.graphics.rectangle("line", brushX * 8, brushY * 8, width * 8, height * 8)
+
+                -- Draw inner rectangle to indicate line mode
+                -- Only needed if the selected area is large enough
+                if tool.mode == "line" and width > 2 and height > 2 then
+                    love.graphics.rectangle("line", brushX * 8 + 8, brushY * 8 + 8, width * 8 - 16, height * 8 - 16)
+                end
             end)
         end)
     end

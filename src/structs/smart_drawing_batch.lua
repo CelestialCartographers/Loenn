@@ -125,9 +125,7 @@ function orderedDrawingBatchMt.__index:clear()
 end
 
 function orderedDrawingBatchMt.__index:release()
-    for _, element in ipairs(self._drawables) do
-        local drawable = element[1]
-
+    for _, drawable in ipairs(self._drawables) do
         if utils.typeof(drawable) == "SpriteBatch" then
             drawable:release()
         end

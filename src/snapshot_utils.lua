@@ -74,7 +74,7 @@ function snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, laye
         room = room.name
     }
 
-    local res
+    local res = {}
 
     if callForward ~= false then
         res = {forward()}

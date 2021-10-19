@@ -1,5 +1,6 @@
 local utils = require("utils")
 local configs = require("configs")
+local persistence = require("persistence")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local toolUtils = require("tool_utils")
@@ -22,11 +23,24 @@ function toolHandler.selectTool(name)
         toolHandler.currentTool = handler
         toolHandler.currentToolName = name
 
-        if handler and handler.selected then
+        if handler.selected then
             handler.selected()
         end
 
         toolUtils.sendToolEvent(handler)
+
+        -- Load previous mode and layer from persistence
+
+        local modeValue = toolUtils.getPersistenceMode(name)
+        local layerValue = toolUtils.getPersistenceLayer(name)
+
+        if modeValue then
+            toolHandler.setMode(modeValue, name)
+        end
+
+        if layerValue then
+            toolHandler.setLayer(layerValue, name)
+        end
     end
 
     return handler ~= nil
@@ -39,6 +53,9 @@ function toolHandler.loadTool(filename)
     local handler = utils.rerequire(pathNoExt)
     local name = handler.name or filenameNoExt
 
+    -- Make sure tools always have a name
+    handler.name = name
+
     if configs.debug.logPluginLoading then
         print("! Loaded tool '" .. name ..  "'")
     end
@@ -47,10 +64,6 @@ function toolHandler.loadTool(filename)
 
     if handler and handler.load then
         handler.load()
-    end
-
-    if not toolHandler.currentTool then
-        toolHandler.selectTool(name)
     end
 
     return name
@@ -65,7 +78,7 @@ end
 local function getHandler(name)
     name = name or toolHandler.currentToolName
 
-    return toolHandler.tools[name]
+    return toolHandler.tools[name], name
 end
 
 function toolHandler.getMaterials(name, layer)
@@ -79,7 +92,7 @@ function toolHandler.getMaterials(name, layer)
 end
 
 function toolHandler.setMaterial(material, name)
-    local handler = getHandler(name)
+    local handler, toolName = getHandler(name)
 
     if handler then
         local oldMaterial = toolHandler.getMaterial(name)
@@ -115,7 +128,7 @@ function toolHandler.getLayers(name)
             return handler.getLayers()
 
         else
-            return handler.validLayers
+            return handler.validLayers or {}
         end
     end
 
@@ -123,9 +136,15 @@ function toolHandler.getLayers(name)
 end
 
 function toolHandler.setLayer(layer, name)
-    local handler = getHandler(name)
+    local handler, toolName = getHandler(name)
 
     if handler then
+        local validLayers = toolHandler.getLayers(name)
+
+        if not utils.contains(layer, validLayers) then
+            return false
+        end
+
         local oldLayer = toolHandler.getLayer(name)
 
         if handler.setLayer then
@@ -134,7 +153,13 @@ function toolHandler.setLayer(layer, name)
         elseif handler.layer then
             handler.layer = layer
 
-            toolUtils.sendLayerEvent(toolHandler.currentTool, layer)
+            toolUtils.sendLayerEvent(handler, layer)
+
+            local materialValue = toolUtils.getPersistenceMaterial(toolName, layer)
+
+            if materialValue then
+                toolHandler.setMaterial(materialValue, name)
+            end
         end
     end
 
@@ -164,7 +189,7 @@ function toolHandler.getModes(name)
             return handler.getModes()
 
         else
-            return handler.modes
+            return handler.modes or {}
         end
     end
 
@@ -172,9 +197,15 @@ function toolHandler.getModes(name)
 end
 
 function toolHandler.setMode(mode, name)
-    local handler = getHandler(name)
+    local handler, toolName = getHandler(name)
 
     if handler then
+        local modes = toolHandler.getModes(name)
+
+        if not utils.contains(mode, modes) then
+            return false
+        end
+
         local oldMode = toolHandler.getMode(name)
 
         if handler.setMode then
@@ -183,7 +214,7 @@ function toolHandler.setMode(mode, name)
         elseif handler.mode then
             handler.mode = mode
 
-            toolUtils.sendToolModeEvent(toolHandler.currentTool, mode)
+            toolUtils.sendToolModeEvent(handler, mode)
         end
     end
 
@@ -207,8 +238,18 @@ end
 
 function toolHandler.loadInternalTools(path)
     path = path or "tools"
+    local previousToolName = persistence.toolName
 
     pluginLoader.loadPlugins(path, nil, toolHandler.loadTool)
+    toolHandler.selectTool(previousToolName)
+
+    -- Select the first tool (alphabetically) if none is selected
+    if not toolHandler.currentTool then
+        local toolNames = table.keys(toolHandler.tools)
+
+        table.sort(toolNames)
+        toolHandler.selectTool(toolNames[1])
+    end
 end
 
 function toolHandler.loadExternalTools()

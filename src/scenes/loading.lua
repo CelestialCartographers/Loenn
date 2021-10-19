@@ -78,10 +78,10 @@ function loadingScene:firstEnter()
             triggers.loadInternalTriggers()
             triggers.loadExternalTriggers()
 
+            atlases.loadCelesteAtlases()
+
             toolHandler.loadInternalTools()
             toolHandler.loadExternalTools()
-
-            atlases.loadCelesteAtlases()
 
             if userInterfaceDevice.initializeDevice then
                 userInterfaceDevice.initializeDevice()

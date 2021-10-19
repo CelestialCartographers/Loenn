@@ -68,10 +68,10 @@ local function addBlockSprites(sprites, entity, frameTexture, middleTexture)
 
     local frameNinePatch = drawableNinePatch.fromTexture(frameTexture, frameNinePatchOptions, x, y, width, height)
     local frameSprites = frameNinePatch:getDrawableSprite()
+    local middleSprite = drawableSprite.fromTexture(middleTexture, entity)
 
-    local lightsSprite = drawableSprite.fromTexture(middleTexture, entity)
-
-    lightsSprite:addPosition(math.floor(width / 2), math.floor(height / 2))
+    middleSprite:addPosition(math.floor(width / 2), math.floor(height / 2))
+    middleSprite.depth = blockDepth
 
     for _, sprite in ipairs(frameSprites) do
         sprite.depth = blockDepth
@@ -79,7 +79,7 @@ local function addBlockSprites(sprites, entity, frameTexture, middleTexture)
         table.insert(sprites, sprite)
     end
 
-    table.insert(sprites, lightsSprite)
+    table.insert(sprites, middleSprite)
 end
 
 local function addTrailSprites(sprites, entity, trailTexture, path)
@@ -135,6 +135,15 @@ function swapBlock.nodeSprite(room, entity)
     addBlockSprites(sprites, entity, themeData.frame, themeData.middle)
 
     return sprites
+end
+
+function swapBlock.selection(room, entity)
+    local nodes = entity.nodes or {}
+    local x, y = entity.x or 0, entity.y or 0
+    local nodeX, nodeY = nodes[1].x or x, nodes[1].y or y
+    local width, height = entity.width or 8, entity.height or 8
+
+    return utils.rectangle(x, y, width, height), {utils.rectangle(nodeX, nodeY, width, height)}
 end
 
 return swapBlock

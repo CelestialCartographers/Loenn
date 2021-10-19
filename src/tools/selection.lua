@@ -117,34 +117,6 @@ local function selectionChanged(x, y, width, height, fromClick)
     end
 end
 
-local function selectionStarted(x, y)
-    selectionRectangle = utils.rectangle(x, y, 0, 0)
-    selectionPreviews = nil
-    selectionCompleted = false
-    resizeDirection = nil
-    resizeDirectionPreview = nil
-
-    dragStartX = x
-    dragStartY = y
-end
-
-local function selectionFinished()
-    selectionRectangle = false
-    selectionCompleted = true
-end
-
-local function resizeStarted(x, y)
-    dragStartX = x
-    dragStartY = y
-end
-
-local function resizeFinished()
-    resizeDirection = nil
-    resizeDirectionPreview = nil
-    resizeLastOffsetX = nil
-    resizeLastOffsetY = nil
-end
-
 local function movementAttemptToActivate(cursorX, cursorY)
     if selectionPreviews and #selectionPreviews > 0 and not movementActive then
         local cursorRectangle = utils.rectangle(cursorX - 1, cursorY - 1, 3, 3)
@@ -162,27 +134,6 @@ local function movementAttemptToActivate(cursorX, cursorY)
     return movementActive
 end
 
-local function movementStarted(x, y)
-    dragStartX = x
-    dragStartY = y
-
-    coverStartX, coverStartY, coverStartWidth, coverStartyHeight = utils.coverRectangles(selectionPreviews)
-    dragMovementTotalX, dragMovementTotalY = 0, 0
-end
-
-local function movementFinished()
-    dragStartX = nil
-    dragStartY = nil
-
-    movementActive = false
-    movementLastOffsetX = nil
-    movementLastOffsetY = nil
-
-    dragMovementTotalX, dragMovementTotalY = 0, 0
-
-    -- TODO - History
-end
-
 local function drawSelectionArea(room)
     if selectionRectangle and not resizeDirection then
         -- Don't render if selection rectangle is too small, weird visuals
@@ -195,11 +146,13 @@ local function drawSelectionArea(room)
                     local borderColor = colors.selectionBorderColor
                     local fillColor = colors.selectionFillColor
 
+                    local lineWidth = love.graphics.getLineWidth()
+
                     love.graphics.setColor(fillColor)
                     love.graphics.rectangle("fill", x, y, width, height)
 
                     love.graphics.setColor(borderColor)
-                    love.graphics.rectangle("line", x, y, width, height)
+                    love.graphics.rectangle("line", x - lineWidth / 2, y - lineWidth / 2, width + lineWidth, height + lineWidth)
                 end)
             end)
         end
@@ -232,6 +185,8 @@ local function drawSelectionRectangles(room)
         local borderColor = preview and colors.selectionPreviewBorderColor or colors.selectionCompleteBorderColor
         local fillColor = preview and colors.selectionPreviewFillColor or colors.selectionCompleteFillColor
 
+        local lineWidth = love.graphics.getLineWidth()
+
         -- Draw all fills then borders
         -- Greatly reduces amount of setColor calls
         -- Potentially find a better solution?
@@ -254,7 +209,7 @@ local function drawSelectionRectangles(room)
                     local x, y = rectangle.x, rectangle.y
                     local width, height = rectangle.width, rectangle.height
 
-                    love.graphics.rectangle("line", x, y, width, height)
+                    love.graphics.rectangle("line", x - lineWidth / 2, y - lineWidth / 2, width + lineWidth, height + lineWidth)
                 end
             end)
         end)
@@ -393,35 +348,35 @@ local function getFlipCallback(room, layer, previews, horizontal, vertical)
     end
 end
 
-local function moveItems(room, layer, previews, offsetX, offsetY)
+local function moveItems(room, layer, previews, offsetX, offsetY, callForward)
     local forward = getMoveCallback(room, layer, previews, offsetX, offsetY)
     local backward = getMoveCallback(room, layer, previews, -offsetX, -offsetY)
-    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved")
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved", callForward)
 
     return snapshot, redraw
 end
 
-local function resizeItems(room, layer, previews, offsetX, offsetY, directionX, directionY)
+local function resizeItems(room, layer, previews, offsetX, offsetY, directionX, directionY, callForward)
     local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, directionX, directionY)
-    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, -directionX, -directionY)
-    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
+    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, directionX, directionY)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
 
 
-local function rotateItems(room, layer, previews, direction)
+local function rotateItems(room, layer, previews, direction, callForward)
     local forward = getRotationCallback(room, layer, previews, direction)
     local backward = getRotationCallback(room, layer, previews, -direction)
-    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
 
-local function flipItems(room, layer, previews, horizontal, vertical)
+local function flipItems(room, layer, previews, horizontal, vertical, callForward)
     local forward = getFlipCallback(room, layer, previews, horizontal, vertical)
     local backward = getFlipCallback(room, layer, previews, horizontal, vertical)
-    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized")
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
@@ -798,7 +753,7 @@ local function updateCursor()
     previousCursor = cursorUtils.setCursor(cursor, previousCursor)
 end
 
-local function updateSelectionPreviews(cursorX, cursorY)
+local function updateSelectionPreviews(x, y)
     if selectionPreviews then
         local couldResize = #selectionPreviews > 0
 
@@ -812,7 +767,7 @@ local function updateSelectionPreviews(cursorX, cursorY)
             local cameraZoom = viewport.scale
             local borderThreshold = 4 / cameraZoom
 
-            local point = utils.point(cursorX, cursorY)
+            local point = utils.point(x, y)
 
             -- Find first selection where we are on the border
             for _, preview in ipairs(selectionPreviews) do
@@ -835,6 +790,88 @@ local function updateSelectionPreviews(cursorX, cursorY)
             end
         end
     end
+end
+
+local function selectionStarted(x, y)
+    selectionRectangle = utils.rectangle(x, y, 0, 0)
+    selectionPreviews = nil
+    selectionCompleted = false
+    resizeDirection = nil
+    resizeDirectionPreview = nil
+
+    dragStartX = x
+    dragStartY = y
+end
+
+local function selectionFinished(x, y)
+    selectionRectangle = false
+    selectionCompleted = true
+end
+
+local function resizeStarted(x, y)
+    dragStartX = x
+    dragStartY = y
+end
+
+local function resizeFinished(x, y)
+    local hasResizeDelta = resizeLastOffsetX and resizeLastOffsetY and (resizeLastOffsetX ~= 0 or resizeLastOffsetY ~= 0)
+
+    if selectionPreviews and #selectionPreviews > 0 and resizeDirection and hasResizeDelta then
+        local room = state.getSelectedRoom()
+        local directionX, directionY = unpack(resizeDirection)
+        local deltaX, deltaY = resizeLastOffsetX, resizeLastOffsetY
+        local offsetX, offsetY = deltaX * directionX, deltaY * directionY
+
+        -- Don't call forward function, we have already resized the items
+        local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, directionX, directionY, false)
+
+        if snapshot then
+            history.addSnapshot(snapshot)
+        end
+
+        if redraw then
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
+    end
+
+    resizeDirection = nil
+    resizeDirectionPreview = nil
+    resizeLastOffsetX = nil
+    resizeLastOffsetY = nil
+
+    updateSelectionPreviews(x, y)
+end
+
+local function movementStarted(x, y)
+    dragStartX = x
+    dragStartY = y
+
+    coverStartX, coverStartY, coverStartWidth, coverStartyHeight = utils.coverRectangles(selectionPreviews)
+    dragMovementTotalX, dragMovementTotalY = 0, 0
+end
+
+local function movementFinished(x, y)
+    local hasMovementDelta = dragMovementTotalX and dragMovementTotalY and (dragMovementTotalX ~= 0 or dragMovementTotalY ~= 0)
+
+    if selectionPreviews and #selectionPreviews > 0 and hasMovementDelta then
+        -- Don't call forward function, we have already moved the items
+        local room = state.getSelectedRoom()
+        local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, dragMovementTotalX, dragMovementTotalY, false)
+
+        if snapshot then
+            history.addSnapshot(snapshot)
+        end
+
+        if redraw then
+            toolUtils.redrawTargetLayer(room, tool.layer)
+        end
+    end
+
+    movementActive = false
+    movementLastOffsetX = nil
+    movementLastOffsetY = nil
+
+    dragMovementTotalX, dragMovementTotalY = 0, 0
 end
 
 local toolHotkeys = {
@@ -1005,20 +1042,22 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
     local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-    if love.mouse.isDown(actionButton) then
-        -- Try in this order: resize, move, select
-        if resizeDirection then
-            mouseMovedResize(cursorX, cursorY)
+    if cursorX and cursorY then
+        if love.mouse.isDown(actionButton) then
+            -- Try in this order: resize, move, select
+            if resizeDirection then
+                mouseMovedResize(cursorX, cursorY)
 
-        elseif movementActive then
-            mouseMovedMovement(cursorX, cursorY)
+            elseif movementActive then
+                mouseMovedMovement(cursorX, cursorY)
+
+            else
+                mouseMovedSelection(cursorX, cursorY)
+            end
 
         else
-            mouseMovedSelection(cursorX, cursorY)
+            updateSelectionPreviews(cursorX, cursorY)
         end
-
-    else
-        updateSelectionPreviews(cursorX, cursorY)
     end
 
     updateCursor()
@@ -1028,12 +1067,17 @@ function tool.mousereleased(x, y, button, istouch, presses)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
-        selectionFinished()
-        resizeFinished()
-        movementFinished()
+        local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
-        updateCursor()
+        if cursorX and cursorY then
+            selectionFinished(cursorX, cursorY)
+            resizeFinished(cursorX, cursorY)
+            movementFinished(cursorX, cursorY)
+
+        end
     end
+
+    updateCursor()
 end
 
 -- Special case
@@ -1047,9 +1091,9 @@ function tool.mouseclicked(x, y, button, istouch, presses)
         if cursorX and cursorY then
             selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
 
-            selectionFinished()
-            resizeFinished()
-            movementFinished()
+            selectionFinished(cursorX, cursorX)
+            resizeFinished(cursorX, cursorX)
+            movementFinished(cursorX, cursorX)
         end
 
     elseif button == contextMenuButton then
