@@ -17,13 +17,36 @@ local colors = require("consts.colors")
 
 local entities = {}
 
-local missingEntity = require("defaults.viewer.entity")
+local missingEntityHandler = require("defaults.viewer.undefined_entity")
+local erroringEntityHandler = require("defaults.viewer.erroring_entity")
 
 local entityRegisteryMT = {
-    __index = function() return missingEntity end
+    __index = function() return missingEntityHandler end
 }
 
 entities.registeredEntities = nil
+
+local seenEntityErrors = {}
+
+local function logEntityDefinitionError(definitionName, message, room, entity)
+    -- Only log errors once per entity instance per definition (rendering, selection, etc)
+    -- This should be safe enough for more uses
+    local seenKey = string.format("%s-%p-%s", entity._name, entity, definitionName)
+
+    if not seenEntityErrors[seenKey] then
+        -- TODO - Log file and event for UI
+        local entityInformation = string.format("Erroring entity definition for '%s' in room '%s' at (%d, %d) when %s", entity._name, room.name, entity.x, entity.y, definitionName)
+
+        print(entityInformation)
+        print(debug.traceback(message))
+
+        seenEntityErrors[seenKey] = true
+    end
+end
+
+function entities.initLogging()
+    seenEntityErrors = {}
+end
 
 -- Sets the registry to the given table (or empty one) and sets the missing entity metatable
 function entities.initDefaultRegistry(t)
@@ -218,7 +241,9 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
     end
 end
 
-function entities.getDrawable(name, handler, room, entity, viewport)
+-- Gets entity drawables
+-- Does not check for errors
+function entities.getDrawableUnsafe(name, handler, room, entity, viewport)
     handler = handler or entities.registeredEntities[name]
 
     local nodeVisibility = entities.nodeVisibility("entities", entity)
@@ -247,6 +272,20 @@ function entities.getDrawable(name, handler, room, entity, viewport)
     end
 
     return entityDrawable, depth
+end
+
+-- Get drawable with pcall, return drawables from the erroring entity handler if not successful
+function entities.getDrawable(name, handler, room, entity, viewport)
+    local success, drawable, depth = pcall(entities.getDrawableUnsafe, name, handler, room, entity, viewport)
+
+    if success then
+        return drawable, depth
+
+    else
+        logEntityDefinitionError("rendering", drawable, room, entity)
+
+        return entities.getDrawable(name, erroringEntityHandler, room, entity, viewport)
+    end
 end
 
 local function getSpriteRectangle(drawables)
@@ -324,9 +363,10 @@ function entities.getNodeRectangles(room, entity, viewport)
 end
 
 -- Returns main entity selection rectangle, then table of node rectangles
-function entities.getSelection(room, entity, viewport)
+-- Does not check for errors
+function entities.getSelectionUnsafe(room, entity, viewport, handlerOverride)
     local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = handlerOverride or entities.registeredEntities[name]
 
     if handler.selection then
         return handler.selection(room, entity)
@@ -349,6 +389,20 @@ function entities.getSelection(room, entity, viewport)
                 return getSpriteRectangle(drawable), nodeRectangles
             end
         end
+    end
+end
+
+-- Get selection with pcall, return selections from the erroring entity handler if not successful
+function entities.getSelection(room, entity, viewport, handlerOverride)
+    local success, rectangle, nodeRectangles = pcall(entities.getSelectionUnsafe, room, entity, viewport, handlerOverride)
+
+    if success then
+        return rectangle, nodeRectangles
+
+    else
+        logEntityDefinitionError("selecting", rectangle, room, entity)
+
+        return entities.getSelection(room, entity, viewport, erroringEntityHandler)
     end
 end
 

@@ -21,6 +21,7 @@ end
 function debugUtils.reloadEntities()
     print("! Reloading entities")
 
+    entities.initLogging()
     entities.initDefaultRegistry()
 
     entities.loadInternalEntities()
