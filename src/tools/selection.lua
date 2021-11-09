@@ -466,6 +466,7 @@ local function pasteItems(room, layer, previews)
     local pasteCentered = configs.editor.pasteCentered
     local snapshot, usedLayers = snapshotUtils.roomLayerSnapshot(function()
         local layerItems = {}
+        local newPreviews = {}
 
         local cursorX, cursorY = toolUtils.getCursorPositionInRoom(viewportHandler.getMousePosition())
 
@@ -484,10 +485,17 @@ local function pasteItems(room, layer, previews)
 
             placementUtils.finalizePlacement(room, layer, item)
 
-            item.x = item.x + offsetGridX
-            item.y = item.y + offsetGridY
-            preview.x = preview.x + offsetGridX
-            preview.y = preview.y + offsetGridY
+            item.x += offsetGridX
+            item.y += offsetGridY
+            preview.x += offsetGridX
+            preview.y += offsetGridY
+
+            if type(item.nodes) == "table" then
+                for _, node in ipairs(item.nodes) do
+                    node.x += offsetGridX
+                    node.y += offsetGridY
+                end
+            end
 
             local targetItems = layerItems[targetLayer]
 
@@ -503,9 +511,13 @@ local function pasteItems(room, layer, previews)
             if targetItems then
                 table.insert(targetItems, item)
             end
+
+            -- Add preview for all main and node parts of the item
+            -- Makes more sense for visuals after a paste
+            selectionUtils.getSelectionsForItem(room, targetLayer, item, newPreviews)
         end
 
-        selectionPreviews = previews
+        selectionPreviews = newPreviews
 
         return table.keys(layerItems)
     end, room, layer, "Selection Pasted")
@@ -669,7 +681,23 @@ local function copyCommon(cut)
         return false
     end
 
-    copyPreviews = utils.deepcopy(selectionPreviews)
+    copyPreviews = {}
+
+    -- We should only handle an item once
+    local handledItems = {}
+
+    for _, preview in ipairs(selectionPreviews) do
+        local item = preview.item
+
+        if not handledItems[item] then
+            local previewCopy = utils.deepcopy(preview)
+
+            previewCopy.node = 0
+            handledItems[item] = true
+
+            table.insert(copyPreviews, previewCopy)
+        end
+    end
 
     if cut then
         local snapshot, redraw = deleteItems(room, tool.layer, selectionPreviews)

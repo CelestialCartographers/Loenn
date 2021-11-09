@@ -1,13 +1,19 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
 
 local defaultSpinnerColor = "blue"
-local unknownSpinnerColor = "white"
+local unknownSpinnerColor = "blue"
 local spinnerColors = {
     "blue",
     "red",
     "purple",
     "core",
     "rainbow"
+}
+
+-- Doesn't have textures directly, handled by code
+local customSpinnerColors = {
+    core = "red",
+    rainbow = "white"
 }
 
 local spinner = {}
@@ -40,7 +46,7 @@ function spinner.depth(room, entity)
 end
 
 function spinner.sprite(room, entity)
-    local color = entity.color or defaultSpinnerColor
+    local color = string.lower(entity.color or defaultSpinnerColor)
     local dusty = entity.dusty
 
     if dusty then
@@ -59,7 +65,11 @@ function spinner.sprite(room, entity)
             y = entity.y
         }
 
-        local texture = "danger/crystal/fg_" .. string.lower(color) .. "00"
+        if customSpinnerColors[color] then
+            color = customSpinnerColors[color]
+        end
+
+        local texture = "danger/crystal/fg_" .. color .. "00"
         local sprite = drawableSpriteStruct.fromTexture(texture, position)
 
         -- Check if texture color exists, otherwise use default color
@@ -68,7 +78,7 @@ function spinner.sprite(room, entity)
             return sprite
 
         else
-            texture = "danger/crystal/fg_" .. string.lower(unknownSpinnerColor) .. "00"
+            texture = "danger/crystal/fg_" .. unknownSpinnerColor .. "00"
 
             return drawableSpriteStruct.fromTexture(texture, position)
         end
