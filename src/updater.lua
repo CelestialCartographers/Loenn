@@ -137,8 +137,37 @@ function updater.update(tagName)
     return false
 end
 
+-- Persist time and version the user wanted to delay
+function updater.remindMeLater(version)
+    persistence.updaterRemindMeLaterVersion = version
+    persistence.updaterRemindMeLaterTime = os.time()
+end
+
+-- Persist version the user didn't want to update to
+function updater.dontAskAgain(version)
+    persistence.updaterDontAskAgainVersion = version
+end
+
+-- Checks if the user has opted out of seeing notification for given version
+function updater.shouldNotifyUser(version)
+    if persistence.updaterDontAskAgainVersion == version then
+        return false
+    end
+
+    if persistence.updaterRemindMeLaterVersion == version then
+        local laterTime = persistence.updaterRemindMeLaterTime or 0
+        local checkTime = laterTime + configs.updater.remindMeLaterDelay
+
+        if os.time() < checkTime then
+            return false
+        end
+    end
+
+    return true
+end
+
 -- Check for updates and queue up related events
-function updater.checkForUpdates()
+function updater.checkForUpdates(forceNotification)
     local code = [[
         require("selene").load()
         require("selene/selene/wrappers/searcher/love2d/searcher").load()
@@ -158,7 +187,9 @@ function updater.checkForUpdates()
 
             if not isLatest then
                 -- Metatables are lost over channels
-                channel:push({"updaterUpdateAvailable", tostring(latestVersion), tostring(meta.version)})
+                local shouldNotify = forceNotification or updater.shouldNotifyUser(tostring(latestVersion))
+
+                channel:push({"updaterUpdateAvailable", tostring(latestVersion), tostring(meta.version), shouldNotify})
             end
         end
     ]]
