@@ -8,6 +8,7 @@ local history = require("history")
 local loadedState = require("loaded_state")
 local languageRegistry = require("language_registry")
 local mapItemUtils = require("map_item_utils")
+local updater = require("updater")
 
 local notifications = require("ui.notification")
 
@@ -127,6 +128,38 @@ function notificationHandlers:editorRoomDelete(map, item)
             })
         })
     end, -1)
+end
+
+-- TODO - Move over to modal when those are implemented
+function notificationHandlers:updaterUpdateAvailable(latestVersion, currentVersion, shouldNotify)
+    local language = languageRegistry.getLanguage()
+
+    local updateTitle = string.format(tostring(language.ui.notifications.updaterUpdateFound), currentVersion, latestVersion)
+
+    if shouldNotify then
+        notifications.notify(function(popup)
+            return uiElements.column({
+                uiElements.label(updateTitle),
+                uiElements.row({
+                    uiElements.button(tostring(language.ui.notifications.updaterUpdateYes), function()
+                        updater.update(latestVersion)
+                        closePopup(popup)
+                    end),
+                    uiElements.button(tostring(language.ui.notifications.updaterUpdateNo), function()
+                        closePopup(popup)
+                    end),
+                    uiElements.button(tostring(language.ui.notifications.updaterRemindMeLater), function()
+                        updater.remindMeLater(latestVersion)
+                        closePopup(popup)
+                    end),
+                    uiElements.button(tostring(language.ui.notifications.updaterDontRemindMeAgain), function()
+                        updater.dontAskAgain(latestVersion)
+                        closePopup(popup)
+                    end),
+                })
+            })
+        end, -1)
+    end
 end
 
 function eventNotifications.getWindow()

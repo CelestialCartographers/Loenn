@@ -22,6 +22,12 @@ ui.notifications.editorQuitWithChanges=You have unsaved pending changes.\nAre yo
 ui.notifications.editorLoadWithChanges=You have unsaved pending changes.\nAre you sure you want to load this map?
 ui.notifications.editorDeleteRoom=Are you sure you want to delete this room?
 
+ui.notifications.updaterUpdateFound=Update found!\nFrom version %s to %s\nDo you want to update?
+ui.notifications.updaterUpdateYes=Update
+ui.notifications.updaterUpdateNo=Not now
+ui.notifications.updaterRemindMeLater=Remind me later
+ui.notifications.updaterDontRemindMeAgain=Don't ask me again
+
 
 # Room Window
 ui.room_window.editing_room=Editing room - %s
