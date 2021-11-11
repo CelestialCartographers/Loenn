@@ -1,5 +1,6 @@
 return {
     githubAuthor = "CelestialCartographers",
     githubRepository = "Loenn",
-    checkOnStartup = true
+    checkOnStartup = true,
+    remindMeLaterDelay = 60 * 60 * 24 * 7
 }
