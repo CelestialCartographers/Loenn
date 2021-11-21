@@ -237,19 +237,34 @@ local function editorMapLoadedCallback(list, filename)
 end
 
 function toolWindow.getWindow()
+    local toolListOptions = {
+        initialItem = toolHandler.currentToolName
+    }
+
+    local modeListOptions = {
+        initialItem = toolHandler.getMode()
+    }
+
+    local layerListOptions = {
+        initialItem = toolHandler.getLayer()
+    }
+
     local materialListOptions = {
-        searchBarLocation = "below"
+        searchBarLocation = "below",
+        initialItem = toolHandler.getMaterial()
     }
 
     local toolItems = getToolItems()
-    local layerItems = getLayerItems()
-    local materialItems = getMaterialItems()
-    local modeItems = getModeItems()
+    local scrolledToolList, toolList = listWidgets.getList(toolCallback, toolItems, toolListOptions)
 
+    local modeItems = getModeItems()
+    local scrolledModeList, modeList = listWidgets.getList(modeCallback, modeItems, modeListOptions)
+
+    local layerItems = getLayerItems()
+    local scrolledLayerList, layerList = listWidgets.getList(layerCallback, layerItems, layerListOptions)
+
+    local materialItems = getMaterialItems()
     local scrolledMaterialList, materialList = listWidgets.getList(materialCallback, materialItems, materialListOptions)
-    local scrolledLayerList, layerList = listWidgets.getList(layerCallback, layerItems)
-    local scrolledToolList, toolList = listWidgets.getList(toolCallback, toolItems)
-    local scrolledModeList, modeList = listWidgets.getList(modeCallback, modeItems)
 
     -- Make sure lists are visually updated
     -- This does some extra logic to hide the lists if they are empty
