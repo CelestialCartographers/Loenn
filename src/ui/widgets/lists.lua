@@ -37,13 +37,12 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
     local selectedTarget = false
     local selectedIndex = 1
     local previousSelection = list.selected and list.selected.data
+    local newSelection
 
-    list.selected = list.children[1]
-
-    if target then
+    if target and target ~= false then
         for i, item in ipairs(list.children) do
-            if item == target or item.data == target or item.text == target then
-                list.selected = item
+            if item == target or item.data == target or item.text == target or i == target then
+                newSelection = item
                 selectedTarget = true
                 selectedIndex = i
 
@@ -52,14 +51,18 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
         end
     end
 
-    if list.selected and not preventCallback then
-        local dataChanged = list.selected.data ~= previousSelection
+    if newSelection then
+        list.selected = newSelection
 
-        if callbackRequiresChange and dataChanged or not callbackRequiresChange then
-            -- Set owner manually here for now
-            -- TODO - Test whether this is actually needed later
-            list.selected.owner = list
-            list.selected:onClick(nil, nil, 1)
+        if not preventCallback then
+            local dataChanged = newSelection.data ~= previousSelection
+
+            if callbackRequiresChange and dataChanged or not callbackRequiresChange then
+                -- Set owner manually here for now
+                -- TODO - Test whether this is actually needed later
+                list.selected.owner = list
+                list.selected:onClick(nil, nil, 1)
+            end
         end
     end
 
@@ -68,7 +71,7 @@ end
 
 function listWidgets.updateItems(list, items, target, fromFilter, preventCallback, callbackRequiresChange)
     local previousSelection = list.selected and list.selected.data
-    local newSelection = nil
+    local newSelection
 
     local processedItems = items
 
