@@ -101,6 +101,8 @@ function editorScene:editorMapTargetChanged(item, itemType, previousItem, previo
         -- If we let it be lazily rerendered it will cause flashes after a few frames
         self.celesteRender.forceRedrawRoom(previousItem, self.viewerState.viewport, false)
     end
+
+    self:propagateEvent("editorMapTargetChanged", item, itemType, previousItem, previousItemType)
 end
 
 return editorScene

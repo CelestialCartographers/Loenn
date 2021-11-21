@@ -426,6 +426,10 @@ function tool.getMaterials()
     return placementsAvailable
 end
 
+function tool.getMaterial()
+    return placementTemplate and placementTemplate.placement.displayName
+end
+
 -- Offset the placement correctly for the new room
 function tool.editorMapTargetChanged(item, itemType)
     local px, py = toolUtils.getCursorPositionInRoom(placementMouseX, placementMouseY)
