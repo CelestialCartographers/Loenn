@@ -140,8 +140,8 @@ local function getModeItems(toolName)
     local modeItems = {}
 
     for _, mode in pairs(modes) do
-        local displayName = getLanguageOrDefault(language.tools[toolName].modes[mode].name, mode)
-        local tooltipText = getLanguageOrDefault(language.tools[toolName].modes[mode].description, mode)
+        local displayName = getLanguageOrDefault(language.tools[toolName].modes.name[mode], mode)
+        local tooltipText = getLanguageOrDefault(language.tools[toolName].modes.description[mode], mode)
 
         local item = uiElements.listItem({
             text = displayName,
