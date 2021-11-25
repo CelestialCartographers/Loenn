@@ -209,7 +209,7 @@ local function fieldUpdater(interactionData)
     return function()
         local formFields = interactionData.formFields
 
-        if interactionData.forceFieldUpdate or  formHelper.formValid(formFields) then
+        if interactionData.forceFieldUpdate or formHelper.formValid(formFields) then
             local formData = formHelper.getFormData(formFields)
             local changedGroup = findChangedColorGroup(formData, interactionData.previousFormData or formData)
 
@@ -342,7 +342,8 @@ function colorPicker.getColorPicker(hexColor, options)
         formFields = formFields,
         areaSize = areaSize,
         sliderWidth = sliderWidth,
-        callback = callback
+        callback = callback,
+        forceFieldUpdate = true
     }
 
     local areaElement = uiElements.image(areaCanvas):with({

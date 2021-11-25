@@ -14,6 +14,7 @@ colorField._MT = {}
 colorField._MT.__index = {}
 
 local previewOffset = 8
+local fallbackHexColor = "ffffff"
 
 local invalidStyle = {
     normalBorder = {0.65, 0.2, 0.2, 0.9, 2.0},
@@ -21,12 +22,12 @@ local invalidStyle = {
 }
 
 function colorField._MT.__index:setValue(value)
-    self.field:setText(value)
-    self.currentValue = value
+    self.currentValue = value or fallbackHexColor
+    self.field:setText(self.currentValue)
 end
 
 function colorField._MT.__index:getValue()
-    return self.currentValue
+    return self.currentValue or fallbackHexColor
 end
 
 function colorField._MT.__index:fieldValid()
@@ -116,7 +117,7 @@ function colorField.getElement(name, value, options)
     local maxWidth = options.maxWidth or options.width or 160
 
     local label = uiElements.label(options.displayName or name)
-    local field = uiElements.field(value or "", fieldChanged(formField)):with({
+    local field = uiElements.field(value or fallbackHexColor, fieldChanged(formField)):with({
         minWidth = minWidth,
         maxWidth = maxWidth
     }):hook({
