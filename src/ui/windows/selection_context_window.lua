@@ -83,6 +83,36 @@ local function getLanguageKey(key, language, default)
     return default
 end
 
+local function getWindowTitle(language, selections, targetItem, targetLayer)
+    local baseTitle = tostring(language.ui.selection_context_window.title)
+    local titleParts = {baseTitle}
+
+    if targetLayer == "entities" or targetLayer == "triggers" then
+        -- Add entity/trigger name
+        table.insert(titleParts, targetItem._name)
+
+        -- Add id for selected items
+        local ids = {}
+
+        for _, selection in ipairs(selections) do
+            local selectionId = selection.item._id
+            local selectionLayer = selection.layer
+
+            if selectionLayer == "entities" or selectionLayer == "trigers" then
+                if selectionId then
+                    table.insert(ids, tostring(selectionId))
+                end
+            end
+        end
+
+        if #ids > 0 then
+            table.insert(titleParts, string.format("ID: %s", table.concat(ids, ", ")))
+        end
+    end
+
+    return table.concat(titleParts, " - ")
+end
+
 -- TODO - Add history support
 function contextWindow.saveChangesCallback(selections)
     return function(formFields)
@@ -204,7 +234,7 @@ function contextWindow.createContextMenu(selections)
         }
     }
 
-    local windowTitle = tostring(language.ui.selection_context_window.title)
+    local windowTitle = getWindowTitle(language, selections, targetItem, targetLayer)
     local selectionForm = form.getForm(buttons, dummyData, {
         fields = fieldInformation,
         fieldOrder = fieldOrder
