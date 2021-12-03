@@ -337,8 +337,8 @@ function entities.getNodeRectangles(room, entity, viewport)
                         nodeRectangle = handler.rectangle(room, entity)
 
                         -- Offset to node position rather than entity
-                        nodeRectangle.x = x - node.x
-                        nodeRectangle.y = y - node.y
+                        nodeRectangle.x += node.x - x
+                        nodeRectangle.y += node.y - y
 
                     elseif entity.width and entity.height then
                         nodeRectangle = utils.rectangle(node.x or 0, node.y or 0, entity.width, entity.height)
