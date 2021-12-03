@@ -1157,6 +1157,14 @@ function tool.keypressed(key, scancode, isrepeat)
     handleNodeAddKey(room, key, scancode, isrepeat)
 end
 
+function tool.editorMapLoaded(item, itemType)
+    selectionPreviews = nil
+end
+
+function tool.editorMapTargetChanged(item, itemType)
+    selectionPreviews = nil
+end
+
 function tool.draw()
     local room = state.getSelectedRoom()
 
