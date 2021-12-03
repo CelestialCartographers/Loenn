@@ -56,7 +56,7 @@ function startup.findSteamDirectory()
 
     if userOS == "Windows" then
         -- TODO - Look for custom game specific install directory?
-        local registry = require("registry")
+        local registry = require("utils.windows_registry")
 
         local steam64Bits = registry.getKey("HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam")
         local steam32Bits = registry.getKey("HKLM\\SOFTWARE\\Valve\\Steam")
