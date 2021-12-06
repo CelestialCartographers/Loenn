@@ -5,6 +5,7 @@ local celesteRender = require("celeste_render")
 local toolHandler = require("tools")
 local sceneHandler = require("scene_handler")
 local languageRegistry = require("language_registry")
+local modHandler = require("mods")
 local tasks = require("utils.tasks")
 local utils = require("utils")
 
@@ -16,6 +17,12 @@ local debugUtils = {}
 -- Clear restart of Lua state without restarting application
 function debugUtils.restartProcess()
     love.event.quit("restart")
+end
+
+function debugUtils.reloadMods()
+    print("! Reloading mods")
+
+    modHandler.unrequireKnownPluginRequires()
 end
 
 function debugUtils.reloadEntities()
@@ -99,6 +106,7 @@ function debugUtils.reloadEverything()
 
     debugUtils.reloadLanguageFiles()
     debugUtils.reloadLibraries()
+    debugUtils.reloadMods()
     debugUtils.reloadEntities()
     debugUtils.reloadTriggers()
     debugUtils.reloadTools()

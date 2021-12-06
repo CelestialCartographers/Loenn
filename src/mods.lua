@@ -22,6 +22,7 @@ modHandler.pluginFolderNames = {
 }
 
 modHandler.loadedMods = {}
+modHandler.knownPluginRequires = {}
 modHandler.modMetadata = {}
 modHandler.modSettings = {}
 modHandler.modPersistence = {}
@@ -183,6 +184,13 @@ function modHandler.hasLoadedMod(name)
     return info ~= nil
 end
 
+-- Only works on files loaded with requireFromPlugin
+function modHandler.unrequireKnownPluginRequires()
+    for name, _ in pairs(modHandler.knownPluginRequires) do
+        utils.unrequire(name)
+    end
+end
+
 -- Defaults to current mod directory
 function modHandler.requireFromPlugin(lib, modName)
     local libPrefix
@@ -203,9 +211,12 @@ function modHandler.requireFromPlugin(lib, modName)
     end
 
     if lib and libPrefix then
-        local success, result = utils.tryrequire(libPrefix .. "." .. lib)
+        local requireName = libPrefix .. "." .. lib
+        local success, result = utils.tryrequire(requireName)
 
         if success then
+            modHandler.knownPluginRequires[requireName] = result
+
             return result
         end
 
