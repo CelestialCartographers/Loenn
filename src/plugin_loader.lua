@@ -29,7 +29,12 @@ function pluginLoader.loadPlugins(path, registerAt, loadFunction, shouldYield, e
     for _, filename in ipairs(filenames) do
         -- Make sure we only load valid plugins for the load function
         if extentionCheck(ext, filename) then
-            loadFunction(filename, registerAt)
+            local success, message = pcall(loadFunction, filename, registerAt)
+
+            if not success then
+                print(string.format("! Failed to load plugin from '%s'", filename))
+                print(debug.traceback(message))
+            end
         end
 
         if shouldYield then
