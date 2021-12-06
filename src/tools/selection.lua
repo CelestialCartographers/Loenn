@@ -275,7 +275,7 @@ end
 
 local function drawAxisBoundMovement(room)
     if room and selectionPreviews and not resizeDirectionPreview and movementActive then
-        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisLockModifier)
+        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier)
 
         if axisBound then
             drawAxisBoundMovementLines(room)
@@ -994,7 +994,7 @@ local function mouseMovedMovement(cursorX, cursorY)
 
     if room and cursorX and cursorY and dragStartX and dragStartY then
         local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
-        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisLockModifier)
+        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier)
         local startX, startY = dragStartX, dragStartY
 
         if not precise then
