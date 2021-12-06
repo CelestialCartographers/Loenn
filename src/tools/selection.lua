@@ -677,7 +677,7 @@ local function copyCommon(cut)
     local room = state.getSelectedRoom()
     local useClipboard = configs.editor.copyUsesClipboard
 
-    if not room or #selectionPreviews == 0 then
+    if not room or not selectionPreviews or #selectionPreviews == 0 then
         return false
     end
 
