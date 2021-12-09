@@ -87,6 +87,8 @@ function celesteRender.loadCustomTilesetAutotiler(state)
             end
         end
     end
+
+    celesteRender.clearTileSpriteQuadCache()
 end
 
 function celesteRender.sortBatchingTasks(state, tasks)
@@ -239,6 +241,12 @@ function celesteRender.getRoomBorderColor(room, selected)
     end
 
     return color
+end
+
+function celesteRender.clearTileSpriteQuadCache()
+    -- TODO - Does this need to release quads? Should be small enough to just wait for Lua GC
+
+    celesteRender.tilesSpriteMetaCache = {}
 end
 
 function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
