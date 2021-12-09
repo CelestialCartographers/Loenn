@@ -659,7 +659,7 @@ local function handleNodeAddKey(room, key, scancode, isrepeat)
 
     local targetKey = configs.editor.itemAddNode
 
-    if targetKey == key then
+    if targetKey == key and not isrepeat then
         local snapshot, redraw = addNode(room, tool.layer, selectionPreviews)
 
         if redraw then
