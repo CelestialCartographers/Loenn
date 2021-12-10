@@ -354,14 +354,29 @@ function utils.rgbToHsv(r, g, b)
     return hue, saturation, value
 end
 
+-- Case insensitive XNA color getter
+function utils.getXNAColor(name)
+    local nameLower = name:lower()
+
+    for colorName, color in pairs(xnaColors) do
+        if colorName:lower() == nameLower then
+            return color, colorName
+        end
+    end
+
+    return false, false
+end
+
 -- Get color in various formats, return as table
 function utils.getColor(color)
     local colorType = type(color)
 
     if colorType == "string" then
         -- Check XNA colors, otherwise parse as hex color
-        if xnaColors[color] then
-            return xnaColors[color]
+        local xnaColor = utils.getXNAColor(color)
+
+        if xnaColor then
+            return xnaColor
 
         else
             local success, r, g, b = utils.parseHexColor(color)
