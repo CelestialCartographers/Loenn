@@ -275,7 +275,7 @@ end
 
 local function drawAxisBoundMovement(room)
     if room and selectionPreviews and not resizeDirectionPreview and movementActive then
-        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisLockModifier)
+        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier)
 
         if axisBound then
             drawAxisBoundMovementLines(room)
@@ -659,7 +659,7 @@ local function handleNodeAddKey(room, key, scancode, isrepeat)
 
     local targetKey = configs.editor.itemAddNode
 
-    if targetKey == key then
+    if targetKey == key and not isrepeat then
         local snapshot, redraw = addNode(room, tool.layer, selectionPreviews)
 
         if redraw then
@@ -677,7 +677,7 @@ local function copyCommon(cut)
     local room = state.getSelectedRoom()
     local useClipboard = configs.editor.copyUsesClipboard
 
-    if not room or #selectionPreviews == 0 then
+    if not room or not selectionPreviews or #selectionPreviews == 0 then
         return false
     end
 
@@ -994,7 +994,7 @@ local function mouseMovedMovement(cursorX, cursorY)
 
     if room and cursorX and cursorY and dragStartX and dragStartY then
         local precise = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
-        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisLockModifier)
+        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier)
         local startX, startY = dragStartX, dragStartY
 
         if not precise then

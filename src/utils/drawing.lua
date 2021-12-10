@@ -83,11 +83,13 @@ function drawing.printCenteredText(text, x, y, width, height, font, fontSize, tr
         text = utils.trim(text)
     end
 
+    local fontHeight = font:getHeight()
+    local fontLineHeight = font:getLineHeight()
     local longest, lines = font:getWrap(text, width / fontSize)
-    local textHeight = #lines * (font:getHeight() * font:getLineHeight())
+    local textHeight = (#lines - 1) * (fontHeight * fontLineHeight) + fontHeight
 
-    local offsetX = 0
-    local offsetY = (height - textHeight) / 2
+    local offsetX = 1
+    local offsetY = math.floor((height - textHeight) / 2) + 1
 
     love.graphics.push()
 

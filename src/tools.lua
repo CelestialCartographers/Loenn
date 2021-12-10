@@ -95,11 +95,20 @@ function toolHandler.setMaterial(material, name)
     local handler, toolName = getHandler(name)
 
     if handler then
+        local result = false
         local oldMaterial = toolHandler.getMaterial(name)
 
         if handler.setMaterial then
-            return handler.setMaterial(material, oldMaterial)
+            result = handler.setMaterial(material, oldMaterial)
         end
+
+        if result ~= false then
+            local layer = toolHandler.getLayer(name)
+
+            toolUtils.sendMaterialEvent(handler, layer, material)
+        end
+
+        return result
     end
 
     return false
@@ -146,14 +155,13 @@ function toolHandler.setLayer(layer, name)
         end
 
         local oldLayer = toolHandler.getLayer(name)
+        local result = true
 
         if handler.setLayer then
-            return handler.setLayer(layer, oldLayer)
+            result = handler.setLayer(layer, oldLayer)
 
         elseif handler.layer then
             handler.layer = layer
-
-            toolUtils.sendLayerEvent(handler, layer)
 
             local materialValue = toolUtils.getPersistenceMaterial(toolName, layer)
 
@@ -161,6 +169,12 @@ function toolHandler.setLayer(layer, name)
                 toolHandler.setMaterial(materialValue, name)
             end
         end
+
+        if result ~= false then
+            toolUtils.sendLayerEvent(handler, layer)
+        end
+
+        return result
     end
 
     return false
@@ -206,16 +220,21 @@ function toolHandler.setMode(mode, name)
             return false
         end
 
+        local result = true
         local oldMode = toolHandler.getMode(name)
 
         if handler.setMode then
-            return handler.setMode(mode, oldMode)
+            result = handler.setMode(mode, oldMode)
 
         elseif handler.mode then
             handler.mode = mode
+        end
 
+        if result ~= false then
             toolUtils.sendToolModeEvent(handler, mode)
         end
+
+        return result
     end
 
     return false

@@ -153,6 +153,10 @@ end
 
 -- Adds or removes amount rows/columns from the given side
 function tilesStruct.directionalResize(tiles, side, amount, default)
+    if not tiles then
+        return false
+    end
+
     local newTilesMatrix
     local width, height = tiles.matrix:size()
 

@@ -70,14 +70,16 @@ function triggers.getDrawable(name, handler, room, trigger, viewport)
         local width = trigger.width or 16
         local height = trigger.height or 16
 
-        drawing.callKeepOriginalColor(function()
-            love.graphics.setColor(colors.triggerColor)
+        local lineWidth = love.graphics.getLineWidth()
 
-            love.graphics.rectangle("line", x, y, width, height)
-            love.graphics.rectangle("fill", x, y, width, height)
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(colors.triggerBorderColor)
+            love.graphics.rectangle("line", x + lineWidth / 2, y + lineWidth / 2, width - lineWidth, height - lineWidth)
+
+            love.graphics.setColor(colors.triggerColor)
+            love.graphics.rectangle("fill", x + lineWidth, y + lineWidth, width - 2 * lineWidth, height - 2 * lineWidth)
 
             love.graphics.setColor(colors.triggerTextColor)
-
             drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
         end)
     end

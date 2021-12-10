@@ -142,7 +142,7 @@ end
 function entities.getEntityDrawable(name, handler, room, entity, viewport)
     handler = handler or entities.registeredEntities[name]
 
-    local defaultDepth = utils.callIfFunction(handler.nodeDepth, room, entity, viewport)
+    local defaultDepth = utils.callIfFunction(handler.depth, room, entity, viewport)
 
     if handler.sprite then
         local sprites = handler.sprite(room, entity, viewport)
@@ -178,6 +178,7 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
 
     elseif handler.rectangle or entity.width and entity.height then
         local rectangle
+        local drawableSprites
 
         if handler.rectangle then
             rectangle = handler.rectangle(room, entity, viewport)
@@ -188,15 +189,25 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
 
         -- If both fillColor and borderColor is specified then make a rectangle with these
         if handler.fillColor and handler.borderColor then
-            local drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, handler.fillColor, handler.borderColor):getDrawableSprite()
-
-            return drawableSprites
+            drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, handler.fillColor, handler.borderColor):getDrawableSprite()
 
         else
-            local drawable = drawableRectangle.fromRectangle(handler.mode or "fill", rectangle, handler.color or colors.default)
-
-            return drawable
+            drawableSprites = drawableRectangle.fromRectangle(handler.mode or "fill", rectangle, handler.color or colors.default)
         end
+
+        -- Add depth to sprite(s)
+        if drawableSprites then
+            if utils.typeof(drawableSprites) == "table" then
+                for _, sprite in ipairs(drawableSprites) do
+                    sprite.depth = defaultDepth
+                end
+            end
+
+        else
+            drawableSprites.defaultDepth = defaultDepth
+        end
+
+        return drawableSprites
     end
 end
 
