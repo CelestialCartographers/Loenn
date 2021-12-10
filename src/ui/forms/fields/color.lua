@@ -5,6 +5,7 @@ local contextMenu = require("ui.context_menu")
 local utils = require("utils")
 local colorPicker = require("ui.widgets.color_picker")
 local configs = require("configs")
+local xnaColors = require("consts.xna_colors")
 
 local colorField = {}
 
@@ -36,8 +37,22 @@ function colorField._MT.__index:fieldValid()
     return parsed
 end
 
+-- Return the hex color of the XNA name if allowed
+-- Otherwise return the value as it is
+local function getXNAColorHex(element, value)
+    if element._allowXNAColors then
+        local xnaColor = utils.getXNAColor(value or "")
+
+        if xnaColor then
+            return utils.rgbToHex(unpack(xnaColor))
+        end
+    end
+
+    return value
+end
+
 local function cacheFieldPreviewColor(element, new)
-    local parsed, r, g, b = utils.parseHexColor(new)
+    local parsed, r, g, b = utils.parseHexColor(getXNAColorHex(element, new))
 
     element._parsed = parsed
     element._r, element._g, element._b = r, g, b
@@ -115,11 +130,13 @@ function colorField.getElement(name, value, options)
 
     local minWidth = options.minWidth or options.width or 160
     local maxWidth = options.maxWidth or options.width or 160
+    local allowXNAColors = options.allowXNAColors
 
     local label = uiElements.label(options.displayName or name)
     local field = uiElements.field(value or fallbackHexColor, fieldChanged(formField)):with({
         minWidth = minWidth,
-        maxWidth = maxWidth
+        maxWidth = maxWidth,
+        _allowXNAColors = allowXNAColors
     }):hook({
         draw = fieldDrawColorPreview
     })
@@ -132,7 +149,9 @@ function colorField.getElement(name, value, options)
                 end
             }
 
-            return colorPicker.getColorPicker(field:getText() or "", pickerOptions)
+            local fieldText = getXNAColorHex(field, field:getText() or "")
+
+            return colorPicker.getColorPicker(fieldText, pickerOptions)
         end,
         {
             shouldShowMenu = shouldShowMenu
