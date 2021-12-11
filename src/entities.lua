@@ -189,10 +189,15 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
 
         -- If both fillColor and borderColor is specified then make a rectangle with these
         if handler.fillColor and handler.borderColor then
-            drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, handler.fillColor, handler.borderColor):getDrawableSprite()
+            local fillColor = utils.callIfFunction(handler.fillColor, room, entity)
+            local borderColor = utils.callIfFunction(handler.borderColor, room, entity)
+
+            drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, fillColor, borderColor):getDrawableSprite()
 
         else
-            drawableSprites = drawableRectangle.fromRectangle(handler.mode or "fill", rectangle, handler.color or colors.default)
+            local color = utils.callIfFunction(handler.color, room, entity)
+
+            drawableSprites = drawableRectangle.fromRectangle(handler.mode or "fill", rectangle, color or colors.default)
         end
 
         -- Add depth to sprite(s)
@@ -726,7 +731,15 @@ local function guessPlacementType(name, handler, placement)
     return "point"
 end
 
-local function getPlacement(placementInfo, name, handler, language)
+local function getPlacements(handler)
+    return utils.callIfFunction(handler.placements)
+end
+
+local function getDefaultPlacement(handler, placements)
+    return placements.default
+end
+
+local function getPlacement(placementInfo, defaultPlacement, name, handler, language)
     local placementType = placementInfo.placementType or guessPlacementType(name, handler, placementInfo)
     local modPrefix = modHandler.getEntityModPrefix(name)
     local simpleName = string.format("%s#%s", name, placementInfo.name)
@@ -756,6 +769,12 @@ local function getPlacement(placementInfo, name, handler, language)
         _id = 0
     }
 
+    if defaultPlacement and defaultPlacement.data then
+        for k, v in pairs(defaultPlacement.data) do
+            itemTemplate[k] = v
+        end
+    end
+
     if placementInfo.data then
         for k, v in pairs(placementInfo.data) do
             itemTemplate[k] = v
@@ -777,8 +796,8 @@ local function getPlacement(placementInfo, name, handler, language)
     return placement
 end
 
-local function addPlacement(placementInfo, res, name, handler, language)
-    table.insert(res, getPlacement(placementInfo, name, handler, language))
+local function addPlacement(placementInfo, defaultPlacement, res, name, handler, language)
+    table.insert(res, getPlacement(placementInfo, defaultPlacement, name, handler, language))
 end
 
 -- TODO - Make more sophisticated? Works for now
@@ -801,10 +820,12 @@ function entities.getPlacements(layer)
 
     if entities.registeredEntities then
         for name, handler in pairs(entities.registeredEntities) do
-            local placements = utils.callIfFunction(handler.placements)
+            local placements = getPlacements(handler)
 
             if placements then
-                utils.callIterateFirstIfTable(addPlacement, placements, res, name, handler, language)
+                local defaultPlacement = getDefaultPlacement(handler, placements)
+
+                utils.callIterateFirstIfTable(addPlacement, placements, defaultPlacement, res, name, handler, language)
             end
         end
     end

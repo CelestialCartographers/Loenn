@@ -360,7 +360,15 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
-local function getPlacement(placementInfo, name, handler, language)
+local function getPlacements(handler)
+    return utils.callIfFunction(handler.placements)
+end
+
+local function getDefaultPlacement(handler, placements)
+    return placements.default
+end
+
+local function getPlacement(placementInfo, defaultPlacement, name, handler, language)
     local placementType = "rectangle"
     local modPrefix = modHandler.getEntityModPrefix(name)
     local simpleName = string.format("%s#%s", name, placementInfo.name)
@@ -390,6 +398,12 @@ local function getPlacement(placementInfo, name, handler, language)
         _id = 0
     }
 
+    if defaultPlacement and defaultPlacement.data then
+        for k, v in pairs(defaultPlacement.data) do
+            itemTemplate[k] = v
+        end
+    end
+
     if placementInfo.data then
         for k, v in pairs(placementInfo.data) do
             itemTemplate[k] = v
@@ -414,8 +428,8 @@ local function getPlacement(placementInfo, name, handler, language)
     return placement
 end
 
-local function addPlacement(placementInfo, res, name, handler, language)
-    table.insert(res, getPlacement(placementInfo, name, handler, language))
+local function addPlacement(placementInfo, defaultPlacement, res, name, handler, language)
+    table.insert(res, getPlacement(placementInfo, defaultPlacement, name, handler, language))
 end
 
 -- TODO - Make more sophisticated? Works for now
@@ -438,10 +452,12 @@ function triggers.getPlacements(layer)
 
     if triggers.registeredTriggers then
         for name, handler in pairs(triggers.registeredTriggers) do
-            local placements = utils.callIfFunction(handler.placements)
+            local placements = getPlacements(handler)
 
             if placements then
-                utils.callIterateFirstIfTable(addPlacement, placements, res, name, handler, language)
+                local defaultPlacement = getDefaultPlacement(handler, placements)
+
+                utils.callIterateFirstIfTable(addPlacement, placements, defaultPlacement, res, name, handler, language)
             end
         end
     end
