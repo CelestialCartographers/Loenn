@@ -189,10 +189,15 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
 
         -- If both fillColor and borderColor is specified then make a rectangle with these
         if handler.fillColor and handler.borderColor then
-            drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, handler.fillColor, handler.borderColor):getDrawableSprite()
+            local fillColor = utils.callIfFunction(handler.fillColor, room, entity)
+            local borderColor = utils.callIfFunction(handler.borderColor, room, entity)
+
+            drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, fillColor, borderColor):getDrawableSprite()
 
         else
-            drawableSprites = drawableRectangle.fromRectangle(handler.mode or "fill", rectangle, handler.color or colors.default)
+            local color = utils.callIfFunction(handler.color, room, entity)
+
+            drawableSprites = drawableRectangle.fromRectangle(handler.mode or "fill", rectangle, color or colors.default)
         end
 
         -- Add depth to sprite(s)
