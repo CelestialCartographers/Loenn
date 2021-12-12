@@ -40,6 +40,7 @@ ui.room_window.close_window=Close window
 ui.selection_context_window.title=Editing Selections
 ui.selection_context_window.save_changes=Save changes
 ui.selection_context_window.close_window=Close window
+ui.selection_context_window.multiple_selections=Multiple selection editing is current not available.
 
 
 # Color Picker

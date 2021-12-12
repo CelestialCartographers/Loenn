@@ -12,6 +12,7 @@ local history = require("history")
 local viewportHandler = require("viewport_handler")
 local layerHandlers = require("layer_handlers")
 local toolUtils = require("tool_utils")
+local notifications = require("ui.notification")
 
 local contextWindow = {}
 
@@ -204,6 +205,13 @@ function contextWindow.createContextMenu(selections)
     local windowX = windowPreviousX
     local windowY = windowPreviousY
     local language = languageRegistry.getLanguage()
+
+    -- TODO - Remove this once we support multiple selection editing
+    if #selections > 1 then
+        notifications.notify(tostring(language.ui.selection_context_window.multiple_selections))
+
+        return
+    end
 
     -- Don't stack windows on top of each other
     if #activeWindows > 0 then
