@@ -112,8 +112,14 @@ local function filterList(list, search)
     listWidgets.updateItems(list, filteredItems, nil, true, false, true)
 end
 
-local function searchFieldChanged(element, new, old)
-    filterList(element.list, new)
+local function getSearchFieldChanged(onChange)
+    return function(element, new, old)
+        if onChange then
+            onChange(element, new, old)
+        end
+
+        filterList(element.list, new)
+    end
 end
 
 function listWidgets.setFilterText(list, text, updateList)
@@ -170,7 +176,8 @@ function listWidgets.getList(callback, items, options)
         calcWidth = calculateWidth
     })):with(uiUtils.fillHeight(true))
 
-    local searchField = uiElements.field(initialSearch, searchFieldChanged):with({
+    local searchFieldCallback = getSearchFieldChanged(options.searchBarCallback)
+    local searchField = uiElements.field(initialSearch, searchFieldCallback):with({
         list = list
     }):with(uiUtils.fillWidth)
 

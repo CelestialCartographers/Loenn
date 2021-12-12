@@ -10,6 +10,8 @@ local simpleDocks = require("ui.widgets.simple_docks")
 
 local languageRegistry = require("language_registry")
 local toolHandler = require("tools")
+local toolUtils = require("tool_utils")
+local persistence = require("persistence")
 
 local toolWindow = {}
 
@@ -111,8 +113,15 @@ local function layerCallback(list, layer)
 end
 
 local function toolLayerChangedCallback(self, tool, layer)
+    local persistenceKey = toolUtils.getPersistenceKey(tool.name, layer, "search")
+    local searchText = persistence[persistenceKey] or ""
+    local searchField = toolWindow.materialList.searchField
+
+    searchField:setText(searchText)
+    searchField.index = #searchField
+
     listWidgets.setSelection(toolWindow.layerList, layer, true)
-    listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer))
+    listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer), nil, true)
 end
 
 local function updateLayerList(name)
@@ -236,6 +245,14 @@ local function editorMapLoadedCallback(list, filename)
     listWidgets.updateItems(toolWindow.layerList, getLayerItems())
 end
 
+local function materialSearchFieldChanged(element, new, old)
+    local toolName = toolHandler.currentToolName
+    local layer = toolHandler.getLayer()
+    local persistenceKey = toolUtils.getPersistenceKey(toolName, layer, "search")
+
+    persistence[persistenceKey] = new
+end
+
 function toolWindow.getWindow()
     local toolListOptions = {
         initialItem = toolHandler.currentToolName
@@ -251,6 +268,8 @@ function toolWindow.getWindow()
 
     local materialListOptions = {
         searchBarLocation = "below",
+        searchBarCallback = materialSearchFieldChanged,
+        initialSearch = toolUtils.getPersistenceValue(toolHandler.currentToolName, toolHandler.getLayer(), "search"),
         initialItem = toolHandler.getMaterial()
     }
 
