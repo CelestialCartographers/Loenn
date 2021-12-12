@@ -4,6 +4,11 @@ local summitGems = {}
 
 summitGems.name = "summitgem"
 summitGems.depth = 0
+summitGems.fieldInformation = {
+    gem = {
+        fieldType = "integer",
+    }
+}
 
 function summitGems.texture(room, entity)
     local index = entity.gem or 0

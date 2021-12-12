@@ -5,6 +5,8 @@ local hangingLamp = {}
 
 hangingLamp.name = "hanginglamp"
 hangingLamp.depth = 2000
+hangingLamp.minimumSize = {0, 16}
+hangingLamp.canResize = {false, true}
 hangingLamp.placements = {
     name = "hanging_lamp",
     data = {

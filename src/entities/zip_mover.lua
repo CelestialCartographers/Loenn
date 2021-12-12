@@ -37,6 +37,7 @@ zipMover.name = "zipMover"
 zipMover.depth = -9999
 zipMover.nodeVisibility = "never"
 zipMover.nodeLimits = {1, 1}
+zipMover.maximumSize = {16, 16}
 zipMover.placements = {}
 
 for i, theme in ipairs(themes) do
@@ -101,7 +102,7 @@ function zipMover.sprite(room, entity)
     local sprites = {}
 
     local x, y = entity.x or 0, entity.y or 0
-    local width, height = entity.width or 8, entity.height or 8
+    local width, height = entity.width or 16, entity.height or 16
     local halfWidth, halfHeight = math.floor(entity.width / 2), math.floor(entity.height / 2)
 
     local nodes = entity.nodes or {{x = 0, y = 0}}

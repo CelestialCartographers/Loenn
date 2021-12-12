@@ -12,6 +12,12 @@ local everestCoreMessage = {}
 everestCoreMessage.name = "everest/coreMessage"
 everestCoreMessage.depth = 0
 everestCoreMessage.texture = "@Internal@/core_message"
+everestCoreMessage.fieldInformation = {
+    line = {
+        fieldType = "integer",
+    }
+}
+
 everestCoreMessage.placements = {
     name = "core_message",
     data = {

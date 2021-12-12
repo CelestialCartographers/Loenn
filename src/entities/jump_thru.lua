@@ -13,6 +13,7 @@ local jumpthru = {}
 
 jumpthru.name = "jumpThru"
 jumpthru.depth = -9000
+jumpthru.canResize = {true, false}
 jumpthru.placements = {}
 
 for i, texture in ipairs(textures) do

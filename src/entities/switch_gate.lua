@@ -7,6 +7,7 @@ switchGate.name = "switchGate"
 switchGate.depth = 0
 switchGate.nodeLimits = {1, 1}
 switchGate.nodeLineRenderType = "line"
+switchGate.minimumSize = {16, 16}
 switchGate.placements = {}
 
 local textures = {

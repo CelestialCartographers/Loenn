@@ -8,6 +8,12 @@ local heartDoor = {}
 heartDoor.name = "heartGemDoor"
 heartDoor.depth = 0
 heartDoor.nodeLimits = {0, 1}
+heartDoor.minimumSize = {40, 8}
+heartDoor.fieldInformation = {
+    requires = {
+        fieldType = "integer",
+    }
+}
 heartDoor.placements = {
     name = "door",
     data = {

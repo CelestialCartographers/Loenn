@@ -3,6 +3,11 @@
 local everestFlag = {}
 
 everestFlag.name = "everest/flagTrigger"
+everestFlag.fieldInformation = {
+    death_count = {
+        fieldType = "integer",
+    }
+}
 everestFlag.placements = {
     name = "flag",
     data = {

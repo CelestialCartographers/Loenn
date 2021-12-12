@@ -4,6 +4,7 @@ local templeCrackedBlock = {}
 
 templeCrackedBlock.name = "templeCrackedBlock"
 templeCrackedBlock.depth = 0
+templeCrackedBlock.minimumSize = {24, 24}
 templeCrackedBlock.placements = {
     name = "temple_block",
     data = {
@@ -23,7 +24,7 @@ local blockTexture = "objects/temple/breakBlock00"
 
 function templeCrackedBlock.sprite(room, entity)
     local x, y = entity.x or 0, entity.y or 0
-    local width, height = entity.width or 16, entity.height or 16
+    local width, height = entity.width or 24, entity.height or 24
 
     local ninePatch = drawableNinePatch.fromTexture(blockTexture, ninePatchOptions, x, y, width, height)
 
