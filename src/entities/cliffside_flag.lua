@@ -3,6 +3,11 @@ local cliffsideFlag = {}
 cliffsideFlag.name = "cliffside_flag"
 cliffsideFlag.depth = 8999
 cliffsideFlag.justification = {0.0, 0.0}
+cliffsideFlag.fieldInformation = {
+    index = {
+        fieldType = "integer",
+    }
+}
 cliffsideFlag.placements = {
     name = "cliffside_flag",
     data = {

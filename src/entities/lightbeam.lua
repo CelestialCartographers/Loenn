@@ -10,7 +10,7 @@ lightBeam.placements = {
         width = 32,
         height = 24,
         flag = "",
-        rotation = 0
+        rotation = 0.0
     }
 }
 

@@ -6,6 +6,7 @@ local moveBlock = {}
 
 moveBlock.name = "moveBlock"
 moveBlock.depth = 8995
+moveBlock.minimumSize = {16, 16}
 moveBlock.placements = {}
 
 local moveBlockDirections = {

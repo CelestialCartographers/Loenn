@@ -5,11 +5,12 @@ local goldenBlock = {}
 
 goldenBlock.name = "goldenBlock"
 goldenBlock.depth = -10000
+goldenBlock.minimumSize = {16, 16}
 goldenBlock.placements = {
     name = "golden_block",
     data = {
-        width = 24,
-        height = 24
+        width = 16,
+        height = 16
     }
 }
 

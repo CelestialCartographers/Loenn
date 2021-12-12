@@ -4,6 +4,11 @@ local powerSourceNumber = {}
 
 powerSourceNumber.name = "powerSourceNumber"
 powerSourceNumber.depth = -10010
+powerSourceNumber.fieldInformation = {
+    number = {
+        fieldType = "integer",
+    }
+}
 powerSourceNumber.placements = {
     name = "power_source_number",
     data = {

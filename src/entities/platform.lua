@@ -16,7 +16,7 @@ for i, texture in ipairs(textures) do
     movingPlatform.placements[i] = {
         name = texture,
         data = {
-            width = 16,
+            width = 8,
             texture = texture
         }
     }
@@ -29,14 +29,14 @@ function movingPlatform.sprite(room, entity)
     local nodes = entity.nodes or {{x = 0, y = 0}}
     local nodeX, nodeY = nodes[1].x, nodes[1].y
 
-    resortPlatformHelper.addConnectorSprites(sprites, entity, x, y, nodeX, nodeY, width)
-    resortPlatformHelper.addPlatformSprites(sprites, entity, entity, texture, width)
+    resortPlatformHelper.addConnectorSprites(sprites, entity, x, y, nodeX, nodeY)
+    resortPlatformHelper.addPlatformSprites(sprites, entity, entity)
 
     return sprites
 end
 
 function movingPlatform.nodeSprite(room, entity, node)
-    return resortPlatformHelper.addPlatformSprites({}, entity, node, texture, width)
+    return resortPlatformHelper.addPlatformSprites({}, entity, node)
 end
 
 movingPlatform.selection = resortPlatformHelper.getSelection

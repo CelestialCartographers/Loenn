@@ -6,6 +6,7 @@ local kevin = {}
 
 kevin.name = "crushBlock"
 kevin.depth = 0
+kevin.minimumSize = {24, 24}
 kevin.placements = {}
 
 local axesOptions = {
@@ -16,8 +17,8 @@ for _, axes in ipairs(axesOptions) do
     table.insert(kevin.placements, {
         name = axes,
         data = {
-            width = 16,
-            height = 16,
+            width = 24,
+            height = 24,
             axes = axes
         }
     })

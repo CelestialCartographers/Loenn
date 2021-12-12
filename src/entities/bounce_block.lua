@@ -5,11 +5,12 @@ local bounceBlock = {}
 
 bounceBlock.name = "bounceBlock"
 bounceBlock.depth = 8990
+bounceBlock.minimumSize = {16, 16}
 bounceBlock.placements = {
     name = "bounce_block",
     data = {
-        width = 24,
-        height = 24,
+        width = 16,
+        height = 16,
         notCoreMode = false
     }
 }

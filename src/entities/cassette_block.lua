@@ -29,6 +29,11 @@ local depths = {
 
 cassetteBlock.name = "cassetteBlock"
 cassetteBlock.minimumSize = {16, 16}
+cassetteBlock.fieldInformation = {
+    index = {
+        fieldType = "integer",
+    }
+}
 cassetteBlock.placements = {}
 
 for i, _ in ipairs(colors) do
@@ -37,8 +42,8 @@ for i, _ in ipairs(colors) do
         data = {
             index = i - 1,
             tempo = 1.0,
-            width = 8,
-            height = 8
+            width = 16,
+            height = 16
         }
     }
 end

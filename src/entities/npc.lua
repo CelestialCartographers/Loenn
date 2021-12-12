@@ -28,6 +28,20 @@ local everestNpc = {}
 everestNpc.name = "everest/npc"
 everestNpc.depth = 100
 everestNpc.justification = {0.5, 1.0}
+everestNpc.fieldInformation = {
+    spriteRate = {
+        fieldType = "integer",
+    },
+    approachDistance = {
+        fieldType = "integer",
+    },
+    indicatorOffsetX = {
+        fieldType = "integer",
+    },
+    indicatorOffsetY = {
+        fieldType = "integer",
+    }
+}
 everestNpc.placements = {
     name = "npc",
     data = {

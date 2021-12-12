@@ -5,13 +5,14 @@ local templeMirror = {}
 
 templeMirror.name = "templeMirror"
 templeMirror.depth = 8995
+templeMirror.minimumSize = {24, 24}
 templeMirror.placements = {
     name = "mirror",
     data = {
         width = 24,
         height = 24,
-        reflectionX = 0,
-        reflectionY = 0
+        reflectionX = 0.0,
+        reflectionY = 0.0
     }
 }
 

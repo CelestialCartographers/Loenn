@@ -4,6 +4,11 @@ local summitCheckpoint = {}
 
 summitCheckpoint.name = "summitcheckpoint"
 summitCheckpoint.depth = 8999
+summitCheckpoint.fieldInformation = {
+    number = {
+        fieldType = "integer",
+    }
+}
 summitCheckpoint.placements = {
     name = "summit_checkpoint",
     data = {

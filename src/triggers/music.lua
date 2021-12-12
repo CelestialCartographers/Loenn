@@ -3,6 +3,11 @@
 local music = {}
 
 music.name = "musicTrigger"
+music.fieldInformation = {
+    death_count = {
+        fieldType = "integer",
+    }
+}
 music.placements = {
     name = "music",
     data = {

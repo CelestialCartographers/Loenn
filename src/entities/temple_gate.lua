@@ -1,10 +1,11 @@
 local drawableSprite = require("structs.drawable_sprite")
 
-local refill = {}
+local templeGate = {}
 
-refill.name = "templeGate"
-refill.depth = -9000
-refill.placements = {}
+templeGate.name = "templeGate"
+templeGate.depth = -9000
+templeGate.canResize = {false, false}
+templeGate.placements = {}
 
 local placementPresets = {
     {"theo", "HoldingTheo"},
@@ -16,7 +17,7 @@ local placementPresets = {
 }
 
 for _, preset in ipairs(placementPresets) do
-    table.insert(refill.placements, {
+    table.insert(templeGate.placements, {
         name = string.format("%s_%s", preset[1], string.lower(preset[2])),
         data = {
             height = 48,
@@ -32,7 +33,7 @@ local textures = {
     theo = "objects/door/TempleDoorC00"
 }
 
-function refill.sprite(room, entity)
+function templeGate.sprite(room, entity)
     local variant = entity.sprite or "default"
     local texture = textures[variant] or textures["default"]
     local sprite = drawableSprite.fromTexture(texture, entity)
@@ -43,4 +44,4 @@ function refill.sprite(room, entity)
     return sprite
 end
 
-return refill
+return templeGate

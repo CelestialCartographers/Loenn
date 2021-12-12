@@ -5,6 +5,7 @@ local wallBooster = {}
 
 wallBooster.name = "wallBooster"
 wallBooster.depth = 1999
+wallBooster.canResize = {false, true}
 wallBooster.placements = {
     {
         name = "right",
@@ -64,6 +65,10 @@ function wallBooster.sprite(room, entity)
     table.insert(sprites, bottomSprite)
 
     return sprites
+end
+
+function wallBooster.rectangle(room, entity)
+    return utils.rectangle(entity.x, entity.y, 8, entity.height or 8)
 end
 
 return wallBooster

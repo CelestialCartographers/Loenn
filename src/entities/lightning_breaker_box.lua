@@ -7,6 +7,11 @@ breakerBox.name = "lightningBlock"
 breakerBox.depth = -10550
 breakerBox.texture = "objects/breakerBox/Idle00"
 breakerBox.justifications = {0.25, 0.25}
+breakerBox.fieldInformation = {
+    music_progress = {
+        fieldType = "integer",
+    }
+}
 breakerBox.placements = {
     name = "breaker_box",
     data = {

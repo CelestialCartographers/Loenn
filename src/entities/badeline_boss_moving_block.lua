@@ -7,6 +7,11 @@ movingBlock.name = "finalBossMovingBlock"
 movingBlock.depth = 0
 movingBlock.nodeLineRenderType = "line"
 movingBlock.nodeLimits = {1, 1}
+movingBlock.fieldInformation = {
+    nodeIndex = {
+        fieldType = "integer",
+    }
+}
 movingBlock.placements = {
     name = "moving_block",
     data = {
