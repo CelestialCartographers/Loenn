@@ -389,7 +389,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         local modPrefixLanguage = language.mods[modPrefix].name
 
         if modPrefixLanguage._exists then
-            displayName = string.format("%s (%s)", displayName, modPrefixLanguage)
+            displayName = string.format("%s [%s]", displayName, modPrefixLanguage)
         end
     end
 
