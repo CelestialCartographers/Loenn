@@ -158,7 +158,11 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
 
     elseif handler.texture then
         local texture = utils.callIfFunction(handler.texture, room, entity)
-        local drawable = drawableSprite.fromTexture(texture, entity)
+        local position = {
+            x = entity.x,
+            y = entity.y
+        }
+        local drawable = drawableSprite.fromTexture(texture, position)
 
         if drawable then
             addAutomaticDrawableFields(handler, drawable, room, entity, false)
