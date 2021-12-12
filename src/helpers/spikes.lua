@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local entities = require("entities")
 
 local spikeHelper = {}
 
@@ -278,6 +279,39 @@ function spikeHelper.getTriggerSpikePlacements(direction, variants)
     placements[1].data[lengthKey] = 8
 
     return placements
+end
+
+function spikeHelper.getCanResize(direction)
+    if direction == "left" or direction == "right" then
+        return {false, true}
+    end
+
+    return {true, false}
+end
+
+function spikeHelper.createEntityHandler(name, direction, triggerSpike, originalTriggerSpike, variants)
+    variants = variants or spikeHelper.spikeVariants
+
+    local handler = {}
+
+    local spriteFunction = triggerSpike and spikeHelper.getTriggerSpikeSprites or spikeHelper.getSpikeSprites
+    local placementFunction = triggerSpike and spikeHelper.getTriggerSpikePlacements or spikeHelper.getSpikePlacements
+
+    handler.name = name
+    handler.placements = placementFunction(direction, variants, originalTriggerSpike)
+    handler.canResize = spikeHelper.getCanResize(direction)
+
+    function handler.sprite(room, entity)
+        return spriteFunction(entity, direction, originalTriggerSpike)
+    end
+
+    function handler.selection(room, entity)
+        local sprites = spriteFunction(entity, direction, originalTriggerSpike)
+
+        return entities.getDrawableRectangle(sprites)
+    end
+
+    return handler
 end
 
 return spikeHelper

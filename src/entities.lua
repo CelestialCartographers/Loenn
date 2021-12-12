@@ -308,7 +308,11 @@ function entities.getDrawable(name, handler, room, entity, viewport)
     end
 end
 
-local function getSpriteRectangle(drawables)
+function entities.getDrawableRectangle(drawables)
+    if #drawables == 0 and drawables.getRectangle then
+        return drawables:getRectangle()
+    end
+
     -- TODO - Inline coverRectangles?
     -- Check if this is expensive enough in larger rooms
 
@@ -366,12 +370,7 @@ function entities.getNodeRectangles(room, entity, viewport)
                 end
 
                 if not nodeRectangle then
-                    if #nodeDrawable > 0 then
-                        nodeRectangle = getSpriteRectangle(nodeDrawable)
-
-                    else
-                        nodeRectangle = nodeDrawable:getRectangle()
-                    end
+                    nodeRectangle = entities.getDrawableRectangle(nodeDrawable)
                 end
 
                 table.insert(rectangles, utils.deepcopy(nodeRectangle))
@@ -402,12 +401,7 @@ function entities.getSelectionUnsafe(room, entity, viewport, handlerOverride)
         local nodeRectangles = entities.getNodeRectangles(room, entity)
 
         if drawable then
-            if #drawable == 0 and drawable.getRectangle then
-                return drawable:getRectangle(), nodeRectangles
-
-            else
-                return getSpriteRectangle(drawable), nodeRectangles
-            end
+            return entities.getDrawableRectangle(drawable), nodeRectangles
         end
     end
 end
