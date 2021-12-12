@@ -712,6 +712,7 @@ entities.coreModeToggle.description.persistent=Whether the core mode persists af
 entities.clutterDoor.name.yellow=Clutter Door (Boxes)
 entities.clutterDoor.name.red=Clutter Door (Laundry)
 entities.clutterDoor.name.green=Clutter Door (Books)
+entities.clutterDoor.name.lightning=Clutter Door (Lightning)
 entities.clutterDoor.description.type=Determines which clutter switch will activate the block, making it appear.
 
 # Clutter Cabinet
@@ -730,6 +731,7 @@ entities.greenBlocks.name.green=Clutter Block (Books)
 entities.colorSwitch.name.yellow=Color Switch (Boxes)
 entities.colorSwitch.name.red=Color Switch (Laundry)
 entities.colorSwitch.name.green=Color Switch (Books)
+entities.colorSwitch.name.lightning=Color Switch (Lightning)
 entities.colorSwitch.description.type=The colour of the switch.
 
 # Temple Cracked Block

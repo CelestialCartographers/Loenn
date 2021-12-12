@@ -7,7 +7,7 @@ clutterSwitch.name = "colorSwitch"
 clutterSwitch.depth = 0
 clutterSwitch.placements = {}
 
-local variants = {"red", "yellow", "green"}
+local variants = {"red", "yellow", "green", "lightning"}
 
 for i, variant in ipairs(variants) do
     clutterSwitch.placements[i] = {

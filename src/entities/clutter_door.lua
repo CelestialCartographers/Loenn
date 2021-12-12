@@ -10,7 +10,7 @@ clutterDoor.fillColor = {74 / 255, 71 / 255, 135 / 255, 153}
 clutterDoor.borderColor = {1.0, 1.0, 1.0, 1.0}
 clutterDoor.placements = {}
 
-local variants = {"red", "yellow", "green"}
+local variants = {"red", "yellow", "green", "lightning"}
 
 for i, variant in ipairs(variants) do
     clutterDoor.placements[i] = {
