@@ -25,6 +25,7 @@ local invalidStyle = {
 function colorField._MT.__index:setValue(value)
     self.currentValue = value or fallbackHexColor
     self.field:setText(self.currentValue)
+    self.field.index = #self.currentValue
 end
 
 function colorField._MT.__index:getValue()
@@ -146,6 +147,7 @@ function colorField.getElement(name, value, options)
             local pickerOptions = {
                 callback = function(data)
                     field:setText(data.hexColor)
+                    field.index = #data.hexColor
                 end
             }
 
