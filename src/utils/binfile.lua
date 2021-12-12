@@ -2,6 +2,7 @@
 
 local mathFloor = math.floor
 local mathLdexp = math.ldexp
+local mathHuge = math.huge
 
 local stringByte = string.byte
 local stringChar = string.char
@@ -88,6 +89,18 @@ function binfile.readFloat(fh)
 
     local sign = (b1 > 127) and -1 or 1
     local mantissa = ((b2 % 128) * 256 + b3) * 256 + b4
+
+    -- Infinity/NaN check
+    -- Eight 1s in exponent is infinity/NaN
+    if exponent == 255 then
+        if mantissa == 0 then
+            return mathHuge * sign
+
+        else
+            return 0 / 0
+        end
+    end
+
     mantissa = (mathLdexp(mantissa, -23) + 1) * sign
 
     return mathLdexp(mantissa, exponent - 127)
@@ -109,6 +122,17 @@ function binfile.writeFloat(fh, n)
     if val == 0 then
         mantissa = 0
         exponent = 0
+
+    elseif val == mathHuge then
+        -- Exponent is all 1s and mantissa is all 0s on infinity
+        mantissa = 0
+        exponent = 255 -- Eight 1s
+
+    elseif val ~= val then
+        -- NaN is not equal NaN
+        -- Exponent is all 1s and mantissa is not 0 on NaN
+        mantissa = 1
+        exponent = 255 -- Eight 1s
 
     else
         mantissa = (mantissa * 2 - 1) * mathLdexp(0.5, 24)

@@ -140,7 +140,8 @@ local integerBits = {
 }
 
 function mapcoder.encodeNumber(writer, n, lookup)
-    local float = n ~= math.floor(n)
+    -- Needs special check for infinity and NaN
+    local float = n ~= math.floor(n) or math.abs(n) == math.huge or n ~= n
 
     if float then
         writer:writeByte(typeHeaders.float32)
