@@ -53,6 +53,10 @@ function toolUtils.getPersistenceMaterial(toolName, layer)
     return toolUtils.getPersistenceValue(toolName, layer, "material")
 end
 
+function toolUtils.getPersistenceSearch(toolName, layer)
+    return toolUtils.getPersistenceValue(toolName, layer, "search")
+end
+
 function toolUtils.sendToolEvent(tool)
     sceneHandler.sendEvent("editorToolChanged", tool)
 end
