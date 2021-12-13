@@ -149,10 +149,10 @@ function contextWindow.prepareFormData(layer, item, language)
     local fieldIgnored = getItemIgnoredFields(layer, item)
 
     local fieldLanguage, fallbackLanguage = getItemLanguage(layer, item, language)
-    local languageTooltips = fieldLanguage.description
-    local languageAttributes = fieldLanguage.attribute
-    local fallbackTooltips = fallbackLanguage.description
-    local fallbackAttributes = fallbackLanguage.attribute
+    local languageTooltips = fieldLanguage.attributes.description
+    local languageAttributes = fieldLanguage.attributes.attribute
+    local fallbackTooltips = fallbackLanguage.attributes.description
+    local fallbackAttributes = fallbackLanguage.attributes.attribute
 
     for _, field in ipairs(fieldOrder) do
         local value = item[field]
