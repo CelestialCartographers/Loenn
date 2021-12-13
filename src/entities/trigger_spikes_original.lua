@@ -1,9 +1,9 @@
 local spikeHelper = require("helpers.spikes")
 
-local spikeUp = spikeHelper.createEntityHandler("triggerSpikesOriginalUp", "up")
-local spikeDown = spikeHelper.createEntityHandler("triggerSpikesOriginalDown", "down")
-local spikeLeft = spikeHelper.createEntityHandler("triggerSpikesOriginalLeft", "left")
-local spikeRight = spikeHelper.createEntityHandler("triggerSpikesOriginalRight", "right")
+local spikeUp = spikeHelper.createEntityHandler("triggerSpikesOriginalUp", "up", false, true)
+local spikeDown = spikeHelper.createEntityHandler("triggerSpikesOriginalDown", "down", false, true)
+local spikeLeft = spikeHelper.createEntityHandler("triggerSpikesOriginalLeft", "left", false, true)
+local spikeRight = spikeHelper.createEntityHandler("triggerSpikesOriginalRight", "right", false, true)
 
 return {
     spikeUp,

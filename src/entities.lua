@@ -743,8 +743,8 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
     local simpleName = string.format("%s#%s", name, placementInfo.name)
     local displayName = placementInfo.name
     local tooltipText
-    local displayNameLanguage = language.entities[name].name[placementInfo.name]
-    local tooltipTextLanguage = language.entities[name].description[placementInfo.name]
+    local displayNameLanguage = language.entities[name].placements.name[placementInfo.name]
+    local tooltipTextLanguage = language.entities[name].placements.description[placementInfo.name]
 
     if displayNameLanguage._exists then
         displayName = tostring(displayNameLanguage)
@@ -758,7 +758,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         local modPrefixLanguage = language.mods[modPrefix].name
 
         if modPrefixLanguage._exists then
-            displayName = string.format("%s (%s)", displayName, modPrefixLanguage)
+            displayName = string.format("%s [%s]", displayName, modPrefixLanguage)
         end
     end
 

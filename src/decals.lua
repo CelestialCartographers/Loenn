@@ -128,6 +128,26 @@ function decals.moveSelection(room, layer, selection, x, y)
     return true
 end
 
+function decals.resizeSelection(room, layer, selection, offsetX, offsetY, directionX, directionY)
+    local decal = selection.item
+
+    if offsetX < 0 then
+        decal.scaleX = math.max(decal.scaleX / 2, 1.0)
+
+    elseif offsetX > 0 then
+        decal.scaleX = math.min(decal.scaleX * 2, 2^4)
+    end
+
+    if offsetY < 0 then
+        decal.scaleY = math.max(decal.scaleY / 2, 1.0)
+
+    elseif offsetY > 0 then
+        decal.scaleY = math.min(decal.scaleY * 2, 2^4)
+    end
+
+    return true
+end
+
 function decals.flipSelection(room, layer, selection, horizontal, vertical)
     local decal = selection.item
 
