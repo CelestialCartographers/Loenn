@@ -59,1060 +59,1062 @@ decals.description.texture=Texture path forof the decal.
 
 
 # -- Entities --
-# entities.entityName.name.*
-# entities.entityName.attribute.*
-# entities.entityName.description.*
+# entities.entityName.placements.name.*
+# entities.entityName.placements.description.*
+# entities.entityName.attributes.name.*
+# entities.entityName.attributes.description.*
 
 # Default
-entities.default.attribute.x=X
-entities.default.attribute.y=Y
-entities.default.attribute.width=Width
-entities.default.attribute.height=Height
-entities.default.attribute.nodes=Nodes
-entities.default.description.x=X position of entity.
-entities.default.description.y=Y position of entity.
-entities.default.description.width=Width of entity.
-entities.default.description.height=Height of entity.
-entities.default.description.nodes=Nodes for the entity.
+entities.default.attributes.placements.name.x=X
+entities.default.attributes.placements.name.y=Y
+entities.default.attributes.placements.name.width=Width
+entities.default.attributes.placements.name.height=Height
+entities.default.attributes.placements.name.nodes=Nodes
+entities.default.attributes.description.x=X position of entity.
+entities.default.attributes.description.y=Y position of entity.
+entities.default.attributes.description.width=Width of entity.
+entities.default.attributes.description.height=Height of entity.
+entities.default.attributes.description.nodes=Nodes for the entity.
 
 # Refill
-entities.refill.name.one_dash=Refill
-entities.refill.name.two_dashes=Refill (Two Dashes)
-entities.refill.description.twoDash=Whether the refill should give two dashes.
-entities.refill.description.oneUse=Whether the refill should respawn after being used.
+entities.refill.placements.name.one_dash=Refill
+entities.refill.placements.name.two_dashes=Refill (Two Dashes)
+entities.refill.attributes.description.twoDash=Whether the refill should give two dashes.
+entities.refill.attributes.description.oneUse=Whether the refill should respawn after being used.
 
 # Bonfire
-entities.bonfire.name.bonfire=Bonfire
-entities.bonfire.description.mode=Changes the bonfire between lit, unlit, or smoking.
+entities.bonfire.placements.name.bonfire=Bonfire
+entities.bonfire.attributes.description.mode=Changes the bonfire between lit, unlit, or smoking.
 
 # Booster
-entities.booster.name.green=Booster (Green)
-entities.booster.name.red=Booster (Red)
-entities.booster.description.red=Determines whether the booster is green and short distance, or red and infinite distance.
-entities.booster.description.ch9_hub_booster=If set to true, the player is unable to dash out of the booster.
+entities.booster.placements.name.green=Booster (Green)
+entities.booster.placements.name.red=Booster (Red)
+entities.booster.attributes.description.red=Determines whether the booster is green and short distance, or red and infinite distance.
+entities.booster.attributes.description.ch9_hub_booster=If set to true, the player is unable to dash out of the booster.
 
 # Cloud
-entities.cloud.name.normal=Cloud
-entities.cloud.name.fragile=Cloud (Fragile)
-entities.cloud.description.fragile=Determines whether the cloud will temporarily disappear after being touched.
-entities.cloud.description.small=Reduces the surface area of the cloud.
+entities.cloud.placements.name.normal=Cloud
+entities.cloud.placements.name.fragile=Cloud (Fragile)
+entities.cloud.attributes.description.fragile=Determines whether the cloud will temporarily disappear after being touched.
+entities.cloud.attributes.description.small=Reduces the surface area of the cloud.
 
 # Door
-entities.door.name.wood=Door (Wood)
-entities.door.name.metal=Door (Metal)
-entities.door.description.type=Changes the door to metal or wood.
+entities.door.placements.name.wood=Door (Wood)
+entities.door.placements.name.metal=Door (Metal)
+entities.door.attributes.description.type=Changes the door to metal or wood.
 
 # Trapdoor
-entities.trapdoor.name.trapdoor=Trapdoor
+entities.trapdoor.placements.name.trapdoor=Trapdoor
 
 # Dream Mirror
-entities.dreammirror.name.normal=Dream Mirror
+entities.dreammirror.placements.name.normal=Dream Mirror
 
 # Feather
-entities.infiniteStar.name.normal=Feather
-entities.infiniteStar.description.shielded=Determines whether the feather is surrounded by a shield that must be dashed into to activate.
-entities.infiniteStar.description.singleUse=Determines whether the feather is single-use, not reappearing after usage.
+entities.infiniteStar.placements.name.normal=Feather
+entities.infiniteStar.attributes.description.shielded=Determines whether the feather is surrounded by a shield that must be dashed into to activate.
+entities.infiniteStar.attributes.description.singleUse=Determines whether the feather is single-use, not reappearing after usage.
 
 # Flutterbird
-entities.flutterbird.name.normal=Flutterbird
+entities.flutterbird.placements.name.normal=Flutterbird
 
 # Jumpthru
-entities.jumpThru.name.wood=Jump Through (Wood)
-entities.jumpThru.name.dream=Jump Through (Dream)
-entities.jumpThru.name.temple=Jump Through (Temple)
-entities.jumpThru.name.templeB=Jump Through (Temple B)
-entities.jumpThru.name.cliffside=Jump Through (Cliffside)
-entities.jumpThru.name.reflection=Jump Through (Reflection)
-entities.jumpThru.name.core=Jump Through (Core)
-entities.jumpThru.name.moon=Jump Through (Moon)
-entities.jumpThru.description.texture=Changes the appearance of the platform.
-entities.jumpThru.description.surfaceIndex=Footstep sound when walking on the platform.\nLeave at Default for game to decide automatically based on texture.
+entities.jumpThru.placements.name.wood=Jump Through (Wood)
+entities.jumpThru.placements.name.dream=Jump Through (Dream)
+entities.jumpThru.placements.name.temple=Jump Through (Temple)
+entities.jumpThru.placements.name.templeB=Jump Through (Temple B)
+entities.jumpThru.placements.name.cliffside=Jump Through (Cliffside)
+entities.jumpThru.placements.name.reflection=Jump Through (Reflection)
+entities.jumpThru.placements.name.core=Jump Through (Core)
+entities.jumpThru.placements.name.moon=Jump Through (Moon)
+entities.jumpThru.attributes.description.texture=Changes the appearance of the platform.
+entities.jumpThru.attributes.description.surfaceIndex=Footstep sound when walking on the platform.\nLeave at Default for game to decide automatically based on texture.
 
 # Player
-entities.player.name.player=Player
+entities.player.placements.name.player=Player
 
 # Wire
-entities.wire.name.wire=Wire
-entities.wire.description.above=Determines whether the wire is placed in the foreground or background.
-entities.wire.description.color=Determines the colour of the wire.
+entities.wire.placements.name.wire=Wire
+entities.wire.attributes.description.above=Determines whether the wire is placed in the foreground or background.
+entities.wire.attributes.description.color=Determines the colour of the wire.
 
 # Cliff Side Flagline
-entities.cliffflag.name.cliffflag=Cliffside Flagline
+entities.cliffflag.placements.name.cliffflag=Cliffside Flagline
 
 # Clothesline
-entities.clothesline.name.clothesline=Clothes Line
+entities.clothesline.placements.name.clothesline=Clothes Line
 
 # Bridge
-entities.bridge.name.bridge=Bridge
+entities.bridge.placements.name.bridge=Bridge
 
 # Bridge Fixed
-entities.bridgeFixed.name.bridge_fixed=Bridge (Fixed)
+entities.bridgeFixed.placements.name.bridge_fixed=Bridge (Fixed)
 
 # Crystal Heart
-entities.blackGem.name.crystal_heart=Crystal Heart
-entities.blackGem.description.fake=Whether the heart is fake and should visually be grey. Triggers the Farewell fake heart cutscene.
-entities.blackGem.description.removeCameraTriggers=Whether the heart should remove camera triggers onces its triggered. Only usable if fake attribute is set.
-entities.blackGem.description.fakeHeartDialog=Initial dialogue for the fake heart.
-entities.blackGem.description.keepGoingDialog=Dialogue after the fake heart shatters.
+entities.blackGem.placements.name.crystal_heart=Crystal Heart
+entities.blackGem.attributes.description.fake=Whether the heart is fake and should visually be grey. Triggers the Farewell fake heart cutscene.
+entities.blackGem.attributes.description.removeCameraTriggers=Whether the heart should remove camera triggers onces its triggered. Only usable if fake attribute is set.
+entities.blackGem.attributes.description.fakeHeartDialog=Initial dialogue for the fake heart.
+entities.blackGem.attributes.description.keepGoingDialog=Dialogue after the fake heart shatters.
 
 # Strawberry
-entities.strawberry.name.normal=Strawberry
-entities.strawberry.name.normal_winged=Strawberry (Winged)
-entities.strawberry.name.moon=Moonberry
-entities.strawberry.description.winged=The strawberry attempts to vertically rise offscreen when the player dashes.
-entities.strawberry.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
-entities.strawberry.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
-entities.strawberry.description.moon=Makes the strawberry render as a space berry.\nDoes not work with wings or nodes in the base game.
+entities.strawberry.placements.name.normal=Strawberry
+entities.strawberry.placements.name.normal_winged=Strawberry (Winged)
+entities.strawberry.placements.name.moon=Moonberry
+entities.strawberry.attributes.description.winged=The strawberry attempts to vertically rise offscreen when the player dashes.
+entities.strawberry.attributes.description.checkpointID=Manually determine what checkpoint section strawberries are visually grouped up in, showing up on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
+entities.strawberry.attributes.description.order=Manually determine what order strawberries are visually placed in on the start menu during gameplay and level select. Overrides Everest's automatic berry IDs. (Default= -1)
+entities.strawberry.attributes.description.moon=Makes the strawberry render as a space berry.\nDoes not work with wings or nodes in the base game.
 
 # Golden Strawberry
-entities.goldenBerry.name.golden=Golden Strawberry
-entities.goldenBerry.name.golden_winged=Golden Strawberry (Winged)
-entities.goldenBerry.description.winged=The strawberry attempts to vertically rise offscreen when the player dashes.
+entities.goldenBerry.placements.name.golden=Golden Strawberry
+entities.goldenBerry.placements.name.golden_winged=Golden Strawberry (Winged)
+entities.goldenBerry.attributes.description.winged=The strawberry attempts to vertically rise offscreen when the player dashes.
 
 # Golden Strawberry (No Dash)
-entities.memorialTextController.name.golden_no_dash=Golden Strawberry (No Dash)
+entities.memorialTextController.placements.name.golden_no_dash=Golden Strawberry (No Dash)
 
 # Golden Block
-entities.goldenBlock.name.golden_block=Golden Block
+entities.goldenBlock.placements.name.golden_block=Golden Block
 
 # Springs
-entities.spring.name.up=Spring (Up)
-entities.spring.description.playerCanUse=Determines whether the player is able to interact with the spring.
+entities.spring.placements.name.up=Spring (Up)
+entities.spring.attributes.description.playerCanUse=Determines whether the player is able to interact with the spring.
 
-entities.wallSpringLeft.name.right=Spring (Right)
-entities.wallSpringLeft.description.playerCanUse=Determines whether the player is able to interact with the spring.
+entities.wallSpringLeft.placements.name.right=Spring (Right)
+entities.wallSpringLeft.attributes.description.playerCanUse=Determines whether the player is able to interact with the spring.
 
-entities.wallSpringRight.name.left=Spring (Left)
-entities.wallSpringRight.description.playerCanUse=Determines whether the player is able to interact with the spring.
+entities.wallSpringRight.placements.name.left=Spring (Left)
+entities.wallSpringRight.attributes.description.playerCanUse=Determines whether the player is able to interact with the spring.
 
 # Spikes Up
-entities.spikesUp.name.up_default=Spikes (Up, Default)
-entities.spikesUp.name.up_outline=Spikes (Up, Outline)
-entities.spikesUp.name.up_cliffside=Spikes (Up, Cliffside)
-entities.spikesUp.name.up_reflection=Spikes (Up, Reflection)
-entities.spikesUp.name.up_tentacles=Spikes (Up, Tentacles)
-entities.spikesUp.description.type=Determines the visual appearance of the spike.
+entities.spikesUp.placements.name.up_default=Spikes (Up, Default)
+entities.spikesUp.placements.name.up_outline=Spikes (Up, Outline)
+entities.spikesUp.placements.name.up_cliffside=Spikes (Up, Cliffside)
+entities.spikesUp.placements.name.up_reflection=Spikes (Up, Reflection)
+entities.spikesUp.placements.name.up_tentacles=Spikes (Up, Tentacles)
+entities.spikesUp.attributes.description.type=Determines the visual appearance of the spike.
 
 # Spikes Right
-entities.spikesRight.name.right_default=Spikes (Right, Default)
-entities.spikesRight.name.right_outline=Spikes (Right, Outline)
-entities.spikesRight.name.right_cliffside=Spikes (Right, Cliffside)
-entities.spikesRight.name.right_reflection=Spikes (Right, Reflection)
-entities.spikesRight.name.right_tentacles=Spikes (Right, Tentacles)
-entities.spikesRight.description.type=Determines the visual appearance of the spike.
+entities.spikesRight.placements.name.right_default=Spikes (Right, Default)
+entities.spikesRight.placements.name.right_outline=Spikes (Right, Outline)
+entities.spikesRight.placements.name.right_cliffside=Spikes (Right, Cliffside)
+entities.spikesRight.placements.name.right_reflection=Spikes (Right, Reflection)
+entities.spikesRight.placements.name.right_tentacles=Spikes (Right, Tentacles)
+entities.spikesRight.attributes.description.type=Determines the visual appearance of the spike.
 
 # Spikes Down
-entities.spikesDown.name.down_default=Spikes (Down, Default)
-entities.spikesDown.name.down_outline=Spikes (Down, Outline)
-entities.spikesDown.name.down_cliffside=Spikes (Down, Cliffside)
-entities.spikesDown.name.down_reflection=Spikes (Down, Reflection)
-entities.spikesDown.name.down_tentacles=Spikes (Down, Tentacles)
-entities.spikesDown.description.type=Determines the visual appearance of the spike.
+entities.spikesDown.placements.name.down_default=Spikes (Down, Default)
+entities.spikesDown.placements.name.down_outline=Spikes (Down, Outline)
+entities.spikesDown.placements.name.down_cliffside=Spikes (Down, Cliffside)
+entities.spikesDown.placements.name.down_reflection=Spikes (Down, Reflection)
+entities.spikesDown.placements.name.down_tentacles=Spikes (Down, Tentacles)
+entities.spikesDown.attributes.description.type=Determines the visual appearance of the spike.
 
 # Spikes Left
-entities.spikesLeft.name.left_default=Spikes (Left, Default)
-entities.spikesLeft.name.left_outline=Spikes (Left, Outline)
-entities.spikesLeft.name.left_cliffside=Spikes (Left, Cliffside)
-entities.spikesLeft.name.left_reflection=Spikes (Left, Reflection)
-entities.spikesLeft.name.left_tentacles=Spikes (Left, Tentacles)
-entities.spikesLeft.description.type=Determines the visual appearance of the spike.
+entities.spikesLeft.placements.name.left_default=Spikes (Left, Default)
+entities.spikesLeft.placements.name.left_outline=Spikes (Left, Outline)
+entities.spikesLeft.placements.name.left_cliffside=Spikes (Left, Cliffside)
+entities.spikesLeft.placements.name.left_reflection=Spikes (Left, Reflection)
+entities.spikesLeft.placements.name.left_tentacles=Spikes (Left, Tentacles)
+entities.spikesLeft.attributes.description.type=Determines the visual appearance of the spike.
 
 # Resort Lantern
-entities.resortLantern.name.lantern=Resort Lantern
+entities.resortLantern.placements.name.lantern=Resort Lantern
 
 # Resort Roof Ending
-entities.resortRoofEnding.name.resort_roof_ending=Resort Roof Ending
+entities.resortRoofEnding.placements.name.resort_roof_ending=Resort Roof Ending
 
 # Dream Block
-entities.dreamBlock.name.dream_block=Space Jam
-entities.dreamBlock.description.fastMoving=Changes the dream block between two speeds.
-entities.dreamBlock.description.oneUse=Determines whether the dream block should disappear after one use.
-entities.dreamBlock.description.below=Determines whether the dream block should render in the background or foreground.
+entities.dreamBlock.placements.name.dream_block=Space Jam
+entities.dreamBlock.attributes.description.fastMoving=Changes the dream block between two speeds.
+entities.dreamBlock.attributes.description.oneUse=Determines whether the dream block should disappear after one use.
+entities.dreamBlock.attributes.description.below=Determines whether the dream block should render in the background or foreground.
 
 # Bumper
-entities.bigSpinner.name.bumper=Bumper
+entities.bigSpinner.placements.name.bumper=Bumper
 
 # Floating Debris
-entities.floatingDebris.name.floating_debris=Floating Debris
+entities.floatingDebris.placements.name.floating_debris=Floating Debris
 
 # Foreground Debris
-entities.foregroundDebris.name.foreground_debris=Foreground Debris
+entities.foregroundDebris.placements.name.foreground_debris=Foreground Debris
 
 # Hanging Lamp
-entities.hanginglamp.name.hanging_lamp=Hanging Lamp
+entities.hanginglamp.placements.name.hanging_lamp=Hanging Lamp
 
 # Badeline Boost
-entities.badelineBoost.name.boost=Badeline Boost
-entities.badelineBoost.description.lockCamera=Upon activation, the camera cannot pan away from the entity.
-entities.badelineBoost.description.canSkip=Badeline will skip to the next position if the player is too far to the right of the current one  (100 pixels).
-entities.badelineBoost.description.finalCh9Boost=Whether this boost should be able to end the level, transporting the player to room "end-granny". If the player has a golden berry, and this isn't a golden boost, they are transported to the golden room "end-golden" instead.\nRequires a Blackhole in the background, does not work if it is in the foreground.
-entities.badelineBoost.description.finalCh9GoldenBoost=Used to indicate that we are in the golden room and boosting out. Prevents the check in finalCh9Boost, and always ends the level if finalCh9Boost is also set.
-entities.badelineBoost.description.finalCh9Dialog=If finalCh9Boost is also set and doesn't go to golden room, this will trigger the Farewell ending dialog.
+entities.badelineBoost.placements.name.boost=Badeline Boost
+entities.badelineBoost.attributes.description.lockCamera=Upon activation, the camera cannot pan away from the entity.
+entities.badelineBoost.attributes.description.canSkip=Badeline will skip to the next position if the player is too far to the right of the current one  (100 pixels).
+entities.badelineBoost.attributes.description.finalCh9Boost=Whether this boost should be able to end the level, transporting the player to room "end-granny". If the player has a golden berry, and this isn't a golden boost, they are transported to the golden room "end-golden" instead.\nRequires a Blackhole in the background, does not work if it is in the foreground.
+entities.badelineBoost.attributes.description.finalCh9GoldenBoost=Used to indicate that we are in the golden room and boosting out. Prevents the check in finalCh9Boost, and always ends the level if finalCh9Boost is also set.
+entities.badelineBoost.attributes.description.finalCh9Dialog=If finalCh9Boost is also set and doesn't go to golden room, this will trigger the Farewell ending dialog.
 
 # Badeline Boss
-entities.finalBoss.name.boss=Badeline Boss
-entities.finalBoss.description.startHit=Determines whether or not Badeline waits to attack until the first hit or upon room entry.
-entities.finalBoss.description.patternIndex=Determines what pattern of attack Badeline uses.\n 0 - Badeline transforms into the boss after being hit once\n 1 - Shoots orbs\n 2 - Shoots laser followed by one orb\n 3 - Shoots five streams of two orbs\n 4 - Shoots five streams of two orbs followed by one laser\n 5 - Shoots laser followed by three streams of two orbs\n 6 - Shoots lasers\n 7 - Shoots orbs with less delay\n 8 - Shoots lasers with less delay\n 9 - Shoots streams of two orbs\n 10 - Does nothing\n 11 - Shoots orbs with more delay\n 12 - Does nothing\n 13 - Shoots orbs after getting hit once\n 14 - Shoots lasers with very short delay\n 15 - Shoots lasers with more delay
-entities.finalBoss.description.cameraLockY=Whether the camera should be locked vertically, functioning similarly as a killbox.
+entities.finalBoss.placements.name.boss=Badeline Boss
+entities.finalBoss.attributes.description.startHit=Determines whether or not Badeline waits to attack until the first hit or upon room entry.
+entities.finalBoss.attributes.description.patternIndex=Determines what pattern of attack Badeline uses.\n 0 - Badeline transforms into the boss after being hit once\n 1 - Shoots orbs\n 2 - Shoots laser followed by one orb\n 3 - Shoots five streams of two orbs\n 4 - Shoots five streams of two orbs followed by one laser\n 5 - Shoots laser followed by three streams of two orbs\n 6 - Shoots lasers\n 7 - Shoots orbs with less delay\n 8 - Shoots lasers with less delay\n 9 - Shoots streams of two orbs\n 10 - Does nothing\n 11 - Shoots orbs with more delay\n 12 - Does nothing\n 13 - Shoots orbs after getting hit once\n 14 - Shoots lasers with very short delay\n 15 - Shoots lasers with more delay
+entities.finalBoss.attributes.description.cameraLockY=Whether the camera should be locked vertically, functioning similarly as a killbox.
 
 # Oshiro Boss
-entities.friendlyGhost.name.oshiro_boss=Oshiro Boss
+entities.friendlyGhost.placements.name.oshiro_boss=Oshiro Boss
 
 # Oshiro Door
-entities.oshirodoor.name.oshiro_door=Oshiro Door
+entities.oshirodoor.placements.name.oshiro_door=Oshiro Door
 
 # Fire Ball
-entities.fireBall.name.fireball=Fireball
-entities.fireBall.description.amount=Determines the amount of fireballs on a track.
-entities.fireBall.description.offset=Determines how far into the path the fireball starts.
-entities.fireBall.description.speed=Determines how fast a fireball reaches the end of the track.
-entities.fireBall.description.notCoreMode=Determines whether the fireball should ignore the current core mode and default to ice variant.
+entities.fireBall.placements.name.fireball=Fireball
+entities.fireBall.attributes.description.amount=Determines the amount of fireballs on a track.
+entities.fireBall.attributes.description.offset=Determines how far into the path the fireball starts.
+entities.fireBall.attributes.description.speed=Determines how fast a fireball reaches the end of the track.
+entities.fireBall.attributes.description.notCoreMode=Determines whether the fireball should ignore the current core mode and default to ice variant.
 
 # Fire Barrier
-entities.fireBarrier.name.fire_barrier=Fire Barrier
+entities.fireBarrier.placements.name.fire_barrier=Fire Barrier
 
 # Ice Block
-entities.iceBlock.name.ice_block=Ice Block
+entities.iceBlock.placements.name.ice_block=Ice Block
 
 # Nega Block
-entities.negaBlock.name.nega_block=Nega Block
+entities.negaBlock.placements.name.nega_block=Nega Block
 
 # Invisible Barrier
-entities.invisibleBarrier.name.invisible_barrier=Invisible Barrier
+entities.invisibleBarrier.placements.name.invisible_barrier=Invisible Barrier
 
 # Strawberry Blockfield
-entities.blockField.name.block_field=Strawberry Blockfield
+entities.blockField.placements.name.block_field=Strawberry Blockfield
 
 # Killbox
-entities.killbox.name.killbox=Killbox
+entities.killbox.placements.name.killbox=Killbox
 
 # Tentacles
-entities.tentacles.name.tentacles=Tentacles
-entities.tentacles.description.slide_until=Changes how far tentacles fall back when Madeline comes into fear distance.
-entities.tentacles.description.fear_distance=Determines the distance Madeline has to be at for the tentacles to fall back.
+entities.tentacles.placements.name.tentacles=Tentacles
+entities.tentacles.attributes.description.slide_until=Changes how far tentacles fall back when Madeline comes into fear distance.
+entities.tentacles.attributes.description.fear_distance=Determines the distance Madeline has to be at for the tentacles to fall back.
 
 # Seeker
-entities.seeker.name.seeker=Seeker
+entities.seeker.placements.name.seeker=Seeker
 
 # Seeker Statue
-entities.seekerStatue.name.seeker_statue=Seeker Statue
-entities.seekerStatue.description.hatch=Determines whether the statue releases its seeker when the player is to the right of it, or when the player gets close enough.
+entities.seekerStatue.placements.name.seeker_statue=Seeker Statue
+entities.seekerStatue.attributes.description.hatch=Determines whether the statue releases its seeker when the player is to the right of it, or when the player gets close enough.
 
 # Seeker Barrier
-entities.seekerBarrier.name.seeker_barrier=Seeker Barrier
+entities.seekerBarrier.placements.name.seeker_barrier=Seeker Barrier
 
 # Player Seeker
-entities.playerSeeker.name.player_seeker=Player Seeker
+entities.playerSeeker.placements.name.player_seeker=Player Seeker
 
 # Chapter Checkpoint
-entities.checkpoint.description.inventory=Determines the player's inventory when loading from the given chapter.\n Automatic keeps the inventory from Metadata\n Prologue: 0 dashes, Dream blocks disabled, wearing a backpack, ground refills enabled\n Default: 1 dash, Dream blocks enabled, wearing a backpack, ground refills enabled\n OldSite: 1 dash, Dream blocks disabled, wearing a backpack, ground refills enabled\n CH6End: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills enabled\n TheSummit: 2 dashes, Dream blocks enabled, not wearing a backpack, ground refills enabled\n Core: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills disabled
-entities.checkpoint.description.dreaming=Determines the dreaming state when loading from the given chapter.\nAutomatic keeps the dreaming state from Metadata.
-entities.checkpoint.description.checkpointID=Manually determine the order in which the checkpoints are placed on the level selection screen. Overrides Everest's automatic checkpoint system. (Default= -1)
-entities.checkpoint.description.allowOrigin=Whether the Checkpoint shouldn't be special cased and automatically set by Everest if position is (0, 0).
-entities.checkpoint.description.bg=Image to use for the Checkpoint background.\nValue "9" will give the full path of "objects/checkpoint/bg/9.png", leave blank for no image.
+entities.checkpoint.attributes.description.inventory=Determines the player's inventory when loading from the given chapter.\n Automatic keeps the inventory from Metadata\n Prologue: 0 dashes, Dream blocks disabled, wearing a backpack, ground refills enabled\n Default: 1 dash, Dream blocks enabled, wearing a backpack, ground refills enabled\n OldSite: 1 dash, Dream blocks disabled, wearing a backpack, ground refills enabled\n CH6End: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills enabled\n TheSummit: 2 dashes, Dream blocks enabled, not wearing a backpack, ground refills enabled\n Core: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills disabled
+entities.checkpoint.attributes.description.dreaming=Determines the dreaming state when loading from the given chapter.\nAutomatic keeps the dreaming state from Metadata.
+entities.checkpoint.attributes.description.checkpointID=Manually determine the order in which the checkpoints are placed on the level selection screen. Overrides Everest's automatic checkpoint system. (Default= -1)
+entities.checkpoint.attributes.description.allowOrigin=Whether the Checkpoint shouldn't be special cased and automatically set by Everest if position is (0, 0).
+entities.checkpoint.attributes.description.bg=Image to use for the Checkpoint background.\nValue "9" will give the full path of "objects/checkpoint/bg/9.png", leave blank for no image.
 
 # Rotate Spinner
-entities.rotateSpinner.name.blade_clockwise=Rotating Spinner (Blade, Clockwise)
-entities.rotateSpinner.name.blade_counter_clockwise=Rotating Spinner (Blade, Counter Clockwise)
-entities.rotateSpinner.name.dust_clockwise=Rotating Spinner (Dust, Clockwise)
-entities.rotateSpinner.name.dust_counter_clockwise=Rotating Spinner (Dust, Counter Clockwise)
-entities.rotateSpinner.name.starfish_clockwise=Rotating Spinner (Starfish, Clockwise)
-entities.rotateSpinner.name.starfish_counter_clockwise=Rotating Spinner (Starfish, Counter Clockwise)
-entities.rotateSpinner.description.clockwise=The spinning blade will run clockwise.
-entities.rotateSpinner.description.dust=Changes the appearance of the blade to be a dust sprite.
-entities.rotateSpinner.description.star=Changes the appearance of the blade to be a star.
+entities.rotateSpinner.placements.name.blade_clockwise=Rotating Spinner (Blade, Clockwise)
+entities.rotateSpinner.placements.name.blade_counter_clockwise=Rotating Spinner (Blade, Counter Clockwise)
+entities.rotateSpinner.placements.name.dust_clockwise=Rotating Spinner (Dust, Clockwise)
+entities.rotateSpinner.placements.name.dust_counter_clockwise=Rotating Spinner (Dust, Counter Clockwise)
+entities.rotateSpinner.placements.name.starfish_clockwise=Rotating Spinner (Starfish, Clockwise)
+entities.rotateSpinner.placements.name.starfish_counter_clockwise=Rotating Spinner (Starfish, Counter Clockwise)
+entities.rotateSpinner.attributes.description.clockwise=The spinning blade will run clockwise.
+entities.rotateSpinner.attributes.description.dust=Changes the appearance of the blade to be a dust sprite.
+entities.rotateSpinner.attributes.description.star=Changes the appearance of the blade to be a star.
 
 # Spinner
-entities.spinner.name.dust_sprite=Dust Sprite
-entities.spinner.name.blue=Crystal Spinner (Blue)
-entities.spinner.name.red=Crystal Spinner (Red)
-entities.spinner.name.purple=Crystal Spinner (Purple)
-entities.spinner.name.core=Crystal Spinner (Core)
-entities.spinner.name.rainbow=Crystal Spinner (Rainbow)
-entities.spinner.description.attachToSolid=The spinner attaches to the surface of the entity or block, and can be moved by them.
+entities.spinner.placements.name.dust_sprite=Dust Sprite
+entities.spinner.placements.name.blue=Crystal Spinner (Blue)
+entities.spinner.placements.name.red=Crystal Spinner (Red)
+entities.spinner.placements.name.purple=Crystal Spinner (Purple)
+entities.spinner.placements.name.core=Crystal Spinner (Core)
+entities.spinner.placements.name.rainbow=Crystal Spinner (Rainbow)
+entities.spinner.attributes.description.attachToSolid=The spinner attaches to the surface of the entity or block, and can be moved by them.
 
 # Track Spinner
-entities.trackSpinner.name.blade_slow=Track Spinner (Blade, Slow)
-entities.trackSpinner.name.blade_normal=Track Spinner (Blade, Normal)
-entities.trackSpinner.name.blade_fast=Track Spinner (Blade, Fast)
-entities.trackSpinner.name.dust_slow=Track Spinner (Dust, Slow)
-entities.trackSpinner.name.dust_normal=Track Spinner (Dust, Normal)
-entities.trackSpinner.name.dust_fast=Track Spinner (Dust, Fast)
-entities.trackSpinner.name.starfish_slow=Track Spinner (Star, Slow)
-entities.trackSpinner.name.starfish_normal=Track Spinner (Star, Normal)
-entities.trackSpinner.name.starfish_fast=Track Spinner (Star, Fast)
-entities.trackSpinner.description.speed=Changes the speed of the spinner's rotation.
-entities.trackSpinner.description.startCenter=The spinner will start at the end of the track.
-entities.trackSpinner.description.dust=Turns the visual appearance of the blade into a dust sprite.
-entities.trackSpinner.description.star=Turns the visual appearance of the blade into a star.
+entities.trackSpinner.placements.name.blade_slow=Track Spinner (Blade, Slow)
+entities.trackSpinner.placements.name.blade_normal=Track Spinner (Blade, Normal)
+entities.trackSpinner.placements.name.blade_fast=Track Spinner (Blade, Fast)
+entities.trackSpinner.placements.name.dust_slow=Track Spinner (Dust, Slow)
+entities.trackSpinner.placements.name.dust_normal=Track Spinner (Dust, Normal)
+entities.trackSpinner.placements.name.dust_fast=Track Spinner (Dust, Fast)
+entities.trackSpinner.placements.name.starfish_slow=Track Spinner (Star, Slow)
+entities.trackSpinner.placements.name.starfish_normal=Track Spinner (Star, Normal)
+entities.trackSpinner.placements.name.starfish_fast=Track Spinner (Star, Fast)
+entities.trackSpinner.attributes.description.speed=Changes the speed of the spinner's rotation.
+entities.trackSpinner.attributes.description.startCenter=The spinner will start at the end of the track.
+entities.trackSpinner.attributes.description.dust=Turns the visual appearance of the blade into a dust sprite.
+entities.trackSpinner.attributes.description.star=Turns the visual appearance of the blade into a star.
 
 # Watchtower
-entities.towerviewer.name.watchtower=Watchtower
-entities.towerviewer.description.summit=Whether the watch tower should zoom on the final node or not. Requires nodes to function, otherwise game will crash.
-entities.towerviewer.description.onlyY=Whether the watch tower can only move vertically. If the watch tower has nodes it will still follow them.
+entities.towerviewer.placements.name.watchtower=Watchtower
+entities.towerviewer.attributes.description.summit=Whether the watch tower should zoom on the final node or not. Requires nodes to function, otherwise game will crash.
+entities.towerviewer.attributes.description.onlyY=Whether the watch tower can only move vertically. If the watch tower has nodes it will still follow them.
 
 # Wall Booster
-entities.wallBooster.name.left=Wall Booster (Left)
-entities.wallBooster.name.right=Wall Booster (Right)
-entities.wallBooster.description.left=Whether the entity attaches to the left wall or not.
-entities.wallBooster.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
+entities.wallBooster.placements.name.left=Wall Booster (Left)
+entities.wallBooster.placements.name.right=Wall Booster (Right)
+entities.wallBooster.attributes.description.left=Whether the entity attaches to the left wall or not.
+entities.wallBooster.attributes.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Bounce Block
-entities.bounceBlock.name.bounce_block=Bounce Block
-entities.bounceBlock.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
+entities.bounceBlock.placements.name.bounce_block=Bounce Block
+entities.bounceBlock.attributes.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Dark Chaser
-entities.darkChaser.name.dark_chaser=Badeline Chaser
-entities.darkChaser.description.canChangeMusic=Whether the chaser should be able to change the music to the "chasing" track.
+entities.darkChaser.placements.name.dark_chaser=Badeline Chaser
+entities.darkChaser.attributes.description.canChangeMusic=Whether the chaser should be able to change the music to the "chasing" track.
 
 # Dark Chaser Barrier
-entities.darkChaserEnd.name.barrier=Badeline Chaser Barrier
+entities.darkChaserEnd.placements.name.barrier=Badeline Chaser Barrier
 
 # Final Boss
-entities.finalBoss.description.canChangeMusic=Whether the boss should be able to change the music to the boss track.
+entities.finalBoss.attributes.description.canChangeMusic=Whether the boss should be able to change the music to the boss track.
 
 # Moving Platform
-entities.movingPlatform.name.default=Platform (Moving, Default)
-entities.movingPlatform.name.cliffside=Platform (Moving, Cliffside)
-entities.movingPlatform.description.texture=What texture to use for the platform.
+entities.movingPlatform.placements.name.default=Platform (Moving, Default)
+entities.movingPlatform.placements.name.cliffside=Platform (Moving, Cliffside)
+entities.movingPlatform.attributes.description.texture=What texture to use for the platform.
 
 # Sinking Platform
-entities.sinkingPlatform.name.default=Platform (Sinking, Default)
-entities.sinkingPlatform.name.cliffside=Platform (Sinking, Cliffside)
-entities.sinkingPlatform.description.texture=What texture to use for the platform.
+entities.sinkingPlatform.placements.name.default=Platform (Sinking, Default)
+entities.sinkingPlatform.placements.name.cliffside=Platform (Sinking, Cliffside)
+entities.sinkingPlatform.attributes.description.texture=What texture to use for the platform.
 
 # Crumble Block
-entities.crumbleBlock.name.default=Crumble Block (Default)
-entities.crumbleBlock.name.cliffside=Crumble Block (Cliffside)
-entities.crumbleBlock.description.texture=What texture to use for the crumble block.
+entities.crumbleBlock.placements.name.default=Crumble Block (Default)
+entities.crumbleBlock.placements.name.cliffside=Crumble Block (Cliffside)
+entities.crumbleBlock.attributes.description.texture=What texture to use for the crumble block.
 
 # Fake Block
-entities.fakeBlock.name.fake_block=Fake Block
-entities.fakeBlock.description.tiletype=Changes the visual appearance of the wall.
-entities.fakeBlock.description.playTransitionReveal=Determines whether entering the block should play the reveal jingle.
+entities.fakeBlock.placements.name.fake_block=Fake Block
+entities.fakeBlock.attributes.description.tiletype=Changes the visual appearance of the wall.
+entities.fakeBlock.attributes.description.playTransitionReveal=Determines whether entering the block should play the reveal jingle.
 
 # Glass Block
-entities.glassBlock.name.glass_block=Glass Block
-entities.glassBlock.description.sinks=Whether the tile should sink when the player is on top.
+entities.glassBlock.placements.name.glass_block=Glass Block
+entities.glassBlock.attributes.description.sinks=Whether the tile should sink when the player is on top.
 
 # Kevin's PC
-entities.kevins_pc.name.kevins_pc=Kevin's PC
+entities.kevins_pc.placements.name.kevins_pc=Kevin's PC
 
 # Internet Café
-entities.wavedashmachine.name.cafe=Internet Café
+entities.wavedashmachine.placements.name.cafe=Internet Café
 
 # Cobweb
-entities.cobweb.name.cobweb=Cobweb
-entities.cobweb.description.color=Determines the colour of the cobweb.
+entities.cobweb.placements.name.cobweb=Cobweb
+entities.cobweb.attributes.description.color=Determines the colour of the cobweb.
 
 # Lightbeam
-entities.lightbeam.name.lightbeam=Lightbeam
-entities.lightbeam.description.rotation=Determines the rotation of the lightbeam.
-entities.lightbeam.description.flag=Only show up if the given flag is set, or always if left empty.
+entities.lightbeam.placements.name.lightbeam=Lightbeam
+entities.lightbeam.attributes.description.rotation=Determines the rotation of the lightbeam.
+entities.lightbeam.attributes.description.flag=Only show up if the given flag is set, or always if left empty.
 
 # Theo Crystal
-entities.theoCrystal.name.theo_crystal=Theo Crystal
+entities.theoCrystal.placements.name.theo_crystal=Theo Crystal
 
 # Theo Crystal Pedestal
-entities.theoCrystalPedestal.name.pedestal=Theo Crystal Pedestal
+entities.theoCrystalPedestal.placements.name.pedestal=Theo Crystal Pedestal
 
 # Torch
-entities.torch.name.torch=Torch
-entities.torch.description.startLit=Changes whether the light will start lit, or have the player's touch activate it.
+entities.torch.placements.name.torch=Torch
+entities.torch.attributes.description.startLit=Changes whether the light will start lit, or have the player's touch activate it.
 
 # Heart Door
-entities.heartGemDoor.name.door=Heart Door
-entities.heartGemDoor.description.requires=Determines the number of Crystal Hearts required to open the heart door. Everest keeps track of hearts collected within the level set.
-entities.heartGemDoor.description.startHidden=Whether the door should start hidden and come crashing down when the player approaches.\nWill destroy dash blocks as it crashes down.
+entities.heartGemDoor.placements.name.door=Heart Door
+entities.heartGemDoor.attributes.description.requires=Determines the number of Crystal Hearts required to open the heart door. Everest keeps track of hearts collected within the level set.
+entities.heartGemDoor.attributes.description.startHidden=Whether the door should start hidden and come crashing down when the player approaches.\nWill destroy dash blocks as it crashes down.
 
 # Move Block
-entities.moveBlock.name.up_steer_fast=Move Block (Up, Steerable, Fast)
-entities.moveBlock.name.up_steer_slow=Move Block (Up, Steerable, Slow)
-entities.moveBlock.name.up_nosteer_fast=Move Block (Up, Fast)
-entities.moveBlock.name.up_nosteer_slow=Move Block (Up, Slow)
-entities.moveBlock.name.down_steer_fast=Move Block (Down, Steerable, Fast)
-entities.moveBlock.name.down_steer_slow=Move Block (Down, Steerable, Slow)
-entities.moveBlock.name.down_nosteer_fast=Move Block (Down, Fast)
-entities.moveBlock.name.down_nosteer_slow=Move Block (Down, Slow)
-entities.moveBlock.name.right_steer_fast=Move Block (Right, Steerable, Fast)
-entities.moveBlock.name.right_steer_slow=Move Block (Right, Steerable, Slow)
-entities.moveBlock.name.right_nosteer_fast=Move Block (Right, Fast)
-entities.moveBlock.name.right_nosteer_slow=Move Block (Right, Slow)
-entities.moveBlock.name.left_steer_fast=Move Block (Left, Steerable, Fast)
-entities.moveBlock.name.left_steer_slow=Move Block (Left, Steerable, Slow)
-entities.moveBlock.name.left_nosteer_fast=Move Block (Left, Fast)
-entities.moveBlock.name.left_nosteer_slow=Move Block (Left, Slow)
-entities.moveBlock.description.canSteer=Determines whether the move block can be moved by the player.
-entities.moveBlock.description.fast=Changes the move block between two speeds.
-entities.moveBlock.description.direction=Determines the direction the move block moves in upon activation.
+entities.moveBlock.placements.name.up_steer_fast=Move Block (Up, Steerable, Fast)
+entities.moveBlock.placements.name.up_steer_slow=Move Block (Up, Steerable, Slow)
+entities.moveBlock.placements.name.up_nosteer_fast=Move Block (Up, Fast)
+entities.moveBlock.placements.name.up_nosteer_slow=Move Block (Up, Slow)
+entities.moveBlock.placements.name.down_steer_fast=Move Block (Down, Steerable, Fast)
+entities.moveBlock.placements.name.down_steer_slow=Move Block (Down, Steerable, Slow)
+entities.moveBlock.placements.name.down_nosteer_fast=Move Block (Down, Fast)
+entities.moveBlock.placements.name.down_nosteer_slow=Move Block (Down, Slow)
+entities.moveBlock.placements.name.right_steer_fast=Move Block (Right, Steerable, Fast)
+entities.moveBlock.placements.name.right_steer_slow=Move Block (Right, Steerable, Slow)
+entities.moveBlock.placements.name.right_nosteer_fast=Move Block (Right, Fast)
+entities.moveBlock.placements.name.right_nosteer_slow=Move Block (Right, Slow)
+entities.moveBlock.placements.name.left_steer_fast=Move Block (Left, Steerable, Fast)
+entities.moveBlock.placements.name.left_steer_slow=Move Block (Left, Steerable, Slow)
+entities.moveBlock.placements.name.left_nosteer_fast=Move Block (Left, Fast)
+entities.moveBlock.placements.name.left_nosteer_slow=Move Block (Left, Slow)
+entities.moveBlock.attributes.description.canSteer=Determines whether the move block can be moved by the player.
+entities.moveBlock.attributes.description.fast=Changes the move block between two speeds.
+entities.moveBlock.attributes.description.direction=Determines the direction the move block moves in upon activation.
 
 # Forsaken City Satellite
-entities.birdForsakenCityGem.name.satellite=Forsaken City Satellite
+entities.birdForsakenCityGem.placements.name.satellite=Forsaken City Satellite
 
 # White Block
-entities.whiteblock.name.white_block=White Block
+entities.whiteblock.placements.name.white_block=White Block
 
 # Reflection Heart Statue
-entities.reflectionHeartStatue.name.statue=Reflection Heart Statue
+entities.reflectionHeartStatue.placements.name.statue=Reflection Heart Statue
 
 # Touch Switch
-entities.touchSwitch.name.touch_switch=Touch Switch
+entities.touchSwitch.placements.name.touch_switch=Touch Switch
 
 # Switch Gate
-entities.switchGate.name.block=Switch Gate (Stone)
-entities.switchGate.name.mirror=Switch Gate (Mirror)
-entities.switchGate.name.temple=Switch Gate (Temple)
-entities.switchGate.name.stars=Switch Gate (Moon)
-entities.switchGate.description.persistent=Will stay open once activated, even if the player dies.
-entities.switchGate.description.sprite=Changes the visual appearance of the switch gate.
+entities.switchGate.placements.name.block=Switch Gate (Stone)
+entities.switchGate.placements.name.mirror=Switch Gate (Mirror)
+entities.switchGate.placements.name.temple=Switch Gate (Temple)
+entities.switchGate.placements.name.stars=Switch Gate (Moon)
+entities.switchGate.attributes.description.persistent=Will stay open once activated, even if the player dies.
+entities.switchGate.attributes.description.sprite=Changes the visual appearance of the switch gate.
 
 # Cliffside Flag
-entities.cliffside_flag.name.cliffside_flag=Cliffside Big Flag
-entities.cliffside_flag.description.index=Changes the visual appearance of the flag.
+entities.cliffside_flag.placements.name.cliffside_flag=Cliffside Big Flag
+entities.cliffside_flag.attributes.description.index=Changes the visual appearance of the flag.
 
 # Dash Switch Horizontal
-entities.dashSwitchH.name.right_default=Dash Switch (Right) (Temple A)
-entities.dashSwitchH.name.right_mirror=Dash Switch (Right) (Temple B)
-entities.dashSwitchH.name.left_default=Dash Switch (Left) (Temple A)
-entities.dashSwitchH.name.left_mirror=Dash Switch (Left) (Temple B)
-entities.dashSwitchH.description.persistent=Once turned on, it will stay activated, even if the player dies.
-entities.dashSwitchH.description.sprite=Changes the visual appearance of the switch.
-entities.dashSwitchH.description.leftSide=Flips the switch entity horizontally so that it can be attached to wall surfaces facing right.
-entities.dashSwitchH.description.allGates=Whether or not the switch should open all temple gates or not.
+entities.dashSwitchH.placements.name.right_default=Dash Switch (Right) (Temple A)
+entities.dashSwitchH.placements.name.right_mirror=Dash Switch (Right) (Temple B)
+entities.dashSwitchH.placements.name.left_default=Dash Switch (Left) (Temple A)
+entities.dashSwitchH.placements.name.left_mirror=Dash Switch (Left) (Temple B)
+entities.dashSwitchH.attributes.description.persistent=Once turned on, it will stay activated, even if the player dies.
+entities.dashSwitchH.attributes.description.sprite=Changes the visual appearance of the switch.
+entities.dashSwitchH.attributes.description.leftSide=Flips the switch entity horizontally so that it can be attached to wall surfaces facing right.
+entities.dashSwitchH.attributes.description.allGates=Whether or not the switch should open all temple gates or not.
 
 # Dash Switch Vertical
-entities.dashSwitchV.name.up_default=Dash Switch (Up) (Temple A)
-entities.dashSwitchV.name.up_mirror=Dash Switch (Up) (Temple B)
-entities.dashSwitchV.name.down_default=Dash Switch (Down) (Temple A)
-entities.dashSwitchV.name.down_mirror=Dash Switch (Down) (Temple B)
-entities.dashSwitchV.description.persistent=Once turned on, it will stay activated, even if the player dies.
-entities.dashSwitchV.description.sprite=Changes the visual appearance of the switch.
-entities.dashSwitchV.description.ceiling=Flips the switch entity vertically so that it can be attached to ceiling surfaces.
-entities.dashSwitchV.description.allGates=Whether or not the switch should open all temple gates or not.
+entities.dashSwitchV.placements.name.up_default=Dash Switch (Up) (Temple A)
+entities.dashSwitchV.placements.name.up_mirror=Dash Switch (Up) (Temple B)
+entities.dashSwitchV.placements.name.down_default=Dash Switch (Down) (Temple A)
+entities.dashSwitchV.placements.name.down_mirror=Dash Switch (Down) (Temple B)
+entities.dashSwitchV.attributes.description.persistent=Once turned on, it will stay activated, even if the player dies.
+entities.dashSwitchV.attributes.description.sprite=Changes the visual appearance of the switch.
+entities.dashSwitchV.attributes.description.ceiling=Flips the switch entity vertically so that it can be attached to ceiling surfaces.
+entities.dashSwitchV.attributes.description.allGates=Whether or not the switch should open all temple gates or not.
 
 # Memorial
-entities.memorial.description.dreaming=Changes the memorial's text to the dream state from Old Site.
+entities.memorial.attributes.description.dreaming=Changes the memorial's text to the dream state from Old Site.
 
 # Memorial (Everest)
-entities.everest/memorial.name.memorial=Custom Memorial
-entities.everest/memorial.description.dreaming=Changes the memorial's text to the dream state from Old Site.
-entities.everest/memorial.description.dialog=What dialog ID to pull the memorial's text from.
-entities.everest/memorial.description.sprite=What sprite to render for the memorial.
-entities.everest/memorial.description.spacing=The spacing for the letters.
+entities.everest/memorial.placements.name.memorial=Custom Memorial
+entities.everest/memorial.attributes.description.dreaming=Changes the memorial's text to the dream state from Old Site.
+entities.everest/memorial.attributes.description.dialog=What dialog ID to pull the memorial's text from.
+entities.everest/memorial.attributes.description.sprite=What sprite to render for the memorial.
+entities.everest/memorial.attributes.description.spacing=The spacing for the letters.
 
 # Water
-entities.water.name.water=Water
-entities.water.description.hasBottom=Determines whether or not the water has a bottom.
+entities.water.placements.name.water=Water
+entities.water.attributes.description.hasBottom=Determines whether or not the water has a bottom.
 
 # NPC
-entities.npc.description.npc=Changes which NPC entity appears from a list of entities. Certain entities carry dialogue from certain scenes in the game.
+entities.npc.attributes.description.npc=Changes which NPC entity appears from a list of entities. Certain entities carry dialogue from certain scenes in the game.
 
 # NPC (Everest)
-entities.everest/npc.name.npc=Custom NPC
-entities.everest/npc.description.indicatorOffsetX=Offset for the chat icon on the X axis.
-entities.everest/npc.description.indicatorOffsetY=Offset for the chat icon on the Y axis.
-entities.everest/npc.description.dialogId=The dialog ID to use for the dialogue.
-entities.everest/npc.description.flipY=Flips the sprite of the NPC vertically.
-entities.everest/npc.description.flipX=Flips the sprite of the NPC horizontally.
-entities.everest/npc.description.onlyOnce=Whether the dialogue should only be completable once.
-entities.everest/npc.description.endLevel=Whether finishing the dialogue should count as completing the map.
-entities.everest/npc.description.approachWhenTalking=Whether Madeline should walk towards the NPC when talking.
-entities.everest/npc.description.spriteRate=The animation rate for the sprite.
-entities.everest/npc.description.approachDistance=How far away from the NPC Madeline should stop when approaching.
-entities.everest/npc.description.sprite=Which sprite to use. `player/idle` will use the full path `Graphics/Atlases/Gameplay/characters/player/idle00` and loop from 00 to 08.
+entities.everest/npc.placements.name.npc=Custom NPC
+entities.everest/npc.attributes.description.indicatorOffsetX=Offset for the chat icon on the X axis.
+entities.everest/npc.attributes.description.indicatorOffsetY=Offset for the chat icon on the Y axis.
+entities.everest/npc.attributes.description.dialogId=The dialog ID to use for the dialogue.
+entities.everest/npc.attributes.description.flipY=Flips the sprite of the NPC vertically.
+entities.everest/npc.attributes.description.flipX=Flips the sprite of the NPC horizontally.
+entities.everest/npc.attributes.description.onlyOnce=Whether the dialogue should only be completable once.
+entities.everest/npc.attributes.description.endLevel=Whether finishing the dialogue should count as completing the map.
+entities.everest/npc.attributes.description.approachWhenTalking=Whether Madeline should walk towards the NPC when talking.
+entities.everest/npc.attributes.description.spriteRate=The animation rate for the sprite.
+entities.everest/npc.attributes.description.approachDistance=How far away from the NPC Madeline should stop when approaching.
+entities.everest/npc.attributes.description.sprite=Which sprite to use. `player/idle` will use the full path `Graphics/Atlases/Gameplay/characters/player/idle00` and loop from 00 to 08.
 
 # Slider
-entities.slider.name.clockwise=Slider (Clockwise)
-entities.slider.description.clockwise=Whether the slider will run clockwise or counter-clockwise.
-entities.slider.description.surface=Attaches the slider to a surface.
+entities.slider.placements.name.clockwise=Slider (Clockwise)
+entities.slider.attributes.description.clockwise=Whether the slider will run clockwise or counter-clockwise.
+entities.slider.attributes.description.surface=Attaches the slider to a surface.
 
 # Lock Block
-entities.lockBlock.name.wood=Lock Block (Wood)
-entities.lockBlock.name.temple_a=Lock Block (Temple A)
-entities.lockBlock.name.temple_b=Lock Block (Temple B)
-entities.lockBlock.name.moon=Lock Block (Moon)
-entities.lockBlock.description.sprite=Changes the visual appearance of the locked door.
-entities.lockBlock.description.unlock_sfx=The sound to play when unlocking the door. Leave empty for default.
-entities.lockBlock.description.stepMusicProgress=Whether unlocking the door should increment the music progress by one.
+entities.lockBlock.placements.name.wood=Lock Block (Wood)
+entities.lockBlock.placements.name.temple_a=Lock Block (Temple A)
+entities.lockBlock.placements.name.temple_b=Lock Block (Temple B)
+entities.lockBlock.placements.name.moon=Lock Block (Moon)
+entities.lockBlock.attributes.description.sprite=Changes the visual appearance of the locked door.
+entities.lockBlock.attributes.description.unlock_sfx=The sound to play when unlocking the door. Leave empty for default.
+entities.lockBlock.attributes.description.stepMusicProgress=Whether unlocking the door should increment the music progress by one.
 
 # Key
-entities.key.name.normal=Key
-entities.key.name.with_return=Key (With Return)
+entities.key.placements.name.normal=Key
+entities.key.placements.name.with_return=Key (With Return)
 
 # Payphone
-entities.payphone.name.payphone=Payphone
+entities.payphone.placements.name.payphone=Payphone
 
 # Pico Console
-entities.picoconsole.name.pico_console=Pico Console
+entities.picoconsole.placements.name.pico_console=Pico Console
 
 # Trigger Spikes Up
-entities.triggerSpikesOriginalUp.name.up_default=Trigger Spikes (Up, Default)
-entities.triggerSpikesOriginalUp.name.up_outline=Trigger Spikes (Up, Outline)
-entities.triggerSpikesOriginalUp.name.up_cliffside=Trigger Spikes (Up, Cliffside)
-entities.triggerSpikesOriginalUp.name.up_reflection=Trigger Spikes (Up, Reflection)
-entities.triggerSpikesOriginalUp.description.type=Determines the visual appearance of the spike.
+entities.triggerSpikesOriginalUp.placements.name.up_default=Trigger Spikes (Up, Default)
+entities.triggerSpikesOriginalUp.placements.name.up_outline=Trigger Spikes (Up, Outline)
+entities.triggerSpikesOriginalUp.placements.name.up_cliffside=Trigger Spikes (Up, Cliffside)
+entities.triggerSpikesOriginalUp.placements.name.up_reflection=Trigger Spikes (Up, Reflection)
+entities.triggerSpikesOriginalUp.attributes.description.type=Determines the visual appearance of the spike.
 
 # Trigger Spikes Right
-entities.triggerSpikesOriginalRight.name.right_default=Trigger Spikes (Right, Default)
-entities.triggerSpikesOriginalRight.name.right_outline=Trigger Spikes (Right, Outline)
-entities.triggerSpikesOriginalRight.name.right_cliffside=Trigger Spikes (Right, Cliffside)
-entities.triggerSpikesOriginalRight.name.right_reflection=Trigger Spikes (Right, Reflection)
-entities.triggerSpikesOriginalRight.description.type=Determines the visual appearance of the spike.
+entities.triggerSpikesOriginalRight.placements.name.right_default=Trigger Spikes (Right, Default)
+entities.triggerSpikesOriginalRight.placements.name.right_outline=Trigger Spikes (Right, Outline)
+entities.triggerSpikesOriginalRight.placements.name.right_cliffside=Trigger Spikes (Right, Cliffside)
+entities.triggerSpikesOriginalRight.placements.name.right_reflection=Trigger Spikes (Right, Reflection)
+entities.triggerSpikesOriginalRight.attributes.description.type=Determines the visual appearance of the spike.
 
 # Trigger Spikes Down
-entities.triggerSpikesOriginalDown.name.down_default=Trigger Spikes (Down, Default)
-entities.triggerSpikesOriginalDown.name.down_outline=Trigger Spikes (Down, Outline)
-entities.triggerSpikesOriginalDown.name.down_cliffside=Trigger Spikes (Down, Cliffside)
-entities.triggerSpikesOriginalDown.name.down_reflection=Trigger Spikes (Down, Reflection)
-entities.triggerSpikesOriginalDown.description.type=Determines the visual appearance of the spike.
+entities.triggerSpikesOriginalDown.placements.name.down_default=Trigger Spikes (Down, Default)
+entities.triggerSpikesOriginalDown.placements.name.down_outline=Trigger Spikes (Down, Outline)
+entities.triggerSpikesOriginalDown.placements.name.down_cliffside=Trigger Spikes (Down, Cliffside)
+entities.triggerSpikesOriginalDown.placements.name.down_reflection=Trigger Spikes (Down, Reflection)
+entities.triggerSpikesOriginalDown.attributes.description.type=Determines the visual appearance of the spike.
 
 # Trigger Spikes Left
-entities.triggerSpikesOriginalLeft.name.left_default=Trigger Spikes (Left, Default)
-entities.triggerSpikesOriginalLeft.name.left_outline=Trigger Spikes (Left, Outline)
-entities.triggerSpikesOriginalLeft.name.left_cliffside=Trigger Spikes (Left, Cliffside)
-entities.triggerSpikesOriginalLeft.name.left_reflection=Trigger Spikes (Left, Reflection)
-entities.triggerSpikesOriginalLeft.description.type=Determines the visual appearance of the spike.
+entities.triggerSpikesOriginalLeft.placements.name.left_default=Trigger Spikes (Left, Default)
+entities.triggerSpikesOriginalLeft.placements.name.left_outline=Trigger Spikes (Left, Outline)
+entities.triggerSpikesOriginalLeft.placements.name.left_cliffside=Trigger Spikes (Left, Cliffside)
+entities.triggerSpikesOriginalLeft.placements.name.left_reflection=Trigger Spikes (Left, Reflection)
+entities.triggerSpikesOriginalLeft.attributes.description.type=Determines the visual appearance of the spike.
 
 # Trigger Spikes Dust
-entities.triggerSpikesUp.name.up=Trigger Spikes (Up, Dust)
-entities.triggerSpikesDown.name.down=Trigger Spikes (Down, Dust)
-entities.triggerSpikesRight.name.right=Trigger Spikes (Right, Dust)
-entities.triggerSpikesLeft.name.left=Trigger Spikes (Left, Dust)
+entities.triggerSpikesUp.placements.name.up=Trigger Spikes (Up, Dust)
+entities.triggerSpikesDown.placements.name.down=Trigger Spikes (Down, Dust)
+entities.triggerSpikesRight.placements.name.right=Trigger Spikes (Right, Dust)
+entities.triggerSpikesLeft.placements.name.left=Trigger Spikes (Left, Dust)
 
 # Coverup Wall
-entities.coverupWall.name.coverup_wall=Coverup Wall
-entities.coverupWall.description.tiletype=Changes the visual appearance of the wall.
+entities.coverupWall.placements.name.coverup_wall=Coverup Wall
+entities.coverupWall.attributes.description.tiletype=Changes the visual appearance of the wall.
 
 # Fall Plateau
-entities.plateau.name.plateau=Plateau
+entities.plateau.placements.name.plateau=Plateau
 
 # Lamp
-entities.lamp.name.normal=Lamp
-entities.lamp.name.broken=Lamp (Broken)
-entities.lamp.description.broken=Changes the visual appearance of the lamp to be broken.
+entities.lamp.placements.name.normal=Lamp
+entities.lamp.placements.name.broken=Lamp (Broken)
+entities.lamp.attributes.description.broken=Changes the visual appearance of the lamp to be broken.
 
 # Falling Block
-entities.fallingBlock.name.falling_block=Falling Block
-entities.fallingBlock.description.climbFall=After a delay, the block will physically fall down until it comes into contact with another block.
-entities.fallingBlock.description.tiletype=Changes the visual appearance of the falling block.
-entities.fallingBlock.description.behind=Whether the block should visually be further behind in the scene or not.
+entities.fallingBlock.placements.name.falling_block=Falling Block
+entities.fallingBlock.attributes.description.climbFall=After a delay, the block will physically fall down until it comes into contact with another block.
+entities.fallingBlock.attributes.description.tiletype=Changes the visual appearance of the falling block.
+entities.fallingBlock.attributes.description.behind=Whether the block should visually be further behind in the scene or not.
 
 # Fake Wall
-entities.fakeWall.name.fake_wall=Fake Wall
-entities.fakeWall.description.tiletype=Changes the visual appearance of the wall.
+entities.fakeWall.placements.name.fake_wall=Fake Wall
+entities.fakeWall.attributes.description.tiletype=Changes the visual appearance of the wall.
 
 # Spinner
-entities.spinner.description.color=Changes the colour of the spinner.
-entities.spinner.description.dust=Changes the spinner into a dust sprite.
+entities.spinner.attributes.description.color=Changes the colour of the spinner.
+entities.spinner.attributes.description.dust=Changes the spinner into a dust sprite.
 
 # Intro Crusher
-entities.introCrusher.name.intro_crusher=Intro Crusher
-entities.introCrusher.description.tiletype=Determines the visual appearance of the wall.
-entities.introCrusher.description.flags=If any of the flags are set, the entity will rest at its end node instead.
+entities.introCrusher.placements.name.intro_crusher=Intro Crusher
+entities.introCrusher.attributes.description.tiletype=Determines the visual appearance of the wall.
+entities.introCrusher.attributes.description.flags=If any of the flags are set, the entity will rest at its end node instead.
 
 # Dash Block
-entities.dashBlock.name.dash_block=Dash Block
-entities.dashBlock.description.canDash=Whether the player can break the block by dashing into it.
-entities.dashBlock.description.blendin=Blends the block with the walls it touches, making it less apparent.
-entities.dashBlock.description.tiletype=Determines the visual appearance of the wall.
-entities.dashBlock.description.permanent=Once broken, the block will remain that way, even if the player dies.
+entities.dashBlock.placements.name.dash_block=Dash Block
+entities.dashBlock.attributes.description.canDash=Whether the player can break the block by dashing into it.
+entities.dashBlock.attributes.description.blendin=Blends the block with the walls it touches, making it less apparent.
+entities.dashBlock.attributes.description.tiletype=Determines the visual appearance of the wall.
+entities.dashBlock.attributes.description.permanent=Once broken, the block will remain that way, even if the player dies.
 
 # Exit Block
-entities.exitBlock.name.exit_block=Exit Block
-entities.exitBlock.description.tileType=Determines the visual appearance of the wall.
-entities.exitBlock.description.playTransitionReveal=Determines whether revealing the block should play the reveal jingle.
+entities.exitBlock.placements.name.exit_block=Exit Block
+entities.exitBlock.attributes.description.tileType=Determines the visual appearance of the wall.
+entities.exitBlock.attributes.description.playTransitionReveal=Determines whether revealing the block should play the reveal jingle.
 
 # Cassette
-entities.cassette.name.cassette=Cassette
+entities.cassette.placements.name.cassette=Cassette
 
 # Cassette Block
-entities.cassetteBlock.name.cassette_block_0=Cassette Block (0 - Blue)
-entities.cassetteBlock.name.cassette_block_1=Cassette Block (1 - Rose)
-entities.cassetteBlock.name.cassette_block_2=Cassette Block (2 - Bright Sun)
-entities.cassetteBlock.name.cassette_block_3=Cassette Block (3 - Malachite)
-entities.cassetteBlock.description.index=The colour of the cassette block.
-entities.cassetteBlock.description.tempo=The tempo of the cassette blocks. The first non 1 tempo cassette block decides the tempo for all cassette blocks in the room.
+entities.cassetteBlock.placements.name.cassette_block_0=Cassette Block (0 - Blue)
+entities.cassetteBlock.placements.name.cassette_block_1=Cassette Block (1 - Rose)
+entities.cassetteBlock.placements.name.cassette_block_2=Cassette Block (2 - Bright Sun)
+entities.cassetteBlock.placements.name.cassette_block_3=Cassette Block (3 - Malachite)
+entities.cassetteBlock.attributes.description.index=The colour of the cassette block.
+entities.cassetteBlock.attributes.description.tempo=The tempo of the cassette blocks. The first non 1 tempo cassette block decides the tempo for all cassette blocks in the room.
 
 # Temple Gate
-entities.templeGate.name.theo_holdingtheo=Temple Gate (Theo, Holding Theo)
-entities.templeGate.name.default_closebehindplayer=Temple Gate (Default, Close Behind)
-entities.templeGate.name.mirror_closebehindplayer=Temple Gate (Mirror, Close Behind)
-entities.templeGate.name.default_nearestswitch=Temple Gate (Default, Nearest Switch)
-entities.templeGate.name.mirror_nearestswitch=Temple Gate (Mirror, Nearest Switch)
-entities.templeGate.name.default_touchswitches=Temple Gate (Default, Touch Switches)
-entities.templeGate.description.sprite=Determines the visual appearance of the gate.
-entities.templeGate.description.type=Determines what abilities the gate has.
+entities.templeGate.placements.name.theo_holdingtheo=Temple Gate (Theo, Holding Theo)
+entities.templeGate.placements.name.default_closebehindplayer=Temple Gate (Default, Close Behind)
+entities.templeGate.placements.name.mirror_closebehindplayer=Temple Gate (Mirror, Close Behind)
+entities.templeGate.placements.name.default_nearestswitch=Temple Gate (Default, Nearest Switch)
+entities.templeGate.placements.name.mirror_nearestswitch=Temple Gate (Mirror, Nearest Switch)
+entities.templeGate.placements.name.default_touchswitches=Temple Gate (Default, Touch Switches)
+entities.templeGate.attributes.description.sprite=Determines the visual appearance of the gate.
+entities.templeGate.attributes.description.type=Determines what abilities the gate has.
 
 # Temple Mirror
-entities.templeMirror.name.mirror=Temple Mirror
-entities.templeMirror.description.reflectX=The horizontal offset for the reflection.
-entities.templeMirror.description.reflectY=The vertical offset for the reflection.
+entities.templeMirror.placements.name.mirror=Temple Mirror
+entities.templeMirror.attributes.description.reflectX=The horizontal offset for the reflection.
+entities.templeMirror.attributes.description.reflectY=The vertical offset for the reflection.
 
 # Temple Mirror Portal
-entities.templeMirrorPortal.name.temple_mirror_portal=Temple Mirror Portal
+entities.templeMirrorPortal.placements.name.temple_mirror_portal=Temple Mirror Portal
 
 # Temple Eye
-entities.templeEye.name.temple_eye=Temple Eye
+entities.templeEye.placements.name.temple_eye=Temple Eye
 
 # Big Temple Eye
-entities.templeBigEyeball.name.temple_big_eyeball=Temple Big Eyeball
+entities.templeBigEyeball.placements.name.temple_big_eyeball=Temple Big Eyeball
 
 # Sandwich Lava
-entities.sandwichLava.name.lava_sandwich=Lava Sandwich
+entities.sandwichLava.placements.name.lava_sandwich=Lava Sandwich
 
 # Rising Lava
-entities.risingLava.name.rising_lava=Rising Lava
-entities.risingLava.description.intro=Determines whether the lava rises up from below the bottom of the screen or starts already present near the bottom.
+entities.risingLava.placements.name.rising_lava=Rising Lava
+entities.risingLava.attributes.description.intro=Determines whether the lava rises up from below the bottom of the screen or starts already present near the bottom.
 
 # Ridge Gate
-entities.ridgeGate.name.ridge_gate=Ridge Gate
-entities.ridgeGate.description.strawberries=Determines when the gate will appear, creating a block after certain strawberries are collected. If keys attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one berry or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
-entities.ridgeGate.description.keys=Determines when the gate will appear, creating a block after certain keys are collected. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
-entities.ridgeGate.description.texture=The visual apparence of the gate. Defaults to "objects/ridgeGate".
+entities.ridgeGate.placements.name.ridge_gate=Ridge Gate
+entities.ridgeGate.attributes.description.strawberries=Determines when the gate will appear, creating a block after certain strawberries are collected. If keys attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one berry or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
+entities.ridgeGate.attributes.description.keys=Determines when the gate will appear, creating a block after certain keys are collected. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
+entities.ridgeGate.attributes.description.texture=The visual apparence of the gate. Defaults to "objects/ridgeGate".
 
 # Summit Cloud
-entities.summitcloud.name.summit_cloud=Summit Cloud
+entities.summitcloud.placements.name.summit_cloud=Summit Cloud
 
 # Summit Checkpoints
-entities.summitcheckpoint.name.summit_checkpoint=Summit Checkpoint
-entities.summitcheckpoint.description.number=Changes the number on the checkpoint card. (Max = 99)
+entities.summitcheckpoint.placements.name.summit_checkpoint=Summit Checkpoint
+entities.summitcheckpoint.attributes.description.number=Changes the number on the checkpoint card. (Max = 99)
 
 # Bird
-entities.bird.name.bird=Bird NPC
-entities.bird.description.mode=Determines what properties the bird has.
-entities.bird.description.onlyOnce=Determines whether the bird should only show itself once when in "MoveToNodes" mode.
-entities.bird.description.onlyIfPlayerLeft=The bird will only spawn if the player starts to the left of it.
+entities.bird.placements.name.bird=Bird NPC
+entities.bird.attributes.description.mode=Determines what properties the bird has.
+entities.bird.attributes.description.onlyOnce=Determines whether the bird should only show itself once when in "MoveToNodes" mode.
+entities.bird.attributes.description.onlyIfPlayerLeft=The bird will only spawn if the player starts to the left of it.
 
 # Custom Tutorial Bird (Everest)
-entities.everest/customBirdTutorial.name.bird=Custom Bird Tutorial
-entities.everest/customBirdTutorial.description.birdId=The unique id of the bird when used in combination with Custom Tutorial Bird triggers. Useful for extra control over multiple birds in one room.
-entities.everest/customBirdTutorial.description.controls=The controls to display in the bubble, separated by commas. Each part can be:\n- a path to a texture in the Gui atlas (for example "tinyarrow")\n- a direction: Down, DownRight, Right, UpRight, Up, UpLeft, Left, DownLeft\n- a button: Jump, Dash, Grab, Talk, ESC, Pause, MenuLeft, MenuRight, MenuUp, MenuDown, MenuConfirm, MenuCancel, MenuJournal, QuickRestart\n- a dialog ID, if you prefix it with "dialog:" (for example, "dialog:TUTORIAL_DREAMJUMP")\n- plain text
-entities.everest/customBirdTutorial.description.info=The speech bubble title. Can either be a dialog ID or a path to a texture in the GUI atlas.
-entities.everest/customBirdTutorial.description.faceLeft=Whether the bird should face left or right.
-entities.everest/customBirdTutorial.description.caw=Whether the bird should caw upon displaying the speech bubble.
-entities.everest/customBirdTutorial.description.onlyOnce=Whether the bird should respawn after displaying the speech bubble and flying away.
+entities.everest/customBirdTutorial.placements.name.bird=Custom Bird Tutorial
+entities.everest/customBirdTutorial.attributes.description.birdId=The unique id of the bird when used in combination with Custom Tutorial Bird triggers. Useful for extra control over multiple birds in one room.
+entities.everest/customBirdTutorial.attributes.description.controls=The controls to display in the bubble, separated by commas. Each part can be:\n- a path to a texture in the Gui atlas (for example "tinyarrow")\n- a direction: Down, DownRight, Right, UpRight, Up, UpLeft, Left, DownLeft\n- a button: Jump, Dash, Grab, Talk, ESC, Pause, MenuLeft, MenuRight, MenuUp, MenuDown, MenuConfirm, MenuCancel, MenuJournal, QuickRestart\n- a dialog ID, if you prefix it with "dialog:" (for example, "dialog:TUTORIAL_DREAMJUMP")\n- plain text
+entities.everest/customBirdTutorial.attributes.description.info=The speech bubble title. Can either be a dialog ID or a path to a texture in the GUI atlas.
+entities.everest/customBirdTutorial.attributes.description.faceLeft=Whether the bird should face left or right.
+entities.everest/customBirdTutorial.attributes.description.caw=Whether the bird should caw upon displaying the speech bubble.
+entities.everest/customBirdTutorial.attributes.description.onlyOnce=Whether the bird should respawn after displaying the speech bubble and flying away.
 
 # Gondola
-entities.gondola.name.gondola=Gondola
-entities.gondola.description.active=Whether the gondola is active or not. If the gondola is active it starts at the entity position, otherwise it starts at the node.
+entities.gondola.placements.name.gondola=Gondola
+entities.gondola.attributes.description.active=Whether the gondola is active or not. If the gondola is active it starts at the entity position, otherwise it starts at the node.
 
 # Intro Car
-entities.introCar.name.intro_car=Intro Car
-entities.introCar.description.hasRoadAndBarriers=Determines whether the car should come with road and barriers.
+entities.introCar.placements.name.intro_car=Intro Car
+entities.introCar.attributes.description.hasRoadAndBarriers=Determines whether the car should come with road and barriers.
 
 # Core Mode Toggle
-entities.coreModeToggle.name.both=Core Mode Toggle (Both)
-entities.coreModeToggle.name.fire=Core Mode Toggle (Fire)
-entities.coreModeToggle.name.ice=Core Mode Toggle (Ice)
-entities.coreModeToggle.description.onlyIce=Whether the switch can only turn the core mode to ice.
-entities.coreModeToggle.description.onlyFire=Whether the switch can only turn the core mode to fire.
-entities.coreModeToggle.description.persistent=Whether the core mode persists after death instead of resetting to initial room entry state.
+entities.coreModeToggle.placements.name.both=Core Mode Toggle (Both)
+entities.coreModeToggle.placements.name.fire=Core Mode Toggle (Fire)
+entities.coreModeToggle.placements.name.ice=Core Mode Toggle (Ice)
+entities.coreModeToggle.attributes.description.onlyIce=Whether the switch can only turn the core mode to ice.
+entities.coreModeToggle.attributes.description.onlyFire=Whether the switch can only turn the core mode to fire.
+entities.coreModeToggle.attributes.description.persistent=Whether the core mode persists after death instead of resetting to initial room entry state.
 
 # Clutter Door
-entities.clutterDoor.name.yellow=Clutter Door (Boxes)
-entities.clutterDoor.name.red=Clutter Door (Laundry)
-entities.clutterDoor.name.green=Clutter Door (Books)
-entities.clutterDoor.name.lightning=Clutter Door (Lightning)
-entities.clutterDoor.description.type=Determines which clutter switch will activate the block, making it appear.
+entities.clutterDoor.placements.name.yellow=Clutter Door (Boxes)
+entities.clutterDoor.placements.name.red=Clutter Door (Laundry)
+entities.clutterDoor.placements.name.green=Clutter Door (Books)
+entities.clutterDoor.placements.name.lightning=Clutter Door (Lightning)
+entities.clutterDoor.attributes.description.type=Determines which clutter switch will activate the block, making it appear.
 
 # Clutter Cabinet
-entities.clutterCabinet.name.cabinet=Clutter Cabinet
+entities.clutterCabinet.placements.name.cabinet=Clutter Cabinet
 
 # Clutter Block Boxes
-entities.yellowBlocks.name.yellow=Clutter Block (Boxes)
+entities.yellowBlocks.placements.name.yellow=Clutter Block (Boxes)
 
 # Clutter Block Laundry
-entities.redBlocks.name.red=Clutter Block (Laundry)
+entities.redBlocks.placements.name.red=Clutter Block (Laundry)
 
 # Clutter Block Books
-entities.greenBlocks.name.green=Clutter Block (Books)
+entities.greenBlocks.placements.name.green=Clutter Block (Books)
 
 # Colour Switch
-entities.colorSwitch.name.yellow=Color Switch (Boxes)
-entities.colorSwitch.name.red=Color Switch (Laundry)
-entities.colorSwitch.name.green=Color Switch (Books)
-entities.colorSwitch.name.lightning=Color Switch (Lightning)
-entities.colorSwitch.description.type=The colour of the switch.
+entities.colorSwitch.placements.name.yellow=Color Switch (Boxes)
+entities.colorSwitch.placements.name.red=Color Switch (Laundry)
+entities.colorSwitch.placements.name.green=Color Switch (Books)
+entities.colorSwitch.placements.name.lightning=Color Switch (Lightning)
+entities.colorSwitch.attributes.description.type=The colour of the switch.
 
 # Temple Cracked Block
-entities.templeCrackedBlock.name.temple_block=Temple Cracked Block
-entities.templeCrackedBlock.description.persistent=Once broken, the block will remain that way, even if the player dies.
+entities.templeCrackedBlock.placements.name.temple_block=Temple Cracked Block
+entities.templeCrackedBlock.attributes.description.persistent=Once broken, the block will remain that way, even if the player dies.
 
 # Crush Block
-entities.crushBlock.name.both=Kevin (Both)
-entities.crushBlock.name.vertical=Kevin (Vertical)
-entities.crushBlock.name.horizontal=Kevin (Horizontal)
-entities.crushBlock.description.axes=Determines which sides of the Kevin block are hittable.
-entities.crushBlock.description.chillout=Whether the block should have the large face and get tired after being hit.
+entities.crushBlock.placements.name.both=Kevin (Both)
+entities.crushBlock.placements.name.vertical=Kevin (Vertical)
+entities.crushBlock.placements.name.horizontal=Kevin (Horizontal)
+entities.crushBlock.attributes.description.axes=Determines which sides of the Kevin block are hittable.
+entities.crushBlock.attributes.description.chillout=Whether the block should have the large face and get tired after being hit.
 
 # Waterfall
-entities.waterfall.name.waterfall=Waterfall
+entities.waterfall.placements.name.waterfall=Waterfall
 
 # Big Waterfall
-entities.bigWaterfall.name.foreground=Big Waterfall (Foreground)
-entities.bigWaterfall.name.background=Big Waterfall (Background)
-entities.bigWaterfall.description.layer=Where the waterfall should render.\nFG is in the foreground.\nBG is in the background and parallaxes.
+entities.bigWaterfall.placements.name.foreground=Big Waterfall (Foreground)
+entities.bigWaterfall.placements.name.background=Big Waterfall (Background)
+entities.bigWaterfall.attributes.description.layer=Where the waterfall should render.\nFG is in the foreground.\nBG is in the background and parallaxes.
 
 # Sound Source
-entities.soundSource.name.sound_source=Sound Source
-entities.soundSource.description.sound=The sound event that will be played.
+entities.soundSource.placements.name.sound_source=Sound Source
+entities.soundSource.attributes.description.sound=The sound event that will be played.
 
 # Summit Background Manager
-entities.SummitBackgroundManager.name.manager=Summit Background Manager
-entities.SummitBackgroundManager.description.dark=Whether the background is dark or not.
-entities.SummitBackgroundManager.description.cutscene=Dialog ID of cutscene to display. Leave empty for no cutscene.
-entities.SummitBackgroundManager.description.index=Index of text to display when ascending. -1 for no text.
-entities.SummitBackgroundManager.description.intro_launch=Used for first boost in Summit. Does not start the cutscene dialogue.
-entities.SummitBackgroundManager.description.ambience=Ambience background music.
+entities.SummitBackgroundManager.placements.name.manager=Summit Background Manager
+entities.SummitBackgroundManager.attributes.description.dark=Whether the background is dark or not.
+entities.SummitBackgroundManager.attributes.description.cutscene=Dialog ID of cutscene to display. Leave empty for no cutscene.
+entities.SummitBackgroundManager.attributes.description.index=Index of text to display when ascending. -1 for no text.
+entities.SummitBackgroundManager.attributes.description.intro_launch=Used for first boost in Summit. Does not start the cutscene dialogue.
+entities.SummitBackgroundManager.attributes.description.ambience=Ambience background music.
 
 # Cutscene Node
-entities.cutsceneNode.name.cutscene_node=Cutscene Node
-entities.cutsceneNode.description.nodeName=Name of node. Used to find the entity from code.
+entities.cutsceneNode.placements.name.cutscene_node=Cutscene Node
+entities.cutsceneNode.attributes.description.nodeName=Name of node. Used to find the entity from code.
 
 # Hahaha
-entities.hahaha.name.hahaha=Hahaha
-entities.hahaha.description.ifset=Only show up if the given flag is set, or always if left empty.
-entities.hahaha.description.triggerLaughSfx=Whether the laugh should also play audio.
+entities.hahaha.placements.name.hahaha=Hahaha
+entities.hahaha.attributes.description.ifset=Only show up if the given flag is set, or always if left empty.
+entities.hahaha.attributes.description.triggerLaughSfx=Whether the laugh should also play audio.
 
 # Badeline Boss Moving Block
-entities.finalBossMovingBlock.name.moving_block=Badeline Boss Moving Block
-entities.finalBossMovingBlock.description.nodeIndex=The node index of the Badeline boss this should fall down on.
+entities.finalBossMovingBlock.placements.name.moving_block=Badeline Boss Moving Block
+entities.finalBossMovingBlock.attributes.description.nodeIndex=The node index of the Badeline boss this should fall down on.
 
 # Badeline Boss Falling Block
-entities.finalBossFallingBlock.name.falling_block=Badeline Boss Falling Block
+entities.finalBossFallingBlock.placements.name.falling_block=Badeline Boss Falling Block
 
 # Everest Core Message
-entities.everest/coreMessage.name.core_message=Core Message
-entities.everest/coreMessage.description.line=Which line of the dialogue to use.
-entities.everest/coreMessage.description.dialog=The dialogue key to use.
-entities.everest/coreMessage.description.outline=Whether the text has a black outline or not.
+entities.everest/coreMessage.placements.name.core_message=Core Message
+entities.everest/coreMessage.attributes.description.line=Which line of the dialogue to use.
+entities.everest/coreMessage.attributes.description.dialog=The dialogue key to use.
+entities.everest/coreMessage.attributes.description.outline=Whether the text has a black outline or not.
 
 # Star Jump Block
-entities.starJumpBlock.name.star_jump_block=Star Jump Block
-entities.starJumpBlock.description.sinks=Whether the block sinks when the player stands on it.
+entities.starJumpBlock.placements.name.star_jump_block=Star Jump Block
+entities.starJumpBlock.attributes.description.sinks=Whether the block sinks when the player stands on it.
 
 # Star Jump Controller
-entities.starClimbController.name.controller=Star Climb Controller
+entities.starClimbController.placements.name.controller=Star Climb Controller
 
 # Star Jump Graphics Controller (Everest)
-entities.everest/starClimbGraphicsController.name.controller=Star Climb Graphics Controller
-entities.everest/starClimbGraphicsController.description.fgColor=The foreground colour of the Star Jump Block effect.
-entities.everest/starClimbGraphicsController.description.bgColor=The background colour of the Star Jump Block effect.
+entities.everest/starClimbGraphicsController.placements.name.controller=Star Climb Graphics Controller
+entities.everest/starClimbGraphicsController.attributes.description.fgColor=The foreground colour of the Star Jump Block effect.
+entities.everest/starClimbGraphicsController.attributes.description.bgColor=The background colour of the Star Jump Block effect.
 
 # Badeline Boss
-entities.finalBoss.description.cameraPastY=Locks the camera from vertically rising, and changes the bottom screen killbox plane to be under Badeline's current position.
+entities.finalBoss.attributes.description.cameraPastY=Locks the camera from vertically rising, and changes the bottom screen killbox plane to be under Badeline's current position.
 
 # Condition Block
-entities.conditionBlock.name.condition_block=Condition Block
-entities.conditionBlock.description.conditionID=Links the condition block to the ID of a key, strawberry, or button.\nFormat: (room:id)\nExample: "a-01:4"
-entities.conditionBlock.description.condition=Ties the activation to the collection or activation of a key, strawberry, or button.
-entities.conditionBlock.description.tileType=Determines the visual appearance of the condition block.
+entities.conditionBlock.placements.name.condition_block=Condition Block
+entities.conditionBlock.attributes.description.conditionID=Links the condition block to the ID of a key, strawberry, or button.\nFormat: (room:id)\nExample: "a-01:4"
+entities.conditionBlock.attributes.description.condition=Ties the activation to the collection or activation of a key, strawberry, or button.
+entities.conditionBlock.attributes.description.tileType=Determines the visual appearance of the condition block.
 
 # Jellyfish (Glider)
-entities.glider.name.normal=Jellyfish
-entities.glider.name.floating=Jellyfish (Floating)
-entities.glider.description.bubble=Whether the entity should hover in the air before being grabbed.
-entities.glider.description.tutorial=Whether the entity should show the usage tutorial.
+entities.glider.placements.name.normal=Jellyfish
+entities.glider.placements.name.floating=Jellyfish (Floating)
+entities.glider.attributes.description.bubble=Whether the entity should hover in the air before being grabbed.
+entities.glider.attributes.description.tutorial=Whether the entity should show the usage tutorial.
 
 # Puffer (Eye Bomb)
-entities.eyebomb.name.right=Puffer (Right)
-entities.eyebomb.name.left=Puffer (Left)
-entities.eyebomb.description.right=The initial direction of the puffer.
+entities.eyebomb.placements.name.right=Puffer (Right)
+entities.eyebomb.placements.name.left=Puffer (Left)
+entities.eyebomb.attributes.description.right=The initial direction of the puffer.
 
 # Swap Block
-entities.swapBlock.name.normal=Swap Block (Normal)
-entities.swapBlock.name.moon=Swap Block (Moon)
-entities.swapBlock.description.theme=The visual theme of the swap block.
+entities.swapBlock.placements.name.normal=Swap Block (Normal)
+entities.swapBlock.placements.name.moon=Swap Block (Moon)
+entities.swapBlock.attributes.description.theme=The visual theme of the swap block.
 
 # Zip Mover
-entities.zipMover.name.normal=Zip Mover (Normal)
-entities.zipMover.name.moon=Zip Mover (Moon)
-entities.zipMover.description.theme=The visual theme of the zip mover.
+entities.zipMover.placements.name.normal=Zip Mover (Normal)
+entities.zipMover.placements.name.moon=Zip Mover (Moon)
+entities.zipMover.attributes.description.theme=The visual theme of the zip mover.
 
 # Moon Creature
-entities.moonCreature.name.moon_creature=Moon Creature
-entities.moonCreature.description.number=How many moon creatures should spawn in the cluster.
+entities.moonCreature.placements.name.moon_creature=Moon Creature
+entities.moonCreature.attributes.description.number=How many moon creatures should spawn in the cluster.
 
 # Power Source Number
-entities.powerSourceNumber.name.power_source_number=Power Source Number
-entities.powerSourceNumber.description.number=Determines the visual apperance of the entity.
-entities.powerSourceNumber.description.strawberries=Determines when the entity will be lit up. If keys attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one berry or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
-entities.powerSourceNumber.description.keys=Determines when the entity will lit up. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
+entities.powerSourceNumber.placements.name.power_source_number=Power Source Number
+entities.powerSourceNumber.attributes.description.number=Determines the visual apperance of the entity.
+entities.powerSourceNumber.attributes.description.strawberries=Determines when the entity will be lit up. If keys attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one berry or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
+entities.powerSourceNumber.attributes.description.keys=Determines when the entity will lit up. If strawberries attribute is set, these will also need to be collected.\n\nFormat: (room:id) for one key or (room1:id1,room2:id2,...) for multiple\nExample: "a-01:4" and "a-01:4,a-02:5"
 
 # Floaty Space Block
-entities.floatySpaceBlock.name.floaty_space_block=Floaty Space Block
-entities.floatySpaceBlock.description.tiletype=Determines the visual appearance of the wall.
-entities.floatySpaceBlock.description.disableSpawnOffset=Whether or not the entity should spawn without the random offset.
+entities.floatySpaceBlock.placements.name.floaty_space_block=Floaty Space Block
+entities.floatySpaceBlock.attributes.description.tiletype=Determines the visual appearance of the wall.
+entities.floatySpaceBlock.attributes.description.disableSpawnOffset=Whether or not the entity should spawn without the random offset.
 
 # Playback Tutorial
-entities.playbackTutorial.name.playback=Ghost Player Playback
-entities.playbackTutorial.description.tutorial=Determines which tutorial ghost is played.\nFilename is relative to the `Tutorials` folder, and without the .bin extension.
+entities.playbackTutorial.placements.name.playback=Ghost Player Playback
+entities.playbackTutorial.attributes.description.tutorial=Determines which tutorial ghost is played.\nFilename is relative to the `Tutorials` folder, and without the .bin extension.
 
 # Playback Tutorial
-entities.playbackBillboard.name.playback_billboard=Playback Billboard
+entities.playbackBillboard.placements.name.playback_billboard=Playback Billboard
 
 # Crumble Wall On Rumble
-entities.crumbleWallOnRumble.name.crumble_wall=Crumble Wall On Rumble
-entities.crumbleWallOnRumble.description.blendin=Blends the block in with the walls it touches, making it less apparent.
-entities.crumbleWallOnRumble.description.tiletype=Determines the visual appearance of the wall.
-entities.crumbleWallOnRumble.description.persistent=Once broken, the block will remain that way, even if the player dies.
+entities.crumbleWallOnRumble.placements.name.crumble_wall=Crumble Wall On Rumble
+entities.crumbleWallOnRumble.attributes.description.blendin=Blends the block in with the walls it touches, making it less apparent.
+entities.crumbleWallOnRumble.attributes.description.tiletype=Determines the visual appearance of the wall.
+entities.crumbleWallOnRumble.attributes.description.persistent=Once broken, the block will remain that way, even if the player dies.
 
 # Bird Path
-entities.birdPath.name.bird_path=Bird Path
-entities.birdPath.description.only_once=If the bird will only fly the path once, and not come back on death or room transitions.
-entities.birdPath.description.onlyIfLeft=The bird will only fly if the player is to the left of the entity.
-entities.birdPath.description.speedMult=Speed multiplier for the flight speed.
+entities.birdPath.placements.name.bird_path=Bird Path
+entities.birdPath.attributes.description.only_once=If the bird will only fly the path once, and not come back on death or room transitions.
+entities.birdPath.attributes.description.onlyIfLeft=The bird will only fly if the player is to the left of the entity.
+entities.birdPath.attributes.description.speedMult=Speed multiplier for the flight speed.
 
 # Fake Crystal Heart
-entities.fakeHeart.description.color=Which colour to use for the heart.\nNormal - Blue\nBSide - Red\nCSide - Yellow
+entities.fakeHeart.attributes.description.color=Which colour to use for the heart.\nNormal - Blue\nBSide - Red\nCSide - Yellow
 
 # Lightning
-entities.lightning.name.lightning=Lightning
-entities.lightning.description.moveTime=The time it takes to move from the base position to the node position.
-entities.lightning.description.perLevel=Whether the lightning ignores the global disabling flag set by breaker boxes with the flag attribute set.
+entities.lightning.placements.name.lightning=Lightning
+entities.lightning.attributes.description.moveTime=The time it takes to move from the base position to the node position.
+entities.lightning.attributes.description.perLevel=Whether the lightning ignores the global disabling flag set by breaker boxes with the flag attribute set.
 
 # Fling Bird
-entities.flingBird.name.fling_bird=Fling Bird
-entities.flingBird.description.waiting=Whether the bird should visually look like it is tired and waiting to grab the player.
+entities.flingBird.placements.name.fling_bird=Fling Bird
+entities.flingBird.attributes.description.waiting=Whether the bird should visually look like it is tired and waiting to grab the player.
 
 # Fling Bird Intro
-entities.flingBirdIntro.name.fling_bird=Fling Bird Intro
-entities.flingBirdIntro.description.crashes=Determines which cutscene is played after the bird is caught.
+entities.flingBirdIntro.placements.name.fling_bird=Fling Bird Intro
+entities.flingBirdIntro.attributes.description.crashes=Determines which cutscene is played after the bird is caught.
 
 # Lightning Breaker Box
-entities.lightningBlock.name.breaker_box=Lightning Breaker Box
-entities.lightningBlock.description.music_session=Whether the music should be stored in session when box is broken.
-entities.lightningBlock.description.flipX=Whether the sprite should be vertically mirrored.
-entities.lightningBlock.description.flag=Whether the breaker box should disable all lightning entities without the perLevel attribute set when loading a new room. 
-entities.lightningBlock.description.music=Change the currently playing music to this when box is broken.\nLeave empty to not change song.
-entities.lightningBlock.description.music_progress=The new music progress once box is broken.\n-1 keeps the same progress.
+entities.lightningBlock.placements.name.breaker_box=Lightning Breaker Box
+entities.lightningBlock.attributes.description.music_session=Whether the music should be stored in session when box is broken.
+entities.lightningBlock.attributes.description.flipX=Whether the sprite should be vertically mirrored.
+entities.lightningBlock.attributes.description.flag=Whether the breaker box should disable all lightning entities without the perLevel attribute set when loading a new room. 
+entities.lightningBlock.attributes.description.music=Change the currently playing music to this when box is broken.\nLeave empty to not change song.
+entities.lightningBlock.attributes.description.music_progress=The new music progress once box is broken.\n-1 keeps the same progress.
 
 
 # -- Triggers --
-# triggers.triggerName.name.*
-# triggers.triggerName.attribute.*
-# triggers.triggerName.description.*
+# triggers.triggerName.placements.name.*
+# triggers.triggerName.placements.description.*
+# triggers.triggerName.attributes.name.*
+# triggers.triggerName.attributes.description.*
 
 # Default
-triggers.default.attribute.x=X
-triggers.default.attribute.y=Y
-triggers.default.attribute.width=Width
-triggers.default.attribute.height=Height
-triggers.default.attribute.nodes=Nodes
-triggers.default.description.x=X position of trigger.
-triggers.default.description.y=Y position of trigger.
-triggers.default.description.width=Width of trigger.
-triggers.default.description.height=Height of trigger.
-triggers.default.description.nodes=Nodes for the trigger.
+triggers.default.attributes.placements.name.x=X
+triggers.default.attributes.placements.name.y=Y
+triggers.default.attributes.placements.name.width=Width
+triggers.default.attributes.placements.name.height=Height
+triggers.default.attributes.placements.name.nodes=Nodes
+triggers.default.attributes.description.x=X position of trigger.
+triggers.default.attributes.description.y=Y position of trigger.
+triggers.default.attributes.description.width=Width of trigger.
+triggers.default.attributes.description.height=Height of trigger.
+triggers.default.attributes.description.nodes=Nodes for the trigger.
 
 # Alt Music
-triggers.altMusicTrigger.name.alt_music=Alt Music
-triggers.altMusicTrigger.description.resetOnLeave=Resets the music when the player leaves the current zone after entering the trigger zone.
-triggers.altMusicTrigger.description.track=Changes the track that plays when the player enters the trigger zone.
+triggers.altMusicTrigger.placements.name.alt_music=Alt Music
+triggers.altMusicTrigger.attributes.description.resetOnLeave=Resets the music when the player leaves the current zone after entering the trigger zone.
+triggers.altMusicTrigger.attributes.description.track=Changes the track that plays when the player enters the trigger zone.
 
 # Ambience Param
-triggers.ambienceParamTrigger.name.ambience_param=Ambience Param
-triggers.ambienceParamTrigger.description.to=Determines the volume of the ambience at farther distances.
-triggers.ambienceParamTrigger.description.from=Determines the volume of the ambience at closer distances.
-triggers.ambienceParamTrigger.description.parameter=Uses the ambience properties if left blank, otherwise uses FMOD's escape property.
-triggers.ambienceParamTrigger.description.direction=Determines which direction the ambience comes from.
+triggers.ambienceParamTrigger.placements.name.ambience_param=Ambience Param
+triggers.ambienceParamTrigger.attributes.description.to=Determines the volume of the ambience at farther distances.
+triggers.ambienceParamTrigger.attributes.description.from=Determines the volume of the ambience at closer distances.
+triggers.ambienceParamTrigger.attributes.description.parameter=Uses the ambience properties if left blank, otherwise uses FMOD's escape property.
+triggers.ambienceParamTrigger.attributes.description.direction=Determines which direction the ambience comes from.
 
 # Bird Path
-triggers.birdPathTrigger.name.bird_path=Bird Path
+triggers.birdPathTrigger.placements.name.bird_path=Bird Path
 
 # Black Hole Strength
-triggers.blackholeStrength.name.black_hole_strength=Black Hole Strength
-triggers.blackholeStrength.description.strength=Sets the next visual apparence of the black hole effect.
+triggers.blackholeStrength.placements.name.black_hole_strength=Black Hole Strength
+triggers.blackholeStrength.attributes.description.strength=Sets the next visual apparence of the black hole effect.
 
 # Bloom Fade
-triggers.bloomFadeTrigger.name.bloom_fade=Bloom Fade
-triggers.bloomFadeTrigger.description.positionMode=Determines which direction the bloom fades towards.
-triggers.bloomFadeTrigger.description.bloomAddTo=Determines where the bloom fade ends.
-triggers.bloomFadeTrigger.description.bloomAddFrom=Determines where the bloom fade starts.
+triggers.bloomFadeTrigger.placements.name.bloom_fade=Bloom Fade
+triggers.bloomFadeTrigger.attributes.description.positionMode=Determines which direction the bloom fades towards.
+triggers.bloomFadeTrigger.attributes.description.bloomAddTo=Determines where the bloom fade ends.
+triggers.bloomFadeTrigger.attributes.description.bloomAddFrom=Determines where the bloom fade starts.
 
 # Camera Advance Target
-triggers.cameraAdvanceTargetTrigger.name.camera_advance_target=Camera Advance Target
-triggers.cameraAdvanceTargetTrigger.description.positionModeX=Determines which direction the camera fades towards horizontally.
-triggers.cameraAdvanceTargetTrigger.description.positionModeY=Determines which direction the camera fades towards vertically.
-triggers.cameraAdvanceTargetTrigger.description.xOnly=Whether the trigger should only work horizontally.
-triggers.cameraAdvanceTargetTrigger.description.yOnly=Whether the trigger should only work vertically.
-triggers.cameraAdvanceTargetTrigger.description.lerpStrengthX=The horizontal lerp strength.
-triggers.cameraAdvanceTargetTrigger.description.lerpStrengthY=The vertical lerp strength.
+triggers.cameraAdvanceTargetTrigger.placements.name.camera_advance_target=Camera Advance Target
+triggers.cameraAdvanceTargetTrigger.attributes.description.positionModeX=Determines which direction the camera fades towards horizontally.
+triggers.cameraAdvanceTargetTrigger.attributes.description.positionModeY=Determines which direction the camera fades towards vertically.
+triggers.cameraAdvanceTargetTrigger.attributes.description.xOnly=Whether the trigger should only work horizontally.
+triggers.cameraAdvanceTargetTrigger.attributes.description.yOnly=Whether the trigger should only work vertically.
+triggers.cameraAdvanceTargetTrigger.attributes.description.lerpStrengthX=The horizontal lerp strength.
+triggers.cameraAdvanceTargetTrigger.attributes.description.lerpStrengthY=The vertical lerp strength.
 
 # Camera Offset
-triggers.cameraOffsetTrigger.name.camera_offset=Camera Offset
-triggers.cameraOffsetTrigger.description.cameraX=Offsets the player camera on the X axis.
-triggers.cameraOffsetTrigger.description.cameraY=Offsets the player camera on the Y axis.
+triggers.cameraOffsetTrigger.placements.name.camera_offset=Camera Offset
+triggers.cameraOffsetTrigger.attributes.description.cameraX=Offsets the player camera on the X axis.
+triggers.cameraOffsetTrigger.attributes.description.cameraY=Offsets the player camera on the Y axis.
 
 # Camera Target
-triggers.cameraTargetTrigger.name.camera_target=Camera Target
-triggers.cameraTargetTrigger.description.positionMode=Determines which direction the camera position moves in.
-triggers.cameraTargetTrigger.description.yOnly=The camera will only lock on the Y axis.
-triggers.cameraTargetTrigger.description.xOnly=The camera will only lock on the X axis.
-triggers.cameraTargetTrigger.description.lerpStrength=Determines how fast the camera moves to lock into place upon activation.
-triggers.cameraTargetTrigger.description.deleteFlag=Session flag to deactivate the trigger, ignored if left empty. Camera will not reset if player is inside the trigger as it deactivates.\nIf the player transitions into the room with the flag set, the trigger can not be reactivated. However, if it was enabled and then disabled in the room, the player can reactivate it.
+triggers.cameraTargetTrigger.placements.name.camera_target=Camera Target
+triggers.cameraTargetTrigger.attributes.description.positionMode=Determines which direction the camera position moves in.
+triggers.cameraTargetTrigger.attributes.description.yOnly=The camera will only lock on the Y axis.
+triggers.cameraTargetTrigger.attributes.description.xOnly=The camera will only lock on the X axis.
+triggers.cameraTargetTrigger.attributes.description.lerpStrength=Determines how fast the camera moves to lock into place upon activation.
+triggers.cameraTargetTrigger.attributes.description.deleteFlag=Session flag to deactivate the trigger, ignored if left empty. Camera will not reset if player is inside the trigger as it deactivates.\nIf the player transitions into the room with the flag set, the trigger can not be reactivated. However, if it was enabled and then disabled in the room, the player can reactivate it.
 
 # Change Respawn
-triggers.changeRespawnTrigger.name.change_respawn=Change Respawn
+triggers.changeRespawnTrigger.placements.name.change_respawn=Change Respawn
 
 # Checkpoint Blocker
-triggers.checkpointBlockerTrigger.name.checkpoint_blocker=Checkpoint Blocker
+triggers.checkpointBlockerTrigger.placements.name.checkpoint_blocker=Checkpoint Blocker
 
 # Credits
-triggers.creditsTrigger.name.credits=Credits
-triggers.creditsTrigger.description.event=The event this will trigger.
+triggers.creditsTrigger.placements.name.credits=Credits
+triggers.creditsTrigger.attributes.description.event=The event this will trigger.
 
 # Detach Followers
-triggers.detachFollowersTrigger.name.detach_followers=Detach Followers
-triggers.detachFollowersTrigger.description.global=Whether the entities following you should get the 'global' instead of the 'persistent' tag.
+triggers.detachFollowersTrigger.placements.name.detach_followers=Detach Followers
+triggers.detachFollowersTrigger.attributes.description.global=Whether the entities following you should get the 'global' instead of the 'persistent' tag.
 
 # Event
-triggers.eventTrigger.name.event=Event
-triggers.eventTrigger.description.event=Upon activation, plays the event selected.
-triggers.eventTrigger.description.onSpawn=If the event should automatically play when the player enters the room.
+triggers.eventTrigger.placements.name.event=Event
+triggers.eventTrigger.attributes.description.event=Upon activation, plays the event selected.
+triggers.eventTrigger.attributes.description.onSpawn=If the event should automatically play when the player enters the room.
 
 # Activate Space Jams (Everest)
-triggers.everest/activateDreamBlocksTrigger.name.activate_dream_blocks=Activate Space Jams
-triggers.everest/activateDreamBlocksTrigger.description.fullRoutine=Whether the Space Jam should play the whole animation, rather than just instantly looking ready.
-triggers.everest/activateDreamBlocksTrigger.description.activate=Whether the Space Jam should become usable or not.
-triggers.everest/activateDreamBlocksTrigger.description.fastAnimation=Whether a faster animation should be used.
+triggers.everest/activateDreamBlocksTrigger.placements.name.activate_dream_blocks=Activate Space Jams
+triggers.everest/activateDreamBlocksTrigger.attributes.description.fullRoutine=Whether the Space Jam should play the whole animation, rather than just instantly looking ready.
+triggers.everest/activateDreamBlocksTrigger.attributes.description.activate=Whether the Space Jam should become usable or not.
+triggers.everest/activateDreamBlocksTrigger.attributes.description.fastAnimation=Whether a faster animation should be used.
 
 # Change Inventory (Everest)
-triggers.everest/changeInventoryTrigger.name.change_inventory=Change Inventory
-triggers.everest/changeInventoryTrigger.description.inventory=The inventory the player should get when the trigger is entered.
+triggers.everest/changeInventoryTrigger.placements.name.change_inventory=Change Inventory
+triggers.everest/changeInventoryTrigger.attributes.description.inventory=The inventory the player should get when the trigger is entered.
 
 # Complete Area (Everest)
-triggers.everest/completeAreaTrigger.name.complete_area=Complete Area
+triggers.everest/completeAreaTrigger.placements.name.complete_area=Complete Area
 
 # Core Mode (Everest)
-triggers.everest/coreModeTrigger.name.core_mode=Core Mode
-triggers.everest/coreModeTrigger.description.mode=The core mode that should be used when the trigger is entered.
+triggers.everest/coreModeTrigger.placements.name.core_mode=Core Mode
+triggers.everest/coreModeTrigger.attributes.description.mode=The core mode that should be used when the trigger is entered.
 
 # Crystal Shatter (Everest)
-triggers.everest/crystalShatterTrigger.name.crystal_shatter=Crystal Shatter
-triggers.everest/crystalShatterTrigger.description.mode=Whether the trigger should destroy all crystal spinners, or only the ones contained within it.
+triggers.everest/crystalShatterTrigger.placements.name.crystal_shatter=Crystal Shatter
+triggers.everest/crystalShatterTrigger.attributes.description.mode=Whether the trigger should destroy all crystal spinners, or only the ones contained within it.
 
 # Custom Bird Tutorial (Everest)
-triggers.everest/customBirdTutorialTrigger.name.custom_bird_tutorial=Custom Bird Tutorial
-triggers.everest/customBirdTutorialTrigger.description.birdId=Which bird the trigger should affect.
-triggers.everest/customBirdTutorialTrigger.description.showTutorial=If ticked, the targeted bird will show its speech bubble. If unchecked, the bird will fly away.
+triggers.everest/customBirdTutorialTrigger.placements.name.custom_bird_tutorial=Custom Bird Tutorial
+triggers.everest/customBirdTutorialTrigger.attributes.description.birdId=Which bird the trigger should affect.
+triggers.everest/customBirdTutorialTrigger.attributes.description.showTutorial=If ticked, the targeted bird will show its speech bubble. If unchecked, the bird will fly away.
 
 # Dialog Cutscene (Everest)
-triggers.everest/dialogTrigger.name.dialog=Dialog Cutscene
-triggers.everest/dialogTrigger.description.onlyOnce=Whether the dialogue should only trigger once.
-triggers.everest/dialogTrigger.description.dialogId=The dialog ID to use for the dialogue.
-triggers.everest/dialogTrigger.description.endLevel=Whether finishing the dialog triggers the level to end.
-triggers.everest/dialogTrigger.description.deathCount=Determines the exact amount of deaths required to activate dialog trigger. Will always trigger if set to -1.
+triggers.everest/dialogTrigger.placements.name.dialog=Dialog Cutscene
+triggers.everest/dialogTrigger.attributes.description.onlyOnce=Whether the dialogue should only trigger once.
+triggers.everest/dialogTrigger.attributes.description.dialogId=The dialog ID to use for the dialogue.
+triggers.everest/dialogTrigger.attributes.description.endLevel=Whether finishing the dialog triggers the level to end.
+triggers.everest/dialogTrigger.attributes.description.deathCount=Determines the exact amount of deaths required to activate dialog trigger. Will always trigger if set to -1.
 
 # Flag (Everest)
-triggers.everest/flagTrigger.name.flag=Flag
-triggers.everest/flagTrigger.description.state=The value to set for the flag.
-triggers.everest/flagTrigger.description.flag=The name of the flag to modify.
-triggers.everest/flagTrigger.description.only_once=Whether the trigger should only work once.
-triggers.everest/flagTrigger.description.mode=Determines how the trigger will activate.
-triggers.everest/flagTrigger.description.death_count=Determines the exact amount of deaths required to activate the flag trigger. Will always trigger if set to -1.
+triggers.everest/flagTrigger.placements.name.flag=Flag
+triggers.everest/flagTrigger.attributes.description.state=The value to set for the flag.
+triggers.everest/flagTrigger.attributes.description.flag=The name of the flag to modify.
+triggers.everest/flagTrigger.attributes.description.only_once=Whether the trigger should only work once.
+triggers.everest/flagTrigger.attributes.description.mode=Determines how the trigger will activate.
+triggers.everest/flagTrigger.attributes.description.death_count=Determines the exact amount of deaths required to activate the flag trigger. Will always trigger if set to -1.
 
 # Lava Blocker (Everest)
-triggers.everest/lavaBlockerTrigger.name.lava_blocker=Lava Blocker
-triggers.everest/lavaBlockerTrigger.description.canReenter=Whether the trigger should still be functional after leaving it once.
+triggers.everest/lavaBlockerTrigger.placements.name.lava_blocker=Lava Blocker
+triggers.everest/lavaBlockerTrigger.attributes.description.canReenter=Whether the trigger should still be functional after leaving it once.
 
 # Music Layer (Everest)
-triggers.everest/musicLayerTrigger.name.music_layer=Music Layer
-triggers.everest/musicLayerTrigger.description.layers=Which layers the trigger should change.
-triggers.everest/musicLayerTrigger.description.enable=Whether the trigger should enable or disable the specified layers.
+triggers.everest/musicLayerTrigger.placements.name.music_layer=Music Layer
+triggers.everest/musicLayerTrigger.attributes.description.layers=Which layers the trigger should change.
+triggers.everest/musicLayerTrigger.attributes.description.enable=Whether the trigger should enable or disable the specified layers.
 
 # Smooth Camera Offset (Everest)
-triggers.everest/smoothCameraOffsetTrigger.name.smooth_camera=Smooth Camera Offset
-triggers.everest/smoothCameraOffsetTrigger.description.offsetXFrom=First X position of the camera offset.
-triggers.everest/smoothCameraOffsetTrigger.description.offsetXTo=Second X position of the camera offset.
-triggers.everest/smoothCameraOffsetTrigger.description.offsetYFrom=First Y position of the camera offset.
-triggers.everest/smoothCameraOffsetTrigger.description.offsetYTo=Second Y position of the camera offset.
-triggers.everest/smoothCameraOffsetTrigger.description.positionMode=Which direction the offset moves between the two positions when the player enters the trigger.
-triggers.everest/smoothCameraOffsetTrigger.description.onlyOnce=If checked, the trigger will be disabled when the player first leaves it.
-triggers.everest/smoothCameraOffsetTrigger.description.xOnly=Whether the trigger should only update the horizontal offset, keeping the current vertical offset.
-triggers.everest/smoothCameraOffsetTrigger.description.yOnly=Whether the trigger should only update the vertical offset, keeping the current horizontal offset.
+triggers.everest/smoothCameraOffsetTrigger.placements.name.smooth_camera=Smooth Camera Offset
+triggers.everest/smoothCameraOffsetTrigger.attributes.description.offsetXFrom=First X position of the camera offset.
+triggers.everest/smoothCameraOffsetTrigger.attributes.description.offsetXTo=Second X position of the camera offset.
+triggers.everest/smoothCameraOffsetTrigger.attributes.description.offsetYFrom=First Y position of the camera offset.
+triggers.everest/smoothCameraOffsetTrigger.attributes.description.offsetYTo=Second Y position of the camera offset.
+triggers.everest/smoothCameraOffsetTrigger.attributes.description.positionMode=Which direction the offset moves between the two positions when the player enters the trigger.
+triggers.everest/smoothCameraOffsetTrigger.attributes.description.onlyOnce=If checked, the trigger will be disabled when the player first leaves it.
+triggers.everest/smoothCameraOffsetTrigger.attributes.description.xOnly=Whether the trigger should only update the horizontal offset, keeping the current vertical offset.
+triggers.everest/smoothCameraOffsetTrigger.attributes.description.yOnly=Whether the trigger should only update the vertical offset, keeping the current horizontal offset.
 
 # Custom Height Display (Everest)
-triggers.everest/CustomHeightDisplayTrigger.name.custom_height_display=Custom Height Display
-triggers.everest/CustomHeightDisplayTrigger.description.vanilla=Whether this trigger should use the vanilla height display. The vanilla one only uses the target attribute.
-triggers.everest/CustomHeightDisplayTrigger.description.target=The new meter count.
-triggers.everest/CustomHeightDisplayTrigger.description.from=The previous meter count.
-triggers.everest/CustomHeightDisplayTrigger.description.progressAudio=Whether the trigger should increment audio progress.
-triggers.everest/CustomHeightDisplayTrigger.description.displayOnTransition=Whether the trigger should wait for a room transition to occur before displaying the counter.
-triggers.everest/CustomHeightDisplayTrigger.description.text=The text of the counter. The meter count specified in target is substituted in for {x}.\nExample: "Currently at {x} meters".
+triggers.everest/CustomHeightDisplayTrigger.placements.name.custom_height_display=Custom Height Display
+triggers.everest/CustomHeightDisplayTrigger.attributes.description.vanilla=Whether this trigger should use the vanilla height display. The vanilla one only uses the target attribute.
+triggers.everest/CustomHeightDisplayTrigger.attributes.description.target=The new meter count.
+triggers.everest/CustomHeightDisplayTrigger.attributes.description.from=The previous meter count.
+triggers.everest/CustomHeightDisplayTrigger.attributes.description.progressAudio=Whether the trigger should increment audio progress.
+triggers.everest/CustomHeightDisplayTrigger.attributes.description.displayOnTransition=Whether the trigger should wait for a room transition to occur before displaying the counter.
+triggers.everest/CustomHeightDisplayTrigger.attributes.description.text=The text of the counter. The meter count specified in target is substituted in for {x}.\nExample: "Currently at {x} meters".
 
 # Golden Berry Collection
-triggers.goldenBerryCollectTrigger.name.golden_berry_collection=Golden Berry Collection
+triggers.goldenBerryCollectTrigger.placements.name.golden_berry_collection=Golden Berry Collection
 
 # Light Fade
-triggers.lightFadeTrigger.name.light_fade=Light Fade
-triggers.lightFadeTrigger.description.lightAddTo=Determines how the lighting changes passing through the trigger.
-triggers.lightFadeTrigger.description.lightAddFrom=Determines how the lighting changes passing through the trigger backwards.
-triggers.lightFadeTrigger.description.positionMode=Determines which direction the light fades towards.
+triggers.lightFadeTrigger.placements.name.light_fade=Light Fade
+triggers.lightFadeTrigger.attributes.description.lightAddTo=Determines how the lighting changes passing through the trigger.
+triggers.lightFadeTrigger.attributes.description.lightAddFrom=Determines how the lighting changes passing through the trigger backwards.
+triggers.lightFadeTrigger.attributes.description.positionMode=Determines which direction the light fades towards.
 
 # Lookout Blocker
-triggers.lookoutBlocker.name.lookout_blocker=Lookout Blocker
+triggers.lookoutBlocker.placements.name.lookout_blocker=Lookout Blocker
 
 # Mini Textbox
-triggers.minitextboxTrigger.name.mini_text_box=Mini Textbox
-triggers.minitextboxTrigger.description.only_once=Triggers the dialogue the dialog ID references only once.
-triggers.minitextboxTrigger.description.mode=Determines how the mini text box will trigger.
-triggers.minitextboxTrigger.description.dialog_id=References from English.txt in the map's Dialog folder to use as text in-game.
-triggers.minitextboxTrigger.description.death_count=Determines the exact amount of deaths required to activate the mini text box trigger. Will always trigger if set to -1.
+triggers.minitextboxTrigger.placements.name.mini_text_box=Mini Textbox
+triggers.minitextboxTrigger.attributes.description.only_once=Triggers the dialogue the dialog ID references only once.
+triggers.minitextboxTrigger.attributes.description.mode=Determines how the mini text box will trigger.
+triggers.minitextboxTrigger.attributes.description.dialog_id=References from English.txt in the map's Dialog folder to use as text in-game.
+triggers.minitextboxTrigger.attributes.description.death_count=Determines the exact amount of deaths required to activate the mini text box trigger. Will always trigger if set to -1.
 
 # Moon Glitch Background
-triggers.moonGlitchBackgroundTrigger.name.moon_glitch_background=Moon Glitch Background
-triggers.moonGlitchBackgroundTrigger.description.duration=The duration of the glitch effect.
-triggers.moonGlitchBackgroundTrigger.description.stay=Whether the black hole effect stays in the background after triggering.
-triggers.moonGlitchBackgroundTrigger.description.glitch=Whether the glitch effect is visible or not.
+triggers.moonGlitchBackgroundTrigger.placements.name.moon_glitch_background=Moon Glitch Background
+triggers.moonGlitchBackgroundTrigger.attributes.description.duration=The duration of the glitch effect.
+triggers.moonGlitchBackgroundTrigger.attributes.description.stay=Whether the black hole effect stays in the background after triggering.
+triggers.moonGlitchBackgroundTrigger.attributes.description.glitch=Whether the glitch effect is visible or not.
 
 # Music
-triggers.musicFadeTrigger.name.music_fade=Music
-triggers.musicFadeTrigger.description.direction=The direction the music fades in.
-triggers.musicFadeTrigger.description.fadeB=Determines the ending volume of the fade.
-triggers.musicFadeTrigger.description.fadeA=Determines the starting volume of the fade.
-triggers.musicFadeTrigger.description.parameter=Uses the fade properties if left blank, otherwise uses FMOD's escape property.
+triggers.musicFadeTrigger.placements.name.music_fade=Music
+triggers.musicFadeTrigger.attributes.description.direction=The direction the music fades in.
+triggers.musicFadeTrigger.attributes.description.fadeB=Determines the ending volume of the fade.
+triggers.musicFadeTrigger.attributes.description.fadeA=Determines the starting volume of the fade.
+triggers.musicFadeTrigger.attributes.description.parameter=Uses the fade properties if left blank, otherwise uses FMOD's escape property.
 
 # Music Fade
-triggers.musicTrigger.name.music=Music Fade
-triggers.musicTrigger.description.resetOnLeave=Resets the music when the player leaves the current zone after entering the trigger zone.
-triggers.musicTrigger.description.track=Changes the track that plays when the player enters the trigger zone.
-triggers.musicTrigger.description.progress=Change the progress of the current track. 0 means no change.
+triggers.musicTrigger.placements.name.music=Music Fade
+triggers.musicTrigger.attributes.description.resetOnLeave=Resets the music when the player leaves the current zone after entering the trigger zone.
+triggers.musicTrigger.attributes.description.track=Changes the track that plays when the player enters the trigger zone.
+triggers.musicTrigger.attributes.description.progress=Change the progress of the current track. 0 means no change.
 
 # No Refill
-triggers.noRefillTrigger.name.enable_refills=Refills (Enable)
-triggers.noRefillTrigger.name.disable_refills=Refills (Disable)
-triggers.noRefillTrigger.description.state=Determines whether the player is capable of acquiring refills upon touching the ground.
+triggers.noRefillTrigger.placements.name.enable_refills=Refills (Enable)
+triggers.noRefillTrigger.placements.name.disable_refills=Refills (Disable)
+triggers.noRefillTrigger.attributes.description.state=Determines whether the player is capable of acquiring refills upon touching the ground.
 
 # Oshiro
-triggers.oshiroTrigger.name.oshiro_spawn=Oshiro (Spawn)
-triggers.oshiroTrigger.name.oshiro_leave=Oshiro (Leave)
-triggers.oshiroTrigger.description.state=Triggers whether Oshiro spawns into or leaves the room.
+triggers.oshiroTrigger.placements.name.oshiro_spawn=Oshiro (Spawn)
+triggers.oshiroTrigger.placements.name.oshiro_leave=Oshiro (Leave)
+triggers.oshiroTrigger.attributes.description.state=Triggers whether Oshiro spawns into or leaves the room.
 
 # Respawn Target
-triggers.respawnTargetTrigger.name.respawn_target=Respawn Target
+triggers.respawnTargetTrigger.placements.name.respawn_target=Respawn Target
 
 # Rumble
-triggers.rumbleTrigger.name.rumble=Rumble
-triggers.rumbleTrigger.description.manualTrigger=If set to true, this is not triggered by a player walking into it and can only be triggered by code.
-triggers.rumbleTrigger.description.persistent=Once turned on, it will stay activated, even if the player dies.
-triggers.rumbleTrigger.description.constrainHeight=Whether the trigger respects the Y values of the nodes.
+triggers.rumbleTrigger.placements.name.rumble=Rumble
+triggers.rumbleTrigger.attributes.description.manualTrigger=If set to true, this is not triggered by a player walking into it and can only be triggered by code.
+triggers.rumbleTrigger.attributes.description.persistent=Once turned on, it will stay activated, even if the player dies.
+triggers.rumbleTrigger.attributes.description.constrainHeight=Whether the trigger respects the Y values of the nodes.
 
 # Spawn Facing
-triggers.spawnFacingTrigger.name.spawn_facing=Spawn Facing
-triggers.spawnFacingTrigger.description.facing=The direction the player is facing when respawning inside this trigger.
+triggers.spawnFacingTrigger.placements.name.spawn_facing=Spawn Facing
+triggers.spawnFacingTrigger.attributes.description.facing=The direction the player is facing when respawning inside this trigger.
 
 # Stop Boost
-triggers.stopBoostTrigger.name.stop_boost=Stop Boost
+triggers.stopBoostTrigger.placements.name.stop_boost=Stop Boost
 
 # Snowballs
-triggers.windAttackTrigger.name.wind_attack=Snowballs
+triggers.windAttackTrigger.placements.name.wind_attack=Snowballs
 
 # Wind Pattern
-triggers.windTrigger.name.wind=Wind Pattern
+triggers.windTrigger.placements.name.wind=Wind Pattern
 
 # Wind Trigger
-triggers.windTrigger.description.pattern=Changes the abilities of the room's current wind type.
+triggers.windTrigger.attributes.description.pattern=Changes the abilities of the room's current wind type.
 
 
 # -- Mod Information --
