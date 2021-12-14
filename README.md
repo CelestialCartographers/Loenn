@@ -13,15 +13,14 @@
 
 ---
 
-_Lönn is a visual level maker and editor for the game Celeste. It allows editing map binaries, creating new ones, adding rooms, and filling the rooms with anything your heart desires (as long as what your heart desires is possible within the realms of the game)._
-
-...is what I **would** write here, but this is still an extremely early version of Lönn, and there isn't really any useable map-editing functionality in it yet, although it should come fairly soon. For now, it's just a very fast map viewer. For actually editing maps, continue using [Ahorn][ahorn] for now, but feel free to play around with Lönn!
+Lönn is a visual level maker and editor for the game Celeste. It allows editing map binaries, creating new ones, adding rooms, and filling the rooms with anything your heart desires (as long as what your heart desires is possible within the realms of the game).
+The generated map binaries can be loaded in the stock game or using [Everest](https://everestapi.github.io/), although the use of Everest is highly recommended. For use without Everest, you can replace a map in `Content/Maps` (remember backups), otherwise, you can place it in `Mods/<yourmodname>/Maps` with Everest and use the custom chapter loading (refer to the [Mod Structure guide](https://github.com/EverestAPI/Resources/wiki/Mod-Structure)).
 
 The program is still in an early state, many things are still missing and it is under active development. If you spot something that is missing, it will most likely be added some time in the near future. If you spot a bug or the program crashes, please report it.
 
 Lönn is a successor to [Ahorn][ahorn], a visual level maker based on [Maple][maple]. If you want to be able to generate and edit maps using code, give Maple a try.
 
-This project is an unofficial map maker and level editor, it is merely a fan project aiming to aid map development until something official is available. None of this code is developed by or connected to the Celeste development team.
+This project is an unofficial map maker and level editor, it is merely a fan project trying to enable map development in the most user-friendly way we can think of. None of this code is developed by or connected to the Celeste development team, but we thank the team for supporting our projects.
 
 ## Installation
 
@@ -39,15 +38,78 @@ Download the [latest release][latest-release] for your operating system and extr
 
 ## Usage
 
-Lönn supports a couple of keybinds and special mouse functionality, with more to come. The following list might not be comprehensive.
- - Ctrl + Plus: Zoom In
- - Ctrl + Minus: Zoom Out
- - Ctrl + o: Open Map
- - Left click: Main action button for tools
- - Right click: Camera movement
- - Middle click: Clone the hovered item, tool and layer specific
+The tools in Lönn are shown on the right, just select one to use it.
+Hold right click to move around the map. Left click is your main way of placing objects or selecting things. Tools like rectangle placement require holding left click while moving across the screen. Scroll to zoom.
 
-If you have any question, [**ask us on `#map_making` on Discord**][discord-map-making] so we may add it to this README file. Thanks for being interested in making maps for Celeste!
+In any menu, you can hover over the name of an option or field for a detailed tooltip explaining its meaning and usage.
+
+Lönn supports a couple of keybinds and special mouse functionality, with more to come. The following list might not be comprehensive. Note that you can change all keybinds in the configuration file.
+
+---
+
+#### General Controls
+
+ - Ctrl + O: Open map
+ - Drag & drop map file into main window: Open map
+ - Ctrl + S: Save map
+ - Ctrl + Shift + S: Save map as...
+ - Alt + Arrow keys: Move room (step size 8)
+ - Ctrl + Alt + Arrow keys: Move room (use 1 as step size instead of 8 for more fine-grained control)
+ - Ctrl + Z: Undo action
+ - Ctrl + Shift + Z: Redo action
+ - Scroll wheel: Zoom
+ - Ctrl + ➕ (plus): Zoom in
+ - Ctrl + ➖ (minus): Zoom out
+ - F11: Toggle fullscreen
+
+ #### Placements
+
+ - Left click: Place object
+ - Holding Ctrl + Left click: Place object (use 1 as step size instead of 8 for more fine-grained control)
+ - Right click: Open properties of object under cursor
+ - Left click & drag: Adjust size of resizeable objects while placing
+ - Middle click: Clone object under cursor
+ - Q, E: Shrink / grow width
+ - A, D: Shrink / grow height
+ - L, R: Rotate supported objects counter-clockwise / clockwise
+ - V, H: Flip supported objects vertically / horizontally
+
+ #### Selections
+
+ - Left click: Select object
+ - Left click existing selection: Cycle through objects under cursor (smallest to largest)
+ - Left click & drag: Select multiple objects
+ - Right click selection: Open properties of selected object(s)
+ - Holding Left mouse button over selection: Drag selected objects
+ - Shift + Holding Left mouse button over selection: Axis-bound object dragging
+ - Arrow keys: Move selected objects
+ - Q, E: Shrink / grow width on selected objects
+ - A, D: Shrink / grow height on selected objects
+ - Holding Ctrl + any of the above: use 1 as step size instead of 8 for more fine-grained control
+ - L, R: Rotate supported objects counter-clockwise / clockwise
+ - V, H: Flip supported objects vertically / horizontally
+ - N on entity/trigger: Add starting node to entity/trigger
+ - N on node: Add node to entity/trigger after selected node
+ - Delete: Delete selected objects
+ - Ctrl + C: Copy selection to clipboard
+ - Ctrl + X: Cut selection to clipboard
+ - Ctrl + V: Paste selection from clipboard
+
+#### Brushes
+
+ - Left click: Place tiles
+ - Left click & drag: Drag brush
+ - Middle click: Change material to tile under cursor
+
+ #### Debug - For developers
+
+ - F5: Reload entities and triggers
+ - F6: Clear rendering cache and redraw map
+ - F7: Reload tools
+ - Ctrl + F5: Reload everything
+ - Ctrl + Shift + F5: Restart Lönn
+
+If you have any question, [**ask us in `#map_making` on Discord**][discord-map-making] so we may add it to this README file. Thanks for being interested in making maps for Celeste!
 
 ## Some pictures
 
@@ -59,9 +121,9 @@ Close-up of a room
 
 ## Frequently Asked Questions
 
-**When will I be able to place [entity/decal/trigger/other thing in celeste]?**
+**When will I be able to do [thing you can do in Ahorn]?**
 
-Whenever we add it. Celeste has a lot of things which support for has to be individually added. This takes time, so please be patient. However, if more people complain about the lack of a particular thing, we might add it sooner. For a (currently) more complete set of features, consider using [Ahorn][ahorn] for now.
+Whenever we add it. Celeste has a lot of things which support for has to be individually added. This takes time, so please be patient. However, if more people complain about the lack of a particular thing, we might add it sooner. For a (currently) more complete set of features, just keep using [Ahorn][ahorn] for now.
 
 **Why do so many things in the program have weird names?**
 
@@ -82,21 +144,6 @@ While you can load maps without, it is _highly_ recommended to install [Everest]
 **Something is broken!**
 
 That's not a question, but please report any bug you find!
-
-**What will you do once the official map maker is out?**
-
-Whenever that happens, we might just continue like before; it might well be that the official editor will not be quite as powerful as Lönn tries to be. It might not ever exist. We'll see.
-
-## Development Tools
-
-To make Lönn easier to develop and make plugins for, it also includes the following keybinds.
- - Ctrl + F5: Reload as much as possible
- - F5: Reload entities and triggers
- - F6: Clear rendering caches
- - F7: Reload tools
- - Ctrl + Shift + J: Start Lua debugging session
-
-Feel free to also ask for development help in the Discord server mentioned above.
 
 ## License
 

@@ -37,7 +37,7 @@ zipMover.name = "zipMover"
 zipMover.depth = -9999
 zipMover.nodeVisibility = "never"
 zipMover.nodeLimits = {1, 1}
-zipMover.maximumSize = {16, 16}
+zipMover.minimumSize = {16, 16}
 zipMover.placements = {}
 
 for i, theme in ipairs(themes) do

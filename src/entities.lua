@@ -841,8 +841,10 @@ function entities.cloneItem(room, layer, item)
         return handler.cloneItem(room, layer, item)
     end
 
+    local placements = utils.callIfFunction(handler.placements)
+    local defaultPlacement = getDefaultPlacement(handler, placements)
     local guessedPlacement = guessPlacementFromData(item, name, handler) or {}
-    local placement = getPlacement(guessedPlacement, name, handler, language)
+    local placement = getPlacement(guessedPlacement, defaultPlacement, name, handler, language)
 
     placement.itemTemplate = utils.deepcopy(item)
 

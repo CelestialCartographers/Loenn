@@ -470,8 +470,11 @@ function triggers.cloneItem(room, layer, item)
     local name = item._name
     local handler = triggers.registeredTriggers[name]
     local language = languageRegistry.getLanguage()
+
+    local placements = utils.callIfFunction(handler.placements)
+    local defaultPlacement = getDefaultPlacement(handler, placements)
     local guessedPlacement = guessPlacementFromData(item, name, handler) or {}
-    local placement = getPlacement(guessedPlacement, name, handler, language)
+    local placement = getPlacement(guessedPlacement, defaultPlacement, name, handler, language)
 
     placement.itemTemplate = utils.deepcopy(item)
 
