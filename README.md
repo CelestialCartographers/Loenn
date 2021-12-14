@@ -69,6 +69,10 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
  - Right click: Open properties of object under cursor
  - Left click & drag: Adjust size of resizeable objects while placing
  - Middle click: Clone object under cursor
+ - Q, E: Shrink / grow width
+ - A, D: Shrink / grow height
+ - L, R: Rotate supported objects counter-clockwise / clockwise
+ - V, H: Flip supported objects vertically / horizontally
 
  #### Selections
 
