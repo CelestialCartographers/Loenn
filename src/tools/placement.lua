@@ -39,6 +39,27 @@ local placementDragStartY = 0
 local placementRectangle = nil
 local placementDragCompleted = false
 
+local placementResizeKeys = {
+    {"itemResizeLeftGrow", 1, 0, -1, 0},
+    {"itemResizeRightGrow", 1, 0, 1, 0},
+    {"itemResizeUpGrow", 0, 1, 0, -1},
+    {"itemResizeDownGrow", 0, 1, 0, 1},
+    {"itemResizeLeftShrink", -1, 0, -1, 0},
+    {"itemResizeRightShrink", -1, 0, 1, 0},
+    {"itemResizeUpShrink", 0, -1, 0, -1},
+    {"itemResizeDownShrink", 0, -1, 0, 1}
+}
+
+local placementFlipKeys = {
+    {"itemFlipHorizontal", true, false},
+    {"itemFlipVertical", false, true}
+}
+
+local placementRotationKeys = {
+    {"itemRotateLeft", -1},
+    {"itemRotateRight", 1}
+}
+
 local function getCurrentPlacementType()
     local placementInfo = placementTemplate and placementTemplate.placement
     local placementType = placementInfo and placementInfo.placementType
@@ -430,6 +451,80 @@ function tool.getMaterial()
     return placementTemplate and placementTemplate.placement.displayName
 end
 
+local function handleItemResizeKeys(room, key, scancode, isrepeat)
+    if not placementTemplate or not placementTemplate.item then
+        return
+    end
+
+    for _, resizeData in ipairs(placementResizeKeys) do
+        local configKey, offsetX, offsetY, directionX, directionY = resizeData[1], resizeData[2], resizeData[3], resizeData[4], resizeData[5]
+        local targetKey = configs.editor[configKey]
+
+        if not keyboardHelper.modifierHeld(configs.editor.precisionModifier) then
+            offsetX *= 8
+            offsetY *= 8
+        end
+
+        if targetKey == key then
+            local resized = selectionItemUtils.resizeSelection(room, tool.layer, placementTemplate, offsetX, offsetY, directionX, directionY)
+
+            if resized then
+                updatePlacement(true)
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
+local function handleItemRotateKeys(room, key, scancode, isrepeat)
+    if not placementTemplate or not placementTemplate.item then
+        return
+    end
+
+    for _, rotationData in ipairs(placementRotationKeys) do
+        local configKey, direction = rotationData[1], rotationData[2]
+        local targetKey = configs.editor[configKey]
+
+        if targetKey == key then
+            local rotation = selectionItemUtils.rotateSelection(room, tool.layer, placementTemplate, direction)
+
+            if rotation then
+                updatePlacement(true)
+            end
+
+            return true
+        end
+    end
+
+    return false
+end
+
+local function handleItemFlipKeys(room, key, scancode, isrepeat)
+    if not placementTemplate or not placementTemplate.item then
+        return
+    end
+
+    for _, flipData in ipairs(placementFlipKeys) do
+        local configKey, horizontal, vertical = flipData[1], flipData[2], flipData[3]
+        local targetKey = configs.editor[configKey]
+
+        if targetKey == key then
+            local flipped = selectionItemUtils.flipSelection(room, tool.layer, placementTemplate, horizontal, vertical)
+
+            if flipped then
+                updatePlacement(true)
+            end
+
+            return flipped
+        end
+    end
+
+    return false
+end
+
 -- Offset the placement correctly for the new room
 function tool.editorMapTargetChanged(item, itemType)
     local px, py = toolUtils.getCursorPositionInRoom(placementMouseX, placementMouseY)
@@ -503,6 +598,10 @@ end
 
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
+
+    handleItemResizeKeys(room, key, scancode, isrepeat)
+    handleItemRotateKeys(room, key, scancode, isrepeat)
+    handleItemFlipKeys(room, key, scancode, isrepeat)
 end
 
 function tool.update(dt)
