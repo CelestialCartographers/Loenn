@@ -8,10 +8,17 @@ local fileLocations = require("file_locations")
 local utils = require("utils")
 local history = require("history")
 local persistence = require("persistence")
+local meta = require("meta")
 
 local sideStruct = require("structs.side")
 
 local state = {}
+
+local function getWindowTitle(side)
+    local name = sideStruct.getMapName(side)
+
+    return string.format("%s - %s", meta.title, name)
+end
 
 local function updateSideState(side, roomName, filename, eventName)
     eventName = eventName or "editorMapLoaded"
@@ -42,8 +49,9 @@ local function updateSideState(side, roomName, filename, eventName)
     persistence.lastLoadedFilename = filename
     persistence.lastSelectedRoomName = state.selectedItem and state.selectedItem.name
 
-    sceneHandler.changeScene("Editor")
+    love.window.setTitle(getWindowTitle(side))
 
+    sceneHandler.changeScene("Editor")
     sceneHandler.sendEvent(eventName, filename)
 end
 

@@ -5,6 +5,10 @@ local styleStruct = require("structs.style")
 
 local mapStruct = {}
 
+function mapStruct.getMapName(map)
+    return map and map.package or ""
+end
+
 function mapStruct.decode(data)
     local map = {
         _type = "map"

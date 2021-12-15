@@ -58,6 +58,10 @@ local function binfileify(name, data)
     return res
 end
 
+function sideStruct.getMapName(side)
+    return mapStruct.getMapName(side.map)
+end
+
 function sideStruct.decode(data)
     local side = {
         _type = "side"
