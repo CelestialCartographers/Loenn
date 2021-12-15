@@ -125,6 +125,10 @@ Close-up of a room
 
 Whenever we add it. Celeste has a lot of things which support for has to be individually added. This takes time, so please be patient. However, if more people complain about the lack of a particular thing, we might add it sooner. For a (currently) more complete set of features, just keep using [Ahorn][ahorn] for now.
 
+**Why do my mods not show up in Lönn?**
+
+Lönn does not support the Ahorn plugins that mods contain. Mod developers will have to add compatible Lönn plugins to their mods separately.
+
 **Why do so many things in the program have weird names?**
 
 Most of these are the names internally used by the game, so blame the devs. Most of them do not have any official names, but we might make the names in Lönn a bit more descriptive later on.
