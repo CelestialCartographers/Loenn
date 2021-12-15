@@ -8,6 +8,7 @@ local debugUtils = require("debug_utils")
 local notifications = require("ui.notification")
 local sceneHandler = require("scene_handler")
 local updater = require("updater")
+local configs = require("configs")
 
 local utils = require("utils")
 local languageRegistry = require("language_registry")
@@ -41,6 +42,22 @@ local function reloadUI()
     debugUtils.reloadUI()
 end
 
+local addDebug = configs.debug.enableDebugOptions
+local debugMenu = {"debug", {
+    {"reload", {
+        {"reload_everything", debugUtils.reloadEverything},
+        {"reload_scenes", debugUtils.reloadScenes},
+        {"reload_tools", debugUtils.reloadTools},
+        {"reload_entities", debugUtils.reloadEntities},
+        {"reload_triggers", debugUtils.reloadTriggers},
+        {"reload_effects", notYetImplementedNotification},
+        {"reload_user_interface", reloadUI},
+        {"reload_language_files", debugUtils.reloadLanguageFiles}
+    }},
+    {"redraw_map", debugUtils.redrawMap},
+    {"test_console", debugUtils.debug}
+}}
+
 menubar.menubar = {
     {"file", {
         {"new", loadedState.newMap},
@@ -69,20 +86,8 @@ menubar.menubar = {
         {},
         {"delete", deleteCurrentRoom}
     }},
-    {"debug", {
-        {"reload", {
-            {"reload_everything", debugUtils.reloadEverything},
-            {"reload_scenes", debugUtils.reloadScenes},
-            {"reload_tools", debugUtils.reloadTools},
-            {"reload_entities", debugUtils.reloadEntities},
-            {"reload_triggers", debugUtils.reloadTriggers},
-            {"reload_effects", notYetImplementedNotification},
-            {"reload_user_interface", reloadUI},
-            {"reload_language_files", debugUtils.reloadLanguageFiles}
-        }},
-        {"redraw_map", debugUtils.redrawMap},
-        {"test_console", debugUtils.debug}
-    }},
+    -- Only add if enabled
+    addDebug and debugMenu or false,
     {"help", {
         {"check_for_updates", checkForUpdates},
         {"about", notYetImplementedNotification}
@@ -104,10 +109,19 @@ local function addLanguageStrings(menu, language)
     end
 end
 
+local function removeFalseEntries(menu)
+    for i = #menu, 1, -1 do
+        if not menu[i] then
+            table.remove(menu, i)
+        end
+    end
+end
+
 function menubar.getMenubar()
     local preparedMenubar = utils.deepcopy(menubar.menubar)
     local language = languageRegistry.getLanguage()
 
+    removeFalseEntries(preparedMenubar)
     addLanguageStrings(preparedMenubar, language)
 
     return uiElements.topbar(preparedMenubar)
