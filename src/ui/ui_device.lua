@@ -45,7 +45,7 @@ function ui.initializeDevice()
 
     ui.init(uiRootElement, false)
     ui.features.eventProxies = true
-    ui.features.megacanvas = true
+    ui.features.megacanvas = false
 end
 
 return ui
