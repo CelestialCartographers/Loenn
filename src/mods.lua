@@ -338,11 +338,13 @@ end
 function modHandler.mountMods(directory, force)
     directory = directory or utils.joinpath(fileLocations.getCelesteDir(), "Mods")
 
-    for filename, dir in utils.listDir(directory) do
-        if filename ~= "." and filename ~= ".." then
-            modHandler.mountMod(utils.joinpath(directory, filename), force)
+    if utils.isDirectory(directory) then
+        for filename, dir in utils.listDir(directory) do
+            if filename ~= "." and filename ~= ".." then
+                modHandler.mountMod(utils.joinpath(directory, filename), force)
 
-            coroutine.yield()
+                coroutine.yield()
+            end
         end
     end
 end
