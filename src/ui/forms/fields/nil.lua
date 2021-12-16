@@ -26,6 +26,7 @@ end
 function nilField.getElement(name, value, options)
     local formField = {}
 
+    formField.name = name
     formField.width = 0
     formField.elements = {}
 

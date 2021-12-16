@@ -173,7 +173,9 @@ function forms.getFormData(formFields)
     local data = {}
 
     for _, field in ipairs(formFields) do
-        data[field.name] = field:getValue()
+        if field.name then
+            data[field.name] = field:getValue()
+        end
     end
 
     return data
