@@ -173,24 +173,39 @@ function contextWindow.prepareFormData(layer, item, language)
         end
     end
 
+    -- Find all fields that aren't added yet and prepare them for alphabetical sorting
+    local missingFields = {}
+
     for field, value in pairs(item) do
         -- Some fields should not be exposed automatically
         -- Any fields already added should not be added again
         if not globallyFilteredKeys[field] and not fieldIgnored[field] and not fieldsAdded[field] then
             local humanizedName = utils.humanizeVariableName(field)
             local displayName = getLanguageKey(field, languageAttributes, humanizedName)
-            local tooltip = getLanguageKey(field, languageTooltips)
 
-            table.insert(fieldOrder, field)
-
-            if not fieldInformation[field] then
-                fieldInformation[field] = {}
-            end
-
-            dummyData[field] = utils.deepcopy(value)
-            fieldInformation[field].displayName = displayName
-            fieldInformation[field].tooltipText = tooltip
+            table.insert(missingFields, {field, value, displayName})
         end
+    end
+
+    -- Sort by display name
+    table.sort(missingFields, function(a, b)
+        return a[3] < b[3]
+    end)
+
+    -- Add all missing fields
+    for _, missing in pairs(missingFields) do
+        local field, value, displayName = unpack(missing)
+        local tooltip = getLanguageKey(field, languageTooltips)
+
+        table.insert(fieldOrder, field)
+
+        if not fieldInformation[field] then
+            fieldInformation[field] = {}
+        end
+
+        dummyData[field] = utils.deepcopy(value)
+        fieldInformation[field].displayName = displayName
+        fieldInformation[field].tooltipText = tooltip
     end
 
     return dummyData, fieldInformation, fieldOrder
