@@ -32,10 +32,17 @@ function colorField._MT.__index:getValue()
     return self.currentValue or fallbackHexColor
 end
 
-function colorField._MT.__index:fieldValid()
-    local parsed, r, g, b = utils.parseHexColor(self:getValue())
+function colorField._MT.__index:fieldValid(...)
+    if self._allowXNAColors then
+        local color = utils.getColor(self:getValue())
 
-    return parsed
+        return not not color
+
+    else
+        local parsed, r, g, b = utils.parseHexColor(self:getValue())
+
+        return parsed
+    end
 end
 
 -- Return the hex color of the XNA name if allowed
@@ -175,6 +182,7 @@ function colorField.getElement(name, value, options)
     formField.name = name
     formField.initialValue = value
     formField.currentValue = value
+    formField._allowXNAColors = allowXNAColors
     formField.width = 2
     formField.elements = {
         label, fieldWithContext
