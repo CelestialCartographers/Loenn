@@ -24,7 +24,6 @@ local roomWindow = {}
 local activeWindows = {}
 local windowPreviousX = 0
 local windowPreviousY = 0
-local roomWindowGroup = uiElements.group({})
 
 local minimumRoomWidth = 320
 local minimumRoomHeight = 184
@@ -72,13 +71,27 @@ local fieldTypes = {
     name = "room_name_unique"
 }
 
-function roomWindow.createNewRoom()
-    roomWindow.createRoomWindow(nil, false)
+function roomWindow.editorRoomAdd(self, map, item)
+    roomWindow.createNewRoom(item)
+end
+
+function roomWindow.editorRoomConfigure(self, map, item)
+    roomWindow.editExistingRoom(item)
+end
+
+function roomWindow.createNewRoom(room)
+    roomWindow.createRoomWindow(room, false)
 end
 
 function roomWindow.editExistingRoom(room)
     roomWindow.createRoomWindow(room, true)
 end
+
+local roomWindowGroup = uiElements.group({}):with({
+    editorRoomAdd = roomWindow.editorRoomAdd,
+    editorRoomConfigure = roomWindow.editorRoomConfigure,
+})
+
 
 local function roomWindowUpdate(orig, self, dt)
     orig(self, dt)
@@ -213,20 +226,25 @@ end
 
 function roomWindow.createRoomWindow(room, editing)
     if editing then
-        room = utils.deepcopy(room)
+        room = utils.deepcopy(room or loadedState.getSelectedRoom())
 
     else
+        -- Copy over attributes from currently selected room
+        local templateRoom = room or loadedState.getSelectedRoom()
         -- Decoding with empty data produces a default room
         room = roomStruct.decode({})
 
-        -- Copy over attributes from currently selected room
-        local currentRoom = loadedState.getSelectedRoom()
-
-        if currentRoom then
+        if templateRoom and utils.typeof(templateRoom) == "room" then
             for _, attribute in ipairs(defaultFieldOrder) do
-                room[attribute] = currentRoom[attribute]
+                room[attribute] = templateRoom[attribute]
             end
         end
+    end
+
+    -- Not a room, nothing to edit
+    -- TODO - Filler editor?
+    if utils.typeof(room) ~= "room" then
+        return
     end
 
     -- Not a actual attribute of the room
