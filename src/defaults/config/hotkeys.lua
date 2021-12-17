@@ -1,6 +1,7 @@
 return {
     undo = "ctrl + z",
     redo = "ctrl + shift + z",
+    new = "ctrl + n",
     open = "ctrl + o",
     save = "ctrl + s",
     saveAs = "ctrl + shift + s",
@@ -33,6 +34,11 @@ return {
     roomResizeRightShrink = false,
     roomResizeUpShrink = false,
     roomResizeDownShrink = false,
+
+    -- Rooms
+    roomAddNew = "ctrl + t",
+    roomConfigureCurrent = "ctrl + shift + t",
+    roomDelete = "alt + delete",
 
     -- Debug
     debugReloadEntities = "f5",

@@ -1,4 +1,4 @@
-local movementUtils = {}
+local roomHotkeyUtils = {}
 
 -- Exists to make hotkeys somewhat sane
 
@@ -8,6 +8,7 @@ local fillerStruct = require("structs.filler")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local utils = require("utils")
+local sceneHandler = require("scene_handler")
 
 local directions = {
     Left = "left",
@@ -70,29 +71,56 @@ local function callWithHistory(functionName, item, ...)
 end
 
 for name, direction in pairs(directions) do
-    movementUtils["moveCurrentRoomOneTile" .. name] = function()
+    roomHotkeyUtils["moveCurrentRoomOneTile" .. name] = function()
         local item, itemType = loadedState.getSelectedItem()
 
         return callWithHistory("directionalMove", item, direction, 1)
     end
 
-    movementUtils["moveCurrentRoomOnePixel" .. name] = function()
+    roomHotkeyUtils["moveCurrentRoomOnePixel" .. name] = function()
         local item, itemType = loadedState.getSelectedItem()
 
         return callWithHistory("directionalMove", item, direction, 1, 1)
     end
 
-    movementUtils["growCurrentRoomOneTile" .. name] = function()
+    roomHotkeyUtils["growCurrentRoomOneTile" .. name] = function()
         local item, itemType = loadedState.getSelectedItem()
 
         return callWithHistory("directionalResize", item, direction, 1)
     end
 
-    movementUtils["shrinkCurrentRoomOneTile" .. name] = function()
+    roomHotkeyUtils["shrinkCurrentRoomOneTile" .. name] = function()
         local item, itemType = loadedState.getSelectedItem()
 
         return callWithHistory("directionalResize", item, direction, -1)
     end
 end
 
-return movementUtils
+function roomHotkeyUtils.deleteSelectedRoom()
+    local map = loadedState.map
+    local item = loadedState.getSelectedItem()
+
+    if map and item then
+        sceneHandler.sendEvent("editorRoomDelete", map, item)
+    end
+end
+
+function roomHotkeyUtils.addRoom()
+    local map = loadedState.map
+    local item = loadedState.getSelectedItem()
+
+    if map and item then
+        sceneHandler.sendEvent("editorRoomAdd", map, item)
+    end
+end
+
+function roomHotkeyUtils.configureSelectedRoom()
+    local map = loadedState.map
+    local item = loadedState.getSelectedItem()
+
+    if map and item then
+        sceneHandler.sendEvent("editorRoomConfigure", map, item)
+    end
+end
+
+return roomHotkeyUtils

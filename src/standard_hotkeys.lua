@@ -14,6 +14,7 @@ local hotkeyStruct = require("structs.hotkey")
 local rawHotkeys = {
     {configs.hotkeys.redo, history.redo, "Redo last action"},
     {configs.hotkeys.undo, history.undo, "Undo last action"},
+    {configs.hotkeys.new, loadedState.newMap, "New map"},
     {configs.hotkeys.open, loadedState.openMap, "Open file"},
     {configs.hotkeys.save, loadedState.saveCurrentMap, "Save file"},
     {configs.hotkeys.saveAs, loadedState.saveAsCurrentMap, "Save file as"},
@@ -39,6 +40,11 @@ local rawHotkeys = {
     {configs.hotkeys.roomResizeRightShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileRight, "Shrink room one tile right"},
     {configs.hotkeys.roomResizeUpShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileUp, "Shrink room one tile up"},
     {configs.hotkeys.roomResizeDownShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileDown, "Shrink room one tile down"},
+
+    -- Room
+    {configs.hotkeys.roomDelete, roomHotkeyUtils.deleteSelectedRoom, "Delete selected room"},
+    {configs.hotkeys.roomAddNew, roomHotkeyUtils.addRoom, "Add new room"},
+    {configs.hotkeys.roomConfigureCurrent, roomHotkeyUtils.configureSelectedRoom, "Edit selected room"},
 
     -- Debug hotkeys
     {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},
