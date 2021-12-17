@@ -154,7 +154,7 @@ function modHandler.readModMetadata(path, mountPoint, folderName)
         if content then
             local success, data = pcall(yaml.read, utils.stripByteOrderMark(content))
 
-            if success then
+            if success and type(data) == "table" then
                 result = data
                 result._mountPointLoenn = modHandler.findPluginLoennFolder(mountPoint)
             end

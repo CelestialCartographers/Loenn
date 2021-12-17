@@ -105,4 +105,22 @@ function roomHotkeyUtils.deleteSelectedRoom()
     end
 end
 
+function roomHotkeyUtils.addRoom()
+    local map = loadedState.map
+    local item = loadedState.getSelectedItem()
+
+    if map and item then
+        sceneHandler.sendEvent("editorRoomAdd", map, item)
+    end
+end
+
+function roomHotkeyUtils.configureSelectedRoom()
+    local map = loadedState.map
+    local item = loadedState.getSelectedItem()
+
+    if map and item then
+        sceneHandler.sendEvent("editorRoomConfigure", map, item)
+    end
+end
+
 return roomHotkeyUtils

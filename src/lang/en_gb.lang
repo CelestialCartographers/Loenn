@@ -1069,17 +1069,17 @@ triggers.moonGlitchBackgroundTrigger.attributes.description.stay=Whether the bla
 triggers.moonGlitchBackgroundTrigger.attributes.description.glitch=Whether the glitch effect is visible or not.
 
 # Music
-triggers.musicFadeTrigger.placements.name.music_fade=Music
+triggers.musicTrigger.placements.name.music=Music
+triggers.musicTrigger.attributes.description.resetOnLeave=Resets the music when the player leaves the current zone after entering the trigger zone.
+triggers.musicTrigger.attributes.description.track=Changes the track that plays when the player enters the trigger zone.
+triggers.musicTrigger.attributes.description.progress=Change the progress of the current track. 0 means no change.
+
+# Music Fade
+triggers.musicFadeTrigger.placements.name.music_fade=Music Fade
 triggers.musicFadeTrigger.attributes.description.direction=The direction the music fades in.
 triggers.musicFadeTrigger.attributes.description.fadeB=Determines the ending volume of the fade.
 triggers.musicFadeTrigger.attributes.description.fadeA=Determines the starting volume of the fade.
 triggers.musicFadeTrigger.attributes.description.parameter=Uses the fade properties if left blank, otherwise uses FMOD's escape property.
-
-# Music Fade
-triggers.musicTrigger.placements.name.music=Music Fade
-triggers.musicTrigger.attributes.description.resetOnLeave=Resets the music when the player leaves the current zone after entering the trigger zone.
-triggers.musicTrigger.attributes.description.track=Changes the track that plays when the player enters the trigger zone.
-triggers.musicTrigger.attributes.description.progress=Change the progress of the current track. 0 means no change.
 
 # No Refill
 triggers.noRefillTrigger.placements.name.enable_refills=Refills (Enable)
