@@ -593,6 +593,8 @@ function triggers.fieldInformation(layer, trigger)
             fieldInfo[k] = v
         end
     end
+
+    return fieldInfo
 end
 
 function triggers.languageData(layer, entity, language)
