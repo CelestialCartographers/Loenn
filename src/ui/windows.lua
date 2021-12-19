@@ -4,6 +4,7 @@ local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
 local uiRoot = require("ui.ui_root")
+local logging = require("logging")
 
 local windows = {}
 
@@ -23,7 +24,7 @@ function windows.registerWindow(filename, verbose)
     windows.windowHandlers[filenameNoExt] = window
 
     if verbose then
-        print("! Registered window '" .. name .. "' from '" .. filename .."'")
+        logging.info("Registered window '" .. name .. "' from '" .. filename .."'")
     end
 end
 

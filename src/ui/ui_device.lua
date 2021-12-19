@@ -13,10 +13,11 @@ local debugUtils = require("debug_utils")
 local forms = require("ui.forms.form")
 local windows = require("ui.windows")
 local uiRoot = require("ui.ui_root")
+local logging = require("logging")
 
 -- Add Debug UI reload function
 function debugUtils.reloadUI()
-    print("! Reloading UI elements")
+    logging.info("Reloading UI elements")
 
     windows.storeWindowPositions()
     windows.unloadWindows()
