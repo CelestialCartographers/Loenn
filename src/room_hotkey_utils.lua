@@ -109,7 +109,7 @@ function roomHotkeyUtils.addRoom()
     local map = loadedState.map
     local item = loadedState.getSelectedItem()
 
-    if map and item then
+    if map then
         sceneHandler.sendEvent("editorRoomAdd", map, item)
     end
 end
