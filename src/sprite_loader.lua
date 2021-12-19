@@ -68,7 +68,11 @@ function spriteLoader.getCachedDataImage(dataFile)
     local path = utils.joinpath(storageDir, "Cache", "Data", dataFile .. ".png")
 
     if filesystem.isFile(path) then
-        return utils.newImage(path, false)
+        local success, image = pcall(utils.newImage, path, false)
+
+        if success then
+            return image
+        end
     end
 end
 

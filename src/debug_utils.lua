@@ -8,6 +8,7 @@ local languageRegistry = require("language_registry")
 local modHandler = require("mods")
 local tasks = require("utils.tasks")
 local utils = require("utils")
+local logging = require("logging")
 
 local hasProfile, profile = utils.tryrequire("profile.profile", false)
 local origYield = coroutine.yield
@@ -20,13 +21,13 @@ function debugUtils.restartProcess()
 end
 
 function debugUtils.reloadMods()
-    print("! Reloading mods")
+    logging.info("Reloading mods")
 
     modHandler.unrequireKnownPluginRequires()
 end
 
 function debugUtils.reloadEntities()
-    print("! Reloading entities")
+    logging.info("Reloading entities")
 
     entities.initLogging()
     entities.initDefaultRegistry()
@@ -36,7 +37,7 @@ function debugUtils.reloadEntities()
 end
 
 function debugUtils.reloadTriggers()
-    print("! Reloading triggers")
+    logging.info("Reloading triggers")
 
     triggers.initDefaultRegistry()
 
@@ -45,7 +46,7 @@ function debugUtils.reloadTriggers()
 end
 
 function debugUtils.reloadTools()
-    print("! Reloading tools")
+    logging.info("Reloading tools")
 
     toolHandler.unloadTools()
 
@@ -54,7 +55,7 @@ function debugUtils.reloadTools()
 end
 
 function debugUtils.reloadScenes()
-    print("! Reloading scenes")
+    logging.info("Reloading scenes")
 
     local scene = sceneHandler.getCurrentScene()
 
@@ -69,7 +70,7 @@ function debugUtils.reloadScenes()
 end
 
 function debugUtils.reloadLanguageFiles()
-    print("! Reloading language files")
+    logging.info("Reloading language files")
 
     languageRegistry.unloadFiles()
 
@@ -80,7 +81,7 @@ function debugUtils.reloadLanguageFiles()
 end
 
 function debugUtils.reloadLibraries()
-    print("! Reloading Libraries")
+    logging.info("Reloading Libraries")
 
     libraries.initDefaultRegistry()
 
@@ -94,7 +95,7 @@ function debugUtils.reloadUI()
 end
 
 function debugUtils.redrawMap()
-    print("! Redrawing map")
+    logging.info("Redrawing map")
 
     celesteRender.invalidateRoomCache()
     celesteRender.clearBatchingTasks()
@@ -102,7 +103,7 @@ end
 
 -- TODO - Add as more hotswapping becomes available
 function debugUtils.reloadEverything()
-    print("! Reloading everything")
+    logging.info("Reloading everything")
 
     debugUtils.reloadLanguageFiles()
     debugUtils.reloadLibraries()

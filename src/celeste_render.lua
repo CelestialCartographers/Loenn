@@ -12,6 +12,7 @@ local configs = require("configs")
 local bit = require("bit")
 local modHandler = require("mods")
 local depths = require("consts.object_depths")
+local logging = require("logging")
 
 local entityHandler = require("entities")
 local triggerHandler = require("triggers")
@@ -74,7 +75,7 @@ function celesteRender.loadCustomTilesetAutotiler(state)
 
         else
             if tilesMetaFg then
-                print("Loading custom foreground tile XML failed: ", tilesMetaFg)
+                logging.warning("Loading custom foreground tile XML failed: ", tilesMetaFg)
             end
         end
 
@@ -83,7 +84,7 @@ function celesteRender.loadCustomTilesetAutotiler(state)
 
         else
             if tilesMetaBg then
-                print("Loading custom background tile XML failed: ", tilesMetaBg)
+                logging.warning("Loading custom background tile XML failed: ", tilesMetaBg)
             end
         end
     end
