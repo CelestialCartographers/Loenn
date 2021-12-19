@@ -26,9 +26,6 @@ local activeWindows = {}
 local windowPreviousX = 0
 local windowPreviousY = 0
 
-local minimumRoomWidth = 320
-local minimumRoomHeight = 184
-
 local defaultFieldOrder = {
     "name", "color",
     "x", "y",
@@ -50,10 +47,12 @@ local defaultFieldInformation = {
     },
 
     width = {
-        fieldType = "integer"
+        fieldType = "integer",
+        minimumValue = 1
     },
     height = {
-        fieldType = "integer"
+        fieldType = "integer",
+        minimumValue = 1
     },
 
     color = {
@@ -175,15 +174,15 @@ local function saveRoomCallback(room, editing, usingPixels)
             room.height = room.height * 8
         end
 
+        newRoomData.width = math.max(roomStruct.recommendedMinimumWidth, newRoomData.width)
+        newRoomData.height = math.max(roomStruct.recommendedMinimumHeight, newRoomData.height)
+
         if editing then
             local targetRoom = loadedState.getRoomByName(room.name)
             local before = utils.deepcopy(targetRoom)
 
-            local newWidth = math.max(minimumRoomWidth, newRoomData.width)
-            local newHeight = math.max(minimumRoomHeight, newRoomData.height)
-
-            local deltaWidth = math.ceil((newWidth - before.width) / 8)
-            local deltaHeight = math.ceil((newHeight - before.height) / 8)
+            local deltaWidth = math.ceil((newRoomData.width - before.width) / 8)
+            local deltaHeight = math.ceil((newRoomData.height - before.height) / 8)
 
             for attribute, value in pairs(newRoomData) do
                 if not saveRoomManualAttributesEditing[attribute] then
