@@ -9,6 +9,7 @@ local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local utils = require("utils")
 local sceneHandler = require("scene_handler")
+local configs = require("configs")
 
 local directions = {
     Left = "left",
@@ -78,9 +79,11 @@ for name, direction in pairs(directions) do
     end
 
     roomHotkeyUtils["moveCurrentRoomOnePixel" .. name] = function()
-        local item, itemType = loadedState.getSelectedItem()
+        if configs.editor.itemAllowPixelPerfect then
+            local item, itemType = loadedState.getSelectedItem()
 
-        return callWithHistory("directionalMove", item, direction, 1, 1)
+            return callWithHistory("directionalMove", item, direction, 1, 1)
+        end
     end
 
     roomHotkeyUtils["growCurrentRoomOneTile" .. name] = function()

@@ -6,12 +6,14 @@ local utils = require("utils")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local sceneHandler = require("scene_handler")
+local celesteRender = require("celeste_render")
 
 local mapItemUtils = {}
 
 function mapItemUtils.deleteRoom(map, room)
     for i, r in ipairs(map.rooms) do
         if r.name == room.name then
+            celesteRender.invalidateRoomCache(room)
             table.remove(map.rooms, i)
             sceneHandler.sendEvent("editorRoomDeleted", room)
 

@@ -14,6 +14,7 @@ return {
     precisionModifier = "ctrl",
 
     -- Item Movement
+    itemAllowPixelPerfect = false,
     itemMoveLeft = "left",
     itemMoveRight = "right",
     itemMoveUp = "up",
