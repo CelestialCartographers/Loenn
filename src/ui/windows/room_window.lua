@@ -101,9 +101,13 @@ local function roomWindowUpdate(orig, self, dt)
     windowPreviousY = self.y
 end
 
-local saveRoomManualAttributes = {
+local saveRoomManualAttributesEditing = {
     width = true,
     height = true,
+    checkpoint = true
+}
+
+local saveRoomManualAttributesCreating = {
     checkpoint = true
 }
 
@@ -163,6 +167,12 @@ local function saveRoomCallback(room, editing, usingPixels)
 
             newRoomData.width = newRoomData.width * 8
             newRoomData.height = newRoomData.height * 8
+
+            room.x = room.x * 8
+            room.y = room.y * 8
+
+            room.width = room.width * 8
+            room.height = room.height * 8
         end
 
         if editing then
@@ -176,7 +186,7 @@ local function saveRoomCallback(room, editing, usingPixels)
             local deltaHeight = math.ceil((newHeight - before.height) / 8)
 
             for attribute, value in pairs(newRoomData) do
-                if not saveRoomManualAttributes[attribute] then
+                if not saveRoomManualAttributesEditing[attribute] then
                     targetRoom[attribute] = value
                 end
             end
@@ -198,11 +208,11 @@ local function saveRoomCallback(room, editing, usingPixels)
             local map = loadedState.map
             local newRoom = utils.deepcopy(room)
 
-            local roomTilesWidth = math.ceil(newRoom.width / 8)
-            local roomTilesHeight = math.ceil(newRoom.height / 8)
+            local roomTilesWidth = math.ceil(newRoomData.width / 8)
+            local roomTilesHeight = math.ceil(newRoomData.height / 8)
 
             for attribute, value in pairs(newRoomData) do
-                if not saveRoomManualAttributes[attribute] then
+                if not saveRoomManualAttributesCreating[attribute] then
                     newRoom[attribute] = value
                 end
             end
