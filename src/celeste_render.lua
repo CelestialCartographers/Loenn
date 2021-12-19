@@ -412,7 +412,7 @@ local function getRoomTileBatch(room, tiles, fg)
     if not cache[key]then
         cache[key] = tasks.newTask(
             (-> celesteRender.getTilesBatch(room, tiles, meta, fg)),
-            (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
+            (task -> PRINT_BATCHING_DURATION and logging.info(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
             batchingTasks,
             {room = room}
         )
@@ -464,7 +464,7 @@ local function getRoomDecalsBatch(room, decals, fg, viewport)
     if not cache[key]then
         cache[key] = tasks.newTask(
             (-> getDecalsBatchTaskFunc(decals, room, viewport)),
-            (task -> PRINT_BATCHING_DURATION and print(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
+            (task -> PRINT_BATCHING_DURATION and logging.info(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
             batchingTasks,
             {room = room}
         )
@@ -561,7 +561,7 @@ function celesteRender.getEntityBatch(room, entities, viewport, registeredEntiti
     if not cache.entities then
         cache.entities = tasks.newTask(
             (-> getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)),
-            (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
+            (task -> PRINT_BATCHING_DURATION and logging.info(string.format("Batching 'entities' in '%s' took %s ms", room.name, task.timeTotal * 1000))),
             batchingTasks,
             {room = room}
         )
@@ -595,7 +595,7 @@ function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
     if not cache.triggers then
         cache.triggers = tasks.newTask(
             (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
-            (task -> PRINT_BATCHING_DURATION and print(string.format("Batching 'triggers' in '%s' took %s ms", roomName, task.timeTotal * 1000))),
+            (task -> PRINT_BATCHING_DURATION and logging.info(string.format("Batching 'triggers' in '%s' took %s ms", roomName, task.timeTotal * 1000))),
             batchingTasks,
             {room = room}
         )
