@@ -92,16 +92,24 @@ function celesteRender.loadCustomTilesetAutotiler(state)
     celesteRender.clearTileSpriteQuadCache()
 end
 
-function celesteRender.sortBatchingTasks(state, tasks)
+function celesteRender.sortBatchingTasks(state, taskList)
     local visibleTasks = {}
     local nonVisibileTasks = {}
 
-    for i = #batchingTasks, 1, -1 do
-        local task = batchingTasks[i]
+    for i = #taskList, 1, -1 do
+        local task = taskList[i]
         local viewport = state.viewport
         local room = task.data.room
 
-        if not task.done then
+        local roomExists = false
+
+        for _, r in ipairs(state.map.rooms) do
+            if r.name == room.name then
+                roomExists = true
+            end
+        end
+
+        if not task.done and roomExists then
             if viewport.visible and viewportHandler.roomVisible(room, viewport) then
                 table.insert(visibleTasks, task)
 
@@ -110,7 +118,7 @@ function celesteRender.sortBatchingTasks(state, tasks)
             end
 
         else
-            table.remove(batchingTasks, i)
+            table.remove(taskList, i)
         end
     end
 
@@ -167,7 +175,7 @@ function celesteRender.invalidateRoomCache(roomName, key)
                     celesteRender.releaseBatch(roomName, name)
                 end
 
-                roomCache[roomName] = {}
+                roomCache[roomName] = nil
             end
         end
 

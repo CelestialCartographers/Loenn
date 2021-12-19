@@ -99,7 +99,22 @@ function editorScene:editorMapTargetChanged(item, itemType, previousItem, previo
     if previousItemType == "room" then
         -- Create a new canvas for the previous selected room and rerender it instantly
         -- If we let it be lazily rerendered it will cause flashes after a few frames
-        self.celesteRender.forceRedrawRoom(previousItem, self.viewerState.viewport, false)
+        -- Should not be done if the map target changed because of deletion, check that previous item exists still
+
+        local map = self.viewerState.map
+        local shouldForceRedraw = false
+
+        if map and map.rooms then
+            for _, room in ipairs(map.rooms) do
+                if room.name == previousItem.name then
+                    shouldForceRedraw = true
+                end
+            end
+        end
+
+        if shouldForceRedraw then
+            self.celesteRender.forceRedrawRoom(previousItem, self.viewerState.viewport, false)
+        end
     end
 
     self:propagateEvent("editorMapTargetChanged", item, itemType, previousItem, previousItemType)
