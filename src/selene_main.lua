@@ -1,5 +1,6 @@
 -- love.load() is not called again, put stuff here.
 
+local logging = require("logging")
 local meta = require("meta")
 
 love.window.setTitle(meta.title)
@@ -32,4 +33,13 @@ function love.update(dt)
 
     sceneHandler.update(dt)
     threadHandler.update(dt)
+    logging.update(dt)
+end
+
+local originalErrorHandler = love.errorhandler or love.errhand
+
+function love.errorhandler(message)
+    logging.error(debug.traceback(message))
+
+    return originalErrorHandler(message)
 end

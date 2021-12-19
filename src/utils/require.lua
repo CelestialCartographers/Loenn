@@ -1,3 +1,5 @@
+local logging = require("logging")
+
 local utils = {}
 
 local shownWarningFor = {}
@@ -9,8 +11,8 @@ function utils.tryrequire(lib, verbose)
 
     if not success then
         if not shownWarningFor[lib] and verbose then
-            print("! Failed to require '" .. lib .. "'")
-            print(res)
+            logging.warning("Failed to require '" .. lib .. "'")
+            logging.warning(res)
 
             shownWarningFor[lib] = true
         end

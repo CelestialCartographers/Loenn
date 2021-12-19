@@ -41,6 +41,10 @@ function fileLocations.getStorageDir()
     end
 end
 
+function fileLocations.getLogPath()
+    return filesystem.joinpath(fileLocations.getStorageDir(), "run.log")
+end
+
 function fileLocations.getSettingsPath()
     return filesystem.joinpath(fileLocations.getStorageDir(), "settings.conf")
 end

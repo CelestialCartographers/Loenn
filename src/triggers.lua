@@ -3,6 +3,7 @@ local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local configs = require("configs")
 local nodeStruct = require("structs.node")
+local logging = require("logging")
 
 local languageRegistry = require("language_registry")
 
@@ -28,7 +29,7 @@ local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
     registerAt[name] = handler
 
     if verbose then
-        print("! Registered trigger '" .. name .. "' from '" .. filename .."'")
+        logging.info("Registered trigger '" .. name .. "' from '" .. filename .."'")
     end
 end
 

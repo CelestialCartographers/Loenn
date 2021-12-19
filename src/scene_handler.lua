@@ -3,6 +3,7 @@ local utils = require("utils")
 local configs = require("configs")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
+local logging = require("logging")
 
 local sceneHandler = {}
 
@@ -141,7 +142,7 @@ function sceneHandler.addSceneFromFilename(fn)
     local name = handler.name or filenameNoExt
 
     if configs.debug.logPluginLoading then
-        print("! Registered scene '" .. name .. "'")
+        logging.info("Registered scene '" .. name .. "'")
     end
 
     sceneHandler.addScene(handler)

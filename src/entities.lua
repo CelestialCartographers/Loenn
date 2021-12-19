@@ -4,6 +4,7 @@ local modHandler = require("mods")
 local configs = require("configs")
 local drawing = require("utils.drawing")
 local nodeStruct = require("structs.node")
+local logging = require("logging")
 
 local languageRegistry = require("language_registry")
 
@@ -34,11 +35,11 @@ local function logEntityDefinitionError(definitionName, message, room, entity)
     local seenKey = string.format("%s-%p-%s", entity._name, entity, definitionName)
 
     if not seenEntityErrors[seenKey] then
-        -- TODO - Log file and event for UI
+        -- TODO - Event for UI
         local entityInformation = string.format("Erroring entity definition for '%s' in room '%s' at (%d, %d) when %s", entity._name, room.name, entity.x, entity.y, definitionName)
 
-        print(entityInformation)
-        print(debug.traceback(message))
+        logging.warning(entityInformation)
+        logging.warning(debug.traceback(message))
 
         seenEntityErrors[seenKey] = true
     end
@@ -59,7 +60,7 @@ local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
     registerAt[name] = handler
 
     if verbose then
-        print("! Registered entity '" .. name .. "' from '" .. filename .."'")
+        logging.info("Registered entity '" .. name .. "' from '" .. filename .."'")
     end
 end
 
@@ -171,7 +172,7 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
             drawable = drawableSprite.fromTexture(missingTextureName, entity)
 
             if configs.editor.warnOnMissingTexture then
-                print(string.format("Could not find texture '%s' for entity '%s' in room '%s'", texture, entity._name, room.name))
+                logging.warning(string.format("Could not find texture '%s' for entity '%s' in room '%s'", texture, entity._name, room.name))
             end
         end
 

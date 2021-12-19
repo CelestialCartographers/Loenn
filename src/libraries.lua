@@ -5,6 +5,7 @@ local utils = require("utils")
 local configs = require("configs")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
+local logging = require("logging")
 
 local libraries = {}
 
@@ -27,7 +28,7 @@ function libraries.registerLibrary(filename, registerAt, verbose)
     registerAt[name] = library
 
     if verbose then
-        print("! Registered library '" .. name .. "' from '" .. filename .."'")
+        logging.info("Registered library '" .. name .. "' from '" .. filename .."'")
     end
 end
 

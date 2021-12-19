@@ -1,4 +1,5 @@
 local utils = require("utils")
+local logging = require("logging")
 
 local taskUtils = {}
 
@@ -93,8 +94,8 @@ function taskUtils.processTask(task, time)
             end
 
         else
-            print("! Task Failed:", status)
-            print(debug.traceback(task.coroutine))
+            logging.warning("Task Failed:", status)
+            logging.warning(debug.traceback(task.coroutine))
 
             task.done = true
             task.success = false

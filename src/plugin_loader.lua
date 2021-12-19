@@ -1,5 +1,6 @@
 local utils = require("utils")
 local tasks = require("utils.tasks")
+local logging = require("logging")
 
 local pluginLoader = {}
 
@@ -32,8 +33,8 @@ function pluginLoader.loadPlugins(path, registerAt, loadFunction, shouldYield, e
             local success, message = pcall(loadFunction, filename, registerAt)
 
             if not success then
-                print(string.format("! Failed to load plugin from '%s'", filename))
-                print(debug.traceback(message))
+                logging.warning(string.format("Failed to load plugin from '%s'", filename))
+                logging.warning(debug.traceback(message))
             end
         end
 

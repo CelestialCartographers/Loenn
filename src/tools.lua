@@ -4,6 +4,7 @@ local persistence = require("persistence")
 local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local toolUtils = require("tool_utils")
+local logging = require("logging")
 
 local toolHandler = {}
 
@@ -57,7 +58,7 @@ function toolHandler.loadTool(filename)
     handler.name = name
 
     if configs.debug.logPluginLoading then
-        print("! Loaded tool '" .. name ..  "'")
+        logging.info("Loaded tool '" .. name ..  "'")
     end
 
     toolHandler.tools[name] = handler
