@@ -49,12 +49,15 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
 
 #### General Controls
 
+ - Ctrl + N: New map
  - Ctrl + O: Open map
  - Drag & drop map file into main window: Open map
  - Ctrl + S: Save map
  - Ctrl + Shift + S: Save map as...
+ - Ctrl + T: New room
+ - Ctrl + Shift + T: Configure current room
  - Alt + Arrow keys: Move room (step size 8)
- - Ctrl + Alt + Arrow keys: Move room (use 1 as step size instead of 8 for more fine-grained control)
+ - Alt + Delete: Delete room
  - Ctrl + Z: Undo action
  - Ctrl + Shift + Z: Redo action
  - Scroll wheel: Zoom
