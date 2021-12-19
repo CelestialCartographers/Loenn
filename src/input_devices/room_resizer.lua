@@ -231,13 +231,13 @@ function roomResizer.mousemoved(x, y, dx, dy, istouch)
                 local newWidth = width + deltaX * 8
                 local newHeight = height + deltaY * 8
 
-                if resizeHorizontal and deltaX ~= 0 and newWidth >= itemStruct.recommendedMinimumWidth then
+                if resizeHorizontal and deltaX ~= 0 and (newWidth >= itemStruct.recommendedMinimumWidth or deltaX > 0) then
                     madeChanges = true
 
                     itemStruct.directionalResize(item, resizeHorizontal, deltaX)
                 end
 
-                if resizeVertical and deltaY ~= 0 and newHeight >= itemStruct.recommendedMinimumHeight then
+                if resizeVertical and deltaY ~= 0 and (newHeight >= itemStruct.recommendedMinimumHeight or deltaY > 0) then
                     madeChanges = true
 
                     itemStruct.directionalResize(item, resizeVertical, deltaY)
