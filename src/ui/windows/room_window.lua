@@ -18,6 +18,7 @@ local viewportHandler = require("viewport_handler")
 local mapItemUtils = require("map_item_utils")
 local sceneHandler = require("scene_handler")
 local entityStruct = require("structs.entity")
+local configs = require("configs")
 
 local roomWindow = {}
 
@@ -151,9 +152,18 @@ local function handleCheckpoint(room, hasCheckpoint)
     end
 end
 
-local function saveRoomCallback(room, editing)
+local function saveRoomCallback(room, editing, usingPixels)
     return function(formFields)
         local newRoomData = form.getFormData(formFields)
+
+        -- Restore tile to pixel values
+        if not usingPixels then
+            newRoomData.x = newRoomData.x * 8
+            newRoomData.y = newRoomData.y * 8
+
+            newRoomData.width = newRoomData.width * 8
+            newRoomData.height = newRoomData.height * 8
+        end
 
         if editing then
             local targetRoom = loadedState.getRoomByName(room.name)
@@ -247,6 +257,18 @@ function roomWindow.createRoomWindow(room, editing)
         return
     end
 
+    local usingPixels = configs.editor.itemAllowPixelPerfect
+
+    -- Floor position and size attributes in room data to convert to tiles
+    -- Multiplied back to pixel values in the save callback
+    if not usingPixels then
+        room.x = math.floor(room.x / 8)
+        room.y = math.floor(room.y / 8)
+
+        room.width = math.floor(room.width / 8)
+        room.height = math.floor(room.height / 8)
+    end
+
     -- Not a actual attribute of the room
     -- Used to add a checkpoint entity
     room.checkpoint = checkCheckpointEntity(room)
@@ -290,7 +312,7 @@ function roomWindow.createRoomWindow(room, editing)
         {
             text = tostring(language.ui.room_window.save_changes),
             formMustBeValid = true,
-            callback = saveRoomCallback(room, editing)
+            callback = saveRoomCallback(room, editing, usingPixels)
         },
         {
             text = tostring(language.ui.room_window.close_window),
