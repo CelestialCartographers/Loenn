@@ -150,16 +150,16 @@ function contextWindow.prepareFormData(layer, item, language)
 
     local fieldLanguage, fallbackLanguage = getItemLanguage(layer, item, language)
     local languageTooltips = fieldLanguage.attributes.description
-    local languageAttributes = fieldLanguage.attributes.attribute
+    local languageNames = fieldLanguage.attributes.name
     local fallbackTooltips = fallbackLanguage.attributes.description
-    local fallbackAttributes = fallbackLanguage.attributes.attribute
+    local fallbackNames = fallbackLanguage.attributes.name
 
     for _, field in ipairs(fieldOrder) do
         local value = item[field]
 
         if value ~= nil then
             local humanizedName = utils.humanizeVariableName(field)
-            local displayName = getLanguageKey(field, languageAttributes, getLanguageKey(field, fallbackAttributes, humanizedName))
+            local displayName = getLanguageKey(field, languageNames, getLanguageKey(field, fallbackNames, humanizedName))
             local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
 
             if not fieldInformation[field] then
@@ -181,7 +181,7 @@ function contextWindow.prepareFormData(layer, item, language)
         -- Any fields already added should not be added again
         if not globallyFilteredKeys[field] and not fieldIgnored[field] and not fieldsAdded[field] then
             local humanizedName = utils.humanizeVariableName(field)
-            local displayName = getLanguageKey(field, languageAttributes, humanizedName)
+            local displayName = getLanguageKey(field, languageNames, humanizedName)
 
             table.insert(missingFields, {field, value, displayName})
         end
