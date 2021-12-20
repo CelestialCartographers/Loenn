@@ -68,6 +68,11 @@ function viewportHandler.pixelToTileCoordinates(x, y)
     return math.floor(x / 8), math.floor(y / 8)
 end
 
+function viewportHandler.updateSize(width, height)
+    viewport.width = width or love.graphics.getWidth()
+    viewport.height = height or love.graphics.getHeight()
+end
+
 function viewportHandler.persistCamera()
     persistence.cameraPositionX = viewport.x
     persistence.cameraPositionY = viewport.y
@@ -162,8 +167,7 @@ function viewportDevice.mousemoved(x, y, dx, dy, istouch)
 end
 
 function viewportDevice.resize(width, height)
-    viewport.width = width
-    viewport.height = height
+    viewportHandler.updateSize(width, height)
 end
 
 function viewportDevice.wheelmoved(dx, dy)

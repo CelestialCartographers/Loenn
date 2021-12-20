@@ -27,6 +27,12 @@ local function updateRunningStatus(status)
     config.writeConfig(persistence, true)
 end
 
+function editorScene:enter()
+    local viewportHandler = require("viewport_handler")
+
+    viewportHandler.updateSize()
+end
+
 function editorScene:firstEnter()
     self.viewerState = require("loaded_state")
     self.celesteRender = require("celeste_render")
