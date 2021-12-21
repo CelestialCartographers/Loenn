@@ -1,6 +1,6 @@
 -- TODO - Get this over to a sprite based solution
 
-local drawableSpriteStruct = require("structs.drawable_sprite")
+local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
 
 local feather = {}
@@ -16,7 +16,7 @@ feather.placements = {
 }
 
 function feather.draw(room, entity, viewport)
-    local featherSprite = drawableSpriteStruct.fromTexture("objects/flyFeather/idle00", entity)
+    local featherSprite = drawableSprite.fromTexture("objects/flyFeather/idle00", entity)
     local shielded = entity.shielded or false
 
     if shielded then
@@ -29,7 +29,14 @@ function feather.draw(room, entity, viewport)
 end
 
 function feather.selection(room, entity)
-    return utils.rectangle(entity.x - 12, entity.y - 12, 24, 24)
+    if entity.shielded then
+        return utils.rectangle(entity.x - 12, entity.y - 12, 24, 24)
+
+    else
+        local sprite = drawableSprite.fromTexture("objects/flyFeather/idle00", entity)
+
+        return sprite:getRectangle()
+    end
 end
 
 return feather
