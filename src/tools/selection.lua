@@ -1142,19 +1142,22 @@ end
 
 function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
+    local handled = false
 
     if not isrepeat then
-        hotkeyStruct.callbackFirstActive(toolHotkeys)
+        handled = hotkeyStruct.callbackFirstActive(toolHotkeys)
     end
 
     updateVisualsOnBehaviorChange()
 
-    handleItemMovementKeys(room, key, scancode, isrepeat)
-    handleItemResizeKeys(room, key, scancode, isrepeat)
-    handleItemRotateKeys(room, key, scancode, isrepeat)
-    handleItemFlipKeys(room, key, scancode, isrepeat)
-    handleItemDeletionKey(room, key, scancode, isrepeat)
-    handleNodeAddKey(room, key, scancode, isrepeat)
+    handled = handled or handleItemMovementKeys(room, key, scancode, isrepeat)
+    handled = handled or handleItemResizeKeys(room, key, scancode, isrepeat)
+    handled = handled or handleItemRotateKeys(room, key, scancode, isrepeat)
+    handled = handled or handleItemFlipKeys(room, key, scancode, isrepeat)
+    handled = handled or handleItemDeletionKey(room, key, scancode, isrepeat)
+    handled = handled or handleNodeAddKey(room, key, scancode, isrepeat)
+
+    return handled
 end
 
 function tool.editorMapLoaded(item, itemType)
