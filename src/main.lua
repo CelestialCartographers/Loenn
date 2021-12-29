@@ -1,5 +1,4 @@
 function love.load()
-    require("lua_setup")
     require("selene_main")
 end
 
