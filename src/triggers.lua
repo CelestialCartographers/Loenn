@@ -118,7 +118,10 @@ function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
         local displayName = humanizedNameCache[name]
 
         if not displayName then
+            -- Humanize data name and then remove " Trigger" at the end if possible
             displayName = utils.humanizeVariableName(name)
+            displayName = string.match(displayName, "(.-) Trigger$") or displayName
+
             humanizedNameCache[name] = displayName
         end
 
