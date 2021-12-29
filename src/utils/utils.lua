@@ -3,6 +3,7 @@ local filesystem = require("utils.filesystem")
 local requireUtils = require("utils.require")
 local xnaColors = require("consts.xna_colors")
 local bit = require("bit")
+local ffi = require("ffi")
 
 local rectangles = require("structs.rectangle")
 
@@ -677,6 +678,22 @@ function utils.round(n, decimals)
     end
 end
 
+-- ffi to love.system names
+local ffiOSLookup = {
+    Windows = "Windows",
+    Linux = "Linux",
+    OSX = "OS X"
+}
+
+function utils.getOS()
+    if love.system then
+        return love.system.getOS()
+    end
+
+    -- Fallback to ffi.os, some names differ but it is good enough
+    return ffiOSLookup[ffi.os]
+end
+
 -- Add all of require utils into utils
 for k, v <- requireUtils do
     utils[k] = v
@@ -689,7 +706,7 @@ for k, v <- filesystem do
 end
 
 -- Add filesystem specific helper methods
-local osFilename = love.system.getOS():lower():gsub(" ", "_")
+local osFilename = utils.getOS():lower():gsub(" ", "_")
 local hasOSHelper, osHelper = requireUtils.tryrequire("utils.system." .. osFilename)
 
 function utils.getProcessId()
