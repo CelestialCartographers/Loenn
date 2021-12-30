@@ -16,7 +16,7 @@ local function getWindowSize()
 end
 
 local function getWindowFullscreen()
-	local fullscreen, fullscreenType = false, "normal"
+	local fullscreen, fullscreenType = false, "desktop"
 
 	if configs.general.persistWindowFullscreen then
 		fullscreen = persistence.windowFullscreen or fullscreen

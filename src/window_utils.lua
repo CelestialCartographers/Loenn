@@ -4,7 +4,7 @@ local configs = require("configs")
 local windowUtils = {}
 
 function windowUtils.setFullscreen(fullscreen, fullscreenType)
-    local result = love.window.setFullscreen(fullscreen, fullscreenType or "normal")
+    local result = love.window.setFullscreen(fullscreen, fullscreenType or "desktop")
 
     -- Resize events are not sent when going out of fullscreen
     if not fullscreen then
@@ -20,7 +20,7 @@ end
 function windowUtils.toggleFullscreen()
     local fullscreen, fullscreenType = love.window.getFullscreen()
 
-    return windowUtils.setFullscreen(not fullscreen, fullscreenType or "normal")
+    return windowUtils.setFullscreen(not fullscreen, fullscreenType or "desktop")
 end
 
 return windowUtils
