@@ -58,6 +58,11 @@ local debugMenu = {"debug", {
     {"test_console", debugUtils.debug}
 }}
 
+-- Tree of menubar items
+-- First element is translation key
+-- Second element is a sub tree or a function callback
+-- Third is whether or not the submenu should be closed after the callback is done
+-- Closes by default, some menu items might not want to close the menu, for example "View" toggles
 menubar.menubar = {
     {"file", {
         {"new", loadedState.newMap},
@@ -109,6 +114,32 @@ local function addLanguageStrings(menu, language)
     end
 end
 
+local function wrapInSubmenuClosers(menu)
+    if type(menu) == "table" then
+        local callback = menu[2]
+        local shouldCloseMenu = menu[3]
+        local callbackType = type(callback)
+
+        if callbackType == "function" or callbackType == "nil" then
+            menu[2] = function(self)
+                if callback then
+                    callback()
+                end
+
+                if shouldCloseMenu ~= false then
+                    if self.parent:is("menuItemSubmenu") then
+                        self.parent:removeSelf()
+                    end
+                end
+            end
+        end
+
+        for _, sub in pairs(menu) do
+            wrapInSubmenuClosers(sub)
+        end
+    end
+end
+
 local function removeFalseEntries(menu)
     for i = #menu, 1, -1 do
         if not menu[i] then
@@ -122,6 +153,7 @@ function menubar.getMenubar()
     local language = languageRegistry.getLanguage()
 
     removeFalseEntries(preparedMenubar)
+    wrapInSubmenuClosers(preparedMenubar)
     addLanguageStrings(preparedMenubar, language)
 
     return uiElements.topbar(preparedMenubar)
