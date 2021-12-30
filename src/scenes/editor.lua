@@ -27,6 +27,12 @@ local function updateRunningStatus(status)
     config.writeConfig(persistence, true)
 end
 
+function editorScene:enter()
+    local viewportHandler = require("viewport_handler")
+
+    viewportHandler.updateSize()
+end
+
 function editorScene:firstEnter()
     self.viewerState = require("loaded_state")
     self.celesteRender = require("celeste_render")
@@ -42,6 +48,7 @@ function editorScene:firstEnter()
     local mapLoaderDevice = require("input_devices.map_loader")
     local roomResizeDevice = require("input_devices.room_resizer")
     local toolHandlerDevice = require("input_devices.tool_device")
+    local windowDataDevice = require("input_devices.window_persister")
 
     inputDevice.newInputDevice(self.inputDevices, userInterfaceDevice)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
@@ -49,6 +56,7 @@ function editorScene:firstEnter()
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)
     inputDevice.newInputDevice(self.inputDevices, roomResizeDevice)
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
+    inputDevice.newInputDevice(self.inputDevices, windowDataDevice)
 
     updater.startupUpdateCheck()
     checkForUncleanStartup()

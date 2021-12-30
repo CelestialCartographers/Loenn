@@ -8,7 +8,9 @@ local hasRequest, request = requireUtils.tryrequire("lib.luajit-request.luajit-r
 
 local filesystem = {}
 
-filesystem.supportWindowsInThreads = love.system.getOS() ~= "OS X"
+function filesystem.supportWindowsInThreads()
+    return love.system.getOS() ~= "OS X"
+end
 
 function filesystem.filename(path, sep)
     sep = sep or physfs.getDirSeparator()
@@ -176,7 +178,7 @@ function filesystem.saveDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
     if callback then
-        if filesystem.supportWindowsInThreads then
+        if filesystem.supportWindowsInThreads() then
             local code = [[
                 local args = {...}
                 local channelName, path, filter = unpack(args)
@@ -207,7 +209,7 @@ function filesystem.openDialog(path, filter, callback)
     -- TODO - Verify arguments, documentation was very existant
 
     if callback then
-        if filesystem.supportWindowsInThreads then
+        if filesystem.supportWindowsInThreads() then
             local code = [[
                 local args = {...}
                 local channelName, path, filter = unpack(args)

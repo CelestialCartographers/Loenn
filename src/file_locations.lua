@@ -1,5 +1,6 @@
 local filesystem = require("utils.filesystem")
 local config = require("utils.config")
+local utils = require("utils")
 
 local fileLocations = {}
 
@@ -9,7 +10,7 @@ fileLocations.loennLinuxFolderName = "Lönn"
 fileLocations.loennZipFolderName = "L" .. string.char(148) .. "nn"
 
 function fileLocations.getStorageDir()
-    local userOS = love.system.getOS()
+    local userOS = utils.getOS()
 
     local windowsFolderName = fileLocations.loennWindowsFolderName
     local linuxFolderName = fileLocations.loennLinuxFolderName

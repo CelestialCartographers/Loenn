@@ -59,7 +59,7 @@ local placementsInfo = {
     {dashSwitchVertical.placements, "up", "ceiling", false},
     {dashSwitchVertical.placements, "down", "ceiling", true},
     {dashSwitchHorizontal.placements, "left", "leftSide", false},
-    {dashSwitchHorizontal.placements, "right", "leftside", true}
+    {dashSwitchHorizontal.placements, "right", "leftSide", true}
 }
 
 for name, texture in pairs(textures) do

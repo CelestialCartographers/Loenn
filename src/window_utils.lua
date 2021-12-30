@@ -11,6 +11,9 @@ function windowUtils.setFullscreen(fullscreen, fullscreenType)
         love.event.push("resize", love.graphics.getWidth(), love.graphics.getHeight())
     end
 
+    persistence.windowFullscreen = fullscreen
+    persistence.windowFullscreenType = fullscreenType
+
     return result
 end
 
