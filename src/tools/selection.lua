@@ -38,7 +38,7 @@ local dragMovementTotalX, dragMovementTotalY = 0, 0
 
 local selectionRectangle = nil
 local selectionCompleted = false
-local selectionPreviews = nil
+local selectionPreviews = {}
 local selectionCycleTargets = {}
 local selectionCycleIndex = 1
 
@@ -1165,11 +1165,11 @@ function tool.keypressed(key, scancode, isrepeat)
 end
 
 function tool.editorMapLoaded(item, itemType)
-    selectionPreviews = nil
+    selectionPreviews = {}
 end
 
 function tool.editorMapTargetChanged(item, itemType)
-    selectionPreviews = nil
+    selectionPreviews = {}
 end
 
 function tool.draw()
