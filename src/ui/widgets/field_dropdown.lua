@@ -48,26 +48,7 @@ local function fieldDropdownOnClickHook(field, icon)
             if hoveringDropdownArea(field, icon, x, y) then
                 local backingDropdown = field._backingDropdown
 
-                local menuX = field.screenX
-                local menuY = field.screenY + field.height + field.parent.style.spacing
-
-                if backingDropdown.submenu then
-                    backingDropdown.submenu:removeSelf()
-                end
-
-                backingDropdown.submenu = uiElements.menuItemSubmenu.spawn(field, menuX, menuY, uiUtils.map(backingDropdown.data, function(data, i)
-                    local item = backingDropdown:getItemCached(data, i):hook({
-                        onClick = dropdownItemOnClickHook(field, backingDropdown)
-                    })
-
-                    item.width = false
-                    item.height = false
-                    item:layout()
-
-                    return item
-                end))
-
-                return true
+                return backingDropdown:onClick(x, y, button)
             end
         end
 
@@ -85,11 +66,21 @@ function fieldDropdown.addDropdown(field, dropdown, currentText)
     field.label.text = currentText
     field._text = currentText
 
+    dropdown.submenuParent = field
+
     field._backingDropdown = dropdown
     field:addChild(icon)
     field:hook({
         onClick = fieldDropdownOnClickHook(field, icon)
     })
+
+    uiUtils.map(dropdown.data, function(data, i)
+        local item = dropdown:getItemCached(data, i)
+
+        item:hook({
+            onClick = dropdownItemOnClickHook(field, dropdown)
+        })
+    end)
 
     return field
 end
