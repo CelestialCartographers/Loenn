@@ -3,14 +3,13 @@
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
 local configs = require("configs")
-local brushHelper = require("brushes")
+local matrixLib = require("utils.matrix")
 local colors = require("consts.colors")
 local drawing = require("utils.drawing")
 local utils = require("utils")
-local snapshotUtils = require("snapshot_utils")
-local history = require("history")
 local toolUtils = require("tool_utils")
-local matrixLib = require("utils.matrix")
+local brushHelper = require("brushes")
+local brushToolUtils = require("utils.brush_tool")
 
 local tool = {}
 
@@ -19,7 +18,7 @@ tool.name = "rectangle"
 tool.group = "brush"
 tool.image = nil
 
-tool.mode = "line"
+tool.mode = "fill"
 tool.modes = {
     "fill",
     "line"
@@ -39,27 +38,6 @@ local lastClickX, lastClickY = -1, -1
 local lastMouseX, lastMouseY = -1, -1
 local startX, startY
 local dragX, dragY
-
-local snapshotValue = nil
-local snapshotHasChanged = false
-
-local function handleActionClick(x, y, force)
-    local room = state.getSelectedRoom()
-
-    if room then
-        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
-        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
-
-        if lastTileX ~= tx + 1 or lastTileY ~= ty + 1 or force then
-            brushHelper.placeTile(room, tx + 1, ty + 1, tool.material, tool.layer)
-
-            lastTileX, lastTileY = tx + 1, ty + 1
-            snapshotHasChanged = true
-        end
-
-        lastClickX, lastClickY = x, y
-    end
-end
 
 local function handleDragFinished()
     local room = state.getSelectedRoom()
@@ -90,100 +68,21 @@ local function handleDragFinished()
             end
 
             brushHelper.placeTile(room, brushStartX + 1, brushStartY + 1, matrix, tool.layer)
-
-            snapshotHasChanged = true
+            brushToolUtils.toolMadeChanges(tool)
         end
     end
-end
-
-local function handleCloneClick(x, y)
-    local room = state.getSelectedRoom()
-
-    if room then
-        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
-        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
-
-        local material = brushHelper.getTile(room, tx + 1, ty + 1, tool.layer)
-
-        if material ~= tool.material then
-            tool.material = material
-
-            toolUtils.sendMaterialEvent(tool, tool.layer, material)
-        end
-    end
-end
-
-local function getTileSnapshotValue()
-    local room = state.getSelectedRoom()
-
-    return brushHelper.getRoomSnapshotValue(room, tool.layer)
-end
-
-local function startTileSnapshot()
-    snapshotValue = getTileSnapshotValue()
-    snapshotHasChanged = false
-end
-
-local function stopTileSnapshot()
-    if snapshotValue and snapshotHasChanged then
-        local room = state.getSelectedRoom()
-        local afterSnapshotValue = getTileSnapshotValue()
-
-        if afterSnapshotValue then
-            local snapshot = snapshotUtils.roomTilesSnapshot(room, tool.layer, "Brush", snapshotValue, afterSnapshotValue)
-
-            history.addSnapshot(snapshot)
-        end
-    end
-end
-
-local function updateMaterialLookup()
-    tool.materialsLookup = brushHelper.getMaterialLookup(tool.layer)
 end
 
 function tool.getMaterials()
-    local paths = brushHelper.getValidTiles(tool.layer)
-    local placements = {}
-
-    for displayName, id in pairs(tool.materialsLookup) do
-        table.insert(placements, {
-            name = id,
-            displayName = displayName
-        })
-    end
-
-    return placements
+    return brushToolUtils.getPlacements(tool)
 end
 
 function tool.setMaterial(material)
-    local paths = brushHelper.getValidTiles(tool.layer)
-    local target = nil
-
-    if paths[material] then
-        target = material
-
-    else
-        target = tool.materialsLookup[material]
-    end
-
-    if target and target ~= tool.material then
-        tool.material = target
-
-        toolUtils.sendMaterialEvent(tool, tool.layer, target)
-    end
+    brushToolUtils.setMaterial(tool, material)
 end
 
 function tool.setLayer(layer)
-    tool.layer = layer
-
-    updateMaterialLookup()
-    toolUtils.sendLayerEvent(tool, layer)
-
-    local persistenceMaterial = toolUtils.getPersistenceMaterial(tool.name, layer)
-
-    if persistenceMaterial then
-        tool.setMaterial(persistenceMaterial)
-    end
+    brushToolUtils.setLayer(tool, layer)
 end
 
 function tool.mouseclicked(x, y, button, istouch, pressed)
@@ -191,10 +90,10 @@ function tool.mouseclicked(x, y, button, istouch, pressed)
     local cloneButton = configs.editor.objectCloneButton
 
     if button == actionButton then
-        handleActionClick(x, y)
+        brushToolUtils.handleActionClick(x, y)
 
     elseif button == cloneButton then
-        handleCloneClick(x, y)
+        brushToolUtils.handleCloneClick(tool, x, y)
     end
 end
 
@@ -218,7 +117,7 @@ function tool.mousepressed(x, y, button, istouch, pressed)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
-        startTileSnapshot()
+        brushToolUtils.startTileSnapshot(tool)
 
         local room = state.getSelectedRoom()
 
@@ -237,7 +136,7 @@ function tool.mousereleased(x, y, button)
 
     if button == actionButton then
         handleDragFinished()
-        stopTileSnapshot()
+        brushToolUtils.stopTileSnapshot(tool)
 
         startX, startY = nil, nil
         dragX, dragY = nil, nil
