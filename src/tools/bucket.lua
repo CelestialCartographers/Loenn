@@ -36,6 +36,7 @@ local lastMouseX, lastMouseY = -1, -1
 local startX, startY
 local dragX, dragY
 local points = {}
+local pointsConnectedLines
 local currentFloodMatrix
 
 local function floodFill(matrix, x, y)
@@ -96,6 +97,7 @@ local function updatePoints(x, y)
         local tilesMatrix = tiles.matrix
 
         points, currentFloodMatrix = floodFill(tilesMatrix, x, y)
+        pointsConnectedLines = brushToolUtils.connectEdgesFromPoints(points)
     end
 end
 
@@ -121,6 +123,7 @@ local function handleActionClick(x, y, force)
         end
 
         points, currentFloodMatrix = nil, nil
+        pointsConnectedLines = nil
 
         updatePoints(tx + 1, ty + 1)
     end
@@ -198,12 +201,7 @@ function tool.draw()
             drawing.callKeepOriginalColor(function()
                 love.graphics.setColor(colors.brushColor)
 
-                -- TODO - Improve, this is really slow with large numbers of points
-                for _, point in ipairs(points) do
-                    local tx, ty = point[1], point[2]
-
-                    love.graphics.rectangle("line", tx * 8 - 8, ty * 8 - 8, 8, 8)
-                end
+                brushToolUtils.drawConnectedLines(pointsConnectedLines, -8, -8)
             end)
         end)
     end

@@ -36,6 +36,7 @@ local lastMouseX, lastMouseY = -1, -1
 local startX, startY
 local dragX, dragY
 local points = {}
+local pointsConnectedLines
 
 local function handleDragFinished()
     local room = state.getSelectedRoom()
@@ -93,6 +94,7 @@ local function updatePoints()
         local line = lineStruct.create(startX, startY, dragX, dragY)
 
         points = line:getPoints()
+        pointsConnectedLines = brushToolUtils.connectEdgesFromPoints(points)
     end
 end
 
@@ -144,6 +146,7 @@ function tool.mousereleased(x, y, button)
         startX, startY = nil, nil
         dragX, dragY = nil, nil
         points = {}
+        pointsConnectedLines = nil
     end
 end
 
@@ -156,12 +159,7 @@ function tool.draw()
                 love.graphics.setColor(colors.brushColor)
 
                 if #points > 0 then
-                    -- TODO - Improve, this is really slow with large numbers of points
-                    for _, point in ipairs(points) do
-                        local tx, ty = point[1], point[2]
-
-                        love.graphics.rectangle("line", tx * 8, ty * 8, 8, 8)
-                    end
+                    brushToolUtils.drawConnectedLines(pointsConnectedLines)
 
                 else
                     love.graphics.rectangle("line", lastMouseX * 8, lastMouseY * 8, 8, 8)
