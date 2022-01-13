@@ -52,5 +52,8 @@ return {
     -- Debug
     displayFPS = false,
     warnOnMissingTexture = false,
-    warnOnMissingEntityHandler = false
+    warnOnMissingEntityHandler = false,
+
+    -- Persistence
+    toolsPersistUsingGroup = true,
 }

@@ -31,7 +31,7 @@ function brushToolUtils.setLayer(tool, layer)
     tool.materialsLookup = brushHelper.getMaterialLookup(layer)
     toolUtils.sendLayerEvent(tool, layer)
 
-    local persistenceMaterial = toolUtils.getPersistenceMaterial(tool.name, layer)
+    local persistenceMaterial = toolUtils.getPersistenceMaterial(tool, layer)
 
     if persistenceMaterial then
         tool.setMaterial(persistenceMaterial)
