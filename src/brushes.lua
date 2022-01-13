@@ -1,5 +1,4 @@
 local celesteRender = require("celeste_render")
-local viewportHandler = require("viewport_handler")
 local matrix = require("utils.matrix")
 local utils = require("utils")
 local autotiler = require("autotiler")

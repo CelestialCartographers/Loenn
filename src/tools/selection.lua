@@ -38,7 +38,7 @@ local dragMovementTotalX, dragMovementTotalY = 0, 0
 
 local selectionRectangle = nil
 local selectionCompleted = false
-local selectionPreviews = nil
+local selectionPreviews = {}
 local selectionCycleTargets = {}
 local selectionCycleIndex = 1
 
@@ -799,21 +799,25 @@ local function updateSelectionPreviews(x, y)
 
             -- Find first selection where we are on the border
             for _, preview in ipairs(selectionPreviews) do
-                local resizeHorizontal, resizeVertical = selectionItemUtils.canResizeItem(room, tool.layer, preview)
-                local onBorder, horizontalDirection, verticalDirection = utils.onRectangleBorder(point, preview, borderThreshold)
+                local mainTarget = preview.node == 0
 
-                if not resizeHorizontal then
-                    horizontalDirection = 0
-                end
+                if mainTarget then
+                    local resizeHorizontal, resizeVertical = selectionItemUtils.canResizeItem(room, tool.layer, preview)
+                    local onBorder, horizontalDirection, verticalDirection = utils.onRectangleBorder(point, preview, borderThreshold)
 
-                if not resizeVertical then
-                    verticalDirection = 0
-                end
+                    if not resizeHorizontal then
+                        horizontalDirection = 0
+                    end
 
-                if onBorder and (horizontalDirection ~= 0 or verticalDirection ~= 0) then
-                    resizeDirectionPreview = {horizontalDirection, verticalDirection}
+                    if not resizeVertical then
+                        verticalDirection = 0
+                    end
 
-                    break
+                    if onBorder and (horizontalDirection ~= 0 or verticalDirection ~= 0) and preview.node == 0 then
+                        resizeDirectionPreview = {horizontalDirection, verticalDirection}
+
+                        break
+                    end
                 end
             end
         end
@@ -1161,11 +1165,11 @@ function tool.keypressed(key, scancode, isrepeat)
 end
 
 function tool.editorMapLoaded(item, itemType)
-    selectionPreviews = nil
+    selectionPreviews = {}
 end
 
 function tool.editorMapTargetChanged(item, itemType)
-    selectionPreviews = nil
+    selectionPreviews = {}
 end
 
 function tool.draw()

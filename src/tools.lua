@@ -32,8 +32,8 @@ function toolHandler.selectTool(name)
 
         -- Load previous mode and layer from persistence
 
-        local modeValue = toolUtils.getPersistenceMode(name)
-        local layerValue = toolUtils.getPersistenceLayer(name)
+        local modeValue = toolUtils.getPersistenceMode(handler)
+        local layerValue = toolUtils.getPersistenceLayer(handler)
 
         if modeValue then
             toolHandler.setMode(modeValue, name)
@@ -164,7 +164,7 @@ function toolHandler.setLayer(layer, name)
         elseif handler.layer then
             handler.layer = layer
 
-            local materialValue = toolUtils.getPersistenceMaterial(toolName, layer)
+            local materialValue = toolUtils.getPersistenceMaterial(handler, layer)
 
             if materialValue then
                 toolHandler.setMaterial(materialValue, name)

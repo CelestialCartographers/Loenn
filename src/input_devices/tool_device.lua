@@ -94,21 +94,15 @@ function device.editorToolChanged(tool)
 end
 
 function device.editorToolModeChanged(tool, mode)
-    local persistenceKey = toolUtils.getPersistenceKey(tool.name, "mode")
-
-    persistence[persistenceKey] = mode
+    toolUtils.setPersistenceMode(tool, mode)
 end
 
 function device.editorToolLayerChanged(tool, layer)
-    local persistenceKey = toolUtils.getPersistenceKey(tool.name, "layer")
-
-    persistence[persistenceKey] = layer
+    toolUtils.setPersistenceLayer(tool, layer)
 end
 
 function device.editorToolMaterialChanged(tool, layer, material)
-    local persistenceKey = toolUtils.getPersistenceKey(tool.name, layer, "material")
-
-    persistence[persistenceKey] = material
+    toolUtils.setPersistenceMaterial(tool, layer, material)
 end
 
 return device

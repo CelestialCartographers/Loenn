@@ -29,6 +29,10 @@ layers.name.triggers=Triggers
 # tools.toolName.mode.description.modeName
 tools.name.brush=Brush
 
+tools.name.line=Line
+
+tools.name.bucket=Bucket
+
 tools.name.rectangle=Rectangle
 
 tools.rectangle.modes.name.fill=Fill

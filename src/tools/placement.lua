@@ -421,7 +421,7 @@ function tool.setLayer(layer)
         selectPlacement(nil, 1)
         toolUtils.sendLayerEvent(tool, layer)
 
-        local persistenceMaterial = toolUtils.getPersistenceMaterial(tool.name, layer)
+        local persistenceMaterial = toolUtils.getPersistenceMaterial(tool, layer)
 
         if persistenceMaterial then
             tool.setMaterial(persistenceMaterial)

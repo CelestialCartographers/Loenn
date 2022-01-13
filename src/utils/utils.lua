@@ -572,6 +572,12 @@ function utils.sign(n)
     end
 end
 
+function utils.isApprox(v1, v2, tolerance)
+    tolerance = tolerance or 10^-6
+
+    return math.abs(v1 - v2) <= tolerance
+end
+
 function utils.logn(base, n)
     return math.log(n) / math.log(base)
 end

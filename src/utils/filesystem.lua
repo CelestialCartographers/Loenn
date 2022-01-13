@@ -217,7 +217,7 @@ function filesystem.openDialog(path, filter, callback)
 
                 local nfd = require("nfd")
 
-                local res = nfd.open(filter, nil, path)
+                local res = nfd.open(filter, path)
                 channel:push(res)
             ]]
 
@@ -230,7 +230,7 @@ function filesystem.openDialog(path, filter, callback)
         end
 
     else
-        return nfd.open(filter, nil, path)
+        return nfd.open(filter, path)
     end
 end
 
