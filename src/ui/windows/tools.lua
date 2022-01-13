@@ -113,8 +113,7 @@ local function layerCallback(list, layer)
 end
 
 local function toolLayerChangedCallback(self, tool, layer)
-    local persistenceKey = toolUtils.getPersistenceKey(tool.name, layer, "search")
-    local searchText = persistence[persistenceKey] or ""
+    local searchText = toolUtils.getPersistenceSearch(tool, layer) or ""
     local searchField = toolWindow.materialList.searchField
 
     searchField:setText(searchText)
@@ -246,11 +245,10 @@ local function editorMapLoadedCallback(list, filename)
 end
 
 local function materialSearchFieldChanged(element, new, old)
-    local toolName = toolHandler.currentToolName
+    local tool = toolHandler.currentTool
     local layer = toolHandler.getLayer()
-    local persistenceKey = toolUtils.getPersistenceKey(toolName, layer, "search")
 
-    persistence[persistenceKey] = new
+    toolUtils.setPersistenceSearch(tool, layer, new)
 end
 
 function toolWindow.getWindow()
@@ -269,7 +267,7 @@ function toolWindow.getWindow()
     local materialListOptions = {
         searchBarLocation = "below",
         searchBarCallback = materialSearchFieldChanged,
-        initialSearch = toolUtils.getPersistenceValue(toolHandler.currentToolName, toolHandler.getLayer(), "search"),
+        initialSearch = toolUtils.getPersistenceSearch(toolHandler.currentTool, toolHandler.getLayer()),
         initialItem = toolHandler.getMaterial()
     }
 
