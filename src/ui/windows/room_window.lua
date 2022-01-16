@@ -129,7 +129,11 @@ local function handleCheckpoint(room, hasCheckpoint)
         local existingCheckpoint = findFirstEntity(room, "checkpoint")
 
         if not existingCheckpoint then
-            local player = findFirstEntity(room, "player")
+            local locationDefault = {
+                x = math.floor(room.width / 2),
+                y = math.floor(room.height / 2)
+            }
+            local player = findFirstEntity(room, "player") or locationDefault
             local checkpoint = entityStruct.decode({
                 __name = "checkpoint",
 
