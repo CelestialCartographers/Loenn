@@ -31,6 +31,8 @@ function editorScene:enter()
     local viewportHandler = require("viewport_handler")
 
     viewportHandler.updateSize()
+
+    self:propagateEvent("enter")
 end
 
 function editorScene:firstEnter()
@@ -41,22 +43,25 @@ function editorScene:firstEnter()
     local inputDevice = require("input_device")
     local standardHotkeys = require("standard_hotkeys")
     local updater = require("updater")
+    local hotkeyHandler = require("hotkey_handler")
 
     local viewportHandler = require("viewport_handler")
-    local hotkeyHandler = require("hotkey_handler")
+    local hotkeyDevice = hotkeyHandler.createHotkeyDevice(standardHotkeys)
     local userInterfaceDevice = require("ui.ui_device")
     local mapLoaderDevice = require("input_devices.map_loader")
     local roomResizeDevice = require("input_devices.room_resizer")
     local toolHandlerDevice = require("input_devices.tool_device")
     local windowDataDevice = require("input_devices.window_persister")
+    local graphicsDevice = require("input_devices.graphics_device")
 
     inputDevice.newInputDevice(self.inputDevices, userInterfaceDevice)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
-    inputDevice.newInputDevice(self.inputDevices, hotkeyHandler.createHotkeyDevice(standardHotkeys))
+    inputDevice.newInputDevice(self.inputDevices, hotkeyDevice)
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)
     inputDevice.newInputDevice(self.inputDevices, roomResizeDevice)
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
     inputDevice.newInputDevice(self.inputDevices, windowDataDevice)
+    inputDevice.newInputDevice(self.inputDevices, graphicsDevice)
 
     updater.startupUpdateCheck()
     checkForUncleanStartup()
