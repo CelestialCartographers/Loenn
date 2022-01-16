@@ -40,6 +40,13 @@ tools.rectangle.modes.description.fill=Fills the whole selected area.
 tools.rectangle.modes.name.line=Line
 tools.rectangle.modes.description.line=Fills only the border of the selected area.
 
+tools.name.circle=Circle
+
+tools.circle.modes.name.fill=Fill
+tools.circle.modes.description.fill=Fills the whole circle.
+tools.circle.modes.name.line=Line
+tools.circle.modes.description.line=Fills only the border of the circle.
+
 tools.name.selection=Selection
 
 tools.name.placement=Placement
