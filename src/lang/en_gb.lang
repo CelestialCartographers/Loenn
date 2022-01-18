@@ -141,7 +141,7 @@ entities.jumpThru.attributes.description.texture=Changes the appearance of the p
 entities.jumpThru.attributes.description.surfaceIndex=Footstep sound when walking on the platform.\nLeave at Default for game to decide automatically based on texture.
 
 # Player
-entities.player.placements.name.player=Player
+entities.player.placements.name.player=Player (Spawn Point)
 
 # Wire
 entities.wire.placements.name.wire=Wire
