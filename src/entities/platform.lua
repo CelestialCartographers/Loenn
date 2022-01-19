@@ -4,12 +4,22 @@ local utils = require("utils")
 local textures = {
     "default", "cliffside"
 }
+local textureOptions = {}
+
+for _, texture in ipairs(textures) do
+    textureOptions[utils.titleCase(texture)] = texture
+end
 
 local movingPlatform = {}
 
 movingPlatform.name = "movingPlatform"
 movingPlatform.depth = 1
 movingPlatform.nodeLimits = {1, 1}
+movingPlatform.fieldInformation = {
+    texture = {
+        options = textureOptions
+    }
+}
 movingPlatform.placements = {}
 
 for i, texture in ipairs(textures) do
@@ -45,6 +55,11 @@ local sinkingPlatform = {}
 
 sinkingPlatform.name = "sinkingPlatform"
 sinkingPlatform.depth = 1
+sinkingPlatform.fieldInformation = {
+    texture = {
+        options = textureOptions
+    }
+}
 sinkingPlatform.placements = {}
 
 for i, texture in ipairs(textures) do

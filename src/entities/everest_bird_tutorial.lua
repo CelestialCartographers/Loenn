@@ -1,3 +1,5 @@
+local enums = require("consts.celeste_enums")
+
 local birdTutorial = {}
 
 birdTutorial.name = "everest/customBirdTutorial"
@@ -6,6 +8,12 @@ birdTutorial.nodeLineRenderType = "line"
 birdTutorial.justification = {0.5, 1.0}
 birdTutorial.texture = "characters/bird/crow00"
 birdTutorial.nodeLimits = {0, -1}
+birdTutorial.fieldInformation = {
+    info = {
+        options = enums.everest_bird_tutorial_tutorials,
+        editable = false
+    }
+}
 birdTutorial.placements = {
     name = "bird",
     data = {

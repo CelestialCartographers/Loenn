@@ -3,6 +3,7 @@ local drawableLine = require("structs.drawable_line")
 local drawableNinePatch = require("structs.drawable_nine_patch")
 local drawableRectangle = require("structs.drawable_rectangle")
 local utils = require("utils")
+local enums = require("consts.celeste_enums")
 
 local swapBlock = {}
 
@@ -48,6 +49,12 @@ local blockDepth = -9999
 
 swapBlock.name = "swapBlock"
 swapBlock.nodeLimits = {1, 1}
+swapBlock.fieldInformation = {
+    theme = {
+        options = enums.swap_block_themes,
+        editable = false
+    }
+}
 swapBlock.placements = {}
 swapBlock.minimumSize = {16, 16}
 

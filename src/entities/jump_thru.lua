@@ -1,8 +1,8 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
 local drawing = require("utils.drawing")
 local utils = require("utils")
+local enums = require("consts.celeste_enums")
 
--- For future use I guess?
 local textures = {"wood", "dream", "temple", "templeB", "cliffside", "reflection", "core", "moon"}
 
 local function getTexture(entity)
@@ -14,6 +14,15 @@ local jumpthru = {}
 jumpthru.name = "jumpThru"
 jumpthru.depth = -9000
 jumpthru.canResize = {true, false}
+jumpthru.fieldInformation = {
+    texture = {
+        options = textures
+    },
+    surfaceIndex = {
+        options = enums.tileset_sound_ids,
+        fieldType = "integer"
+    }
+}
 jumpthru.placements = {}
 
 for i, texture in ipairs(textures) do
@@ -21,7 +30,8 @@ for i, texture in ipairs(textures) do
         name = texture,
         data = {
             width = 8,
-            texture = texture
+            texture = texture,
+            surfaceIndex = -1
         }
     }
 end

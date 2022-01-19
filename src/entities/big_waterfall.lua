@@ -7,6 +7,12 @@ local bigWaterfall = {}
 
 bigWaterfall.name = "bigWaterfall"
 bigWaterfall.minimumSize = {16, 16}
+bigWaterfall.fieldInformation = {
+    layer = {
+        options = {"FG", "BG"},
+        editable = false
+    }
+}
 bigWaterfall.placements = {
     {
         name = "foreground",

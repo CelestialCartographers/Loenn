@@ -1,4 +1,4 @@
--- TODO Editing options: mode
+local enums = require("consts.celeste_enums")
 
 local everestFlag = {}
 
@@ -6,6 +6,10 @@ everestFlag.name = "everest/flagTrigger"
 everestFlag.fieldInformation = {
     death_count = {
         fieldType = "integer",
+    },
+    mode = {
+        options = enums.everest_flag_trigger_modes,
+        editable = false
     }
 }
 everestFlag.placements = {

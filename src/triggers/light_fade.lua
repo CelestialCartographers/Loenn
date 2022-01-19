@@ -1,8 +1,14 @@
--- TODO Editing options: positionMode
+local enums = require("consts.celeste_enums")
 
 local lightFade = {}
 
 lightFade.name = "lightFadeTrigger"
+lightFade.fieldInformation = {
+    positionMode = {
+        options = enums.trigger_position_modes,
+        editable = false
+    }
+}
 lightFade.placements = {
     name = "light_fade",
     data = {

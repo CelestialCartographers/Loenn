@@ -1,8 +1,14 @@
--- TODO Editing options: positionMode
+local enums = require("consts.celeste_enums")
 
 local bloomFade = {}
 
 bloomFade.name = "bloomFadeTrigger"
+bloomFade.fieldInformation = {
+    positionMode = {
+        options = enums.trigger_position_modes,
+        editable = false
+    }
+}
 bloomFade.placements = {
     name = "bloom_fade",
     data = {

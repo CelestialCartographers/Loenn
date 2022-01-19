@@ -1,9 +1,15 @@
 local drawableSprite = require("structs.drawable_sprite")
+local utils = require("utils")
 
 local textures = {
     default = "objects/temple/dashButton00",
     mirror = "objects/temple/dashButtonMirror00",
 }
+local textureOptions = {}
+
+for texture, _ in pairs(textures) do
+    textureOptions[utils.titleCase(texture)] = texture
+end
 
 local dashSwitchHorizontal = {}
 
@@ -11,6 +17,12 @@ dashSwitchHorizontal.name = "dashSwitchH"
 dashSwitchHorizontal.texture = "objects/temple/dashButton00"
 dashSwitchHorizontal.depth = 0
 dashSwitchHorizontal.justification = {0.5, 0.5}
+dashSwitchHorizontal.fieldInformation = {
+    sprite = {
+        options = textureOptions,
+        editable = false
+    }
+}
 dashSwitchHorizontal.placements = {}
 
 function dashSwitchHorizontal.sprite(room, entity)
@@ -36,6 +48,12 @@ dashSwitchVertical.name = "dashSwitchV"
 dashSwitchVertical.texture = "objects/temple/dashButton00"
 dashSwitchVertical.depth = 0
 dashSwitchVertical.justification = {0.5, 0.5}
+dashSwitchVertical.fieldInformation = {
+    sprite = {
+        options = textureOptions,
+        editable = false
+    }
+}
 dashSwitchVertical.placements = {}
 
 function dashSwitchVertical.sprite(room, entity)

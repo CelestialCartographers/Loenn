@@ -1,8 +1,14 @@
--- TODO Editing options: positionMode
+local enums = require("consts.celeste_enums")
 
 local everestSmoothCamera = {}
 
 everestSmoothCamera.name = "everest/smoothCameraOffsetTrigger"
+everestSmoothCamera.fieldInformation = {
+    positionMode = {
+        options = enums.trigger_position_modes,
+        editable = false
+    }
+}
 everestSmoothCamera.placements = {
     name = "smooth_camera",
     data = {

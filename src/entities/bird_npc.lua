@@ -1,3 +1,5 @@
+local enums = require("consts.celeste_enums")
+
 local birdNpc = {}
 
 birdNpc.name = "bird"
@@ -6,10 +8,16 @@ birdNpc.nodeLineRenderType = "line"
 birdNpc.justification = {0.5, 1.0}
 birdNpc.texture = "characters/bird/crow00"
 birdNpc.nodeLimits = {0, -1}
+birdNpc.fieldInformation = {
+    mode = {
+        options = enums.bird_npc_modes,
+        editable = false
+    }
+}
 birdNpc.placements = {
     name = "bird",
     data = {
-        mode = "sleeping",
+        mode = "Sleeping",
         onlyOnce = false,
         onlyIfPlayerLeft = false
     }

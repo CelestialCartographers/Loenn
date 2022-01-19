@@ -4,14 +4,20 @@ local drawableSprite = require("structs.drawable_sprite")
 
 local moveBlock = {}
 
-moveBlock.name = "moveBlock"
-moveBlock.depth = 8995
-moveBlock.minimumSize = {16, 16}
-moveBlock.placements = {}
-
 local moveBlockDirections = {
     "Up", "Down", "Left", "Right"
 }
+
+moveBlock.name = "moveBlock"
+moveBlock.depth = 8995
+moveBlock.minimumSize = {16, 16}
+moveBlock.fieldInformation = {
+    direction = {
+        options = moveBlockDirections,
+        editable = false
+    }
+}
+moveBlock.placements = {}
 
 for _, direction in ipairs(moveBlockDirections) do
     for steerable = 1, 2 do

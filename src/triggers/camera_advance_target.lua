@@ -1,9 +1,19 @@
--- TODO Editing options: positionModeX, positionModeY
+local enums = require("consts.celeste_enums")
 
 local cameraAdvanceTarget = {}
 
 cameraAdvanceTarget.name = "cameraAdvanceTargetTrigger"
 cameraAdvanceTarget.nodeLimits = {1, 1}
+cameraAdvanceTarget.fieldInformation = {
+    positionModeX = {
+        options = enums.trigger_position_modes,
+        editable = false
+    },
+    positionModeY = {
+        options = enums.trigger_position_modes,
+        editable = false
+    }
+}
 cameraAdvanceTarget.placements = {
     name = "camera_advance_target",
     data = {

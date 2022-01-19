@@ -38,6 +38,12 @@ zipMover.depth = -9999
 zipMover.nodeVisibility = "never"
 zipMover.nodeLimits = {1, 1}
 zipMover.minimumSize = {16, 16}
+zipMover.fieldInformation = {
+    theme = {
+        options = themes,
+        editable = false
+    }
+}
 zipMover.placements = {}
 
 for i, theme in ipairs(themes) do

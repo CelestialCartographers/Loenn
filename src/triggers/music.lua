@@ -1,4 +1,8 @@
--- TODO Editing options: track
+local enums = require("consts.celeste_enums")
+local songs = table.keys(enums.songs)
+
+table.sort(songs)
+
 
 local music = {}
 
@@ -6,6 +10,9 @@ music.name = "musicTrigger"
 music.fieldInformation = {
     death_count = {
         fieldType = "integer",
+    },
+    track = {
+        options = songs
     }
 }
 music.placements = {
