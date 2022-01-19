@@ -876,7 +876,11 @@ entities.birdPath.attributes.description.onlyIfLeft=The bird will only fly if th
 entities.birdPath.attributes.description.speedMult=Speed multiplier for the flight speed.
 
 # Fake Crystal Heart
+entities.fakeHeart.placements.name.crystal_heart=Crystal Heart (Fake)
 entities.fakeHeart.attributes.description.color=Which colour to use for the heart.\nNormal - Blue\nBSide - Red\nCSide - Yellow
+
+# Dream Crystal Heart
+entities.dreamHeartGem.placements.name.crystal_heart=Crystal Heart (Dream)
 
 # Lightning
 entities.lightning.placements.name.lightning=Lightning
