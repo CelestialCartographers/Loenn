@@ -45,6 +45,7 @@ everestNpc.fieldInformation = {
 everestNpc.placements = {
     name = "npc",
     data = {
+        sprite = "player/idle",
         spriteRate = 1,
         dialogId = "",
         onlyOnce = true,

@@ -27,11 +27,20 @@ local depths = {
     -10
 }
 
+local colorNames = {
+    ["Blue"] = 0,
+    ["Rose"] = 1,
+    ["Bright Sun"] = 2,
+    ["Malachite"] = 3
+}
+
 cassetteBlock.name = "cassetteBlock"
 cassetteBlock.minimumSize = {16, 16}
 cassetteBlock.fieldInformation = {
     index = {
         fieldType = "integer",
+        options = colorNames,
+        editable = false
     }
 }
 cassetteBlock.placements = {}

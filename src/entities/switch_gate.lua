@@ -1,18 +1,30 @@
 local drawableNinePatch = require("structs.drawable_nine_patch")
 local drawableSprite = require("structs.drawable_sprite")
+local enums = require("consts.celeste_enums")
+local utils = require("utils")
 
 local switchGate = {}
+
+local textures = {
+    "block", "mirror", "temple", "stars"
+}
+local textureOptions = {}
+
+for _, texture in ipairs(textures) do
+    textureOptions[utils.titleCase(texture)] = texture
+end
 
 switchGate.name = "switchGate"
 switchGate.depth = 0
 switchGate.nodeLimits = {1, 1}
 switchGate.nodeLineRenderType = "line"
 switchGate.minimumSize = {16, 16}
-switchGate.placements = {}
-
-local textures = {
-    "block", "mirror", "temple", "stars"
+switchGate.fieldInformation = {
+    sprite = {
+        options = textureOptions
+    }
 }
+switchGate.placements = {}
 
 for i, texture in ipairs(textures) do
     switchGate.placements[i] = {

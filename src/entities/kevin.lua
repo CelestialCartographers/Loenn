@@ -4,22 +4,30 @@ local drawableSprite = require("structs.drawable_sprite")
 
 local kevin = {}
 
+local axesOptions = {
+    Both = "both",
+    Vertical = "vertical",
+    Horizontal = "horizontal"
+}
+
 kevin.name = "crushBlock"
 kevin.depth = 0
 kevin.minimumSize = {24, 24}
+kevin.fieldInformation = {
+    axes = {
+        options = axesOptions,
+        editable = false
+    }
+}
 kevin.placements = {}
 
-local axesOptions = {
-    "both", "vertical", "horizontal"
-}
-
-for _, axes in ipairs(axesOptions) do
+for _, axis in pairs(axesOptions) do
     table.insert(kevin.placements, {
-        name = axes,
+        name = axis,
         data = {
             width = 24,
             height = 24,
-            axes = axes
+            axes = axis
         }
     })
 end

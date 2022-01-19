@@ -1,4 +1,5 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
+local enums = require("consts.celeste_enums")
 
 local trackSpinner = {}
 
@@ -19,6 +20,12 @@ trackSpinner.name = "trackSpinner"
 trackSpinner.nodeLimits = {1, 1}
 trackSpinner.nodeLineRenderType = "line"
 trackSpinner.depth = -50
+trackSpinner.fieldInformation = {
+    speed = {
+        options = enums.track_spinner_speeds,
+        editable = false
+    }
+}
 trackSpinner.placements = {}
 
 for typeName, typeAttributes in pairs(trackSpinnerTypes) do

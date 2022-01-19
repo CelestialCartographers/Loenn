@@ -1,11 +1,7 @@
 local drawableSprite = require("structs.drawable_sprite")
+local utils = require("utils")
 
 local templeGate = {}
-
-templeGate.name = "templeGate"
-templeGate.depth = -9000
-templeGate.canResize = {false, false}
-templeGate.placements = {}
 
 local placementPresets = {
     {"theo", "HoldingTheo"},
@@ -16,22 +12,48 @@ local placementPresets = {
     {"default", "TouchSwitches"}
 }
 
+local textures = {
+    default = "objects/door/TempleDoor00",
+    mirror = "objects/door/TempleDoorB00",
+    theo = "objects/door/TempleDoorC00"
+}
+
+local textureOptions = {}
+local typeOptions = {}
+
+for texture, _ in pairs(textures) do
+    textureOptions[utils.titleCase(texture)] = texture
+end
+
+for _, preset in pairs(placementPresets) do
+    typeOptions[preset[2]] = preset[2]
+end
+
+templeGate.name = "templeGate"
+templeGate.depth = -9000
+templeGate.canResize = {false, false}
+templeGate.fieldInformation = {
+    sprite = {
+        options = textureOptions,
+        editable = false
+    },
+    type = {
+        options = typeOptions,
+        editable = false
+    }
+}
+templeGate.placements = {}
+
 for _, preset in ipairs(placementPresets) do
     table.insert(templeGate.placements, {
         name = string.format("%s_%s", preset[1], string.lower(preset[2])),
         data = {
             height = 48,
             sprite = preset[1],
-            ["type"] = preset[2]
+            type = preset[2]
         }
     })
 end
-
-local textures = {
-    default = "objects/door/TempleDoor00",
-    mirror = "objects/door/TempleDoorB00",
-    theo = "objects/door/TempleDoorC00"
-}
 
 function templeGate.sprite(room, entity)
     local variant = entity.sprite or "default"

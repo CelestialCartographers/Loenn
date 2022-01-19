@@ -1,5 +1,12 @@
 local tentacles = {}
 
+local fearDistanceOptions = {
+    None = "",
+    Close = "close",
+    Medium = "medium",
+    Far = "far"
+}
+
 tentacles.name = "tentacles"
 tentacles.depth = 0
 tentacles.texture = "@Internal@/tentacles"
@@ -8,6 +15,10 @@ tentacles.nodeLimits = {1, -1}
 tentacles.fieldInformation = {
     slide_until = {
         fieldType = "integer",
+    },
+    fear_distance = {
+        options = fearDistanceOptions,
+        editable = false
     }
 }
 tentacles.placements = {

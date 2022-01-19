@@ -1,4 +1,5 @@
 local drawableSprite = require("structs.drawable_sprite")
+local utils = require("utils")
 
 local lockBlock = {}
 
@@ -8,10 +9,21 @@ local textures = {
     temple_b = "objects/door/lockdoorTempleB00",
     moon = "objects/door/moonDoor11"
 }
+local textureOptions = {}
+
+for name, _ in pairs(textures) do
+    textureOptions[utils.humanizeVariableName(name)] = name
+end
 
 lockBlock.name = "lockBlock"
 lockBlock.depth = 0
 lockBlock.justification = {0.25, 0.25}
+lockBlock.fieldInformation = {
+    sprite = {
+        options = textureOptions,
+        editable = false
+    }
+}
 lockBlock.placements = {}
 
 for name, texture in pairs(textures) do

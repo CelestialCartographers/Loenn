@@ -9,6 +9,11 @@ local textures = {
 
 crumbleBlock.name = "crumbleBlock"
 crumbleBlock.depth = 0
+crumbleBlock.fieldInformation = {
+    texture = {
+        options = textures,
+    }
+}
 crumbleBlock.placements = {}
 
 for _, texture in ipairs(textures) do

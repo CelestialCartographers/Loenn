@@ -1,4 +1,6 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
+local enums = require("consts.celeste_enums")
+local utils = require("utils")
 
 local defaultSpinnerColor = "blue"
 local unknownSpinnerColor = "blue"
@@ -9,6 +11,11 @@ local spinnerColors = {
     "core",
     "rainbow"
 }
+local colorOptions = {}
+
+for _, color in ipairs(spinnerColors) do
+    colorOptions[utils.titleCase(color)] = color
+end
 
 -- Doesn't have textures directly, handled by code
 local customSpinnerColors = {
@@ -19,6 +26,12 @@ local customSpinnerColors = {
 local spinner = {}
 
 spinner.name = "spinner"
+spinner.fieldInformation = {
+    color = {
+        options = colorOptions,
+        editable = false
+    }
+}
 spinner.placements = {
     {
         name = "dust_sprite",

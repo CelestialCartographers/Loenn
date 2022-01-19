@@ -1,3 +1,5 @@
+local enums = require("consts.celeste_enums")
+
 local badelineBoss = {}
 
 badelineBoss.name = "finalBoss"
@@ -8,6 +10,8 @@ badelineBoss.nodeLimits = {0, -1}
 badelineBoss.fieldInformation = {
     patternIndex = {
         fieldType = "integer",
+        options = enums.badeline_boss_shooting_patterns,
+        editable = false
     }
 }
 badelineBoss.placements = {

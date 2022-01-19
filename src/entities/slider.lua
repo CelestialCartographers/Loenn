@@ -1,11 +1,18 @@
 local drawableSpriteStruct = require("structs.drawable_sprite")
 local drawing = require("utils.drawing")
 local utils = require("utils")
+local enums = require("consts.celeste_enums")
 
 local slider = {}
 
 slider.name = "slider"
 slider.depth = 0
+slider.fieldInformation = {
+    surface = {
+        options = enums.slider_surfaces,
+        editable = false
+    }
+}
 slider.placements = {
     name = "clockwise",
     data = {
