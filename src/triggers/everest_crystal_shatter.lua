@@ -1,8 +1,14 @@
--- TODO Editing options: mode
+local enums = require("consts.celeste_enums")
 
 local everestCrystalShatter = {}
 
 everestCrystalShatter.name = "everest/crystalShatterTrigger"
+everestCrystalShatter.fieldInformation = {
+    mode = {
+        options = enums.everest_crystal_shatter_trigger_modes,
+        editable = false
+    }
+}
 everestCrystalShatter.placements = {
     name = "crystal_shatter",
     data = {
