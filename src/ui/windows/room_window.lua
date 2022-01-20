@@ -19,12 +19,17 @@ local mapItemUtils = require("map_item_utils")
 local sceneHandler = require("scene_handler")
 local entityStruct = require("structs.entity")
 local configs = require("configs")
+local enums = require("consts.celeste_enums")
 
 local roomWindow = {}
 
 local activeWindows = {}
 local windowPreviousX = 0
 local windowPreviousY = 0
+
+local songs = table.keys(enums.songs)
+
+table.sort(songs)
 
 local defaultFieldOrder = {
     "name", "color",
@@ -64,6 +69,15 @@ local defaultFieldInformation = {
     },
     ambienceProgress = {
         fieldType = "string"
+    },
+
+    music = {
+        options = songs
+    },
+
+    windPattern = {
+        options = enums.wind_patterns,
+        editable = false
     }
 }
 
