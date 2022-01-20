@@ -10,17 +10,17 @@ local pluginLoader = require("plugin_loader")
 
 local forms = {}
 
-forms.registereFieldTypes = {}
+forms.registeredFieldTypes = {}
 
 function forms.getFieldElement(name, value, options)
     local fieldType = options and options.fieldType or utils.typeof(value)
-    local handler = forms.registereFieldTypes[fieldType]
+    local handler = forms.registeredFieldTypes[fieldType]
 
     if handler then
         return handler.getElement(name, value, options)
 
     else
-        local unknownHandler = forms.registereFieldTypes["unknown_type"]
+        local unknownHandler = forms.registeredFieldTypes["unknown_type"]
 
         return unknownHandler.getElement(name, value, options)
     end
@@ -245,7 +245,7 @@ end
 function forms.loadFieldType(filename, registerAt, verbose)
     -- Use verbose flag or default to logPluginLoading from config
     verbose = verbose or verbose == nil and configs.debug.logPluginLoading
-    registerAt = registerAt or forms.registereFieldTypes
+    registerAt = registerAt or forms.registeredFieldTypes
 
     local pathNoExt = utils.stripExtension(filename)
     local filenameNoExt = utils.filename(pathNoExt, "/")
@@ -269,7 +269,7 @@ function forms.loadExternalFieldTypes()
 end
 
 function forms.unloadFieldTypes()
-    forms.registereFieldTypes = {}
+    forms.registeredFieldTypes = {}
 end
 
 return forms
