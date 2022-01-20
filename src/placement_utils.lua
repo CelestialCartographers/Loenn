@@ -2,6 +2,7 @@ local layerHandlers = require("layer_handlers")
 local utils = require("utils")
 local keyboardHelper = require("utils.keyboard")
 local configs = require("configs")
+local state = require("loaded_state")
 
 local placementUtils = {}
 
@@ -25,15 +26,21 @@ function placementUtils.getDrawable(layer, name, room, data)
     return nil
 end
 
+local idLayers = {"entities", "triggers"}
+
 -- Add unique ID to trigger/entity
 function placementUtils.finalizePlacement(room, layer, item)
     if layer == "entities" or layer == "triggers" then
         local ids = {}
 
-        if room[layer] then
-            for _, target in ipairs(room[layer]) do
-                if target._id then
-                    ids[target._id] = true
+        for _, targetLayer in ipairs(idLayers) do
+            for _, targetRoom in ipairs(state.map.rooms) do
+                if targetRoom[targetLayer] then
+                    for _, target in ipairs(targetRoom[layer]) do
+                        if target._id then
+                            ids[target._id] = true
+                        end
+                    end
                 end
             end
         end
