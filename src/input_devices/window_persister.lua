@@ -8,12 +8,19 @@ local deltaTimeAcc = 0
 local function persistWindowData()
     local windowX, windowY, windowDisplay = love.window.getPosition()
     local windowWidth, windowHeight = love.graphics.getDimensions()
+    local windowMaximized = love.window.isMaximized()
+    local windowMinimized = love.window.isMinimized()
 
-    persistence.windowX = windowX
-    persistence.windowY = windowY
-    persistence.windowWidth = windowWidth
-    persistence.windowHeight = windowHeight
     persistence.windowDisplay = windowDisplay
+    persistence.windowMaximized = windowMaximized
+
+    if not windowMaximized and not windowMinimized then
+        persistence.windowX = windowX
+        persistence.windowY = windowY
+
+        persistence.windowWidth = windowWidth
+        persistence.windowHeight = windowHeight
+    end
 end
 
 function device.update(dt)
