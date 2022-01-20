@@ -6,6 +6,9 @@ local inputHandler = {}
 local mouseButtonsPressed = {}
 local dragTreshold = 2
 
+local windowFocused = true
+local usingMacOS = love.system.getOS() == "OS X"
+
 function inputHandler.getMouseDrag(x, y, button)
     local from = mouseButtonsPressed[button]
     local startX, startY = from[1], from[2]
@@ -39,6 +42,11 @@ function love.textinput(text)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
+    -- Mouse events on Mac should only be handled if window is focused
+    if not windowFocused and usingMacOS then
+        return
+    end
+
     for button, data <- mouseButtonsPressed do
         sceneHandler.sendEvent("mousedragmoved", inputHandler.getMouseDragDelta(x, y, button, istouch))
     end
@@ -47,12 +55,22 @@ function love.mousemoved(x, y, dx, dy, istouch)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
+    -- Mouse events on Mac should only be handled if window is focused
+    if not windowFocused and usingMacOS then
+        return
+    end
+
     mouseButtonsPressed[button] = {x, y, x, y}
 
     sceneHandler.sendEvent("mousepressed", x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
+    -- Mouse events on Mac should only be handled if window is focused
+    if not windowFocused and usingMacOS then
+        return
+    end
+
     local startX, startY, dx, dy, consideredDrag = inputHandler.getMouseDrag(x, y, button)
 
     if consideredDrag then
@@ -80,6 +98,8 @@ function love.visible(visible)
 end
 
 function love.focus(focus)
+    windowFocused = focus
+
     sceneHandler.sendEvent("focus", focus)
 end
 

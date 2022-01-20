@@ -8,7 +8,7 @@ wallBooster.depth = 1999
 wallBooster.canResize = {false, true}
 wallBooster.placements = {
     {
-        name = "right",
+        name = "booster_right",
         placementType = "rectangle",
         data = {
             height = 8,
@@ -17,19 +17,50 @@ wallBooster.placements = {
         }
     },
     {
-        name = "left",
+        name = "booster_left",
         placementType = "rectangle",
         data = {
             height = 8,
             left = false,
             notCoreMode = false
         }
+    },
+    {
+        name = "ice_right",
+        placementType = "rectangle",
+        data = {
+            height = 8,
+            left = true,
+            notCoreMode = true
+        }
+    },
+    {
+        name = "ice_left",
+        placementType = "rectangle",
+        data = {
+            height = 8,
+            left = false,
+            notCoreMode = true
+        }
     }
 }
 
-local topTexture = "objects/wallBooster/fireTop00"
-local middleTexture = "objects/wallBooster/fireMid00"
-local bottomTexture = "objects/wallBooster/fireBottom00"
+local fireTopTexture = "objects/wallBooster/fireTop00"
+local fireMiddleTexture = "objects/wallBooster/fireMid00"
+local fireBottomTexture = "objects/wallBooster/fireBottom00"
+
+local iceTopTexture = "objects/wallBooster/iceTop00"
+local iceMiddleTexture = "objects/wallBooster/iceMid00"
+local iceBottomTexture = "objects/wallBooster/iceBottom00"
+
+local function getWallTextures(entity)
+    if entity.notCoreMode then
+        return iceTopTexture, iceMiddleTexture, iceBottomTexture
+
+    else
+        return fireTopTexture, fireMiddleTexture, fireBottomTexture
+    end
+end
 
 function wallBooster.sprite(room, entity)
     local sprites = {}
@@ -39,6 +70,8 @@ function wallBooster.sprite(room, entity)
     local tileHeight = math.floor(height / 8)
     local offsetX = left and 0 or 8
     local scaleX = left and 1 or -1
+
+    local topTexture, middleTexture, bottomTexture = getWallTextures(entity)
 
     for i = 2, tileHeight - 1 do
         local middleSprite = drawableSprite.fromTexture(middleTexture, entity)

@@ -15,5 +15,6 @@ exitBlock.placements = {
 }
 
 exitBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tileType", false, "tilesFg", {1.0, 1.0, 1.0, 0.7})
+exitBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tileType")
 
 return exitBlock

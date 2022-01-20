@@ -197,11 +197,13 @@ function brushHelper.getTile(room, x, y, layer)
     return tilesMatrix:get(x, y, "0")
 end
 
-function brushHelper.getValidTiles(layer)
+function brushHelper.getValidTiles(layer, addAir)
     local autoTiler = layer == "tilesFg" and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
     local paths = utils.deepcopy(autoTiler.paths)
 
-    paths["0"] = "Air"
+    if addAir ~= false then
+        paths["0"] = "Air"
+    end
 
     return paths
 end

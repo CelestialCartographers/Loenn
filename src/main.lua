@@ -12,7 +12,7 @@ function love.run()
         love.load(love.arg.parseGameArguments(arg), arg)
     end
 
-	-- We don't want the first frame's dt to include time taken by love.load.
+    -- We don't want the first frame's dt to include time taken by love.load.
     if love.timer then
         love.timer.step()
     end
@@ -22,20 +22,20 @@ function love.run()
     local drawAcc = 0
     local updateAcc = 0
 
-	return function()
-		if love.event then
+    return function()
+        if love.event then
             love.event.pump()
 
-			for name, a, b, c, d, e, f in love.event.poll() do
-				if name == "quit" then
-					if not love.quit or not love.quit() then
-						return a or 0
-					end
+            for name, a, b, c, d, e, f in love.event.poll() do
+                if name == "quit" then
+                    if not love.quit or not love.quit() then
+                        return a or 0
+                    end
                 end
 
-				love.handlers[name](a, b, c, d, e, f)
-			end
-		end
+                love.handlers[name](a, b, c, d, e, f)
+            end
+        end
 
         if love.timer then
             dt = love.timer.step()

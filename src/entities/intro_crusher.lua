@@ -17,5 +17,6 @@ introCrusher.placements = {
 }
 
 introCrusher.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
+introCrusher.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
 
 return introCrusher
