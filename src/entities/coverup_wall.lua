@@ -14,5 +14,6 @@ coverupWall.placements = {
 }
 
 coverupWall.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", true, "tilesFg", {1.0, 1.0, 1.0, 0.7})
+coverupWall.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
 
 return coverupWall

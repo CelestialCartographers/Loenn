@@ -17,5 +17,6 @@ dashBlock.placements = {
 }
 
 dashBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", "blendin")
+dashBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
 
 return dashBlock

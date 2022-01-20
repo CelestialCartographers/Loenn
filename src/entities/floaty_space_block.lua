@@ -17,6 +17,8 @@ floatySpaceBlock.placements = {
     }
 }
 
+floatySpaceBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
+
 -- Filter by floaty space blocks sharing the same tiletype
 local function getSearchPredicate(entity)
     return function(target)

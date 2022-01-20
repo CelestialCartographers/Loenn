@@ -15,6 +15,7 @@ crumbleWall.placements = {
 }
 
 crumbleWall.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", "blendin")
+crumbleWall.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
 
 function crumbleWall.depth(room, entity)
     return entity.blendin and -10501 or -12999

@@ -16,5 +16,6 @@ conditionBlock.placements = {
 }
 
 conditionBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tileType", "blendin", "tilesFg", {1.0, 1.0, 1.0, 0.7})
+conditionBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tileType")
 
 return conditionBlock

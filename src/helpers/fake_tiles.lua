@@ -4,6 +4,7 @@ local matrix = require("utils.matrix")
 local drawableSprite = require("structs.drawable_sprite")
 local drawableRectangle = require("structs.drawable_rectangle")
 local colors = require("consts.colors")
+local brushes = require("brushes")
 
 local fakeTilesHelper = {}
 
@@ -234,6 +235,26 @@ function fakeTilesHelper.getCombinedEntitySpriteFunction(entities, materialKey, 
     return function(room)
         return fakeTilesHelper.getEntitySpriteFunction(materialMatrix, blendIn, layer, color, x, y)(room, fakeEntity)
     end
+end
+
+function fakeTilesHelper.getFieldInformation(materialKey, layer)
+    layer = layer or "tilesFg"
+
+    local validTiles = brushes.getValidTiles(layer, false)
+    local tileOptions = {}
+
+    for id, path in pairs(validTiles) do
+        local displayName = brushes.cleanMaterialPath(path)
+
+        tileOptions[displayName] = id
+    end
+
+    return {
+        [materialKey] = {
+            options = tileOptions,
+            editable = false
+        }
+    }
 end
 
 return fakeTilesHelper

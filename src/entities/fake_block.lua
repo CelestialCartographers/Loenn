@@ -15,5 +15,6 @@ fakeBlock.placements = {
 }
 
 fakeBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false, "tilesFg", {1.0, 1.0, 1.0, 0.7})
+fakeBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
 
 return fakeBlock
