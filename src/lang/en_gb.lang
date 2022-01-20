@@ -744,10 +744,10 @@ entities.redBlocks.placements.name.red=Clutter Block (Laundry)
 entities.greenBlocks.placements.name.green=Clutter Block (Books)
 
 # Colour Switch
-entities.colorSwitch.placements.name.yellow=Color Switch (Boxes)
-entities.colorSwitch.placements.name.red=Color Switch (Laundry)
-entities.colorSwitch.placements.name.green=Color Switch (Books)
-entities.colorSwitch.placements.name.lightning=Color Switch (Lightning)
+entities.colorSwitch.placements.name.yellow=Clutter Switch (Boxes)
+entities.colorSwitch.placements.name.red=Clutter Switch (Laundry)
+entities.colorSwitch.placements.name.green=Clutter Switch (Books)
+entities.colorSwitch.placements.name.lightning=Clutter Switch (Lightning)
 entities.colorSwitch.attributes.description.type=The colour of the switch.
 
 # Temple Cracked Block
