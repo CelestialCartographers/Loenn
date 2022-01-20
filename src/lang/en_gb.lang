@@ -275,6 +275,7 @@ entities.oshirodoor.placements.name.oshiro_door=Oshiro Door
 
 # Fire Ball
 entities.fireBall.placements.name.fireball=Fireball
+entities.fireBall.placements.name.iceball=Iceball
 entities.fireBall.attributes.description.amount=Determines the amount of fireballs on a track.
 entities.fireBall.attributes.description.offset=Determines how far into the path the fireball starts.
 entities.fireBall.attributes.description.speed=Determines how fast a fireball reaches the end of the track.
@@ -364,13 +365,16 @@ entities.towerviewer.attributes.description.summit=Whether the watch tower shoul
 entities.towerviewer.attributes.description.onlyY=Whether the watch tower can only move vertically. If the watch tower has nodes it will still follow them.
 
 # Wall Booster
-entities.wallBooster.placements.name.left=Wall Booster (Left)
-entities.wallBooster.placements.name.right=Wall Booster (Right)
+entities.wallBooster.placements.name.booster_left=Wall Booster (Left)
+entities.wallBooster.placements.name.booster_right=Wall Booster (Right)
+entities.wallBooster.placements.name.ice_left=Ice Wall (Left)
+entities.wallBooster.placements.name.ice_right=Ice Wall (Right)
 entities.wallBooster.attributes.description.left=Whether the entity attaches to the left wall or not.
 entities.wallBooster.attributes.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Bounce Block
-entities.bounceBlock.placements.name.bounce_block=Bounce Block
+entities.bounceBlock.placements.name.fire=Bounce Block
+entities.bounceBlock.placements.name.ice=Ice Crumble Block
 entities.bounceBlock.attributes.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Dark Chaser

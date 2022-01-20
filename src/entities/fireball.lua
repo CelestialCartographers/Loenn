@@ -3,7 +3,6 @@ local fireball = {}
 fireball.name = "fireBall"
 fireball.depth = 0
 fireball.nodeLineRenderType = "line"
-fireball.texture = "objects/fireball/fireball01"
 fireball.nodeLimits = {0, -1}
 fireball.fieldInformation = {
     amount = {
@@ -11,13 +10,33 @@ fireball.fieldInformation = {
     }
 }
 fireball.placements = {
-    name = "fireball",
-    data = {
-        amount = 3,
-        offset = 0.0,
-        speed = 1.0,
-        notCoreMode = false
+    {
+        name = "fireball",
+        data = {
+            amount = 3,
+            offset = 0.0,
+            speed = 1.0,
+            notCoreMode = false
+        }
+    },
+    {
+        name = "iceball",
+        data = {
+            amount = 3,
+            offset = 0.0,
+            speed = 1.0,
+            notCoreMode = true
+        }
     }
 }
+
+function fireball.texture(room, entity)
+    if entity.notCoreMode then
+        return "objects/fireball/fireball09"
+
+    else
+        return "objects/fireball/fireball01"
+    end
+end
 
 return fireball
