@@ -3,7 +3,6 @@ local songs = table.keys(enums.songs)
 
 table.sort(songs)
 
-
 local music = {}
 
 music.name = "musicTrigger"
