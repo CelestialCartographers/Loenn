@@ -115,7 +115,7 @@ local function getWindowTitle(language, selections, targetItem, targetLayer)
 end
 
 -- TODO - Add history support
-function contextWindow.saveChangesCallback(selections)
+function contextWindow.saveChangesCallback(selections, dummyData)
     return function(formFields)
         local redraw = {}
         local newData = form.getFormData(formFields)
@@ -124,6 +124,13 @@ function contextWindow.saveChangesCallback(selections)
         for _, selection in ipairs(selections) do
             local layer = selection.layer
             local item = selection.item
+
+            -- Apply nil values from new data
+            for k, v in pairs(dummyData) do
+                if newData[k] == nil then
+                    item[k] = nil
+                end
+            end
 
             for k, v in pairs(newData) do
                 item[k] = v
@@ -157,7 +164,7 @@ function contextWindow.prepareFormData(layer, item, language)
     for _, field in ipairs(fieldOrder) do
         local value = item[field]
 
-        if value ~= nil then
+        if value ~= nil or fieldInformation.options then
             local humanizedName = utils.humanizeVariableName(field)
             local displayName = getLanguageKey(field, languageNames, getLanguageKey(field, fallbackNames, humanizedName))
             local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
@@ -174,12 +181,25 @@ function contextWindow.prepareFormData(layer, item, language)
     end
 
     -- Find all fields that aren't added yet and prepare them for alphabetical sorting
+    -- Some fields should not be exposed automatically
+    -- Any fields already added should not be added again
     local missingFields = {}
 
     for field, value in pairs(item) do
-        -- Some fields should not be exposed automatically
-        -- Any fields already added should not be added again
         if not globallyFilteredKeys[field] and not fieldIgnored[field] and not fieldsAdded[field] then
+            local humanizedName = utils.humanizeVariableName(field)
+            local displayName = getLanguageKey(field, languageNames, humanizedName)
+
+            fieldsAdded[field] = true
+
+            table.insert(missingFields, {field, value, displayName})
+        end
+    end
+
+    -- Add all fields that have options, but have not yet been added
+    for field, info in pairs(fieldInformation) do
+        if info.options and not globallyFilteredKeys[field] and not fieldIgnored[field] and not fieldsAdded[field] then
+            local value = item[field]
             local humanizedName = utils.humanizeVariableName(field)
             local displayName = getLanguageKey(field, languageNames, humanizedName)
 
@@ -238,7 +258,7 @@ function contextWindow.createContextMenu(selections)
         {
             text = tostring(language.ui.room_window.save_changes),
             formMustBeValid = true,
-            callback = contextWindow.saveChangesCallback(selections)
+            callback = contextWindow.saveChangesCallback(selections, dummyData)
         },
         {
             text = tostring(language.ui.room_window.close_window),

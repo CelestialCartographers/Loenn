@@ -92,7 +92,7 @@ local function prepareDropdownOptions(value, options, displayTransformer, insert
 
     else
         -- Check if already flattened or only values
-        if type(options[1]) == "table" and #options[1] == 2 then
+        if type(options[1]) == "table" then
             for i, option in ipairs(options) do
                 flattenedOptions[i] = option
 
