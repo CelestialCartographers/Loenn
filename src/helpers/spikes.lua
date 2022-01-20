@@ -47,6 +47,13 @@ spikeHelper.spikeVariants = {
     "tentacles"
 }
 
+spikeHelper.triggerSpikeVariants = {
+    "default",
+    "outline",
+    "cliffside",
+    "reflection"
+}
+
 local triggerSpikeColors = {
     {242 / 255, 90 / 255, 16 / 255},
     {255 / 255, 0 / 255, 0 / 255},
@@ -207,17 +214,14 @@ function spikeHelper.getSpikePlacements(direction, variants, originalTrigger)
     local lengthKey = horizontal and "height" or "width"
 
     for i, variant in ipairs(variants) do
-        -- Trigger spikes doesn't have tentacles
-        if not (originalTrigger and variant == "tentacles") then
-            placements[i] = {
-                name = string.format("%s_%s", direction, variant),
-                data = {
-                    type = variant,
-                }
+        placements[i] = {
+            name = string.format("%s_%s", direction, variant),
+            data = {
+                type = variant,
             }
+        }
 
-            placements[i].data[lengthKey] = 8
-        end
+        placements[i].data[lengthKey] = 8
     end
 
     return placements
@@ -289,8 +293,18 @@ function spikeHelper.getCanResize(direction)
     return {true, false}
 end
 
+function spikeHelper.getFieldInformations(variants, attribute)
+    attribute = attribute or "type"
+
+    return {
+        [attribute] = {
+            options = variants
+        }
+    }
+end
+
 function spikeHelper.createEntityHandler(name, direction, triggerSpike, originalTriggerSpike, variants)
-    variants = variants or spikeHelper.spikeVariants
+    variants = variants or (originalTriggerSpike and spikeHelper.triggerSpikeVariants) or spikeHelper.spikeVariants
 
     local handler = {}
 
@@ -300,6 +314,7 @@ function spikeHelper.createEntityHandler(name, direction, triggerSpike, original
     handler.name = name
     handler.placements = placementFunction(direction, variants, originalTriggerSpike)
     handler.canResize = spikeHelper.getCanResize(direction)
+    handler.fieldInformation = spikeHelper.getFieldInformations(variants)
 
     function handler.sprite(room, entity)
         return spriteFunction(entity, direction, originalTriggerSpike)
