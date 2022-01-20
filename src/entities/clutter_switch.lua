@@ -3,11 +3,23 @@ local utils = require("utils")
 
 local clutterSwitch = {}
 
+local variants = {"red", "yellow", "green", "lightning"}
+local variantOptions = {
+    Laundry = "red",
+    Books = "green",
+    Boxes = "yellow",
+    Lightning = "lightning"
+}
+
 clutterSwitch.name = "colorSwitch"
 clutterSwitch.depth = 0
+clutterSwitch.fieldInformation = {
+    type = {
+        options = variantOptions,
+        editable = false
+    }
+}
 clutterSwitch.placements = {}
-
-local variants = {"red", "yellow", "green", "lightning"}
 
 for i, variant in ipairs(variants) do
     clutterSwitch.placements[i] = {

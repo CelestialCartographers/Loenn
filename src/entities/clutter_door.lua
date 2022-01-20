@@ -4,13 +4,25 @@ local utils = require("utils")
 
 local clutterDoor = {}
 
+local variants = {"red", "yellow", "green", "lightning"}
+local variantOptions = {
+    Laundry = "red",
+    Books = "green",
+    Boxes = "yellow",
+    Lightning = "lightning"
+}
+
 clutterDoor.name = "clutterDoor"
 clutterDoor.depth = 0
 clutterDoor.fillColor = {74 / 255, 71 / 255, 135 / 255, 153}
 clutterDoor.borderColor = {1.0, 1.0, 1.0, 1.0}
+clutterDoor.fieldInformation = {
+    type = {
+        options = variantOptions,
+        editable = false
+    }
+}
 clutterDoor.placements = {}
-
-local variants = {"red", "yellow", "green", "lightning"}
 
 for i, variant in ipairs(variants) do
     clutterDoor.placements[i] = {
