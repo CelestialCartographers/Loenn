@@ -7,5 +7,5 @@ return {
 
     unfocused_draw_rate = false,
     unfocused_update_rate = false,
-    unfocused_main_loop_sleep = 0.1,
+    unfocused_main_loop_sleep = 0.033,
 }
