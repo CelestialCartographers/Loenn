@@ -224,7 +224,7 @@ function filesystem.openDialog(path, filter, callback)
             return threadHandler.createStartWithCallback(code, callback, path, filter)
 
         else
-            callback(nfd.open(filter, nil, path))
+            callback(nfd.open(filter, path))
 
             return false, false
         end
