@@ -261,6 +261,31 @@ local function checkCheckpointEntity(room)
     return false
 end
 
+local function prepareRoomData(room, usingPixels)
+    -- Floor position and size attributes in room data to convert to tiles
+    -- Multiplied back to pixel values in the save callback
+    if not usingPixels then
+        room.x = math.floor(room.x / 8)
+        room.y = math.floor(room.y / 8)
+
+        room.width = math.floor(room.width / 8)
+        room.height = math.floor(room.height / 8)
+    end
+
+    -- Not a actual attribute of the room
+    -- Used to add a checkpoint entity
+    room.checkpoint = checkCheckpointEntity(room)
+
+    -- Music progress and ambience from vanilla maps might be saved as numbers
+    if type(room.musicProgress) == "number" then
+        room.musicProgress = tostring(room.musicProgress)
+    end
+
+    if type(room.ambienceProgress) == "number" then
+        room.ambienceProgress = tostring(room.ambienceProgress)
+    end
+end
+
 function roomWindow.createRoomWindow(room, editing)
     if editing then
         room = utils.deepcopy(room or loadedState.getSelectedRoom())
@@ -286,19 +311,7 @@ function roomWindow.createRoomWindow(room, editing)
 
     local usingPixels = configs.editor.itemAllowPixelPerfect
 
-    -- Floor position and size attributes in room data to convert to tiles
-    -- Multiplied back to pixel values in the save callback
-    if not usingPixels then
-        room.x = math.floor(room.x / 8)
-        room.y = math.floor(room.y / 8)
-
-        room.width = math.floor(room.width / 8)
-        room.height = math.floor(room.height / 8)
-    end
-
-    -- Not a actual attribute of the room
-    -- Used to add a checkpoint entity
-    room.checkpoint = checkCheckpointEntity(room)
+    prepareRoomData(room, usingPixels)
 
     local window
 
