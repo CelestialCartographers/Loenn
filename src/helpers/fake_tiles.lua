@@ -237,7 +237,8 @@ function fakeTilesHelper.getCombinedEntitySpriteFunction(entities, materialKey, 
     end
 end
 
-function fakeTilesHelper.getFieldInformation(materialKey, layer)
+-- Make sure to get this in a function if used for fieldInformation, otherwise it won't update!
+function fakeTilesHelper.getTilesOptions(layer)
     layer = layer or "tilesFg"
 
     local validTiles = brushes.getValidTiles(layer, false)
@@ -249,12 +250,35 @@ function fakeTilesHelper.getFieldInformation(materialKey, layer)
         tileOptions[displayName] = id
     end
 
-    return {
-        [materialKey] = {
-            options = tileOptions,
+    return tileOptions
+end
+
+-- Returns a function to be up to date with any XML changes
+function fakeTilesHelper.addTileFieldInformation(fieldInformation, materialKey, layer, room, entity)
+    return function()
+        if type(fieldInformation) == "function" then
+            fieldInformation = fieldInformation(room, entity)
+        end
+
+        fieldInformation[materialKey] = {
+            options = fakeTilesHelper.getTilesOptions(layer),
             editable = false
         }
-    }
+
+        return fieldInformation
+    end
+end
+
+-- Returns a function to be up to date with any XML changes
+function fakeTilesHelper.getFieldInformation(materialKey, layer)
+    return function()
+        return {
+            [materialKey] = {
+                options = fakeTilesHelper.getTilesOptions(layer),
+                editable = false
+            }
+        }
+    end
 end
 
 return fakeTilesHelper

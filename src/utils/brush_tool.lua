@@ -64,11 +64,12 @@ function brushToolUtils.handleActionClick(tool, x, y, force)
         local px, py = viewportHandler.getRoomCoordindates(room, x, y)
         local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
-        if tool.lastTileX ~= tx + 1 or tool.lastTileY ~= ty + 1 or force then
+        if tool.lastMaterial ~= tool.material or tool.lastTileX ~= tx + 1 or tool.lastTileY ~= ty + 1 or force then
             brushHelper.placeTile(room, tx + 1, ty + 1, tool.material, tool.layer)
             brushToolUtils.toolMadeChanges(tool)
 
             tool.lastTileX, tool.lastTileY = tx + 1, ty + 1
+            tool.lastMaterial = tool.material
         end
 
         tool.lastX, tool.lastY = x, y

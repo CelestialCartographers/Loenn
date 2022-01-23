@@ -735,7 +735,9 @@ local function getPlacements(handler)
 end
 
 local function getDefaultPlacement(handler, placements)
-    return placements.default
+    if placements then
+        return placements.default
+    end
 end
 
 local function getPlacement(placementInfo, defaultPlacement, name, handler, language)

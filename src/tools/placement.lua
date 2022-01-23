@@ -136,6 +136,11 @@ local function dragFinished()
     placementRectangle = nil
 end
 
+local function dragReset()
+    placementDragCompleted = true
+    placementRectangle = nil
+end
+
 local function mouseMoved(x, y)
     placementCurrentX = x
     placementCurrentY = y
@@ -529,7 +534,7 @@ end
 function tool.editorMapTargetChanged(item, itemType)
     local px, py = toolUtils.getCursorPositionInRoom(placementMouseX, placementMouseY)
 
-    dragFinished()
+    dragReset()
     mouseMoved(px, py)
 
     if itemType == "room" then

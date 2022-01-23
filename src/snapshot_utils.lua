@@ -9,6 +9,17 @@ local viewportHandler = require("viewport_handler")
 
 local snapshotUtils = {}
 
+local function redrawLayer(room, layer)
+    local selected = state.isItemSelected(room)
+
+    if selected then
+        toolUtils.redrawTargetLayer(room, layer)
+
+    else
+        celesteRender.forceRedrawRoom(room, state.viewport, false)
+    end
+end
+
 local function getRoomLayerSnapshot(room, layer, description, itemsBefore, itemsAfter)
     local function forward(data)
         local targetRoom = state.getRoomByName(data.room)
@@ -16,7 +27,7 @@ local function getRoomLayerSnapshot(room, layer, description, itemsBefore, items
         if targetRoom then
             targetRoom[layer] = utils.deepcopy(itemsAfter)
 
-            toolUtils.redrawTargetLayer(targetRoom, layer)
+            redrawLayer(targetRoom, layer)
         end
     end
 
@@ -26,7 +37,7 @@ local function getRoomLayerSnapshot(room, layer, description, itemsBefore, items
         if targetRoom then
             targetRoom[layer] = utils.deepcopy(itemsBefore)
 
-            toolUtils.redrawTargetLayer(targetRoom, layer)
+            redrawLayer(targetRoom, layer)
         end
     end
 
@@ -56,7 +67,7 @@ function snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, laye
         if targetRoom then
             forward(targetRoom, layer)
 
-            toolUtils.redrawTargetLayer(targetRoom, layer)
+            redrawLayer(targetRoom, layer)
         end
     end
 
@@ -66,7 +77,7 @@ function snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, laye
         if targetRoom then
             backward(targetRoom, layer)
 
-            toolUtils.redrawTargetLayer(targetRoom, layer)
+            redrawLayer(targetRoom, layer)
         end
     end
 
@@ -90,7 +101,7 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         if targetRoom then
             targetRoom[layer].matrix = matrix.fromTable(tilesAfter, data.width, data.height)
 
-            toolUtils.redrawTargetLayer(targetRoom, layer)
+            redrawLayer(targetRoom, layer)
         end
     end
 
@@ -100,7 +111,7 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         if targetRoom then
             targetRoom[layer].matrix = matrix.fromTable(tilesBefore, data.width, data.height)
 
-            toolUtils.redrawTargetLayer(targetRoom, layer)
+            redrawLayer(targetRoom, layer)
         end
     end
 
