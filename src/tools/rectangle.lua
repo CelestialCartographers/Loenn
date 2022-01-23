@@ -90,7 +90,7 @@ function tool.mouseclicked(x, y, button, istouch, pressed)
     local cloneButton = configs.editor.objectCloneButton
 
     if button == actionButton then
-        brushToolUtils.handleActionClick(x, y)
+        brushToolUtils.handleActionClick(tool, x, y)
 
     elseif button == cloneButton then
         brushToolUtils.handleCloneClick(tool, x, y)
