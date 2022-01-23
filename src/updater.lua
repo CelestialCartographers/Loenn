@@ -44,7 +44,7 @@ function updater.isLatestVersion()
     if availableVersions and #availableVersions > 0 then
         local latest = availableVersions[1]
 
-        return latest == current, latest
+        return current >= latest, latest
     end
 
     return true
