@@ -165,6 +165,17 @@ function state.getSelectedItem()
     return state.selectedItem, state.selectedItemType
 end
 
+function state.isItemSelected(item)
+    if state.selectedItem == item then
+        return true
+
+    elseif state.selectedItemType == "table" then
+        return not not state.selectedItemType[item]
+    end
+
+    return false
+end
+
 function state.openMap()
     filesystem.openDialog(fileLocations.getCelesteDir(), "bin", state.loadFile)
 end
