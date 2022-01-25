@@ -126,7 +126,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
                 local tx, ty = x + i - 1, y + j - 1
 
                 if tx >= 1 and ty >= 1 and tx <= tilesWidth and ty <= tilesHeight then
-                    local target = tilesMatrix:get(tx, ty, "0")
+                    local target = tilesMatrix:get(tx, ty, " ")
                     local mat = material:getInbounds(i, j)
 
                     if mat ~= target and mat ~= " " then
