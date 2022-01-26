@@ -5,6 +5,7 @@ local drawableSprite = require("structs.drawable_sprite")
 local drawableRectangle = require("structs.drawable_rectangle")
 local colors = require("consts.colors")
 local brushes = require("brushes")
+local utf8 = require("utf8")
 
 local fakeTilesHelper = {}
 
@@ -148,10 +149,10 @@ local function getEntityMaterialFromKey(entity, materialKey)
         fromKey = tostring(fromKey)
     end
 
-    if fromKeyType == "string" and #fromKey == 1 then
+    if fromKeyType == "string" and utf8.len(fromKey) == 1 then
         return fakeTilesHelper.getMaterialMatrix(entity, fromKey)
 
-    elseif materialKeyType == "string" and #materialKey == 1 then
+    elseif materialKeyType == "string" and utf8.len(materialKey) == 1 then
         return fakeTilesHelper.getMaterialMatrix(entity, materialKey)
 
     elseif materialKeyType == "matrix" then

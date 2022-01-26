@@ -4,6 +4,7 @@ local requireUtils = require("utils.require")
 local xnaColors = require("consts.xna_colors")
 local bit = require("bit")
 local ffi = require("ffi")
+local utf8 = require("utf8")
 
 local rectangles = require("structs.rectangle")
 
@@ -225,6 +226,26 @@ function utils.findCharacter(string, character)
             return i
         end
     end
+end
+
+function utils.splitUTF8(s, separator)
+    separator = separator or 1
+
+    local res = {}
+    local separatorType = type(separator)
+
+    if separatorType == "string" then
+        res = s:split(separator)()
+
+    elseif separatorType == "number" then
+        local length = utf8.len(s)
+
+        for i = 1, length, separator do
+            table.insert(res, utf8.char(utf8.codepoint(s, utf8.offset(s, i), utf8.offset(s, math.min(i + separator - 1, length)))))
+        end
+    end
+
+    return res
 end
 
 function utils.titleCase(name)

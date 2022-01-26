@@ -1,4 +1,5 @@
 local matrix = require("utils.matrix")
+local utils = require("utils")
 
 local tilesStruct = {}
 
@@ -78,8 +79,8 @@ function tilesStruct.matrixToTileStringMinimized(matrix, seperator, empty)
     return table.concat(lines, "\n")
 end
 
-function tilesStruct.tileStringToMatrix(tiles, seperator, empty)
-    seperator = seperator or 1
+function tilesStruct.tileStringToMatrix(tiles, separator, empty)
+    separator = separator or 1
     empty = empty or "0"
     tiles = tiles:gsub("\r\n", "\n")
 
@@ -95,9 +96,7 @@ function tilesStruct.tileStringToMatrix(tiles, seperator, empty)
     local res = matrix.filled(empty, cols, rows)
 
     for y, line in ipairs(lines) do
-        local chars = line:split(seperator)()
-
-        for x, char in ipairs(chars) do
+        for x, char in ipairs(utils.splitUTF8(line)) do
             res:setInbounds(x, y, char)
         end
     end
