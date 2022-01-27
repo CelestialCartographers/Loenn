@@ -75,7 +75,7 @@ function celesteRender.loadCustomTilesetAutotiler(state)
 
         else
             if tilesMetaFg then
-                logging.warning("Loading custom foreground tile XML failed: ", tilesMetaFg)
+                logging.warning(string.format("Loading custom foreground tile XML failed: %s", tilesMetaFg))
             end
         end
 
@@ -84,7 +84,7 @@ function celesteRender.loadCustomTilesetAutotiler(state)
 
         else
             if tilesMetaBg then
-                logging.warning("Loading custom background tile XML failed: ", tilesMetaBg)
+                logging.warning(string.format("Loading custom background tile XML failed: %s", tilesMetaBg))
             end
         end
     end
