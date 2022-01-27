@@ -75,12 +75,12 @@ local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTil
     if checkPadding(tiles, x, y, airTile, emptyTile) then
         local padding = meta.padding[tile]
 
-        return #padding > 0 and padding or defaultQuad, defaultSprite
+        return padding and #padding > 0 and padding or defaultQuad, defaultSprite
 
     else
         local center = meta.center[tile]
 
-        return #center > 0 and center or defaultQuad, defaultSprite
+        return center and #center > 0 and center or defaultQuad, defaultSprite
     end
 end
 

@@ -174,9 +174,12 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
                     local texture = meta.paths[tile] or emptyTile
 
                     local spriteMeta = atlases.gameplay[texture]
-                    local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
 
-                    batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+                    if spriteMeta then
+                        local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
+
+                        batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+                    end
                 end
             end
         end
