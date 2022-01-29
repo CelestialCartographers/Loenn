@@ -20,6 +20,7 @@ local sceneHandler = require("scene_handler")
 local entityStruct = require("structs.entity")
 local configs = require("configs")
 local enums = require("consts.celeste_enums")
+local colors = require("consts.colors")
 
 local roomWindow = {}
 
@@ -28,6 +29,11 @@ local windowPreviousX = 0
 local windowPreviousY = 0
 
 local songs = table.keys(enums.songs)
+local colorOptions = {}
+
+for i = 1, #colors.roomBorderColors do
+    table.insert(colorOptions, i - 1)
+end
 
 table.sort(songs)
 
@@ -61,7 +67,9 @@ local defaultFieldInformation = {
     },
 
     color = {
-        fieldType = "integer"
+        fieldType = "integer",
+        options = colorOptions,
+        editable = false
     },
 
     musicProgress = {
