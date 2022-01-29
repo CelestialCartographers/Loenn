@@ -27,7 +27,7 @@ local function addBridgeTileSprites(sprites, x, y, size)
 
             sprite:useRelativeQuad(size.x, py, size.width, height)
             sprite:setJustification(0.0, 0.0)
-            sprite:addPosition(x, y + py - 8)
+            sprite:addPosition(x, y + py - 3)
 
             table.insert(sprites, sprite)
 
@@ -40,7 +40,7 @@ local function addBridgeTileSprites(sprites, x, y, size)
 
         sprite:useRelativeQuad(size.x, size.y, size.width, size.height)
         sprite:setJustification(0.0, 0.0)
-        sprite:addPosition(x, y - 8)
+        sprite:addPosition(x, y - 3)
 
         table.insert(sprites, sprite)
     end
