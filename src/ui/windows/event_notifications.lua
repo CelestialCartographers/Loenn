@@ -163,7 +163,7 @@ function notificationHandlers:updaterUpdateAvailable(latestVersion, currentVersi
 end
 
 function eventNotifications.getWindow()
-    local handler = uiElements.panel()
+    local handler = uiElements.group()
 
     handler:with(notificationHandlers)
 
