@@ -73,12 +73,12 @@ end
 
 local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
     if checkPadding(tiles, x, y, airTile, emptyTile) then
-        local padding = meta.padding[tile]
+        local padding = meta[tile].padding
 
         return padding and #padding > 0 and padding or defaultQuad, defaultSprite
 
     else
-        local center = meta.center[tile]
+        local center = meta[tile].center
 
         return center and #center > 0 and center or defaultQuad, defaultSprite
     end
@@ -165,9 +165,10 @@ end
 
 function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
     local tile = tiles:get(x, y)
+    local tileMeta = meta[tile]
 
-    local masks = meta.masks[tile]
-    local ignore = meta.ignores[tile]
+    local masks = tileMeta.masks
+    local ignore = tileMeta.ignores
 
     local matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, airTile, wildcard, checkTile)
 
@@ -181,9 +182,10 @@ end
 
 function autotiler.getQuadsWithBitmask(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
     local tile = tiles:get(x, y)
+    local tileMeta = meta[tile]
 
-    local masks = meta.masks[tile]
-    local ignore = meta.ignores[tile]
+    local masks = tileMeta.masks
+    local ignore = tileMeta.ignores
 
     local matches, quads, sprites = getMaskQuadsFromTilesWithBitmask(x, y, masks, tiles, tile, ignore, airTile, wildcard, checkTile, lshift, bxor, band)
 
@@ -211,6 +213,80 @@ local function convertTileString(s)
     return res
 end
 
+-- X values are stored as nil in the mask matrix
+local function countMaskXs(mask)
+    local maskMatrix = mask.mask
+    local width, height = maskMatrix:size()
+    local count = 0
+
+    for x = 1, width do
+        for y = 1, height do
+            if maskMatrix:getInbounds(x, y) == nil then
+                count += 1
+            end
+        end
+    end
+
+    return count
+end
+
+local function maskCompare(lhs, rhs)
+    return countMaskXs(lhs) < countMaskXs(rhs)
+end
+
+-- Inline mask sort, more X -> later
+local function sortTilesetMasks(masks)
+    table.sort(masks, maskCompare)
+
+    return masks
+end
+
+local function getTilesetStructure(id)
+    return {
+        id = id,
+        path = "",
+        padding = {},
+        center = {},
+        masks = {},
+        ignores = {}
+    }
+end
+
+local function readTilesetInfo(tileset, id, element)
+    local currentMasks = {}
+
+    -- Doesn't store single child tags in list, pack it into a table for easier use
+    local elementSets = element.set and (#element.set > 0 and element.set or {element.set}) or {}
+
+    for _, child in ipairs(elementSets) do
+        local attrs = child._attr or child
+
+        local mask = attrs.mask
+        local tiles = attrs.tiles or ""
+        local sprites = attrs.sprites or ""
+
+        if mask == "padding" then
+            tileset.padding = convertTileString(tiles)
+
+        elseif mask == "center" then
+            tileset.center = convertTileString(tiles)
+
+        else
+            local maskMatrix = convertMaskString(mask)
+
+            table.insert(tileset.masks, {
+                mask = maskMatrix,
+                quads = convertTileString(tiles),
+                sprites = sprites,
+                tilesMask = maskToBitmask(maskMatrix, bit.lshift),
+                ignoresMask = maskToIgnoreBitmask(maskMatrix, bit.lshift)
+            })
+        end
+    end
+
+    sortTilesetMasks(tileset.masks)
+end
+
 function autotiler.loadTilesetXML(fn)
     local handler = require("lib.xml2lua.xmlhandler.tree")
     local parser = xml2lua.parser(handler)
@@ -218,74 +294,40 @@ function autotiler.loadTilesetXML(fn)
 
     parser:parse(xml)
 
-    local paths = {}
-    local masks = {}
-    local padding = {}
-    local center = {}
-    local ignores = {}
+    local tilesetsMeta =  {}
+    local elementLookup = {}
+    local tilesetsRoot = handler.root.Data.Tileset
 
     local lshift = bit.lshift
 
-    for i, tileset in ipairs(handler.root.Data.Tileset) do
-        local id = tileset._attr.id
-        local path = tileset._attr.path
-        local copy = tileset._attr.copy
-        local ignore = tileset._attr.ignores
+    for i, element in ipairs(tilesetsRoot) do
+        local id = element._attr.id
+        local copy = element._attr.copy
+        local ignores = element._attr.ignores
+        local path = element._attr.path
+        local tileset = getTilesetStructure(id)
 
-        paths[id] = "tilesets/" .. path
+        tileset.path = "tilesets/" .. path
 
-        if ignore then
-            -- TODO - Check assumption, none of the XML files have mutliple ignores without wildcard
-            ignores[id] = table.flip($(ignore):split(";"))
-        end
+        readTilesetInfo(tileset, id, element)
 
-        padding[id] = copy and table.shallowcopy(padding[copy]) or {}
-        center[id] = copy and table.shallowcopy(center[copy]) or {}
-        masks[id] = copy and table.shallowcopy(masks[copy]) or {}
-
-        local currentMasks = {}
-
-        -- Doesn't store single child tags in list, pack it into a table for easier use
-        local tilesetSets = tileset.set and (#tileset.set > 0 and tileset.set or {tileset.set}) or {}
-
-        for j, child in ipairs(tilesetSets) do
-            local attrs = child._attr or child
-
-            local mask = attrs.mask
-            local tiles = attrs.tiles or ""
-            local sprites = attrs.sprites or ""
-
-            if mask == "padding" then
-                padding[id] = convertTileString(tiles)
-
-            elseif mask == "center" then
-                center[id] = convertTileString(tiles)
-
-            else
-                local maskMatrix = convertMaskString(mask)
-
-                table.insert(currentMasks, {
-                    mask = maskMatrix,
-                    quads = convertTileString(tiles),
-                    sprites = sprites,
-                    tilesMask = maskToBitmask(maskMatrix, lshift),
-                    ignoresMask = maskToIgnoreBitmask(maskMatrix, lshift)
-                })
+        if copy then
+            if not elementLookup[copy] then
+                error(string.format("Copied tilesets must be defined before the tileset coping from them: %s copies %s", id, copy))
             end
+
+            readTilesetInfo(tileset, id, elementLookup[copy])
         end
 
-        if #currentMasks > 0 then
-            masks[id] = currentMasks
+        if ignores then
+            tileset.ignores = table.flip($(ignores):split(";"))
         end
+
+        tilesetsMeta[id] = tileset
+        elementLookup[id] = element
     end
 
-    return {
-        paths = paths,
-        masks = masks,
-        center = center,
-        padding = padding,
-        ignores = ignores
-    }
+    return tilesetsMeta
 end
 
 return autotiler

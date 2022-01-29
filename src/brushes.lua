@@ -171,7 +171,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
 
                 if quadCount > 0 then
                     local randQuad = quads[utils.mod1(rng, quadCount)]
-                    local texture = meta.paths[tile] or emptyTile
+                    local texture = meta[tile].path or emptyTile
 
                     local spriteMeta = atlases.gameplay[texture]
 
@@ -201,8 +201,12 @@ function brushHelper.getTile(room, x, y, layer)
 end
 
 function brushHelper.getValidTiles(layer, addAir)
-    local autoTiler = layer == "tilesFg" and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
-    local paths = utils.deepcopy(autoTiler.paths)
+    local tilerMeta = layer == "tilesFg" and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
+    local paths = {}
+
+    for id, tileset in ipairs(tilerMeta) do
+        paths[id] = tileset.path
+    end
 
     if addAir ~= false then
         paths["0"] = "Air"
