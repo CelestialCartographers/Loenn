@@ -287,10 +287,16 @@ local function readTilesetInfo(tileset, id, element)
     sortTilesetMasks(tileset.masks)
 end
 
-function autotiler.loadTilesetXML(fn)
+function autotiler.loadTilesetXML(filename)
     local handler = require("lib.xml2lua.xmlhandler.tree")
     local parser = xml2lua.parser(handler)
-    local xml = utils.stripByteOrderMark(utils.readAll(fn, "rb"))
+    local xmlString = utils.readAll(filename, "rb")
+
+    if not xmlString then
+        error(string.format("Unable to read tileset xml from '%s'", filename))
+    end
+
+    local xml = utils.stripByteOrderMark(xmlString)
 
     parser:parse(xml)
 
