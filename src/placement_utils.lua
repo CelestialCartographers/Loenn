@@ -36,7 +36,7 @@ function placementUtils.finalizePlacement(room, layer, item)
         for _, targetLayer in ipairs(idLayers) do
             for _, targetRoom in ipairs(state.map.rooms) do
                 if targetRoom[targetLayer] then
-                    for _, target in ipairs(targetRoom[layer]) do
+                    for _, target in ipairs(targetRoom[targetLayer]) do
                         if target._id then
                             ids[target._id] = true
                         end
