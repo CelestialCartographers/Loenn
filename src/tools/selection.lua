@@ -526,7 +526,7 @@ local function pasteItems(room, layer, previews)
 end
 
 local function handleItemMovementKeys(room, key, scancode, isrepeat)
-    if not selectionPreviews then
+    if not selectionPreviews or not room then
         return
     end
 
@@ -555,7 +555,7 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemResizeKeys(room, key, scancode, isrepeat)
-    if not selectionPreviews then
+    if not selectionPreviews or not room then
         return
     end
 
@@ -584,7 +584,7 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemRotateKeys(room, key, scancode, isrepeat)
-    if not selectionPreviews then
+    if not selectionPreviews or not room then
         return
     end
 
@@ -608,7 +608,7 @@ local function handleItemRotateKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemFlipKeys(room, key, scancode, isrepeat)
-    if not selectionPreviews then
+    if not selectionPreviews or not room then
         return
     end
 
@@ -632,7 +632,7 @@ local function handleItemFlipKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemDeletionKey(room, key, scancode, isrepeat)
-    if not selectionPreviews then
+    if not selectionPreviews or not room then
         return
     end
 
@@ -653,7 +653,7 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
 end
 
 local function handleNodeAddKey(room, key, scancode, isrepeat)
-    if not selectionPreviews then
+    if not selectionPreviews or not room then
         return
     end
 
