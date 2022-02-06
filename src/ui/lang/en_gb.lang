@@ -36,6 +36,11 @@ ui.room_window.save_changes=Save changes
 ui.room_window.close_window=Close window
 
 
+# Room List
+ui.room_list.action.edit=Edit
+ui.room_list.action.delete=Delete
+
+
 # Selection Context Window
 ui.selection_context_window.title=Editing Selections
 ui.selection_context_window.save_changes=Save changes

@@ -5,6 +5,10 @@ local uiUtils = require("ui.utils")
 local widgetUtils = require("ui.widgets.utils")
 local listWidgets = require("ui.widgets.lists")
 local simpleDocks = require("ui.widgets.simple_docks")
+local contextMenu = require("ui.context_menu")
+local roomEditor = require("ui.room_editor")
+local sceneHandler = require("scene_handler")
+local languageRegistry = require("language_registry")
 
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
@@ -19,17 +23,62 @@ local function cleanRoomName(name)
     return nameWithoutPrefix or name
 end
 
+local function roomContextEditAction(room)
+    roomEditor.editExistingRoom(nil, room)
+end
+
+local function roomContextDeleteAction(room)
+    local map = state.map
+
+    sceneHandler.sendEvent("editorRoomDelete", map, room)
+end
+
+local roomContextActions = {
+    edit = roomContextEditAction,
+    delete = roomContextDeleteAction
+}
+
+local function handleContextListClickHandler(room)
+    return function(element, action)
+        if roomContextActions[action] then
+            roomContextActions[action](room)
+        end
+
+        element:removeSelf()
+    end
+end
+
+local function roomListItemContexthandler(room, language)
+    return function()
+        return uiElements.list({
+            uiElements.listItem({
+                text = tostring(language.ui.room_list.action.edit),
+                data = "edit"
+            }),
+            uiElements.listItem({
+                text = tostring(language.ui.room_list.action.delete),
+                data = "delete"
+            })
+        }, handleContextListClickHandler(room))
+    end
+end
+
 local function getRoomItems()
+    local language = languageRegistry.getLanguage()
     local rooms = state.map and state.map.rooms or {}
     local roomItems = {}
 
     for _, room in ipairs(rooms) do
         local name = cleanRoomName(room.name)
-
-        table.insert(roomItems, uiElements.listItem({
+        local roomItem = uiElements.listItem({
             text = name,
             data = room.name
-        }))
+        })
+
+        table.insert(roomItems, contextMenu.addContextMenu(
+            roomItem,
+            roomListItemContexthandler(room, language))
+        )
     end
 
     return roomItems
