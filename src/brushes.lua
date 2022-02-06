@@ -204,7 +204,7 @@ function brushHelper.getValidTiles(layer, addAir)
     local tilerMeta = layer == "tilesFg" and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
     local paths = {}
 
-    for id, tileset in ipairs(tilerMeta) do
+    for id, tileset in pairs(tilerMeta) do
         paths[id] = tileset.path
     end
 
