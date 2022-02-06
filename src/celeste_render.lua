@@ -75,7 +75,7 @@ function celesteRender.loadCustomTilesetAutotiler(state)
 
         else
             if tilesMetaFg then
-                logging.warning("Loading custom foreground tile XML failed: ", tilesMetaFg)
+                logging.warning(string.format("Loading custom foreground tile XML failed: %s", tilesMetaFg))
             end
         end
 
@@ -84,7 +84,7 @@ function celesteRender.loadCustomTilesetAutotiler(state)
 
         else
             if tilesMetaBg then
-                logging.warning("Loading custom background tile XML failed: ", tilesMetaBg)
+                logging.warning(string.format("Loading custom background tile XML failed: %s", tilesMetaBg))
             end
         end
     end
@@ -349,14 +349,15 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix, batchM
             local tile = tilesMatrix:getInbounds(x, y)
 
             if tile ~= airTile then
-                if meta.paths[tile] then
+                local tileMeta = meta[tile]
+                if tileMeta and tileMeta.path then
                     -- TODO - Render overlay sprites
                     local quads, sprites = autotiler.getQuadsWithBitmask(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
                     if quadCount > 0 then
                         local randQuad = quads[utils.mod1(rng, quadCount)]
-                        local texture = meta.paths[tile] or emptyTile
+                        local texture = tileMeta.path or emptyTile
 
                         local spriteMeta = atlases.gameplay[texture]
 

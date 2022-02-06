@@ -1,6 +1,7 @@
 local binfile = require("utils.binfile")
 local binaryReader = require("utils.binary_reader")
 local binaryWriter = require("utils.binary_writer")
+local utf8 = require("utf8")
 
 local mapcoder = {}
 
@@ -180,8 +181,13 @@ function mapcoder.encodeString(writer, s, lookup)
     else
         local encodedString = binfile.encodeRunLength(s)
         local encodedLength = #encodedString
+        local utf8Length = utf8.len(s)
+        local length = #s
 
-        if encodedLength < #s and encodedLength < 2^15 then
+        -- Only allow run length encoding if the string contains only 1 byte characters
+        -- Celeste does not read it as expected otherwise, this is mainly a tile issue
+        -- Run length encoding has a hardcoded max length, make sure we don't exceed the limit
+        if length == utf8Length and encodedLength < utf8Length and encodedLength < 2^15 then
             writer:writeByte(7)
             writer:writeSignedShort(encodedLength)
             writer:write(encodedString)

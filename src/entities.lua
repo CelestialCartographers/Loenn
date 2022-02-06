@@ -496,9 +496,13 @@ function entities.moveSelection(room, layer, selection, offsetX, offsetY)
     local name = entity._name
     local handler = entities.registeredEntities[name]
 
-    -- Notify movement
+    -- Notify movement, stop movement if it returns false
     if handler.onMove then
-        handler.onMove(room, entity, node, offsetX, offsetY)
+        local handled = handler.onMove(room, entity, node, offsetX, offsetY)
+
+        if handled == false then
+            return false
+        end
     end
 
     -- Custom entity movement
@@ -544,9 +548,13 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, dire
         return false
     end
 
-    -- Notify resize
+    -- Notify resize, stop resize if it returns false
     if handler.onResize then
-        handler.onResize(room, entity, offsetX, offsetY, directionX, directionY)
+        local handled = handler.onResize(room, entity, offsetX, offsetY, directionX, directionY)
+
+        if handled == false then
+            return false
+        end
     end
 
     local entityOffsetX = 0
@@ -631,9 +639,13 @@ function entities.deleteSelection(room, layer, selection)
                 end
             end
 
-            -- Notify deletion
+            -- Notify deletion, stop deletion if it returns false
             if handler.onDelete then
-                handler.onDelete(room, entity, node)
+                local handled = handler.onDelete(room, entity, node)
+
+                if handled == false then
+                    return false
+                end
             end
 
             -- Custom deletion
@@ -678,9 +690,13 @@ function entities.addNodeToSelection(room, layer, selection)
                 entity.nodes = nodes
             end
 
-            -- Notify addition
+            -- Notify addition, stop node addition if it returns false
             if handler.onNodeAdded then
-                handler.onNodeAdded(room, entity, node)
+                local handled = handler.onNodeAdded(room, entity, node)
+
+                if handled == false then
+                    return false
+                end
             end
 
             -- Custom node adding

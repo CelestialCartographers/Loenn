@@ -94,7 +94,7 @@ function taskUtils.processTask(task, time)
             end
 
         else
-            logging.warning("Task Failed:", status)
+            logging.warning(string.format("Task Failed: %s", status))
             logging.warning(debug.traceback(task.coroutine))
 
             task.done = true

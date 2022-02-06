@@ -60,7 +60,7 @@ end
 
 function spinner.sprite(room, entity)
     local color = string.lower(entity.color or defaultSpinnerColor)
-    local dusty = entity.dusty
+    local dusty = entity.dust
 
     if dusty then
         local textureBase = "danger/dustcreature/base00"
