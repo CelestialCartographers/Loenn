@@ -162,7 +162,12 @@ local function handleCheckpoint(room, hasCheckpoint)
                 x = player.x or 0,
                 y = player.y or 0,
 
-                allowOrigin = true
+                checkpointID = -1,
+                allowOrigin = true,
+                bg = "",
+
+                -- Don't add dreaming, coremode and inventory
+                -- They default to nil
             })
 
             table.insert(room.entities, checkpoint)
