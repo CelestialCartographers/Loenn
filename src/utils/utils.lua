@@ -518,6 +518,25 @@ function utils.contains(value, data)
     return false
 end
 
+function utils.unique(data, hashFunc)
+    hashFunc = hashFunc or function(value) return value end
+
+    local unique = {}
+    local seen = {}
+
+    for _, value in ipairs(data) do
+        local hash = hashFunc(value)
+
+        if not seen[hash] then
+            table.insert(unique, value)
+
+            seen[hash] = true
+        end
+    end
+
+    return unique
+end
+
 function utils.getPath(data, path, default, createIfMissing)
     local target = data
 
