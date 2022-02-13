@@ -128,7 +128,7 @@ function modHandler.findPluginLoennFolder(mountPoint)
         local folderInfo = love.filesystem.getInfo(folderTestPath)
 
         if folderInfo and folderInfo.type == "directory" then
-            return mountPoint .. "." .. folderName
+            return mountPoint .. "/" .. folderName
         end
     end
 end
@@ -222,6 +222,32 @@ function modHandler.requireFromPlugin(lib, modName)
 
     else
         -- TODO - Add warning
+    end
+end
+
+-- Defaults to current mod directory
+function modHandler.readFromPlugin(filename, modName)
+    local filenamePrefix
+
+    if modName then
+        local modInfo, pluginInfo = modHandler.findLoadedMod(modName)
+
+        if modInfo then
+            filenamePrefix = pluginInfo._mountPointLoenn
+        end
+
+    else
+        local info = debug.getinfo(2)
+        local source = info.source
+        local parts = string.split(source, "/")()
+
+        filenamePrefix = table.concat(parts, "/", 1, 2)
+    end
+
+    if filename and filenamePrefix then
+        local content = utils.readAll(filenamePrefix .. "/" .. filename)
+
+        return content
     end
 end
 
