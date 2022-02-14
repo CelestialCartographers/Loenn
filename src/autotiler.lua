@@ -285,7 +285,7 @@ local function readTilesetInfo(tileset, id, element)
                 table.insert(tileset.center, center)
             end
 
-            tileset.center = utils.unique(tileset.padding, tileStringHashFunction)
+            tileset.center = utils.unique(tileset.center, tileStringHashFunction)
 
         else
             local maskMatrix = convertMaskString(mask)
