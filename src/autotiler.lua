@@ -241,6 +241,10 @@ local function sortTilesetMasks(masks)
     return masks
 end
 
+local function tileStringHashFunction(value)
+    return string.format("%s, %s", value[1], value[2])
+end
+
 local function getTilesetStructure(id)
     return {
         id = id,
@@ -266,10 +270,22 @@ local function readTilesetInfo(tileset, id, element)
         local sprites = attrs.sprites or ""
 
         if mask == "padding" then
-            tileset.padding = convertTileString(tiles)
+            local newPadding = convertTileString(tiles)
+
+            for _, padding in ipairs(newPadding) do
+                table.insert(tileset.padding, padding)
+            end
+
+            tileset.padding = utils.unique(tileset.padding, tileStringHashFunction)
 
         elseif mask == "center" then
-            tileset.center = convertTileString(tiles)
+            local newCenters = convertTileString(tiles)
+
+            for _, center in ipairs(newCenters) do
+                table.insert(tileset.center, center)
+            end
+
+            tileset.center = utils.unique(tileset.center, tileStringHashFunction)
 
         else
             local maskMatrix = convertMaskString(mask)

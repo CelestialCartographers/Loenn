@@ -3,8 +3,8 @@ local utils = require("utils")
 
 local tilesStruct = {}
 
-function tilesStruct.matrixToTileString(matrix, seperator, empty)
-    seperator = seperator or ""
+function tilesStruct.matrixToTileString(matrix, separator, empty)
+    separator = separator or ""
     empty = empty or "0"
 
     local width, height = matrix:size
@@ -18,7 +18,7 @@ function tilesStruct.matrixToTileString(matrix, seperator, empty)
             table.insert(row, matrix:getInbounds(x, y))
         end
 
-        table.insert(lines, table.concat(row, seperator))
+        table.insert(lines, table.concat(row, separator))
     end
 
     return table.concat(lines, "\n")
@@ -57,8 +57,8 @@ local function getRelevantRowCount(relevantCols)
     return 0
 end
 
-function tilesStruct.matrixToTileStringMinimized(matrix, seperator, empty)
-    seperator = seperator or ""
+function tilesStruct.matrixToTileStringMinimized(matrix, separator, empty)
+    separator = separator or ""
     empty = empty or "0"
 
     local width, height = matrix:size
@@ -73,7 +73,7 @@ function tilesStruct.matrixToTileStringMinimized(matrix, seperator, empty)
             row[x] = matrix:getInbounds(x, y)
         end
 
-        lines[y] = table.concat(row, seperator)
+        lines[y] = table.concat(row, separator)
     end
 
     return table.concat(lines, "\n")
@@ -96,7 +96,7 @@ function tilesStruct.tileStringToMatrix(tiles, separator, empty)
     local res = matrix.filled(empty, cols, rows)
 
     for y, line in ipairs(lines) do
-        for x, char in ipairs(utils.splitUTF8(line)) do
+        for x, char in ipairs(utils.splitUTF8(line, separator)) do
             res:setInbounds(x, y, char)
         end
     end
