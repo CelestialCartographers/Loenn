@@ -81,6 +81,7 @@ filesystem.dir = lfs.dir
 filesystem.rmdir = lfs.rmdir
 
 filesystem.remove = os.remove
+filesystem.rename = os.rename
 
 -- Use Unix paths
 local function findRecursive(filenames, path, recursive, predicate, useYields, counter)

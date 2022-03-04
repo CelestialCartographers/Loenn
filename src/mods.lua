@@ -3,6 +3,7 @@ local fileLocations = require("file_locations")
 local yaml = require("lib.yaml")
 local config = require("utils.config")
 local filesystem = require("utils.filesystem")
+local logging = require("logging")
 
 local modHandler = {}
 
@@ -40,6 +41,20 @@ function modHandler.findPluginFiletype(startFolder, filetype)
                 folderName,
                 startFolder
             ))
+
+            -- Deprecation check, remove later
+            local directoryInfo = (love.filesystem.getInfo(path) or {}).type
+
+            if folderName ~= fileLocations.loennSimpleFolderName and directoryInfo == "directory" then
+                local deprecationMessage = string.format(
+                    "Mod '%s' contains plugin folder with deprecated foldername '%s', only '%s' will be valid in the future",
+                    modFolderName,
+                    folderName,
+                    fileLocations.loennSimpleFolderName
+                )
+
+                logging.warning(deprecationMessage)
+            end
 
             if filetype then
                 utils.getFilenames(path, true, filenames, function(filename)

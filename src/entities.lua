@@ -221,7 +221,8 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
     end
 end
 
-function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, viewport)
+-- Does not check for errors
+function entities.getNodeDrawableUnsafe(name, handler, room, entity, node, nodeIndex, viewport)
     handler = handler or entities.registeredEntities[name]
 
     local defaultDepth = utils.callIfFunction(handler.nodeDepth, room, entity, node, nodeIndex, viewport)
@@ -259,6 +260,20 @@ function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, 
         entityCopy.y = node.y
 
         return entities.getEntityDrawable(name, handler, room, entityCopy, viewport), nil, true
+    end
+end
+
+-- Get node drawable with pcall, return drawables from the erroring entity handler if not successful
+function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, viewport)
+    local success, drawables = pcall(entities.getNodeDrawableUnsafe, name, handler, room, entity, node, nodeIndex, viewport)
+
+    if success then
+        return drawables
+
+    else
+        logEntityDefinitionError("rendering node", drawables, room, entity)
+
+        return entities.getNodeDrawable(name, erroringEntityHandler, room, entity, node, nodeIndex, viewport)
     end
 end
 

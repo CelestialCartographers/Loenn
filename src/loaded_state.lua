@@ -177,7 +177,13 @@ function state.isItemSelected(item)
 end
 
 function state.openMap()
-    filesystem.openDialog(fileLocations.getCelesteDir(), "bin", state.loadFile)
+    local targetDirectory = fileLocations.getCelesteDir()
+
+    if state.filename and filesystem.isFile(state.filename) then
+        targetDirectory = filesystem.dirname(state.filename)
+    end
+
+    filesystem.openDialog(targetDirectory, "bin", state.loadFile)
 end
 
 function state.newMap()
