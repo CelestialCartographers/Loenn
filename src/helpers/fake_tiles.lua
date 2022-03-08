@@ -79,6 +79,7 @@ function fakeTilesHelper.getMaterialMatrix(entity, material)
     end
 end
 
+-- TODO - Object scenery
 function fakeTilesHelper.generateFakeTilesBatch(room, x, y, fakeTiles, layer)
     local fg = layer == "tilesFg"
     local tilerMeta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
@@ -86,9 +87,10 @@ function fakeTilesHelper.generateFakeTilesBatch(room, x, y, fakeTiles, layer)
     local random = celesteRender.getRoomRandomMatrix(room, layer)
     local randomSlice = random:getSlice(x - 2, y - 2, x + width - 3, y + height - 3, 0)
 
-    return celesteRender.getTilesBatch(room, fakeTiles, tilerMeta, fg, randomSlice, "canvasGrid", false)
+    return celesteRender.getTilesBatch(room, fakeTiles, tilerMeta, nil, fg, randomSlice, "canvasGrid", false)
 end
 
+-- TODO - Object scenery
 function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, offsetX, offsetY, color)
     offsetX = offsetX or 0
     offsetY = offsetY or 0
@@ -99,7 +101,7 @@ function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, 
     local width, height = tileWidth * 8, tileHeight * 8
     local random = celesteRender.getRoomRandomMatrix(room, layer)
     local randomSlice = random:getSlice(x - 2, y - 2, x + tileWidth - 3, y + tileHeight - 3, 0)
-    local tiles, missingTiles = celesteRender.getTilesBatch(room, fakeTiles, tilerMeta, fg, randomSlice, "table", false)
+    local tiles, missingTiles = celesteRender.getTilesBatch(room, fakeTiles, tilerMeta, nil, fg, randomSlice, "table", false)
     local missingColor = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
 
     local sprites = {}

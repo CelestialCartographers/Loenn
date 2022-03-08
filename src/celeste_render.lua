@@ -30,6 +30,7 @@ celesteRender.tilesMetaFg = celesteRender.tilesMetaFgVanilla
 celesteRender.tilesMetaBg = celesteRender.tilesMetaBgVanilla
 
 celesteRender.tilesSpriteMetaCache = {}
+celesteRender.tilesSceneryMetaCache = {}
 
 local tilesFgDepth = depths.fgTerrain
 local tilesBgDepth = depths.bgTerrain
@@ -44,6 +45,8 @@ local YIELD_RATE = 100
 local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = configs.editor.alwaysRedrawUnselectedRooms
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = configs.editor.prepareRoomRenderInBackground
+
+local SCENERY_GAMEPLAY_PATH = "tilesets/scenery"
 
 local roomCache = {}
 local roomRandomMatrixCache = {}
@@ -90,6 +93,7 @@ function celesteRender.loadCustomTilesetAutotiler(state)
     end
 
     celesteRender.clearTileSpriteQuadCache()
+    celesteRender.clearScenerySpriteQuadCache()
 end
 
 function celesteRender.sortBatchingTasks(state, taskList)
@@ -252,10 +256,20 @@ function celesteRender.getRoomBorderColor(room, selected)
     return color
 end
 
+function celesteRender.getSceneryMeta()
+    return atlases.gameplay[SCENERY_GAMEPLAY_PATH]
+end
+
 function celesteRender.clearTileSpriteQuadCache()
     -- TODO - Does this need to release quads? Should be small enough to just wait for Lua GC
 
     celesteRender.tilesSpriteMetaCache = {}
+end
+
+function celesteRender.clearScenerySpriteQuadCache()
+    -- TODO - Does this need to release quads? Should be small enough to just wait for Lua GC
+
+    celesteRender.tilesSceneryMetaCache = nil
 end
 
 function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
@@ -281,6 +295,29 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
         quadCache:set0(quadX, quadY, res)
 
         return res
+    end
+
+    return quadCache:get0(quadX, quadY)
+end
+
+function celesteRender.getOrCacheScenerySpriteQuad(index)
+    local sceneryMeta = celesteRender.getSceneryMeta()
+    local sceneryWidth, sceneryHeight = math.ceil(sceneryMeta.realWidth / 8), math.ceil(sceneryMeta.realHeight / 8)
+    local quadX, quadY = index % sceneryWidth, math.floor(index / sceneryWidth)
+
+    if not celesteRender.tilesSceneryMetaCache then
+        celesteRender.tilesSceneryMetaCache = matrix.filled(nil, sceneryWidth, sceneryHeight)
+    end
+
+    local quadCache = celesteRender.tilesSceneryMetaCache
+
+    if not quadCache:get0(quadX, quadY) then
+        local spritesWidth, spritesHeight = sceneryMeta.image:getDimensions()
+        local quad = love.graphics.newQuad(sceneryMeta.x - sceneryMeta.offsetX + quadX * 8, sceneryMeta.y - sceneryMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
+
+        quadCache:set0(quadX, quadY, quad)
+
+        return quad
     end
 
     return quadCache:get0(quadX, quadY)
@@ -319,13 +356,13 @@ local function getTilesBatchFromMode(width, height, mode)
 end
 
 -- randomMatrix is for custom randomness, mostly to give the correct "slice" of the matrix when making fake tiles
-function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix, batchMode, shouldYield)
+function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatrix, batchMode, shouldYield)
     batchMode = batchMode or "canvasGrid"
 
     local tilesMatrix = tiles.matrix
 
     -- Getting upvalues
-    local cache = celesteRender.tilesSpriteMetaCache
+    local tileCache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = meta
     local checkTile = autotiler.checkTile
@@ -345,14 +382,31 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix, batchM
 
     local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, fg and "tilesFg" or "tilesBg")
 
+    local sceneryMatrix = scenery and scenery.matrix or matrix.filled(-1, width, height)
+    local sceneryMeta = celesteRender.getSceneryMeta()
+    local sceneryWidth, sceneryHeight = sceneryMeta.realWidth, sceneryMeta.realHeight
+
     local missingTiles = {}
 
     for x = 1, width do
         for y = 1, height do
             local rng = random:getInbounds(x, y)
             local tile = tilesMatrix:getInbounds(x, y)
+            local sceneryTile = sceneryMatrix:getInbounds(x, y)
 
-            if tile ~= airTile then
+            if sceneryTile > -1 then
+                local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
+
+                if quad then
+                    if batchMode == "canvasGrid" then
+                        batch:set(x, y, sceneryMeta, quad, x * 8 - 8, y * 8 - 8)
+
+                    elseif batchMode == "table" then
+                        table.insert(batch, {sceneryMeta, quad, x * 8 - 8, y * 8 - 8})
+                    end
+                end
+
+            elseif tile ~= airTile then
                 local tileMeta = meta[tile]
                 if tileMeta and tileMeta.path then
                     -- TODO - Render overlay sprites
@@ -366,7 +420,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, fg, randomMatrix, batchM
                         local spriteMeta = atlases.gameplay[texture]
 
                         if spriteMeta then
-                            local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
+                            local quad = celesteRender.getOrCacheTileSpriteQuad(tileCache, tile, texture, randQuad, fg)
 
                             if batchMode == "canvasGrid" then
                                 batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
@@ -405,6 +459,7 @@ end
 local function getRoomTileBatch(room, tiles, fg)
     local key = fg and "tilesFg" or "tilesBg"
     local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
+    local scenery = fg and room.sceneryFg or room.sceneryBg
 
     local roomName = room.name
     local cache = roomCache[roomName]
@@ -416,7 +471,7 @@ local function getRoomTileBatch(room, tiles, fg)
 
     if not cache[key]then
         cache[key] = tasks.newTask(
-            (-> celesteRender.getTilesBatch(room, tiles, meta, fg)),
+            (-> celesteRender.getTilesBatch(room, tiles, meta, scenery, fg)),
             (task -> PRINT_BATCHING_DURATION and logging.info(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
             batchingTasks,
             {room = room}
