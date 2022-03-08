@@ -260,9 +260,13 @@ end
 
 function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     if not cache[tile] then
+        local tilesetSpriteMeta = atlases.gameplay[texture]
+        local tilesetSpriteWidth, tilesetSpriteHeight = tilesetSpriteMeta.realWidth, tilesetSpriteMeta.realHeight
+        local width, height = math.ceil(tilesetSpriteWidth / 8), math.ceil(tilesetSpriteWidth / 8)
+
         cache[tile] = {
-            [false] = matrix.filled(nil, 6, 15),
-            [true] = matrix.filled(nil, 6, 15)
+            [false] = matrix.filled(nil, width, height),
+            [true] = matrix.filled(nil, width, height)
         }
     end
 
