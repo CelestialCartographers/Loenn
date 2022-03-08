@@ -94,10 +94,16 @@ function tilesStruct.tileStringToMatrix(tiles, separator, empty)
     end
 
     local res = matrix.filled(empty, cols, rows)
+    local parseNumber = type(empty) == "number"
 
     for y, line in ipairs(lines) do
         for x, char in ipairs(utils.splitUTF8(line, separator)) do
-            res:setInbounds(x, y, char)
+            if parseNumber then
+                res:setInbounds(x, y, tonumber(char))
+
+            else
+                res:setInbounds(x, y, char)
+            end
         end
     end
 
