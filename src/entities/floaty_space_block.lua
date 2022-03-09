@@ -27,7 +27,6 @@ local function getSearchPredicate(entity)
 end
 
 function floatySpaceBlock.sprite(room, entity)
-    local searchPredicate = getSearchPredicate(entity)
     local relevantBlocks = utils.filter(getSearchPredicate(entity), room.entities)
 
     connectedEntities.appendIfMissing(relevantBlocks, entity)
