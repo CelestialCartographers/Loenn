@@ -489,13 +489,13 @@ function entities.drawSelected(room, layer, entity, color)
                     if nodeVisibility == "selected" then
                         if #nodeDrawable > 0 then
                             for _, drawable in ipairs(nodeDrawable) do
-                                if drawable.x and drawable.y then
+                                if drawable.draw then
                                     drawable:draw()
                                 end
                             end
 
                         else
-                            if nodeDrawable.x and nodeDrawable.y then
+                            if nodeDrawable.draw then
                                 nodeDrawable:draw()
                             end
                         end
