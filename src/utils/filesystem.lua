@@ -72,6 +72,19 @@ function filesystem.stripExtension(path)
     return path
 end
 
+-- Maunal iteration for performance
+-- String matching or getting ext just to sub is expensive
+-- Extension is returned without the dot
+function filesystem.splitExtension(path)
+    for i = #path, 1, -1 do
+        if path:byte(i, i) == 46 then
+            return path:sub(1, i - 1), path:sub(i + 1)
+        end
+    end
+
+    return path, nil
+end
+
 function filesystem.mkdir(path, mode)
     return lfs.mkdir(path, mode or 493) -- octal mode 755
 end

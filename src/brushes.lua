@@ -91,6 +91,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local cache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
+    local scenery = fg and room.sceneryFg or room.sceneryBg
     local checkTile = autotiler.checkTile
     local lshift = bit.lshift
     local bxor = bit.bxor
@@ -110,6 +111,9 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, layer)
     local roomCache = celesteRender.getRoomCache(room.name, layer)
     local batch = roomCache and roomCache.result
+
+    local sceneryMatrix = scenery and scenery.matrix or matrix.filled(-1, width, height)
+    local sceneryMeta = celesteRender.getSceneryMeta()
 
     if not batch then
         return false
@@ -160,8 +164,16 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         if tilesMatrix:inbounds(x, y) then
             local rng = random:getInbounds(x, y)
             local tile = tilesMatrix:getInbounds(x, y)
+            local sceneryTile = sceneryMatrix:getInbounds(x, y)
 
-            if tile == airTile then
+            if sceneryTile > -1 then
+                local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
+
+                if quad then
+                    batch:set(x, y, sceneryMeta, quad, x * 8 - 8, y * 8 - 8)
+                end
+
+            elseif tile == airTile then
                 batch:set(x, y, false)
 
             else

@@ -22,9 +22,17 @@ local themeTextures = {
     }
 }
 
+local nodeFrameColor = {1.0, 1.0, 1.0, 0.7}
+
 local frameNinePatchOptions = {
     mode = "fill",
     borderMode = "repeat"
+}
+
+local frameNodeNinePatchOptions = {
+    mode = "fill",
+    borderMode = "repeat",
+    color = nodeFrameColor
 }
 
 local trailNinePatchOptions = {
@@ -69,16 +77,21 @@ for i, theme in ipairs(themes) do
     }
 end
 
-local function addBlockSprites(sprites, entity, frameTexture, middleTexture)
-    local x, y = entity.x or 0, entity.y or 0
+local function addBlockSprites(sprites, entity, position, frameTexture, middleTexture, isNode)
+    local x, y = position.x or 0, position.y or 0
     local width, height = entity.width or 8, entity.height or 8
 
-    local frameNinePatch = drawableNinePatch.fromTexture(frameTexture, frameNinePatchOptions, x, y, width, height)
+    local ninePatchOptions = isNode and frameNodeNinePatchOptions or frameNinePatchOptions
+    local frameNinePatch = drawableNinePatch.fromTexture(frameTexture, ninePatchOptions, x, y, width, height)
     local frameSprites = frameNinePatch:getDrawableSprite()
-    local middleSprite = drawableSprite.fromTexture(middleTexture, entity)
+    local middleSprite = drawableSprite.fromTexture(middleTexture, position)
 
     middleSprite:addPosition(math.floor(width / 2), math.floor(height / 2))
     middleSprite.depth = blockDepth
+
+    if isNode then
+        middleSprite:setColor(nodeFrameColor)
+    end
 
     for _, sprite in ipairs(frameSprites) do
         sprite.depth = blockDepth
@@ -128,18 +141,18 @@ function swapBlock.sprite(room, entity)
     local themeData = themeTextures[theme] or themeTextures["normal"]
 
     addTrailSprites(sprites, entity, themeData.trail, themeData.path)
-    addBlockSprites(sprites, entity, themeData.frame, themeData.middle)
+    addBlockSprites(sprites, entity, entity, themeData.frame, themeData.middle)
 
     return sprites
 end
 
-function swapBlock.nodeSprite(room, entity)
+function swapBlock.nodeSprite(room, entity, node)
     local sprites = {}
 
     local theme = string.lower(entity.theme or "normal")
     local themeData = themeTextures[theme] or themeTextures["normal"]
 
-    addBlockSprites(sprites, entity, themeData.frame, themeData.middle)
+    addBlockSprites(sprites, entity, node, themeData.frame, themeData.middle, true)
 
     return sprites
 end

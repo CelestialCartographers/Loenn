@@ -59,16 +59,19 @@ function decals.getDecalNames(removeAnimationFrames, yield)
 
     for i, name in ipairs(filenames) do
         if not added[name] then
-            local nameNoExt, ext = utils.stripExtension(name)
-            local shouldKeepFrame = keepFrame(nameNoExt, removeAnimationFrames)
+            local nameNoExt, ext = utils.splitExtension(name)
 
-            if shouldKeepFrame then
-                -- Remove mod specific path, keep decals/ prefix
-                local firstSlashIndex = utils.findCharacter(nameNoExt, "/")
-                local resourceName = nameNoExt:sub(firstSlashIndex + decalPathLength - 5)
+            if ext == "png" then
+                local shouldKeepFrame = keepFrame(nameNoExt, removeAnimationFrames)
 
-                if not added[resourceName] then
-                    table.insert(res, resourceName)
+                if shouldKeepFrame then
+                    -- Remove mod specific path, keep decals/ prefix
+                    local firstSlashIndex = utils.findCharacter(nameNoExt, "/")
+                    local resourceName = nameNoExt:sub(firstSlashIndex + decalPathLength - 5)
+
+                    if not added[resourceName] then
+                        table.insert(res, resourceName)
+                    end
                 end
             end
 

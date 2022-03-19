@@ -9,7 +9,9 @@ local roomStruct = {}
 local structTilesNames = {
     solids = {"tilesFg", tilesStruct},
     bg = {"tilesBg", tilesStruct},
-    objtiles = {"tilesObj", objectTilesStruct}
+    objtiles = {"sceneryObj", objectTilesStruct},
+    fgtiles = {"sceneryFg", objectTilesStruct},
+    bgtiles = {"sceneryBg", objectTilesStruct}
 }
 
 local structMutlipleNames = {
@@ -69,7 +71,9 @@ function roomStruct.decode(data)
 
     room.tilesFg = nil
     room.tilesBg = nil
-    room.tilesObj = nil
+    room.sceneryObj = nil
+    room.sceneryFg = nil
+    room.sceneryBg = nil
 
     local roomTilesWidth = math.ceil(room.width / 8)
     local roomTilesHeight = math.ceil(room.height / 8)

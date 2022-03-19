@@ -1,7 +1,6 @@
 local filesystem = require("utils.filesystem")
 local config = require("utils.config")
 local utils = require("utils")
-local logging = require("logging")
 
 local fileLocations = {}
 
@@ -21,9 +20,9 @@ end
 -- Part of Lönn zip/windows config name deprecation, will be removed later
 function fileLocations.handleWindowsStorageDeprecation()
     if fileLocations.hasOldStorageDir() then
-        local deprecationMessage = "Moving existing config to new location, old folder is deprecated due to encoding issues"
+        local deprecationMessage = "[Migration] Moving existing config to new location, old folder is deprecated due to encoding issues"
 
-        logging.warning(deprecationMessage)
+        print(deprecationMessage)
 
         fileLocations.migrateOldWindowsStorage()
     end
