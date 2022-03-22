@@ -178,19 +178,23 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
 
             else
                 -- TODO - Update overlay sprites
-                local quads, sprites = autotiler.getQuadsWithBitmask(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
-                local quadCount = #quads
+                local tileMeta = meta[tile]
 
-                if quadCount > 0 then
-                    local randQuad = quads[utils.mod1(rng, quadCount)]
-                    local texture = meta[tile].path or emptyTile
+                if tileMeta and tileMeta.path then
+                    local quads, sprites = autotiler.getQuadsWithBitmask(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+                    local quadCount = #quads
 
-                    local spriteMeta = atlases.gameplay[texture]
+                    if quadCount > 0 then
+                        local randQuad = quads[utils.mod1(rng, quadCount)]
+                        local texture = meta[tile].path or emptyTile
 
-                    if spriteMeta then
-                        local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
+                        local spriteMeta = atlases.gameplay[texture]
 
-                        batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+                        if spriteMeta then
+                            local quad = celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, randQuad, fg)
+
+                            batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
+                        end
                     end
                 end
             end
