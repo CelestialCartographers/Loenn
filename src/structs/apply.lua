@@ -15,18 +15,18 @@ function applyStruct.decode(data)
         end
     end
 
-    res.__children = {}
+    res.children = {}
 
     for i, child in ipairs(data.__children or {}) do
         if child.__name == "parallax" then
-            table.insert(res.__children, parallaxStruct.decode(child))
+            table.insert(res.children, parallaxStruct.decode(child))
 
         elseif child.__name == "apply" then
-            table.insert(res.__children, applyStruct.decode(child))
+            table.insert(res.children, applyStruct.decode(child))
 
         -- Anything else with a valid name is a effect
         elseif child.__name then
-            table.insert(res.__children, effectStruct.decode(child))
+            table.insert(res.children, effectStruct.decode(child))
         end
     end
 
@@ -37,14 +37,14 @@ function applyStruct.encode(apply)
     local res = {}
 
     for k, v in pairs(apply) do
-        if k:sub(1, 1) ~= "_" then
+        if k:sub(1, 1) ~= "_" and k ~= "children" then
             res[k] = v
         end
     end
 
     res.__children = {}
 
-    for i, backdrop in ipairs(apply.__children or {}) do
+    for i, backdrop in ipairs(apply.children or {}) do
         local typ = utils.typeof(backdrop)
 
         if typ == "parallax" then
