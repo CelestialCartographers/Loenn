@@ -69,11 +69,15 @@ function windows.getLoadedWindows()
     windows.windows = {}
 
     for name, window in pairs(windows.windowHandlers) do
-        if window.getWindow then
-            windows.windows[name] = window.getWindow()
+        local visible = utils.callIfFunction(window.visible)
 
-        else
-            windows.windows[name] = window
+        if visible ~= false then
+            if window.getWindow then
+                windows.windows[name] = window.getWindow()
+
+            else
+                windows.windows[name] = window
+            end
         end
     end
 
