@@ -14,6 +14,7 @@ local utils = require("utils")
 local languageRegistry = require("language_registry")
 
 local roomEditor = require("ui.room_editor")
+local stylegroundEditor = require("ui.styleground_editor")
 
 local menubar = {}
 
@@ -82,7 +83,7 @@ menubar.menubar = {
     }},
     {"view", notYetImplementedNotification},
     {"map", {
-        {"stylegrounds", notYetImplementedNotification},
+        {"stylegrounds", stylegroundEditor.editStylegrounds},
         {"metadata", notYetImplementedNotification}
     }},
     {"room", {
