@@ -33,13 +33,19 @@ function colorField._MT.__index:getValue()
 end
 
 function colorField._MT.__index:fieldValid(...)
-    if self._allowXNAColors then
-        local color = utils.getColor(self:getValue())
+    local current = self:getValue()
+    local fieldEmpty = current == nil or #current == 0
+
+    if fieldEmpty then
+        return self._allowEmpty
+
+    elseif self._allowXNAColors then
+        local color = utils.getColor(current)
 
         return not not color
 
     else
-        local parsed, r, g, b = utils.parseHexColor(self:getValue())
+        local parsed, r, g, b = utils.parseHexColor(current)
 
         return parsed
     end
@@ -48,6 +54,12 @@ end
 -- Return the hex color of the XNA name if allowed
 -- Otherwise return the value as it is
 local function getXNAColorHex(element, value)
+    local fieldEmpty = value == nil or #value == 0
+
+    if fieldEmpty and element._allowEmpty then
+        return fallbackHexColor
+    end
+
     if element._allowXNAColors then
         local xnaColor = utils.getXNAColor(value or "")
 
@@ -139,12 +151,14 @@ function colorField.getElement(name, value, options)
     local minWidth = options.minWidth or options.width or 160
     local maxWidth = options.maxWidth or options.width or 160
     local allowXNAColors = options.allowXNAColors
+    local allowEmpty = options.allowEmpty
 
     local label = uiElements.label(options.displayName or name)
     local field = uiElements.field(value or fallbackHexColor, fieldChanged(formField)):with({
         minWidth = minWidth,
         maxWidth = maxWidth,
-        _allowXNAColors = allowXNAColors
+        _allowXNAColors = allowXNAColors,
+        _allowEmpty = allowEmpty
     }):hook({
         draw = fieldDrawColorPreview
     })
@@ -183,6 +197,7 @@ function colorField.getElement(name, value, options)
     formField.initialValue = value
     formField.currentValue = value
     formField._allowXNAColors = allowXNAColors
+    formField._allowEmpty = allowEmpty
     formField.width = 2
     formField.elements = {
         label, fieldWithContext
