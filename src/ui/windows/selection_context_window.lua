@@ -13,6 +13,7 @@ local viewportHandler = require("viewport_handler")
 local layerHandlers = require("layer_handlers")
 local toolUtils = require("tool_utils")
 local notifications = require("ui.notification")
+local formUtils = require("ui.utils.forms")
 
 local contextWindow = {}
 
@@ -20,11 +21,6 @@ local contextGroup
 local activeWindows = {}
 local windowPreviousX = 0
 local windowPreviousY = 0
-
--- Remove values that would very want to be exposed for any type of selection item
-local globallyFilteredKeys = {
-    _type = true
-}
 
 local function editorSelectionContextMenuCallback(group, selections)
     contextWindow.createContextMenu(selections)
@@ -35,53 +31,6 @@ local function contextWindowUpdate(orig, self, dt)
 
     windowPreviousX = self.x
     windowPreviousY = self.y
-end
-
-local function getItemIgnoredFields(layer, item)
-    local handler = layerHandlers.getHandler(layer)
-    local ignored = handler.ignoredFields and handler.ignoredFields(layer, item) or {}
-    local ignoredSet = {}
-
-    for _, name in ipairs(ignored) do
-        ignoredSet[name] = true
-    end
-
-    return ignoredSet
-end
-
-local function getItemFieldOrder(layer, item)
-    local handler = layerHandlers.getHandler(layer)
-    local fieldOrder = handler.fieldOrder and handler.fieldOrder(layer, item) or {}
-
-    return utils.deepcopy(fieldOrder)
-end
-
-local function getItemFieldInformation(layer, item)
-    local handler = layerHandlers.getHandler(layer)
-    local fieldInformation = handler.fieldInformation and handler.fieldInformation(layer, item) or {}
-
-    return utils.deepcopy(fieldInformation)
-end
-
-local function getItemLanguage(layer, item, language)
-    local handler = layerHandlers.getHandler(layer)
-
-    if handler and handler.languageData then
-        local itemLanguage, fallbackLanguage = handler.languageData(layer, item, language)
-
-        return itemLanguage, fallbackLanguage or itemLanguage
-
-    else
-        return language, language
-    end
-end
-
-local function getLanguageKey(key, language, default)
-    if language[key]._exists then
-        return tostring(language[key])
-    end
-
-    return default
 end
 
 local function getWindowTitle(language, selections, targetItem, targetLayer)
@@ -147,88 +96,10 @@ function contextWindow.saveChangesCallback(selections, dummyData)
     end
 end
 
-function contextWindow.prepareFormData(layer, item, language)
-    local dummyData = {}
+local function prepareFormData(layer, item, language)
+    local handler = layerHandlers.getHandler(layer)
 
-    local fieldsAdded = {}
-    local fieldInformation = getItemFieldInformation(layer, item)
-    local fieldOrder = getItemFieldOrder(layer, item)
-    local fieldIgnored = getItemIgnoredFields(layer, item)
-
-    local fieldLanguage, fallbackLanguage = getItemLanguage(layer, item, language)
-    local languageTooltips = fieldLanguage.attributes.description
-    local languageNames = fieldLanguage.attributes.name
-    local fallbackTooltips = fallbackLanguage.attributes.description
-    local fallbackNames = fallbackLanguage.attributes.name
-
-    for _, field in ipairs(fieldOrder) do
-        local value = item[field]
-
-        if value ~= nil or fieldInformation.options then
-            local humanizedName = utils.humanizeVariableName(field)
-            local displayName = getLanguageKey(field, languageNames, getLanguageKey(field, fallbackNames, humanizedName))
-            local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
-
-            if not fieldInformation[field] then
-                fieldInformation[field] = {}
-            end
-
-            fieldsAdded[field] = true
-            dummyData[field] = utils.deepcopy(value)
-            fieldInformation[field].displayName = displayName
-            fieldInformation[field].tooltipText = tooltip
-        end
-    end
-
-    -- Find all fields that aren't added yet and prepare them for alphabetical sorting
-    -- Some fields should not be exposed automatically
-    -- Any fields already added should not be added again
-    local missingFields = {}
-
-    for field, value in pairs(item) do
-        if not globallyFilteredKeys[field] and not fieldIgnored[field] and not fieldsAdded[field] then
-            local humanizedName = utils.humanizeVariableName(field)
-            local displayName = getLanguageKey(field, languageNames, humanizedName)
-
-            fieldsAdded[field] = true
-
-            table.insert(missingFields, {field, value, displayName})
-        end
-    end
-
-    -- Add all fields that have options, but have not yet been added
-    for field, info in pairs(fieldInformation) do
-        if info.options and not globallyFilteredKeys[field] and not fieldIgnored[field] and not fieldsAdded[field] then
-            local value = item[field]
-            local humanizedName = utils.humanizeVariableName(field)
-            local displayName = getLanguageKey(field, languageNames, humanizedName)
-
-            table.insert(missingFields, {field, value, displayName})
-        end
-    end
-
-    -- Sort by display name
-    table.sort(missingFields, function(a, b)
-        return a[3] < b[3]
-    end)
-
-    -- Add all missing fields
-    for _, missing in pairs(missingFields) do
-        local field, value, displayName = unpack(missing)
-        local tooltip = getLanguageKey(field, languageTooltips)
-
-        table.insert(fieldOrder, field)
-
-        if not fieldInformation[field] then
-            fieldInformation[field] = {}
-        end
-
-        dummyData[field] = utils.deepcopy(value)
-        fieldInformation[field].displayName = displayName
-        fieldInformation[field].tooltipText = tooltip
-    end
-
-    return dummyData, fieldInformation, fieldOrder
+    return formUtils.prepareFormData(handler, item, {}, {layer, item})
 end
 
 function contextWindow.createContextMenu(selections)
@@ -253,7 +124,7 @@ function contextWindow.createContextMenu(selections)
         windowX, windowY = 0, 0
     end
 
-    local dummyData, fieldInformation, fieldOrder = contextWindow.prepareFormData(targetLayer, targetItem, language)
+    local dummyData, fieldInformation, fieldOrder = prepareFormData(targetLayer, targetItem, language)
     local buttons = {
         {
             text = tostring(language.ui.room_window.save_changes),
