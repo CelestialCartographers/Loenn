@@ -1194,3 +1194,125 @@ room.description.windPattern=The type of wind in the room.
 room.description.color=The colour of the room border. Can also be seen in the game's debug map viewer.\n0 - White\n1 - Red\n2 - Green\n3 - Light Blue\n4 - Dark Blue\n5 - Purple\n6 - Pink
 room.description.cameraOffsetX=Global horizontal offset of camera in room.
 room.description.cameraOffsetY=Global vertical offset of camera in room.
+
+
+# -- Parallax --
+# style.parallax.attribute.Attribute=Attribute Display Name
+# style.parallax.description.Attribute=Tooltip
+
+style.parallax.attribute.alpha=Alpha
+style.parallax.attribute.color=Colour
+style.parallax.attribute.exclude=Exclude
+style.parallax.attribute.only=Only
+style.parallax.attribute.scrollx=Scroll X
+style.parallax.attribute.scrolly=Scroll Y
+style.parallax.attribute.speedx=Speed X
+style.parallax.attribute.speedy=Speed Y
+style.parallax.attribute.x=X
+style.parallax.attribute.y=Y
+style.parallax.attribute.blendmode=Blend Mode
+style.parallax.attribute.texture=Texture
+style.parallax.attribute.fadeIn=Fade In
+style.parallax.attribute.flipx=Flip X
+style.parallax.attribute.flipy=Flip Y
+style.parallax.attribute.fadex=Fade X
+style.parallax.attribute.fadey=Fade Y
+style.parallax.attribute.instantOut=Instant Out
+style.parallax.attribute.instantIn=Instant In
+style.parallax.attribute.loopx=Loop X
+style.parallax.attribute.loopy=Loop Y
+style.parallax.attribute.fg=Foreground
+style.parallax.attribute.flag=Flag
+style.parallax.attribute.notflag=Not Flag
+style.parallax.attribute.tag=Tag
+
+style.parallax.description.alpha=Determines opacity between 0 (Translucent) and 1 (Opaque). 
+style.parallax.description.color=Using hex colour code, the code tints a styleground that colour.
+style.parallax.description.exclude=Exludes specific rooms from taking stylegrounds and/or effects, taking priority over Only. Use * as a wildcard character.
+style.parallax.description.only=Adds rooms to a styleground or effect. Use * as a wildcard character.
+style.parallax.description.scrollx=Determines the parallax scrolling of a styleground along the X axis.
+style.parallax.description.scrolly=Determines the parallax scrolling of a styleground along the Y axis.
+style.parallax.description.speedx=Automatically moves the styleground along the X axis in-game.
+style.parallax.description.speedy=Automatically moves the styleground along the Y axis in-game.
+style.parallax.description.x=Determines the position of the styleground's appearance on screen in-game on the X axis.
+style.parallax.description.y=Determines the position of the styleground's appearance on screen in-game on the Y axis.
+style.parallax.description.blendmode=Determines whether the colours from overlaping stylegrounds should be added ontop of each other or multiplied.
+style.parallax.description.texture=The texture that the styleground should use.
+style.parallax.description.fadeIn=Determines whether the styleground should fade in when transitioning to it.
+style.parallax.description.flipx=Flips the styleground on the X axis.
+style.parallax.description.flipy=Flips the styleground on the Y axis.
+style.parallax.description.fadex=Advanced horizontal fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+style.parallax.description.fadey=Advanced vertical fading zones.\nFormat is "FromPosition-ToPosition,FromAlpha-ToAlpha". Example "n500-500,1-0".\nNegative numbers in position are denoted with "n" rather than minus. Position numbers are in pixels and use map coordinates.\nMultiple zones can be set up by using ":" as separator.
+style.parallax.description.instantOut=Determines whether the styleground should instantly fade out when transitioning away from it.
+style.parallax.description.instantIn=Determines whether the styleground should instantly fade in when transitioning away from it.
+style.parallax.description.loopx=Loops the styleground on the X axis.
+style.parallax.description.loopy=Loops the styleground on the Y axis.
+style.parallax.description.fg=Whether the styleground is in the foreground or background.
+style.parallax.description.flag=Flag to make the backdrop visible. Leave empty to disable.
+style.parallax.description.notflag=Flag to make the backdrop not visible. Leave empty to disable. Overrides the Flag field if set.
+style.parallax.description.tag=A tag to make it easier to access given backdrops from code.
+
+
+# -- Effects --
+# style.effects.effectName.attribute.Attribute=Attribute Display Name
+# style.effects.effectName.description.Attribute=Attribute Display Name
+
+# Defaults
+style.effects.default.attribute.name=Name
+style.effects.default.attribute.only=Rooms
+style.effects.default.attribute.exclude=Exclude
+style.effects.default.attribute.fg=Foreground
+style.effects.default.attribute.flag=Flag
+style.effects.default.attribute.notflag=Not Flag
+style.effects.default.attribute.tag=Tag
+
+style.effects.default.description.name=The name of the effect.
+style.effects.default.description.only=Which rooms the effect will be visible in. Room names can be comma seperated and wildcards are supported.\nExample: "a00,b00,c*".
+style.effects.default.description.exclude=Which rooms the effect will not be visible in. Room names can be comma seperated and wildcards are supported.\nExample: "a00,b00,c*".
+style.effects.default.description.fg=Whether the effect should be in the foreground or background.
+style.effects.default.description.flag=Flag to make the effect visible. Leave empty to disable.
+style.effects.default.description.notflag=Flag to make the effect not visible. Leave empty to disable. Overrides the Flag field if set.
+style.effects.default.description.tag=A tag to make it easier to access given backdrops from code.
+
+# Tentacles
+style.effects.tentacles.attribute.sides=Sides
+style.effects.tentacles.attribute.offset=Offset
+style.effects.tentacles.attribute.color=Colour
+
+style.effects.tentacles.description.sides=The side of the screen that the tentacles should attach to.
+style.effects.tentacles.description.offset=Determines the lerp strength of the tentacles, and their offset compared to the player's position.
+style.effects.tentacles.description.color=The colour of the tentacles.
+
+# Starfield
+style.effects.starfield.attribute.color=Colour
+style.effects.starfield.attribute.scrollx=Scroll X
+style.effects.starfield.attribute.scrolly=Scroll Y
+style.effects.starfield.attribute.speed=Speed
+
+style.effects.starfield.description.color=The colour of the stars.
+style.effects.starfield.description.scrollx=Determines the parallax scrolling of the stars along the X axis.
+style.effects.starfield.description.scrolly=Determines the parallax scrolling of the stars along the Y axis.
+style.effects.starfield.description.speed=Speed multiplier for the stars.
+
+# Rain
+style.effects.rain.attribute.color=Colour
+
+style.effects.rain.description.color=The colour of the rain.
+
+# Planets
+style.effects.planets.attribute.count=Count
+style.effects.planets.attribute.size=Size
+style.effects.planets.attribute.color=Colour
+style.effects.planets.attribute.scrollx=Scroll X
+style.effects.planets.attribute.scrolly=Scroll Y
+
+style.effects.planets.description.count=The amount of planets to render.
+style.effects.planets.description.color=The colour of the planets.
+style.effects.planets.description.size=The sprite to use for the planets.\nLocated at "Gameplay/bgs/10/$size00", where "$size" is the size attribute value.
+style.effects.planets.description.scrollx=Determines the parallax scrolling of the planets along the X axis.
+style.effects.planets.description.scrolly=Determines the parallax scrolling of the planets along the Y axis.
+
+# Windsnow
+style.effects.windsnow.attribute.color=Colour
+
+style.effects.windsnow.description.color=The colour of the snow.
