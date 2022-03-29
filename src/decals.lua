@@ -243,7 +243,7 @@ function decals.fieldOrder(layer, decal)
     return {"x", "y", "scaleX", "scaleY", "texture"}
 end
 
-function decals.languageData(layer, decal, language)
+function decals.languageData(language, layer, decal)
     return language.decals
 end
 

@@ -1048,7 +1048,7 @@ function entities.fieldInformation(layer, entity)
     return fieldInfo
 end
 
-function entities.languageData(layer, entity, language)
+function entities.languageData(language, layer, entity)
     local name = entity._name
     local handler = entities.registeredEntities[name]
 
