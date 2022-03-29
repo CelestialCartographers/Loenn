@@ -603,7 +603,7 @@ function triggers.fieldInformation(layer, trigger)
     return fieldInfo
 end
 
-function triggers.languageData(layer, entity, language)
+function triggers.languageData(language, layer, entity)
     local name = entity._name
     local handler = triggers.registeredTriggers[name]
 
