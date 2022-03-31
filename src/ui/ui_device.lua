@@ -14,6 +14,7 @@ local forms = require("ui.forms.form")
 local windows = require("ui.windows")
 local uiRoot = require("ui.ui_root")
 local logging = require("logging")
+local themes = require("ui.themes")
 
 -- Add Debug UI reload function
 function debugUtils.reloadUI()
@@ -30,6 +31,10 @@ function debugUtils.reloadUI()
     forms.loadInternalFieldTypes()
     forms.loadExternalFieldTypes()
 
+    themes.unloadThemes()
+    themes.loadInternalThemes()
+    themes.loadExternalThemes()
+
     uiRoot.updateWindows(windows.getLoadedWindows())
 
     windows.restoreWindowPositions()
@@ -42,11 +47,17 @@ function ui.initializeDevice()
     windows.loadInternalWindows()
     windows.loadExternalWindows()
 
+    themes.loadInternalThemes()
+    themes.loadExternalThemes()
+
     local uiRootElement = uiRoot.getRootElement(windows.getLoadedWindows())
 
     ui.init(uiRootElement, false)
     ui.features.eventProxies = true
     ui.features.megacanvas = false
+
+    -- TODO - Config option
+    themes.useTheme("dark")
 end
 
 return ui
