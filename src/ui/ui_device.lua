@@ -34,6 +34,7 @@ function debugUtils.reloadUI()
     themes.unloadThemes()
     themes.loadInternalThemes()
     themes.loadExternalThemes()
+    themes.useTheme(themes.currentTheme)
 
     uiRoot.updateWindows(windows.getLoadedWindows())
 

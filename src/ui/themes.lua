@@ -74,7 +74,7 @@ function themes.loadExternalThemes()
 end
 
 function themes.useTheme(name)
-    if themes.themes[name] then
+    if name and themes.themes[name] then
         themes.currentTheme = name
 
         themer.apply(themes.themes[name])
