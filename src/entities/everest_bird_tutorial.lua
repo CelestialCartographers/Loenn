@@ -10,8 +10,7 @@ birdTutorial.texture = "characters/bird/crow00"
 birdTutorial.nodeLimits = {0, -1}
 birdTutorial.fieldInformation = {
     info = {
-        options = enums.everest_bird_tutorial_tutorials,
-        editable = false
+        options = enums.everest_bird_tutorial_tutorials
     }
 }
 birdTutorial.placements = {
