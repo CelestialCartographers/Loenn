@@ -81,4 +81,11 @@ function widgetUtils.focusMainEditor()
     ui.focusing = false
 end
 
+function widgetUtils.cursorDeltaFromElementCenter(element, x, y)
+    local elementX, elementY = element.screenX, element.screenY
+    local elementWidth, elementHeight = element.width, element.height
+
+    return x - elementX - elementWidth / 2, y - elementY - elementHeight / 2
+end
+
 return widgetUtils
