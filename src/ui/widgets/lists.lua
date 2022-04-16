@@ -19,19 +19,26 @@ local function filterItems(items, search, caseSensitive)
 
     for _, item in ipairs(items) do
         local text = item.text
+        local textType = type(text)
 
-        if caseSensitive ~= false then
-            text = text:lower()
-        end
+        if textType == "string" then
+            if caseSensitive ~= false then
+                text = text:lower()
+            end
 
-        if text:contains(search) then
+            if text:contains(search) then
+                table.insert(filtered, item)
+            end
+
+        else
+            -- Improve this for non string in the future
+
             table.insert(filtered, item)
         end
     end
 
     return filtered
 end
-
 function listWidgets.setSelection(list, target, preventCallback, callbackRequiresChange)
     -- Select first item as default, callback if it exists
     -- If target is defined attempt to select this instead of the first item
