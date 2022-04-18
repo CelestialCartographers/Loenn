@@ -3,13 +3,14 @@ local nfd = require("nfd")
 local physfs = require("lib.physfs")
 local requireUtils = require("utils.require")
 local threadHandler = require("utils.threads")
+local osUtils = require("utils.os")
 
 local hasRequest, request = requireUtils.tryrequire("lib.luajit-request.luajit-request")
 
 local filesystem = {}
 
 function filesystem.supportWindowsInThreads()
-    return love.system.getOS() ~= "OS X"
+    return osUtils.getOS() ~= "OS X"
 end
 
 function filesystem.filename(path, sep)
@@ -43,7 +44,7 @@ function filesystem.splitpath(s)
 end
 
 function filesystem.samePath(path1, path2)
-    local userOS = love.system.getOS()
+    local userOS = osUtils.getOS()
 
     if userOS == "Windows" then
         return path1:lower() == path2:lower()
@@ -95,7 +96,7 @@ function filesystem.mkdir(path, mode)
 end
 
 function filesystem.mkpath(path, mode)
-    local isWindows = love.system.getOS() == "Windows"
+    local isWindows = osUtils.getOS() == "Windows"
     local parts = filesystem.splitpath(path)
     local seenParts = {}
 

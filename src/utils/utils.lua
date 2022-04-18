@@ -1,5 +1,6 @@
 local serialize = require("utils.serialize")
 local filesystem = require("utils.filesystem")
+local osUtils = require("utils.os")
 local requireUtils = require("utils.require")
 local xnaColors = require("consts.xna_colors")
 local bit = require("bit")
@@ -724,27 +725,15 @@ function utils.round(n, decimals)
     end
 end
 
--- ffi to love.system names
-local ffiOSLookup = {
-    Windows = "Windows",
-    Linux = "Linux",
-    OSX = "OS X"
-}
-
-function utils.getOS()
-    if love.system then
-        return love.system.getOS()
-    end
-
-    -- Fallback to ffi.os, some names differ but it is good enough
-    return ffiOSLookup[ffi.os]
-end
-
 -- Add all of require utils into utils
 for k, v <- requireUtils do
     utils[k] = v
 end
 
+-- Add all of os utils into utils
+for k, v <- osUtils do
+    utils[k] = v
+end
 
 -- Add all of filesystem helper into utils
 for k, v <- filesystem do
