@@ -6,7 +6,7 @@ local config = require("utils.config")
 local fileLocations = require("file_locations")
 
 local defaultsPath = "defaults/config"
-local defaultValues = {}
+local defaultsUIPath = "ui/defaults/config"
 
 local configs = config.readConfig(fileLocations.getSettingsPath())
 
@@ -26,14 +26,26 @@ local function mergeIfMissing(from, to)
     return madeChanges
 end
 
-for _, file in ipairs(love.filesystem.getDirectoryItems(defaultsPath)) do
-    local filenameNoExt = utils.stripExtension(file)
-    local default = require(defaultsPath .. "." .. filenameNoExt)
+local function readDefaultData(path)
+    local data = {}
 
-    defaultValues[filenameNoExt] = default
+    for _, file in ipairs(love.filesystem.getDirectoryItems(path)) do
+        local filenameNoExt = utils.stripExtension(file)
+        local default = require(path .. "." .. filenameNoExt)
+
+        data[filenameNoExt] = default
+    end
+
+    return data
 end
 
-if mergeIfMissing(defaultValues, configs) then
+local defaultData = readDefaultData(defaultsPath)
+local defaultUIData = readDefaultData(defaultsUIPath)
+
+local mergedDefaults = mergeIfMissing(defaultData, configs)
+local mergedUIDefaults = mergeIfMissing({ui = defaultUIData}, configs)
+
+if mergedDefaults or mergedUIDefaults then
     config.writeConfig(configs, true)
 end
 
