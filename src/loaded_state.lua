@@ -55,6 +55,12 @@ local function updateSideState(side, roomName, filename, eventName)
     sceneHandler.sendEvent(eventName, filename)
 end
 
+-- Updates state filename and flags history with no changes
+local function defaultSaveCallback(filename)
+    state.filename = filename
+    history.madeChanges = false
+end
+
 function state.loadFile(filename, roomName)
     if not filename then
         return
@@ -88,11 +94,17 @@ function state.loadFile(filename, roomName)
     )
 end
 
-function state.saveFile(filename, addExtIfMissing)
+function state.saveFile(filename, callback, addExtIfMissing)
     if filename and state.side then
         if addExtIfMissing ~= false and filesystem.fileExtension(filename) ~= "bin" then
             filename ..= ".bin"
         end
+
+        if callback ~= false then
+            callback = callback or defaultSaveCallback
+        end
+
+        filesystem.mkpath(filesystem.dirname(filename))
 
         tasks.newTask(
             (-> sideStruct.encodeTaskable(state.side)),
@@ -102,8 +114,9 @@ function state.saveFile(filename, addExtIfMissing)
                         (-> mapcoder.encodeFile(filename, encodeTask.result)),
                         function(binTask)
                             if binTask.done and binTask.success then
-                                state.filename = filename
-                                history.madeChanges = false
+                                if callback then
+                                    callback(filename)
+                                end
 
                                 sceneHandler.sendEvent("editorMapSaved", filename)
 
