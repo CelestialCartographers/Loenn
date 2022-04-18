@@ -54,7 +54,7 @@ function config.writeConfigData(filename, data, pretty)
         success, content = utils.serialize(data, pretty)
 
         if success then
-            utils.mkdir(utils.dirname(filename))
+            utils.mkpath(utils.dirname(filename))
             local fh = io.open(tempFilename, "wb")
 
             if fh then
