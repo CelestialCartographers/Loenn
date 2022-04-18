@@ -8,6 +8,7 @@ local history = require("history")
 local sceneHandler = require("scene_handler")
 local drawing = require("utils.drawing")
 local languageRegistry = require("language_registry")
+local backups = require("backups")
 
 editorScene.name = "Editor"
 
@@ -47,6 +48,7 @@ function editorScene:firstEnter()
 
     local viewportHandler = require("viewport_handler")
     local hotkeyDevice = hotkeyHandler.createHotkeyDevice(standardHotkeys)
+    local backupDevice = backups.createBackupDevice()
     local userInterfaceDevice = require("ui.ui_device")
     local mapLoaderDevice = require("input_devices.map_loader")
     local roomResizeDevice = require("input_devices.room_resizer")
@@ -57,6 +59,7 @@ function editorScene:firstEnter()
     inputDevice.newInputDevice(self.inputDevices, userInterfaceDevice)
     inputDevice.newInputDevice(self.inputDevices, viewportHandler.device)
     inputDevice.newInputDevice(self.inputDevices, hotkeyDevice)
+    inputDevice.newInputDevice(self.inputDevices, backupDevice)
     inputDevice.newInputDevice(self.inputDevices, mapLoaderDevice)
     inputDevice.newInputDevice(self.inputDevices, roomResizeDevice)
     inputDevice.newInputDevice(self.inputDevices, toolHandlerDevice)
