@@ -9,6 +9,7 @@ local history = require("history")
 local backups = {}
 
 local timestampFormat = "%Y-%m-%d %H-%M-%S"
+local timestampPattern = "(%d%d%d%d)-(%d%d)-(%d%d) (%d%d)-(%d%d)-(%d%d)"
 
 local function saveCallback(filename)
     logging.debug(string.format("Created map backup to '%s'", filename))
@@ -40,8 +41,8 @@ local function findOldestBackup(fileInformations)
     local oldestFilename
 
     for filename, info in pairs(fileInformations) do
-        if info.modification < oldestTimestamp then
-            oldestTimestamp = info.modification
+        if info.created < oldestTimestamp then
+            oldestTimestamp = info.created
             oldestFilename = filename
         end
     end
@@ -56,6 +57,12 @@ local function findBackupToPrune(fileInformations)
     return findOldestBackup(fileInformations)
 end
 
+local function getTimeFromFilename(filename)
+    local year, month, day, hour, minute, second = string.match(filename, timestampPattern)
+
+    return os.time({year=year, month=month, day=day, hour=hour, min=minute, sec=second})
+end
+
 function backups.cleanupBackups(map)
     local backupFilenames = backups.getMapBackups(map)
     local backupCount = #backupFilenames
@@ -65,8 +72,10 @@ function backups.cleanupBackups(map)
         local fileInformations = {}
 
         for _, filename in ipairs(backupFilenames) do
-            fileInformations[filename] = lfs.attributes(filename)
-            fileInformations[filename].filename = filename
+            fileInformations[filename] = {
+                filename = filename,
+                created = getTimeFromFilename(filename)
+            }
         end
 
         while backupCount > maximumBackups do
