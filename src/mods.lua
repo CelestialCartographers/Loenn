@@ -276,12 +276,8 @@ local function createModSettingDirectory(modName)
     local pluginsPath = fileLocations.getPluginsPath()
     local pluginsModPath = utils.joinpath(pluginsPath, modName)
 
-    if not filesystem.isDirectory(pluginsPath) then
-        filesystem.mkdir(pluginsPath)
-    end
-
     if not filesystem.isDirectory(pluginsModPath) then
-        filesystem.mkdir(pluginsModPath)
+        filesystem.mkpath(pluginsModPath)
     end
 
     return true

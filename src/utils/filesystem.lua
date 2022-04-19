@@ -3,13 +3,14 @@ local nfd = require("nfd")
 local physfs = require("lib.physfs")
 local requireUtils = require("utils.require")
 local threadHandler = require("utils.threads")
+local osUtils = require("utils.os")
 
 local hasRequest, request = requireUtils.tryrequire("lib.luajit-request.luajit-request")
 
 local filesystem = {}
 
 function filesystem.supportWindowsInThreads()
-    return love.system.getOS() ~= "OS X"
+    return osUtils.getOS() ~= "OS X"
 end
 
 function filesystem.filename(path, sep)
@@ -28,6 +29,11 @@ function filesystem.joinpath(...)
     local paths = {...}
     local sep = physfs.getDirSeparator()
 
+    -- Check for table argument
+    if type(paths[1]) == "table" then
+        paths = paths[1]
+    end
+
     return table.concat(paths, sep):gsub(sep .. sep, sep)
 end
 
@@ -38,7 +44,7 @@ function filesystem.splitpath(s)
 end
 
 function filesystem.samePath(path1, path2)
-    local userOS = love.system.getOS()
+    local userOS = osUtils.getOS()
 
     if userOS == "Windows" then
         return path1:lower() == path2:lower()
@@ -87,6 +93,36 @@ end
 
 function filesystem.mkdir(path, mode)
     return lfs.mkdir(path, mode or 493) -- octal mode 755
+end
+
+function filesystem.mkpath(path, mode)
+    local isWindows = osUtils.getOS() == "Windows"
+    local parts = filesystem.splitpath(path)
+    local seenParts = {}
+
+    for i, part in ipairs(parts) do
+        table.insert(seenParts, part)
+
+        -- Skip trailing slashes
+        if i == #parts and part == "" then
+            break
+        end
+
+        -- Skip drive letters on Windows
+        if i > 1 or not isWindows then
+            local subPath = filesystem.joinpath(seenParts)
+
+            if not filesystem.isDirectory(subPath) then
+                local success, message = filesystem.mkdir(subPath, mode)
+
+                if not success then
+                    return success, message
+                end
+            end
+        end
+    end
+
+    return true
 end
 
 filesystem.chdir = lfs.chdir

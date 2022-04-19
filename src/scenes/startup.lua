@@ -9,6 +9,7 @@ local configs = require("configs")
 local startupScene = {}
 
 local drawnOnce = false
+local drawnInfo = false
 local startedDialog = false
 
 startupScene.name = "Startup"
@@ -45,7 +46,10 @@ local function checkDialog(path)
         saveGotoLoading(cleanPath)
 
     else
-        startupScene._dialogChannel, startupScene._dialogThread = filesystem.openDialog(nil, nil, checkDialog)
+        if drawnInfo then
+            startupScene._dialogChannel, startupScene._dialogThread = filesystem.openDialog(nil, nil, checkDialog)
+            startedDialog = true
+        end
     end
 end
 
@@ -87,6 +91,8 @@ end
 function startupScene:draw()
     if not self._alreadyConfigured and self._performedGameScan then
         drawing.callKeepOriginalColor(function()
+            drawnInfo = true
+
             drawing.printCenteredText(self._message, 0, 0, love.graphics.getWidth(), love.graphics.getHeight(), love.graphics.getFont(), 4)
         end)
     end
@@ -106,7 +112,6 @@ function startupScene:update(dt)
         end
 
         self._performedGameScan = true
-        startedDialog = true
     end
 end
 

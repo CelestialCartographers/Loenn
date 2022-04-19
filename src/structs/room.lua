@@ -108,6 +108,8 @@ function roomStruct.directionalResize(room, side, amount)
     room.tilesFg = tilesStruct.directionalResize(room.tilesFg, side, amount)
     room.tilesBg = tilesStruct.directionalResize(room.tilesBg, side, amount)
     room.tilesObj = objectTilesStruct.directionalResize(room.tilesObj, side, amount)
+    room.sceneryFg = objectTilesStruct.directionalResize(room.sceneryFg, side, amount)
+    room.sceneryBg = objectTilesStruct.directionalResize(room.sceneryBg, side, amount)
 
     local offsetX = side == "left" and amount * 8 or 0
     local offsetY = side == "up" and amount * 8 or 0

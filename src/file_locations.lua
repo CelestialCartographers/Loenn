@@ -86,6 +86,10 @@ function fileLocations.getPersistencePath()
     return filesystem.joinpath(fileLocations.getStorageDir(), "persistence.conf")
 end
 
+function fileLocations.getBackupPath()
+    return filesystem.joinpath(fileLocations.getStorageDir(), "Backups")
+end
+
 function fileLocations.getCelesteDir()
     return config.readConfig(fileLocations.getSettingsPath()).celesteGameDirectory
 end
