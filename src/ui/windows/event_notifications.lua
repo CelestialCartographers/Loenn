@@ -9,6 +9,7 @@ local loadedState = require("loaded_state")
 local languageRegistry = require("language_registry")
 local mapItemUtils = require("map_item_utils")
 local updater = require("updater")
+local tasks = require("utils.tasks")
 
 local notifications = require("ui.notification")
 
@@ -71,6 +72,13 @@ function notificationHandlers:editorQuitWithChanges()
         return uiElements.column({
             uiElements.label(tostring(language.ui.notifications.editorQuitWithChanges)),
             uiElements.row({
+                uiElements.button(tostring(language.ui.notifications.editorSaveAndQuit), function()
+                    loadedState.saveCurrentMap(function(filename)
+                        loadedState.defaultSaveCallback(filename)
+
+                        love.event.quit()
+                    end)
+                end),
                 uiElements.button(tostring(language.ui.button.quit), function()
                     -- Update history to think we have no changes
                     history.madeChanges = false
@@ -93,7 +101,15 @@ function notificationHandlers:editorLoadWithChanges(currentFile, filename)
         return uiElements.column({
             uiElements.label(tostring(language.ui.notifications.editorLoadWithChanges)),
             uiElements.row({
-                uiElements.button(tostring(language.ui.button.yes), function()
+                uiElements.button(tostring(language.ui.notifications.editorSaveAndLoad), function()
+                    loadedState.saveCurrentMap(function(previousFilename)
+                        loadedState.defaultSaveCallback(previousFilename)
+
+                        loadedState.loadFile(filename)
+                        closePopup(popup)
+                    end)
+                end),
+                uiElements.button(tostring(language.ui.notifications.editorSaveAndDontLoad), function()
                     -- Update history to think we have no changes
                     history.madeChanges = false
 
