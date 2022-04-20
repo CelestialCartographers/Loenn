@@ -18,8 +18,12 @@ local notificationHandlers = {}
 
 function notificationHandlers:editorMapSaved(filename)
     local language = languageRegistry.getLanguage()
+    local fromBackup = filename ~= loadedState.filename
 
-    notifications.notify(string.format(tostring(language.ui.notifications.editorMapSaved), filename))
+    -- Only display the notification if the user manually saved
+    if not fromBackup then
+        notifications.notify(string.format(tostring(language.ui.notifications.editorMapSaved), filename))
+    end
 end
 
 function notificationHandlers:editorMapSaveFailed(filename)
