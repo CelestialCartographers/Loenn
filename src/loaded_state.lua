@@ -56,7 +56,7 @@ local function updateSideState(side, roomName, filename, eventName)
 end
 
 -- Updates state filename and flags history with no changes
-local function defaultSaveCallback(filename)
+function state.defaultSaveCallback(filename)
     state.filename = filename
     history.madeChanges = false
 end
@@ -101,7 +101,7 @@ function state.saveFile(filename, callback, addExtIfMissing)
         end
 
         if callback ~= false then
-            callback = callback or defaultSaveCallback
+            callback = callback or state.defaultSaveCallback
         end
 
         filesystem.mkpath(filesystem.dirname(filename))
@@ -211,19 +211,21 @@ function state.newMap()
     updateSideState(newSide, nil, nil, "editorMapNew")
 end
 
-function state.saveAsCurrentMap()
+function state.saveAsCurrentMap(callback, addExtIfMissing)
     if state.side then
-        filesystem.saveDialog(state.filename, "bin", state.saveFile)
+        filesystem.saveDialog(state.filename, "bin", function(filename)
+            state.saveFile(filename, callback, addExtIfMissing)
+        end)
     end
 end
 
-function state.saveCurrentMap()
+function state.saveCurrentMap(callback, addExtIfMissing)
     if state.side then
         if state.filename then
-            state.saveFile(state.filename)
+            state.saveFile(state.filename, callback, addExtIfMissing)
 
         else
-            state.saveAsCurrentMap()
+            state.saveAsCurrentMap(callback, addExtIfMissing)
         end
     end
 end
