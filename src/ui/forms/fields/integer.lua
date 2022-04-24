@@ -5,11 +5,15 @@ local integerField = {}
 
 integerField.fieldType = "integer"
 
+-- Any integers outside of this range are not safe to save
+local largestInt = math.floor(2^31 - 1)
+local smallestInt = math.floor(-2^31)
+
 function integerField.getElement(name, value, options)
     -- Add extra options and pass it onto string field
 
-    local minimumValue = options.minimumValue or -math.huge
-    local maximumValue = options.maximumValue or math.huge
+    local minimumValue = math.max(options.minimumValue or smallestInt, smallestInt)
+    local maximumValue = math.min(options.maximumValue or largestInt, largestInt)
 
     options.valueTransformer = tonumber
     options.displayTransformer = tostring
