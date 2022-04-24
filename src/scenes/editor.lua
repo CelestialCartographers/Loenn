@@ -8,7 +8,6 @@ local history = require("history")
 local sceneHandler = require("scene_handler")
 local drawing = require("utils.drawing")
 local languageRegistry = require("language_registry")
-local backups = require("backups")
 
 editorScene.name = "Editor"
 
@@ -41,6 +40,7 @@ function editorScene:firstEnter()
     self.celesteRender = require("celeste_render")
     self.fonts = require("fonts")
 
+    local backups = require("backups")
     local inputDevice = require("input_device")
     local standardHotkeys = require("standard_hotkeys")
     local updater = require("updater")
