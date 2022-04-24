@@ -17,8 +17,8 @@ local rawHotkeys = {
     {configs.hotkeys.undo, history.undo, "Undo last action"},
     {configs.hotkeys.new, loadedState.newMap, "New map"},
     {configs.hotkeys.open, loadedState.openMap, "Open file"},
-    {configs.hotkeys.save, loadedState.saveCurrentMap, "Save file"},
-    {configs.hotkeys.saveAs, loadedState.saveAsCurrentMap, "Save file as"},
+    {configs.hotkeys.save, (-> loadedState.saveCurrentMap()), "Save file"},
+    {configs.hotkeys.saveAs, (-> loadedState.saveAsCurrentMap()), "Save file as"},
 
     -- Room Movement
     {configs.hotkeys.roomMoveLeft, roomHotkeyUtils.moveCurrentRoomOneTileLeft, "Move room left one tile"},

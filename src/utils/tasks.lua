@@ -109,8 +109,11 @@ function taskUtils.processTask(task, time)
         task.processedYieldCount += 1
     end
 
-    task.done = true
-    task.success = true
+    if not task.done then
+        task.done = true
+        task.success = true
+    end
+
     task.processedCount += 1
 
     task:callback()
