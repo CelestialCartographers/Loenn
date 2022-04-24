@@ -157,6 +157,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     end
 
     local updateIndex = 1
+    local missingTiles = {}
 
     while updateIndex < #needsUpdate do
         local x, y = needsUpdate[updateIndex], needsUpdate[updateIndex + 1]
@@ -196,12 +197,17 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
                             batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
                         end
                     end
+
+                else
+                    table.insert(missingTiles, {x, y})
                 end
             end
         end
 
         updateIndex += 2
     end
+
+    celesteRender.drawInvalidTiles(batch, missingTiles, fg)
 
     return batch
 end

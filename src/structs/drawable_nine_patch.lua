@@ -245,6 +245,14 @@ function drawableNinePatchMt.__index:draw()
     end
 end
 
+function drawableNinePatchMt.__index:setColor(color)
+    local tableColor = utils.getColor(color)
+
+    if tableColor then
+        self.color = tableColor
+    end
+end
+
 function drawableNinePatch.fromTexture(texture, options, drawX, drawY, drawWidth, drawHeight)
     local ninePatch = {
         _type = "drawableNinePatch"
@@ -272,7 +280,7 @@ function drawableNinePatch.fromTexture(texture, options, drawX, drawY, drawWidth
     ninePatch.mode = options.mode or "fill"
     ninePatch.borderMode = options.borderMode or "repeat"
     ninePatch.fillMode = options.fillMode or "repeat"
-    ninePatch.color = options.color
+    ninePatch.color = utils.getColor(options.color)
 
     ninePatch.drawX = drawX or 0
     ninePatch.drawY = drawY or 0

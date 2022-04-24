@@ -59,8 +59,8 @@ local function checkMaskFromTiles(mask, a, b, c, d, e, f, g, h, i)
 end
 
 -- Bitwise version of checkMaskFromTiles
-local function checkMaskFromTilesWithBitmask(tilemask, Bitmask, ignoremask, bxor, band)
-    return band(bxor(tilemask, Bitmask), ignoremask) == 0
+local function checkMaskFromTilesWithBitmask(tilemask, bitmask, ignoremask, bxor, band)
+    return band(bxor(tilemask, bitmask), ignoremask) == 0
 end
 
 local function getTile(tiles, x, y, emptyTile)

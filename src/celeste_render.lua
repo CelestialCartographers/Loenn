@@ -323,7 +323,7 @@ function celesteRender.getOrCacheScenerySpriteQuad(index)
     return quadCache:get0(quadX, quadY)
 end
 
-local function drawInvalidTiles(batch, missingTiles, fg)
+function celesteRender.drawInvalidTiles(batch, missingTiles, fg)
     if #missingTiles > 0 then
         if batch._canvas then
             local color = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
@@ -447,7 +447,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
         end
     end
 
-    drawInvalidTiles(batch, missingTiles, fg)
+    celesteRender.drawInvalidTiles(batch, missingTiles, fg)
 
     if shouldYield ~= false then
         tasks.update(batch)
