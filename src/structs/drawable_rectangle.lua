@@ -105,6 +105,19 @@ function drawableRectangleMt.__index:draw()
     self:drawRectangle(self.mode, self.color)
 end
 
+function drawableRectangleMt.__index:setColor(color, secondaryColor)
+    local tableColor = utils.getColor(color)
+    local tableSecondaryColor = utils.getColor(secondaryColor)
+
+    if tableColor then
+        self.color = tableColor
+    end
+
+    if tableSecondaryColor then
+        self.secondaryColor = tableSecondaryColor
+    end
+end
+
 -- Accepting rectangles on `x` argument, or passing in the values manually
 function drawableRectangle.fromRectangle(mode, x, y, width, height, color, secondaryColor)
     local rectangle = {
@@ -120,8 +133,8 @@ function drawableRectangle.fromRectangle(mode, x, y, width, height, color, secon
         rectangle.width = x.width or x[3]
         rectangle.height = x.height or x[4]
 
-        rectangle.color = y
-        rectangle.secondaryColor = width
+        rectangle.color = utils.getColor(y)
+        rectangle.secondaryColor = utils.getColor(width)
 
     else
         rectangle.x = x
@@ -130,8 +143,8 @@ function drawableRectangle.fromRectangle(mode, x, y, width, height, color, secon
         rectangle.width = width
         rectangle.height = height
 
-        rectangle.color = color
-        rectangle.secondaryColor = secondaryColor
+        rectangle.color = utils.getColor(color)
+        rectangle.secondaryColor = utils.getColor(secondaryColor)
     end
 
     return setmetatable(rectangle, drawableRectangleMt)

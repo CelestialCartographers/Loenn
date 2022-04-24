@@ -94,7 +94,7 @@ function drawableLine.fromPoints(points, color, thickness, offsetX, offsetY, mag
     }
 
     line.points = points
-    line.color = color
+    line.color = utils.getColor(color)
     line.thickness = thickness or 1
     line.offsetX = offsetX or 0
     line.offsetY = offsetY or 0
