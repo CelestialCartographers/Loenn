@@ -19,8 +19,11 @@ function backups.getBackupMapName(map)
     map = map or loadedState.map
 
     if map then
-        local humanizedFilename = utils.filename(utils.stripExtension(loadedState.filename))
-        local mapName = map.package or humanizedFilename
+        local mapName = map.package
+
+        if not mapName and loadedState.filename then
+            mapName = utils.filename(utils.stripExtension(loadedState.filename))
+        end
 
         return mapName
     end
