@@ -159,6 +159,11 @@ function mapcoder.encodeNumber(writer, n, lookup)
                 return
             end
         end
+
+        -- Number was outside of integer ranges, save it as a float instead
+        -- This will lose precisision, but we can't tell if the original number was a float or integer
+        writer:writeByte(typeHeaders.float32)
+        writer:writeFloat(n)
     end
 end
 
