@@ -78,7 +78,11 @@ function themes.useTheme(name)
         themes.currentTheme = name
 
         themer.apply(themes.themes[name])
+
+        return true
     end
+
+    return false
 end
 
 return themes

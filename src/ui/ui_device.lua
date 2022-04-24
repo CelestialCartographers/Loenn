@@ -15,6 +15,7 @@ local windows = require("ui.windows")
 local uiRoot = require("ui.ui_root")
 local logging = require("logging")
 local themes = require("ui.themes")
+local configs = require("configs")
 
 -- Add Debug UI reload function
 function debugUtils.reloadUI()
@@ -57,8 +58,12 @@ function ui.initializeDevice()
     ui.features.eventProxies = true
     ui.features.megacanvas = false
 
-    -- TODO - Config option
-    themes.useTheme("dark")
+    local configTheme = configs.ui.theme.themeName
+    local appliedTheme = themes.useTheme(configTheme)
+
+    if not appliedTheme then
+        themes.useTheme("dark")
+    end
 end
 
 return ui
