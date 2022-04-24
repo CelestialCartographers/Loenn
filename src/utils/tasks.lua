@@ -110,7 +110,7 @@ function taskUtils.processTask(task, time)
     end
 
     task.done = true
-    task.success = true
+    task.success = task.success ~= false
     task.processedCount += 1
 
     task:callback()
