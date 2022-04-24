@@ -100,24 +100,31 @@ function filesystem.mkpath(path, mode)
     local parts = filesystem.splitpath(path)
     local seenParts = {}
 
-    for i, part in ipairs(parts) do
+    local startIndex = 1
+    local endIndex = #parts
+
+    -- Don't attempt to create directory with empty string name or Windows drive letters
+    if parts[1] == "" or (isWindows and parts[1]:sub(-1) == ":") then
+        table.insert(seenParts, parts[1])
+
+        startIndex = 2
+    end
+
+    -- Skip trailing slashes
+    if parts[endIndex] == "" then
+        endIndex -= 1
+    end
+
+    for i = startIndex, endIndex do
+        local part = parts[i]
         table.insert(seenParts, part)
+        local subPath = filesystem.joinpath(seenParts)
 
-        -- Skip trailing slashes
-        if i == #parts and part == "" then
-            break
-        end
+        if not filesystem.isDirectory(subPath) then
+            local success, message = filesystem.mkdir(subPath, mode)
 
-        -- Skip drive letters on Windows
-        if i > 1 or not isWindows then
-            local subPath = filesystem.joinpath(seenParts)
-
-            if not filesystem.isDirectory(subPath) then
-                local success, message = filesystem.mkdir(subPath, mode)
-
-                if not success then
-                    return success, message
-                end
+            if not success then
+                return success, message
             end
         end
     end
