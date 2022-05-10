@@ -29,6 +29,16 @@ toolWindow.modePanelVisible = true
 toolWindow.materialList = false
 toolWindow.materialPanel = false
 
+toolWindow.eventStates = {}
+
+local function getLanguageOrDefault(languagePath, default)
+    if languagePath._exists then
+        return tostring(languagePath)
+    end
+
+    return default
+end
+
 local function getMaterialItems(layer, sortItems)
     local materials = toolHandler.getMaterials(nil, layer)
     local materialItems = {}
@@ -54,7 +64,7 @@ local function getMaterialItems(layer, sortItems)
         table.insert(materialItems, listItem)
     end
 
-    if sortItems or sortItems == nil then
+    if sortItems ~= false then
         table.sort(materialItems, function(lhs, rhs)
             return lhs.text < rhs.text
         end)
@@ -64,20 +74,18 @@ local function getMaterialItems(layer, sortItems)
 end
 
 local function materialCallback(list, material)
-    toolHandler.setMaterial(material)
+    local sameMaterial = material ~= toolWindow.eventStates.material
+
+    if sameMaterial then
+        toolWindow.eventStates.material = material
+
+        toolHandler.setMaterial(material)
+    end
 end
 
 local function toolMaterialChangedCallback(self, tool, layer, material)
     listWidgets.setSelection(toolWindow.layerList, layer, true)
     listWidgets.setSelection(toolWindow.materialList, material, true)
-end
-
-local function getLanguageOrDefault(languagePath, default)
-    if languagePath._exists then
-        return tostring(languagePath)
-    end
-
-    return default
 end
 
 local function getLayerItems(toolName)
@@ -108,19 +116,35 @@ local function getLayerItems(toolName)
 end
 
 local function layerCallback(list, layer)
-    toolHandler.setLayer(layer)
-    listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer))
+    local sameLayer = toolWindow.eventStates.layer == layer
+
+    if not sameLayer then
+        toolWindow.eventStates.layer = layer
+        toolWindow.eventStates.searchTerm = ""
+        toolWindow.eventStates.material = nil
+
+        toolHandler.setLayer(layer)
+        listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer), nil, nil, true)
+    end
 end
 
 local function toolLayerChangedCallback(self, tool, layer)
     local searchText = toolUtils.getPersistenceSearch(tool, layer) or ""
-    local searchField = toolWindow.materialList.searchField
+    local sameLayer = toolWindow.eventStates.layer == layer
+    local sameSearch = toolWindow.eventStates.searchTerm == searchText
 
-    searchField:setText(searchText)
-    searchField.index = #searchField
+    if not sameLayer or not sameSearch then
+        toolWindow.eventStates.searchTerm = searchText
+        toolWindow.eventStates.layer = layer
 
-    listWidgets.setSelection(toolWindow.layerList, layer, true)
-    listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer), nil, true)
+        local searchField = toolWindow.materialList.searchField
+
+        searchField:setText(searchText)
+        searchField.index = #searchField
+
+        listWidgets.setSelection(toolWindow.layerList, layer, true)
+        listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer), nil, true, true)
+    end
 end
 
 local function updateLayerList(name)
@@ -147,6 +171,10 @@ local function getModeItems(toolName)
     local modes = toolHandler.getModes(toolName) or {}
     local modeItems = {}
 
+    if not toolName then
+        toolName = toolHandler.currentToolName
+    end
+
     for _, mode in pairs(modes) do
         local displayName = getLanguageOrDefault(language.tools[toolName].modes.name[mode], mode)
         local tooltipText = getLanguageOrDefault(language.tools[toolName].modes.description[mode], mode)
@@ -167,7 +195,16 @@ local function getModeItems(toolName)
 end
 
 local function modeCallback(list, mode)
-    toolHandler.setMode(mode)
+    local sameMode = mode ~= toolWindow.eventStates.mode
+
+    if sameMode then
+        toolWindow.eventStates.mode = mode
+        toolWindow.eventStates.layer = nil
+        toolWindow.eventStates.searchTerm = ""
+        toolWindow.eventStates.material = nil
+
+        toolHandler.setMode(mode)
+    end
 end
 
 local function toolModeChangedCallback(self, tool, mode)
@@ -230,8 +267,18 @@ local function getToolItems(sortItems)
 end
 
 local function toolCallback(list, toolName)
-    toolHandler.selectTool(toolName)
-    listWidgets.updateItems(toolWindow.layerList, getLayerItems(toolName))
+    local sameTool = toolName ~= toolWindow.eventStates.tool
+
+    if sameTool then
+        toolWindow.eventStates.tool = toolName
+        toolWindow.eventStates.mode = nil
+        toolWindow.eventStates.searchTerm = ""
+        toolWindow.eventStates.layer = nil
+        toolWindow.eventStates.material = nil
+
+        toolHandler.selectTool(toolName)
+        listWidgets.updateItems(toolWindow.layerList, getLayerItems(toolName))
+    end
 end
 
 local function toolChangedCallback(self, tool)
