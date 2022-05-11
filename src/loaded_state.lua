@@ -17,6 +17,10 @@ local state = {}
 local function getWindowTitle(side)
     local name = sideStruct.getMapName(side)
 
+    if name == "" then
+        return meta.title
+    end
+
     return string.format("%s - %s", meta.title, name)
 end
 
