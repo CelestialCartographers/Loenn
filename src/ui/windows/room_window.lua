@@ -234,6 +234,7 @@ local function saveRoomCallback(room, editing, usingPixels)
 
             sceneHandler.sendEvent("uiRoomWindowRoomChanged", targetRoom)
 
+            room.name = targetRoom.name
         else
             local map = loadedState.map
             local newRoom = utils.deepcopy(room)
@@ -361,11 +362,16 @@ function roomWindow.createRoomWindow(room, editing)
     -- Make sure new rooms can't use name from template room
     fieldInformation.name.editedRoom = editing and room.name or false
 
+    local saveCallback = saveRoomCallback(room, editing, usingPixels)
+
     local buttons = {
         {
             text = tostring(language.ui.room_window.save_changes),
             formMustBeValid = true,
-            callback = saveRoomCallback(room, editing, usingPixels)
+            callback = function(formFields)
+                saveCallback(formFields)
+                window.titlebar.label.text = tostring(language.ui.room_window[titleKey]):format(room.name)
+            end
         },
         {
             text = tostring(language.ui.room_window.close_window),
