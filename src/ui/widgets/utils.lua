@@ -12,6 +12,12 @@ function widgetUtils.removeWindowTitlebar(window)
     end)
 end
 
+function widgetUtils.setWindowTitle(window, title)
+    if window and window.titlebar and window.titlebar.label then
+        window.titlebar.label.text = title
+    end
+end
+
 function widgetUtils.getSimpleOverlayWidget(widget, ...)
     local widgetType = utils.typeof(widget)
 

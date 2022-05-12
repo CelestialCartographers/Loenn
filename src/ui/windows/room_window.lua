@@ -186,78 +186,80 @@ local function handleCheckpoint(room, hasCheckpoint)
     end
 end
 
-local function saveRoomCallback(room, editing, usingPixels)
-    return function(formFields)
-        local newRoomData = form.getFormData(formFields)
+local function saveRoomCallback(formFields, room, editing, usingPixels)
+    local newRoomData = form.getFormData(formFields)
 
-        -- Restore tile to pixel values
-        if not usingPixels then
-            newRoomData.x = newRoomData.x * 8
-            newRoomData.y = newRoomData.y * 8
+    -- Restore tile to pixel values
+    if not usingPixels then
+        newRoomData.x = newRoomData.x * 8
+        newRoomData.y = newRoomData.y * 8
 
-            newRoomData.width = newRoomData.width * 8
-            newRoomData.height = newRoomData.height * 8
+        newRoomData.width = newRoomData.width * 8
+        newRoomData.height = newRoomData.height * 8
 
-            room.x = room.x * 8
-            room.y = room.y * 8
+        room.x = room.x * 8
+        room.y = room.y * 8
 
-            room.width = room.width * 8
-            room.height = room.height * 8
+        room.width = room.width * 8
+        room.height = room.height * 8
+    end
+
+    newRoomData.width = math.max(roomStruct.recommendedMinimumWidth, newRoomData.width)
+    newRoomData.height = math.max(roomStruct.recommendedMinimumHeight, newRoomData.height)
+
+    if editing then
+        local previousName = room.name
+        local targetRoom = loadedState.getRoomByName(room.name)
+        local before = utils.deepcopy(targetRoom)
+
+        local deltaWidth = math.ceil((newRoomData.width - before.width) / 8)
+        local deltaHeight = math.ceil((newRoomData.height - before.height) / 8)
+
+        for attribute, value in pairs(newRoomData) do
+            if not saveRoomManualAttributesEditing[attribute] then
+                targetRoom[attribute] = value
+            end
         end
 
-        newRoomData.width = math.max(roomStruct.recommendedMinimumWidth, newRoomData.width)
-        newRoomData.height = math.max(roomStruct.recommendedMinimumHeight, newRoomData.height)
+        roomStruct.directionalResize(targetRoom, "right", deltaWidth)
+        roomStruct.directionalResize(targetRoom, "down", deltaHeight)
 
-        if editing then
-            local targetRoom = loadedState.getRoomByName(room.name)
-            local before = utils.deepcopy(targetRoom)
+        handleCheckpoint(targetRoom, newRoomData.checkpoint)
 
-            local deltaWidth = math.ceil((newRoomData.width - before.width) / 8)
-            local deltaHeight = math.ceil((newRoomData.height - before.height) / 8)
+        local snapshot = snapshotUtils.roomSnapshot(targetRoom, "Edited room", before, utils.deepcopy(targetRoom))
 
-            for attribute, value in pairs(newRoomData) do
-                if not saveRoomManualAttributesEditing[attribute] then
-                    targetRoom[attribute] = value
-                end
+        history.addSnapshot(snapshot)
+        celesteRender.invalidateRoomCache(previousName)
+        celesteRender.invalidateRoomCache(targetRoom)
+        celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
+
+        sceneHandler.sendEvent("uiRoomWindowRoomChanged", targetRoom)
+
+        room.name = targetRoom.name
+
+    else
+        local map = loadedState.map
+        local newRoom = utils.deepcopy(room)
+
+        local roomTilesWidth = math.ceil(newRoomData.width / 8)
+        local roomTilesHeight = math.ceil(newRoomData.height / 8)
+
+        for attribute, value in pairs(newRoomData) do
+            if not saveRoomManualAttributesCreating[attribute] then
+                newRoom[attribute] = value
             end
+        end
 
-            roomStruct.directionalResize(targetRoom, "right", deltaWidth)
-            roomStruct.directionalResize(targetRoom, "down", deltaHeight)
+        for _, handlerData in ipairs(structTilesNames) do
+            local target, struct = handlerData[1], handlerData[2]
 
-            handleCheckpoint(targetRoom, newRoomData.checkpoint)
+            newRoom[target] = struct.resize(struct.decode(""), roomTilesWidth, roomTilesHeight)
+        end
 
-            local snapshot = snapshotUtils.roomSnapshot(targetRoom, "Edited room", before, utils.deepcopy(targetRoom))
+        handleCheckpoint(newRoom, newRoomData.checkpoint)
 
-            history.addSnapshot(snapshot)
-            celesteRender.invalidateRoomCache(targetRoom)
-            celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
-
-            sceneHandler.sendEvent("uiRoomWindowRoomChanged", targetRoom)
-
-        else
-            local map = loadedState.map
-            local newRoom = utils.deepcopy(room)
-
-            local roomTilesWidth = math.ceil(newRoomData.width / 8)
-            local roomTilesHeight = math.ceil(newRoomData.height / 8)
-
-            for attribute, value in pairs(newRoomData) do
-                if not saveRoomManualAttributesCreating[attribute] then
-                    newRoom[attribute] = value
-                end
-            end
-
-            for _, handlerData in ipairs(structTilesNames) do
-                local target, struct = handlerData[1], handlerData[2]
-
-                newRoom[target] = struct.resize(struct.decode(""), roomTilesWidth, roomTilesHeight)
-            end
-
-            handleCheckpoint(newRoom, newRoomData.checkpoint)
-
-            if map then
-                mapItemUtils.addItem(map, newRoom)
-            end
+        if map then
+            mapItemUtils.addItem(map, newRoom)
         end
     end
 end
@@ -299,6 +301,13 @@ local function prepareRoomData(room, usingPixels)
     end
 end
 
+local function getWindowTitle(language, room, editing)
+    local titleKey = editing and "editing_room" or "creating_room"
+    local windowTitle = tostring(language.ui.room_window[titleKey]):format(room.name)
+
+    return windowTitle
+end
+
 function roomWindow.createRoomWindow(room, editing)
     if editing then
         room = utils.deepcopy(room or loadedState.getSelectedRoom())
@@ -329,8 +338,7 @@ function roomWindow.createRoomWindow(room, editing)
     local window
 
     local language = languageRegistry.getLanguage()
-    local titleKey = editing and "editing_room" or "creating_room"
-    local windowTitle = tostring(language.ui.room_window[titleKey]):format(room.name)
+    local windowTitle = getWindowTitle(language, room, editing)
 
     local windowX = windowPreviousX
     local windowY = windowPreviousY
@@ -365,7 +373,10 @@ function roomWindow.createRoomWindow(room, editing)
         {
             text = tostring(language.ui.room_window.save_changes),
             formMustBeValid = true,
-            callback = saveRoomCallback(room, editing, usingPixels)
+            callback = function(formFields)
+                saveRoomCallback(formFields, room, editing, usingPixels)
+                widgetUtils.setWindowTitle(window, getWindowTitle(language, room, editing))
+            end
         },
         {
             text = tostring(language.ui.room_window.close_window),
