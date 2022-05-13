@@ -45,18 +45,18 @@ end
 
 local addDebug = configs.debug.enableDebugOptions
 local debugMenu = {"debug", {
-    {"reload", {
-        {"reload_everything", debugUtils.reloadEverything},
-        {"reload_scenes", debugUtils.reloadScenes},
-        {"reload_tools", debugUtils.reloadTools},
-        {"reload_entities", debugUtils.reloadEntities},
-        {"reload_triggers", debugUtils.reloadTriggers},
-        {"reload_effects", notYetImplementedNotification},
-        {"reload_user_interface", reloadUI},
-        {"reload_language_files", debugUtils.reloadLanguageFiles}
+    {"debug_reload", {
+        {"debug_reload_everything", debugUtils.reloadEverything},
+        {"debug_reload_scenes", debugUtils.reloadScenes},
+        {"debug_reload_tools", debugUtils.reloadTools},
+        {"debug_reload_entities", debugUtils.reloadEntities},
+        {"debug_reload_triggers", debugUtils.reloadTriggers},
+        {"debug_reload_effects", notYetImplementedNotification},
+        {"debug_reload_user_interface", reloadUI},
+        {"debug_reload_language_files", debugUtils.reloadLanguageFiles}
     }},
-    {"redraw_map", debugUtils.redrawMap},
-    {"test_console", debugUtils.debug}
+    {"debug_redraw_map", debugUtils.redrawMap},
+    {"debug_test_console", debugUtils.debug}
 }}
 
 -- Tree of menubar items
@@ -66,37 +66,37 @@ local debugMenu = {"debug", {
 -- Closes by default, some menu items might not want to close the menu, for example "View" toggles
 menubar.menubar = {
     {"file", {
-        {"new", loadedState.newMap},
-        {"open", loadedState.openMap},
-        {"recent", notYetImplementedNotification},
+        {"file_new", loadedState.newMap},
+        {"file_open", loadedState.openMap},
+        {"file_recent", notYetImplementedNotification},
         {},
-        {"save", loadedState.saveCurrentMap},
-        {"save_as", loadedState.saveAsCurrentMap},
+        {"file_save", loadedState.saveCurrentMap},
+        {"file_save_as", loadedState.saveAsCurrentMap},
         {},
-        {"exit", love.event.quit}
+        {"file_exit", love.event.quit}
     }},
     {"edit", {
-        {"undo", history.undo},
-        {"redo", history.redo},
+        {"edit_undo", history.undo},
+        {"edit_redo", history.redo},
         {},
-        {"settings", notYetImplementedNotification}
+        {"edit_settings", notYetImplementedNotification}
     }},
     {"view", notYetImplementedNotification},
     {"map", {
-        {"stylegrounds", stylegroundEditor.editStylegrounds},
-        {"metadata", notYetImplementedNotification}
+        {"map_stylegrounds", stylegroundEditor.editStylegrounds},
+        {"map_metadata", notYetImplementedNotification}
     }},
     {"room", {
-        {"add", roomEditor.createNewRoom},
-        {"configure", roomEditor.editExistingRoom},
+        {"room_add", roomEditor.createNewRoom},
+        {"room_edit", roomEditor.editExistingRoom},
         {},
-        {"delete", deleteCurrentRoom}
+        {"room_delete", deleteCurrentRoom}
     }},
     -- Only add if enabled
     addDebug and debugMenu or false,
     {"help", {
-        {"check_for_updates", checkForUpdates},
-        {"about", notYetImplementedNotification}
+        {"help_check_for_updates", checkForUpdates},
+        {"help_about", notYetImplementedNotification}
     }}
 }
 
