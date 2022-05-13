@@ -54,6 +54,13 @@ tools.circle.modes.description.fill=Fills the whole circle.
 tools.circle.modes.name.line=Line
 tools.circle.modes.description.line=Fills only the border of the circle.
 
+tools.name.ellipse=Ellipse
+
+tools.ellipse.modes.name.fill=Fill
+tools.ellipse.modes.description.fill=Fills the whole ellipse.
+tools.ellipse.modes.name.line=Line
+tools.ellipse.modes.description.line=Fills only the border of the ellipse.
+
 tools.name.selection=Selection
 
 tools.name.placement=Placement
