@@ -81,7 +81,7 @@ function startupScene:filedropped(file)
 end
 
 function startupScene:directorydropped(path)
-    local cleanPath = startup.cleanFilename(path)
+    local cleanPath = startup.cleanupDirPath(path)
 
     if startup.verifyCelesteDir(cleanPath) then
         saveGotoLoading(cleanPath)

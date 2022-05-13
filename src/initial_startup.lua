@@ -27,6 +27,24 @@ function startup.cleanupPath(path)
     return path
 end
 
+function startup.cleanupDirPath(path)
+    if not path then
+        return false
+    end
+
+    local macOS = love.system.getOS() == "OS X"
+
+    if macOS and filesystem.filename(path) == "Celeste.app" then
+        return startup.cleanupPath(path)
+    elseif macOS and filesystem.isFile(filesystem.joinpath(path, "Celeste.app")) then
+        return startup.cleanupDirPath(filesystem.joinpath(path, "Contents", "MacOS"))
+    elseif filesystem.isFile(filesystem.joinpath(path, "Celeste.exe")) then
+        return path
+    else
+        return false
+    end
+end
+
 function startup.verifyCelesteDir(path)
     -- Check for some files/directories to check if this could be a actuall Celeste install containing the files we need
 
