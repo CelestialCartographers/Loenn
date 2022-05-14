@@ -17,7 +17,11 @@ local state = {}
 local function getWindowTitle(side)
     local name = sideStruct.getMapName(side)
 
-    return string.format("%s - %s", meta.title, name)
+    if name ~= "" then
+        return string.format("%s - %s", meta.title, name)
+    end
+
+    return meta.title
 end
 
 local function updateSideState(side, roomName, filename, eventName)
