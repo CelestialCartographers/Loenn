@@ -47,6 +47,13 @@ tools.circle.modes.description.fill=Fills the whole circle.
 tools.circle.modes.name.line=Line
 tools.circle.modes.description.line=Fills only the border of the circle.
 
+tools.name.ellipse=Ellipse
+
+tools.ellipse.modes.name.fill=Fill
+tools.ellipse.modes.description.fill=Fills the whole ellipse.
+tools.ellipse.modes.name.line=Line
+tools.ellipse.modes.description.line=Fills only the border of the ellipse.
+
 tools.name.selection=Selection
 
 tools.name.placement=Placement
@@ -903,7 +910,7 @@ entities.flingBirdIntro.attributes.description.crashes=Determines which cutscene
 entities.lightningBlock.placements.name.breaker_box=Lightning Breaker Box
 entities.lightningBlock.attributes.description.music_session=Whether the music should be stored in session when box is broken.
 entities.lightningBlock.attributes.description.flipX=Whether the sprite should be vertically mirrored.
-entities.lightningBlock.attributes.description.flag=Whether the breaker box should disable all lightning entities without the perLevel attribute set when loading a new room. 
+entities.lightningBlock.attributes.description.flag=Whether the breaker box should disable all lightning entities without the perLevel attribute set when loading a new room.
 entities.lightningBlock.attributes.description.music=Change the currently playing music to this when box is broken.\nLeave empty to not change song.
 entities.lightningBlock.attributes.description.music_progress=The new music progress once box is broken.\n-1 keeps the same progress.
 
@@ -1226,7 +1233,7 @@ style.parallax.attribute.flag=Flag
 style.parallax.attribute.notflag=Not Flag
 style.parallax.attribute.tag=Tag
 
-style.parallax.description.alpha=Determines opacity between 0 (Translucent) and 1 (Opaque). 
+style.parallax.description.alpha=Determines opacity between 0 (Translucent) and 1 (Opaque).
 style.parallax.description.color=Using hex colour code, the code tints a styleground that colour.
 style.parallax.description.exclude=Exludes specific rooms from taking stylegrounds and/or effects, taking priority over Only. Use * as a wildcard character.
 style.parallax.description.only=Adds rooms to a styleground or effect. Use * as a wildcard character.
