@@ -10,6 +10,7 @@ local configs = require("configs")
 local enums = require("consts.celeste_enums")
 local stylegroundEditor = require("ui.styleground_editor")
 local listWidgets = require("ui.widgets.lists")
+local widgetUtils = require("ui.widgets.utils")
 local formHelper = require("ui.forms.form")
 
 local stylegroundWindow = {}
@@ -39,6 +40,7 @@ function stylegroundWindow.editStylegrounds(map)
 
     table.insert(activeWindows, window)
     stylegroundWindowGroup.parent:addChild(window)
+    widgetUtils.addWindowCloseButton(window)
 
     return window
 end

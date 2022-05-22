@@ -377,20 +377,6 @@ function roomWindow.createRoomWindow(room, editing)
                 saveRoomCallback(formFields, room, editing, usingPixels)
                 widgetUtils.setWindowTitle(window, getWindowTitle(language, room, editing))
             end
-        },
-        {
-            text = tostring(language.ui.room_window.close_window),
-            callback = function(formFields)
-                for i, w in ipairs(activeWindows) do
-                    if w == window then
-                        table.remove(activeWindows, i)
-
-                        break
-                    end
-                end
-
-                window:removeSelf()
-            end
         }
     }
 
@@ -411,6 +397,7 @@ function roomWindow.createRoomWindow(room, editing)
 
     table.insert(activeWindows, window)
     roomWindowGroup.parent:addChild(window)
+    widgetUtils.addWindowCloseButton(window)
 
     return window
 end

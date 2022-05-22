@@ -18,6 +18,21 @@ function widgetUtils.setWindowTitle(window, title)
     end
 end
 
+function widgetUtils.addWindowCloseButton(window)
+    if window and window.titlebar then
+        local titlebar = window.titlebar
+        local closeButton = uiElements.buttonClose()
+
+        -- Wild guess, looks decent
+        closeButton.style.padding = titlebar.style.padding * 2 - 1
+        closeButton.cb = function()
+            window:removeSelf()
+        end
+
+        table.insert(titlebar.children, closeButton)
+    end
+end
+
 function widgetUtils.getSimpleOverlayWidget(widget, ...)
     local widgetType = utils.typeof(widget)
 
