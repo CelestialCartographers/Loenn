@@ -27,7 +27,8 @@ for _, axis in pairs(axesOptions) do
         data = {
             width = 24,
             height = 24,
-            axes = axis
+            axes = axis,
+            chillout = false
         }
     })
 end

@@ -619,6 +619,17 @@ function utils.isApprox(v1, v2, tolerance)
     return math.abs(v1 - v2) <= tolerance
 end
 
+function utils.prettifyFloat(n, decimals, addDotZero)
+    local rounded = utils.round(n, decimals or 3)
+    local isInteger = utils.isInteger(rounded)
+
+    if isInteger and addDotZero ~= false then
+        return string.format("%s.0", rounded)
+    end
+
+    return tostring(rounded)
+end
+
 function utils.logn(base, n)
     return math.log(n) / math.log(base)
 end

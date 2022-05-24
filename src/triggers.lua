@@ -16,11 +16,17 @@ local triggerFontSize = 1
 
 local triggers = {}
 
+local missingTriggerHandler = require("defaults.viewer.undefined_trigger")
+
+local triggerRegisteryMT = {
+    __index = function() return missingTriggerHandler end
+}
+
 triggers.registeredTriggers = nil
 
 -- Sets the registry to the given table (or empty one)
 function triggers.initDefaultRegistry(t)
-    triggers.registeredTriggers = t or {}
+    triggers.registeredTriggers = setmetatable(t or {}, triggerRegisteryMT)
 end
 
 local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
