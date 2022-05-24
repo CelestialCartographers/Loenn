@@ -130,21 +130,6 @@ function contextWindow.createContextMenu(selections)
             text = tostring(language.ui.room_window.save_changes),
             formMustBeValid = true,
             callback = contextWindow.saveChangesCallback(selections, dummyData)
-        },
-        {
-            text = tostring(language.ui.room_window.close_window),
-            callback = function(formFields)
-                for i, w in ipairs(activeWindows) do
-                    if w == window then
-                        table.remove(activeWindows, i)
-                        widgetUtils.focusMainEditor()
-
-                        break
-                    end
-                end
-
-                window:removeSelf()
-            end
         }
     }
 
@@ -165,6 +150,7 @@ function contextWindow.createContextMenu(selections)
 
     table.insert(activeWindows, window)
     contextGroup.parent:addChild(window)
+    widgetUtils.addWindowCloseButton(window)
 
     return window
 end
