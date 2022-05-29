@@ -23,8 +23,8 @@ function widgetUtils.addWindowCloseButton(window)
         local titlebar = window.titlebar
         local closeButton = uiElements.buttonClose()
 
-        -- Wild guess, looks decent
-        closeButton.style.padding = titlebar.style.padding * 2 - 1
+        -- Fix off by one from button style
+        closeButton.style.padding -= 1
         closeButton.cb = function()
             window:removeSelf()
         end
