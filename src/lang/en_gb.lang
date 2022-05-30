@@ -1261,6 +1261,7 @@ style.parallax.description.tag=A tag to make it easier to access given backdrops
 
 
 # -- Effects --
+# style.effects.effectName.name=Effect Display Name
 # style.effects.effectName.attribute.Attribute=Attribute Display Name
 # style.effects.effectName.description.Attribute=Attribute Display Name
 
@@ -1281,7 +1282,54 @@ style.effects.default.description.flag=Flag to make the effect visible. Leave em
 style.effects.default.description.notflag=Flag to make the effect not visible. Leave empty to disable. Overrides the Flag field if set.
 style.effects.default.description.tag=A tag to make it easier to access given backdrops from code.
 
+# Black Hole
+style.effects.blackhole.name=Black Hole
+
+# Boss Star Field
+style.effects.bossStarField.name=Boss Star field
+
+# Core Stars Foeground
+style.effects.corestarsfg.name=Core Stars
+
+# Dream Stars
+style.effects.dreamstars.name=Dream Stars
+
+# God Rays
+style.effects.godrays.name=God Rays
+
+# Heatwave
+style.effects.heatwave.name=Heatwave
+
+# Mirror Foreground
+style.effects.mirrorfg.name=Mirror Foreground
+
+# Northern Lights
+style.effects.northernlights.name=Northern Lights
+
+# Petals
+style.effects.petals.name=Petals
+
+# Reflection Foreground
+style.effects.reflectionfg.name=Reflection Foreground
+
+# Snow Foreground
+style.effects.snowfg.name=Snow Foreground
+
+# Snow Background
+style.effects.snowbg.name=Snow Background
+
+# Star Dust
+style.effects.stardust.name=Star Dust
+
+# Star Field
+style.effects.starfield.name=Starfield
+
+# Stars
+style.effects.stars.name=Stars
+
 # Tentacles
+style.effects.tentacles.name=Tentacles
+
 style.effects.tentacles.attribute.sides=Sides
 style.effects.tentacles.attribute.offset=Offset
 style.effects.tentacles.attribute.color=Colour
@@ -1291,6 +1339,8 @@ style.effects.tentacles.description.offset=Determines the lerp strength of the t
 style.effects.tentacles.description.color=The colour of the tentacles.
 
 # Starfield
+style.effects.starfield.name=Starfield
+
 style.effects.starfield.attribute.color=Colour
 style.effects.starfield.attribute.scrollx=Scroll X
 style.effects.starfield.attribute.scrolly=Scroll Y
@@ -1302,11 +1352,15 @@ style.effects.starfield.description.scrolly=Determines the parallax scrolling of
 style.effects.starfield.description.speed=Speed multiplier for the stars.
 
 # Rain
+style.effects.rain.name=Rain
+
 style.effects.rain.attribute.color=Colour
 
 style.effects.rain.description.color=The colour of the rain.
 
 # Planets
+style.effects.planets.name=Planets
+
 style.effects.planets.attribute.count=Count
 style.effects.planets.attribute.size=Size
 style.effects.planets.attribute.color=Colour
@@ -1320,6 +1374,8 @@ style.effects.planets.description.scrollx=Determines the parallax scrolling of t
 style.effects.planets.description.scrolly=Determines the parallax scrolling of the planets along the Y axis.
 
 # Windsnow
+style.effects.windsnow.name=Wind Snow
+
 style.effects.windsnow.attribute.color=Colour
 
 style.effects.windsnow.description.color=The colour of the snow.

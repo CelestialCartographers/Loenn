@@ -40,6 +40,7 @@ function loadingScene:firstEnter()
     local toolHandler = require("tools")
     local entities = require("entities")
     local triggers = require("triggers")
+    local effects = require("effects")
     local libraries = require("libraries")
 
     local atlases = require("atlases")
@@ -77,6 +78,9 @@ function loadingScene:firstEnter()
 
             triggers.loadInternalTriggers()
             triggers.loadExternalTriggers()
+
+            effects.loadInternalEffects()
+            effects.loadExternalEffects()
 
             atlases.loadCelesteAtlases()
 

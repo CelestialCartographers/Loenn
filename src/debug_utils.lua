@@ -1,5 +1,6 @@
 local entities = require("entities")
 local triggers = require("triggers")
+local effects = require("effects")
 local libraries = require("libraries")
 local celesteRender = require("celeste_render")
 local toolHandler = require("tools")
@@ -43,6 +44,15 @@ function debugUtils.reloadTriggers()
 
     triggers.loadInternalTriggers()
     triggers.loadExternalTriggers()
+end
+
+function debugUtils.reloadEffects()
+    logging.info("Reloading effects")
+
+    effects.initDefaultRegistry()
+
+    effects.loadInternalEffects()
+    effects.loadExternalEffects()
 end
 
 function debugUtils.reloadTools()
@@ -110,6 +120,7 @@ function debugUtils.reloadEverything()
     debugUtils.reloadMods()
     debugUtils.reloadEntities()
     debugUtils.reloadTriggers()
+    debugUtils.reloadEffects()
     debugUtils.reloadTools()
     debugUtils.reloadScenes()
     debugUtils.redrawMap()
@@ -153,7 +164,6 @@ function debugUtils.profile(f, options, ...)
 
     profile.reset()
     profile.start()
-
 
     for i = 1, rounds do
         res = f(...)
