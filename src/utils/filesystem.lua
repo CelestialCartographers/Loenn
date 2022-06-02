@@ -37,8 +37,8 @@ function filesystem.joinpath(...)
     return table.concat(paths, sep):gsub(sep .. sep, sep)
 end
 
-function filesystem.splitpath(s)
-    local sep = physfs.getDirSeparator()
+function filesystem.splitpath(s, sep)
+    sep = sep or physfs.getDirSeparator()
 
     return string.split(s, sep)()
 end
@@ -229,10 +229,22 @@ function filesystem.copy(from, to)
     return true
 end
 
+-- Crashes on Windows if using / as path separator
+local function fixNFDPath(path)
+    local userOS = osUtils.getOS()
+
+    if userOS == "Windows" then
+        return filesystem.joinpath(filesystem.splitpath(path, "/"))
+
+    else
+        return path
+    end
+end
+
 -- Return thread if called with callback
 -- Otherwise block and return the selected file
 function filesystem.saveDialog(path, filter, callback)
-    -- TODO - Verify arguments, documentation was very existant
+    path = fixNFDPath(path)
 
     if callback then
         if filesystem.supportWindowsInThreads() then
@@ -263,7 +275,7 @@ end
 -- Return thread if called with callback
 -- Otherwise block and return the selected file
 function filesystem.openDialog(path, filter, callback)
-    -- TODO - Verify arguments, documentation was very existant
+    path = fixNFDPath(path)
 
     if callback then
         if filesystem.supportWindowsInThreads() then
