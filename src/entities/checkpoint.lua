@@ -44,6 +44,9 @@ checkpoint.fieldInformation = {
         fieldType = "anything",
         options = coreModes,
         editable = false
+    },
+    checkpointID = {
+        fieldType = "integer"
     }
 }
 
