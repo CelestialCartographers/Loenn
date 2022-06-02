@@ -4,6 +4,14 @@ strawberry.name = "strawberry"
 strawberry.depth = -100
 strawberry.nodeLineRenderType = "fan"
 strawberry.nodeLimits = {0, -1}
+strawberry.fieldInformation = {
+    order = {
+        fieldType = "integer",
+    },
+    checkpointID = {
+        fieldType = "integer"
+    }
+}
 
 function strawberry.texture(room, entity)
     local moon = entity.moon
