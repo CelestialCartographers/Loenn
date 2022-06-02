@@ -73,7 +73,7 @@ end
 
 function effects.defaultData(style)
     local data = utils.shallowcopy(effects.defaultData)
-    local handler = effects.registeredEffects[style.name]
+    local handler = effects.registeredEffects[style._name]
 
     if handler and handler.defaultData then
         local handlerData = utils.callIfFunction(handler.defaultData, style)
@@ -89,7 +89,7 @@ function effects.defaultData(style)
 end
 
 function effects.ignoredFields(style)
-    local handler = effects.registeredEffects[style.name]
+    local handler = effects.registeredEffects[style._name]
 
     if handler and handler.ignoredFields then
         return utils.callIfFunction(handler.ignoredFields, style)
@@ -99,7 +99,7 @@ function effects.ignoredFields(style)
 end
 
 function effects.fieldOrder(style)
-    local handler = effects.registeredEffects[style.name]
+    local handler = effects.registeredEffects[style._name]
 
     if handler and handler.fieldOrder then
         return utils.callIfFunction(handler.fieldOrder, style)
@@ -109,7 +109,7 @@ function effects.fieldOrder(style)
 end
 
 function effects.fieldInformation(style)
-    local handler = effects.registeredEffects[style.name]
+    local handler = effects.registeredEffects[style._name]
 
     if handler and handler.fieldInformation then
         return utils.callIfFunction(handler.fieldInformation, style)
@@ -119,7 +119,7 @@ function effects.fieldInformation(style)
 end
 
 function effects.canForeground(style)
-    local handler = effects.registeredEffects[style.name]
+    local handler = effects.registeredEffects[style._name]
 
     if handler and handler.canForeground then
         return utils.callIfFunction(handler.canForeground, style)
@@ -129,7 +129,7 @@ function effects.canForeground(style)
 end
 
 function effects.canBackground(style)
-    local handler = effects.registeredEffects[style.name]
+    local handler = effects.registeredEffects[style._name]
 
     if handler and handler.canBackground then
         return utils.callIfFunction(handler.canBackground, style)
@@ -145,7 +145,7 @@ function effects.languageData(language, style)
 end
 
 function effects.displayName(language, style)
-    local name = style.name
+    local name = style._name
     local displayName = utils.humanizeVariableName(name)
     local modPrefix = modHandler.getEntityModPrefix(name)
     local displayNameLanguage = language.style.effects[name].name
