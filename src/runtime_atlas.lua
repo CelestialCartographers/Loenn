@@ -103,7 +103,10 @@ function textureAtlas.addImage(atlas, image, filename, layer)
                 love.graphics.setCanvas(atlas.image)
             end
 
+            love.graphics.push()
+            love.graphics.origin()
             love.graphics.draw(image, x, y)
+            love.graphics.pop()
             love.graphics.setCanvas(previousCanvas)
 
             return true, atlas.image, x, y, atlas.layer
