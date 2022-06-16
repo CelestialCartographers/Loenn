@@ -143,7 +143,7 @@ local function toolLayerChangedCallback(self, tool, layer)
         searchField.index = #searchField
 
         listWidgets.setSelection(toolWindow.layerList, layer, true)
-        listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer), nil, true, true)
+        listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer), nil, nil, true)
     end
 end
 
