@@ -105,7 +105,7 @@ function notificationHandlers:editorLoadWithChanges(currentFile, filename)
         return uiElements.column({
             uiElements.label(tostring(language.ui.notifications.editorLoadWithChanges)),
             uiElements.row({
-                uiElements.button(tostring(language.ui.notifications.editorSaveAndLoad), function()
+                uiElements.button(tostring(language.ui.notifications.editorSaveFirst), function()
                     loadedState.saveCurrentMap(function(previousFilename)
                         loadedState.defaultSaveCallback(previousFilename)
 
@@ -113,11 +113,42 @@ function notificationHandlers:editorLoadWithChanges(currentFile, filename)
                         closePopup(popup)
                     end)
                 end),
-                uiElements.button(tostring(language.ui.notifications.editorSaveAndDontLoad), function()
+                uiElements.button(tostring(language.ui.notifications.editorDiscardChanges), function()
                     -- Update history to think we have no changes
                     history.madeChanges = false
 
                     loadedState.loadFile(filename)
+                    closePopup(popup)
+                end),
+                uiElements.button(tostring(language.ui.button.cancel), function()
+                    closePopup(popup)
+                end),
+            })
+        })
+    end, -1)
+end
+
+-- TODO - Move over to modal when those are implemented
+function notificationHandlers:editorNewMapWithChanges()
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(function(popup)
+        return uiElements.column({
+            uiElements.label(tostring(language.ui.notifications.editorNewWithChanges)),
+            uiElements.row({
+                uiElements.button(tostring(language.ui.notifications.editorSaveFirst), function()
+                    loadedState.saveCurrentMap(function(previousFilename)
+                        loadedState.defaultSaveCallback(previousFilename)
+
+                        loadedState.newMap()
+                        closePopup(popup)
+                    end)
+                end),
+                uiElements.button(tostring(language.ui.notifications.editorDiscardChanges), function()
+                    -- Update history to think we have no changes
+                    history.madeChanges = false
+
+                    loadedState.newMap()
                     closePopup(popup)
                 end),
                 uiElements.button(tostring(language.ui.button.cancel), function()

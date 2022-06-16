@@ -20,10 +20,11 @@ ui.notifications.editorHistoryUndoEmpty=Unable to undo, end of history
 ui.notifications.editorHistoryRedoEmpty=Unable to redo, end of history
 ui.notifications.editorQuitWithChanges=You have unsaved pending changes.\nAre you sure you want to quit?
 ui.notifications.editorLoadWithChanges=You have unsaved pending changes.\nAre you sure you want to load this map?
+ui.notifications.editorNewWithChanges=You have unsaved pending changes.\nAre you sure you want to create a new map?
 ui.notifications.editorDeleteRoom=Are you sure you want to delete this room?
 ui.notifications.editorSaveAndQuit=Save and Quit
-ui.notifications.editorSaveAndLoad=Save First
-ui.notifications.editorSaveAndDontLoad=Don't Save
+ui.notifications.editorSaveFirst=Save First
+ui.notifications.editorDiscardChanges=Don't Save
 
 ui.notifications.updaterUpdateFound=Update found!\nFrom version %s to %s\nDo you want to update?
 ui.notifications.updaterUpdateYes=Update
