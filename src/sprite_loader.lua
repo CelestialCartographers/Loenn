@@ -89,7 +89,6 @@ function spriteLoader.saveCachedDataImage(dataFile, image, imageData)
 end
 
 local filenameCheckTimesCache = {}
-local filenameImageDataCache = {}
 
 local function getExternalImage(filename, cacheDuration)
     cacheDuration = cacheDuration or 10
@@ -100,11 +99,14 @@ local function getExternalImage(filename, cacheDuration)
     if not lastCheck or now > lastCheck + cacheDuration then
         local success, image = pcall(love.graphics.newImage, filename)
 
-        filenameCheckTimesCache[filename] = os.time()
-        filenameImageDataCache[filename] = success and image
+        if success then
+            filenameCheckTimesCache[filename] = os.time()
+
+            return image
+        end
     end
 
-    return filenameImageDataCache[filename]
+    return false
 end
 
 -- We can keep quads since atlas sizes matches
@@ -135,7 +137,7 @@ function spriteLoader.loadExternalSprite(filename)
     local image = getExternalImage(filename)
 
     if not image then
-        return
+        return false
     end
 
     local atlasImage, x, y, layer = runtimeAtlas.addImageFirstAtlas(image, filename)
@@ -170,6 +172,8 @@ function spriteLoader.loadExternalSprite(filename)
 
         loadedAt = os.time()
     }
+
+    image:release()
 
     sprite.quad = love.graphics.newQuad(x, y, imageWidth, imageHeight, atlasWidth, atlasHeight)
 
