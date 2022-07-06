@@ -4,6 +4,8 @@ local utils = require("utils")
 
 local fileLocations = {}
 
+local sourceDirectory = love.filesystem.getSource()
+
 fileLocations.loennSimpleFolderName = "Loenn"
 fileLocations.loennWindowsFolderName = "L" .. string.char(246) .. "nn"
 fileLocations.loennLinuxFolderName = "Lönn"
@@ -96,6 +98,10 @@ end
 
 function fileLocations.getPluginsPath()
     return filesystem.joinpath(fileLocations.getStorageDir(), "Plugins")
+end
+
+function fileLocations.getSourcePath()
+    return sourceDirectory
 end
 
 return fileLocations
