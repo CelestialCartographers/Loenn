@@ -231,6 +231,10 @@ end
 
 -- Crashes on Windows if using / as path separator
 local function fixNFDPath(path)
+    if not path then
+        return
+    end
+
     local userOS = osUtils.getOS()
 
     if userOS == "Windows" then

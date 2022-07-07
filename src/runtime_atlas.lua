@@ -65,6 +65,15 @@ function textureAtlas.addAtlas(layer)
     table.insert(textureAtlas.atlases, atlas)
 end
 
+function sortAtlasRectangles(atlas)
+    -- TODO merge adjacent rectangles
+    -- TODO overlap rectangles
+
+    table.sort(atlas.rectangles, function(r1, r2)
+        return r1.width == r2.width and r1.height < r2.height or r1.width < r2.width
+    end)
+end
+
 -- TODO - Check if added already?
 function textureAtlas.addImage(atlas, image, filename, layer)
     local width, height = image:getDimensions()
@@ -85,12 +94,7 @@ function textureAtlas.addImage(atlas, image, filename, layer)
                 table.insert(atlas.rectangles, remaining)
             end
 
-            -- TODO merge adjacent rectangles
-            -- TODO overlap rectangles
-
-            table.sort(atlas.rectangles, function(r1, r2)
-                return r1.width == r2.width and r1.height < r2.height or r1.width < r2.width
-            end)
+            sortAtlasRectangles(atlas)
 
             -- Add the image on the canvas
 
@@ -103,14 +107,44 @@ function textureAtlas.addImage(atlas, image, filename, layer)
                 love.graphics.setCanvas(atlas.image)
             end
 
+            love.graphics.push()
+            love.graphics.origin()
             love.graphics.draw(image, x, y)
+            love.graphics.pop()
             love.graphics.setCanvas(previousCanvas)
 
             return true, atlas.image, x, y, atlas.layer
         end
     end
 
-    return false, nil, 0, 0
+    return false, nil, 0, 0, -1
+end
+
+function textureAtlas.removeImage(image, quad, layer)
+    local x, y, width, height = quad:getViewport()
+
+    local atlas = textureAtlas.atlases[layer]
+
+    if atlas then
+        local previousCanvas = love.graphics.getCanvas()
+        local scissorX, scissorY, scissorWidth, scissorHeight = love.graphics.getScissor()
+
+        love.graphics.setCanvas(image, layer)
+        love.graphics.push()
+        love.graphics.origin()
+        love.graphics.setScissor(x, y, width, height)
+        love.graphics.clear(0.0, 0.0, 0.0, 0.0)
+        love.graphics.pop()
+        love.graphics.setCanvas(previousCanvas)
+        love.graphics.setScissor(scissorX, scissorY, scissorWidth, scissorHeight)
+
+        table.insert(atlas.rectangles, utils.rectangle(x, y, width, height))
+
+        sortAtlasRectangles(atlas)
+
+    else
+        image:release()
+    end
 end
 
 function textureAtlas.addImageFirstAtlas(image, filename, createIfNeeded, onlyCheck)

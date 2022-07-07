@@ -6,6 +6,7 @@ local config = require("utils.config")
 local threadHandler = require("utils.threads")
 local binaryReader = require("utils.binary_reader")
 local runtimeAtlas = require("runtime_atlas")
+local modHandler = require("mods")
 
 local spriteLoader = {}
 
@@ -88,23 +89,14 @@ function spriteLoader.saveCachedDataImage(dataFile, image, imageData)
     end
 end
 
-local filenameCheckTimesCache = {}
-local filenameImageDataCache = {}
-
 local function getExternalImage(filename, cacheDuration)
-    cacheDuration = cacheDuration or 10
+    local success, image = pcall(love.graphics.newImage, filename)
 
-    local now = os.time()
-    local lastCheck = filenameCheckTimesCache[filename]
-
-    if not lastCheck or now > lastCheck + cacheDuration then
-        local success, image = pcall(love.graphics.newImage, filename)
-
-        filenameCheckTimesCache[filename] = os.time()
-        filenameImageDataCache[filename] = success and image
+    if success then
+        return image
     end
 
-    return filenameImageDataCache[filename]
+    return false
 end
 
 -- We can keep quads since atlas sizes matches
@@ -131,17 +123,42 @@ function spriteLoader.addAtlasToRuntimeAtlas(atlas, filename)
     end
 end
 
+function spriteLoader.removeExternalSprite(sprite)
+    runtimeAtlas.removeImage(sprite.image, sprite.quad, sprite.layer)
+end
+
 function spriteLoader.loadExternalSprite(filename)
     local image = getExternalImage(filename)
 
     if not image then
-        return
+        return false
     end
 
     local atlasImage, x, y, layer = runtimeAtlas.addImageFirstAtlas(image, filename)
 
     local imageWidth, imageHeight = image:getDimensions()
     local atlasWidth, atlasHeight = atlasImage:getDimensions()
+
+    local modsCommonPrefix = modHandler.commonModContent
+    local sourcePath = fileLocations.getSourcePath()
+    local realFilenameFolder = love.filesystem.getRealDirectory(filename)
+    local internalFile = realFilenameFolder == sourcePath
+    local realFolderExt = utils.fileExtension(realFilenameFolder)
+    local fromZipFile = realFolderExt == "zip" or realFolderExt == "love"
+    local realFilename
+
+    if fromZipFile then
+        realFilename = realFilenameFolder
+
+    elseif utils.startsWith(filename, modsCommonPrefix) then
+        -- Also remove the / after the prefix
+        local filenameNoPrefix = filename:sub(#modsCommonPrefix + 2)
+
+        realFilename = filesystem.joinpath(realFilenameFolder, filenameNoPrefix)
+
+    else
+        realFilename = filesystem.joinpath(realFilenameFolder, filename)
+    end
 
     local meta = {
         image = atlasImage,
@@ -166,10 +183,16 @@ function spriteLoader.loadExternalSprite(filename)
         image = atlasImage,
         layer = layer,
         meta = meta,
+
         filename = filename,
+        realFilename = realFilename,
+        internalFile = internalFile,
+        fromZipFile = fromZipFile,
 
         loadedAt = os.time()
     }
+
+    image:release()
 
     sprite.quad = love.graphics.newQuad(x, y, imageWidth, imageHeight, atlasWidth, atlasHeight)
 
@@ -242,7 +265,11 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
                 image = spritesImage,
                 imageData = spritesImageData,
                 meta = meta,
+
                 filename = dataFilePath,
+                realFilename = dataFilePath,
+                internalFile = true,
+                fromZipFile = false,
 
                 loadedAt = os.time()
             }

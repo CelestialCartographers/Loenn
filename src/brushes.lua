@@ -175,7 +175,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
                 end
 
             elseif tile == airTile then
-                batch:set(x, y, false)
+                batch:remove(x, y, sceneryMeta)
 
             else
                 -- TODO - Update overlay sprites
