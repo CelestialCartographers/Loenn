@@ -325,7 +325,9 @@ end
 
 function celesteRender.drawInvalidTiles(batch, missingTiles, fg)
     if #missingTiles > 0 then
-        if batch._canvas then
+        local batchType = utils.typeof(batch)
+
+        if batchType == "gridCanvasDrawingBatch" then
             local color = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
 
             local canvas = love.graphics.getCanvas()
@@ -347,8 +349,11 @@ function celesteRender.drawInvalidTiles(batch, missingTiles, fg)
 end
 
 local function getTilesBatchFromMode(width, height, mode)
-    if mode == "canvasGrid" then
+    if mode == "gridCanvasDrawingBatch" then
         return smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8)
+
+    elseif mode == "matrixDrawingBatch" then
+        return smartDrawingBatch.createMatrixBatch(false, width, height, 8, 8)
 
     elseif mode == "table" then
         return {}
@@ -357,7 +362,7 @@ end
 
 -- randomMatrix is for custom randomness, mostly to give the correct "slice" of the matrix when making fake tiles
 function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatrix, batchMode, shouldYield)
-    batchMode = batchMode or "canvasGrid"
+    batchMode = batchMode or "matrixDrawingBatch"
 
     local tilesMatrix = tiles.matrix
 
@@ -398,7 +403,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
                 local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
 
                 if quad then
-                    if batchMode == "canvasGrid" then
+                    if batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch" then
                         batch:set(x, y, sceneryMeta, quad, x * 8 - 8, y * 8 - 8)
 
                     elseif batchMode == "table" then
@@ -422,7 +427,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
                         if spriteMeta then
                             local quad = celesteRender.getOrCacheTileSpriteQuad(tileCache, tile, texture, randQuad, fg)
 
-                            if batchMode == "canvasGrid" then
+                            if batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch" then
                                 batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
 
                             elseif batchMode == "table" then

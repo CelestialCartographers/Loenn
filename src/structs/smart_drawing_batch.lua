@@ -160,17 +160,85 @@ unorderedDrawingBatchMt.__index = {}
 
 function unorderedDrawingBatchMt.__index:add(meta, quad, x, y, r, sx, sy, jx, jy, ox, oy)
     local image = meta.image
+    local layer = meta.layer
+
+    local batch = self._lookup[image]
+
+    if not batch then
+        batch = love.graphics.newSpriteBatch(image, spriteBatchSize, spriteBatchMode)
+
+        self._lookup[image] = batch
+        self._lookupRemovedIndices[image] = {}
+    end
+
+    local removedIndices = self._lookupRemovedIndices[image]
+
+    -- Check for open slot, use if it exists
+    if #removedIndices > 0 then
+        local replaceId = table.remove(removedIndices)
+
+        return self:set(replaceId, meta, quad, x, y, r, sx, sy, jx, jy, ox, oy)
+    end
 
     local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
     local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
 
-    self._lookup[image] = self._lookup[image] or love.graphics.newSpriteBatch(image, spriteBatchSize, spriteBatchMode)
-    self._lookup[image]:add(quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
+    if layer then
+        return batch:addLayer(layer, quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
+
+    else
+        return batch:add(quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
+    end
+end
+
+function unorderedDrawingBatchMt.__index:set(id, meta, quad, x, y, r, sx, sy, jx, jy, ox, oy)
+    local image = meta.image
+    local layer = meta.layer
+
+    local offsetX = ox or ((jx or 0.0) * meta.realWidth + meta.offsetX)
+    local offsetY = oy or ((jy or 0.0) * meta.realHeight + meta.offsetY)
+
+    local batch = self._lookup[image]
+
+    if batch then
+        if layer then
+            batch:setLayer(id, layer, quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
+
+        else
+            return batch:set(id, quad, x or 0, y or 0, r or 0, sx or 1, sy or 1, offsetX, offsetY)
+        end
+
+        return id
+    end
+
+    return false
+end
+
+function unorderedDrawingBatchMt.__index:remove(id, meta)
+    local image = meta.image
+    local layer = meta.layer
+    local batch = self._lookup[image]
+    local removedIndices = self._lookupRemovedIndices[image]
+
+    if layer then
+        batch:setLayer(id, layer, 0, 0, 0, 0, 0)
+
+    else
+        batch:set(id, 0, 0, 0, 0, 0)
+    end
+
+    table.insert(removedIndices, id)
 end
 
 function unorderedDrawingBatchMt.__index:addFromDrawable(drawable)
     if utils.typeof(drawable) == "drawableSprite" then
-        self:add(drawable.meta, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.justificationX, drawable.justificationY, drawable.offsetX, drawable.offsetY)
+        return self:add(drawable.meta, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.justificationX, drawable.justificationY, drawable.offsetX, drawable.offsetY)
+    end
+end
+
+function unorderedDrawingBatchMt.__index:setFromDrawable(id, drawable)
+    if utils.typeof(drawable) == "drawableSprite" then
+        return self:set(id, drawable.meta, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.justificationX, drawable.justificationY, drawable.offsetX, drawable.offsetY)
     end
 end
 
@@ -199,6 +267,7 @@ function smartDrawingBatch.createUnorderedBatch()
     }
 
     res._lookup = {}
+    res._lookupRemovedIndices = {}
 
     return setmetatable(res, unorderedDrawingBatchMt)
 end
@@ -212,103 +281,64 @@ local matrixDrawingBatchMt = {}
 matrixDrawingBatchMt.__index = {}
 
 function matrixDrawingBatchMt.__index:set(x, y, meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
-    -- Exit early if we already have the value set
-    if self._dirtyIfNotEqual then
-        local target = self._matrix:get(x, y)
-
-        if target and target[1] == meta and target[2] == quad then
-            return
-        end
-    end
-
-    local sectorX, sectorY = getSectorCoordinate(x, y, self._sectorWidth, self._sectorHeight)
-
     if meta then
-        self._matrix:set(x, y, {meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy})
+        local previousValue = self._matrix:get(x, y)
+
+        if previousValue then
+            self:remove(x, y, meta)
+        end
+
+        local id = self._batch:add(meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
+
+        self._matrix:set(x, y, true)
+        self._idMatrix:set(x, y, id)
 
     else
-        self._matrix:set(x, y, false)
+        self:remove(x, y, meta)
     end
-
-    self._dirty:set(sectorX, sectorY, true)
-    self._canRender = false
 end
 
 function matrixDrawingBatchMt.__index:get(x, y, default)
     return self._matrix:get(x, y, default)
 end
 
-function matrixDrawingBatchMt.__index:populateBatch(sectorX, sectorY)
-    local batch = self._batches:getInbounds(sectorX, sectorY)
+function matrixDrawingBatchMt.__index:remove(x, y, meta)
+    local id = self._idMatrix:get(x, y, false)
+    local batch = self._batch
 
-    local startX = 1 + (sectorX - 1) * self._sectorWidth
-    local startY = 1 + (sectorY - 1) * self._sectorHeight
+    if id then
+        batch:remove(id, meta)
 
-    for x = startX, startX + self._sectorWidth - 1 do
-        for y = startY, startY + self._sectorHeight - 1 do
-            local target = self._matrix:get(x, y)
-
-            if target then
-                batch:add(unpack(target))
-            end
-        end
-    end
-end
-
--- Clears and updates all dirty sector batches
-function matrixDrawingBatchMt.__index:updateBatches()
-    local width, height = self._batches:size()
-
-    for x = 1, width do
-        for y = 1, height do
-            if self._dirty:getInbounds(x, y) then
-                self._batches:getInbounds(x, y):clear()
-                self._dirty:setInbounds(x, y, false)
-                self:populateBatch(x, y)
-            end
-        end
+        self._idMatrix:set(x, y, false)
+        self._matrix:set(x, y, false)
     end
 end
 
 function matrixDrawingBatchMt.__index:draw()
-    if not self._canRender then
-        self:updateBatches()
-    end
-
-    -- We don't need the x, y coordinates, iterate like a normal table
-    for i, batch in ipairs(self._batches) do
-        batch:draw()
-    end
-
-    self._canRender = true
+    self._batch:draw()
 end
 
 function matrixDrawingBatchMt.__index:release()
-    -- TODO - Implement when needed
-    return false
+    self._batch:release()
 end
 
 -- Only works with textures
--- dirtyIfNotEqual makes it so a sector is only marked as dirty if the "new" value isn't the same as the one already stored
-function smartDrawingBatch.createMatrixBatch(default, width, height, sectorWidth, sectorHeight, dirtyIfNotEqual)
+function smartDrawingBatch.createMatrixBatch(default, width, height, cellWidth, cellHeight)
     local res = {
         _type = "matrixDrawingBatch",
     }
 
-    sectorWidth = sectorWidth or width
-    sectorHeight = sectorHeight or height
-
-    local sectorsMatrixWidth, sectorsMatrixHeight = math.ceil(width / sectorWidth), math.ceil(height / sectorHeight)
-
     res._width = width
     res._height = height
-    res._sectorWidth = sectorWidth
-    res._sectorHeight = sectorHeight
+
+    res._cellWidth = cellWidth
+    res._cellHeight = cellHeight
+
     res._matrix = matrix.filled(default, width, height)
-    res._batches = matrix.fromFunction(smartDrawingBatch.createUnorderedBatch, sectorsMatrixWidth, sectorsMatrixHeight)
-    res._dirty = matrix.filled(true, sectorsMatrixWidth, sectorsMatrixHeight)
-    res._canRender = false
-    res._dirtyIfNotEqual = dirtyIfNotEqual == nil or dirtyIfNotEqual
+
+    -- Track where the cells are drawn
+    res._idMatrix = matrix.filled(false, width, height)
+    res._batch = smartDrawingBatch.createUnorderedBatch()
 
     return setmetatable(res, matrixDrawingBatchMt)
 end
@@ -400,10 +430,14 @@ function gridCanvasBatchMt.__index:set(x, y, meta, quad, drawX, drawY, r, sx, sy
         end
 
     else
-        self._matrix:set(x, y, false)
-
-        table.insert(self._dirtyScissorCells, {x, y, clearCanvasArea})
+        self:remove(x, y)
     end
+end
+
+function gridCanvasBatchMt.__index:remove(x, y)
+    self._matrix:set(x, y, false)
+
+    table.insert(self._dirtyScissorCells, {x, y, clearCanvasArea})
 end
 
 function gridCanvasBatchMt.__index:get(x, y, default)
