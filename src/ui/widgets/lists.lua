@@ -126,6 +126,11 @@ end
 local function moveListItem(fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
     local sameList = fromList == toList
 
+    -- Invalid indices
+    if not fromIndex or not toIndex then
+        return false
+    end
+
     -- No change
     if sameList and fromIndex == toIndex then
         return false
@@ -147,14 +152,19 @@ local function moveListItem(fromList, fromListItem, toList, toListItem, fromInde
     return true
 end
 
-local function handleItemDrag(self, x, y)
-    local ourList, ourListItem = findListParent(self), self
-    local hoveredList, hoveredListItem = getListDropTarget(self, x, y)
+local function handleItemDrag(item, x, y)
+    local ourList, ourListItem = findListParent(item), item
+    local hoveredList, hoveredListItem = getListDropTarget(item, x, y)
 
     if hoveredList then
-        local sameList = ourList == hoveredList
         local ourIndex = findChildIndex(ourList, ourListItem)
         local hoveredIndex = findChildIndex(hoveredList, hoveredListItem)
+
+        if not hoveredIndex or not ourIndex then
+            return false
+        end
+
+        local sameList = ourList == hoveredList
         local centerDeltaX, centerDeltaY = widgetUtils.cursorDeltaFromElementCenter(hoveredListItem, x, y)
         local insertAfter = centerDeltaY >= 0
 
@@ -162,25 +172,100 @@ local function handleItemDrag(self, x, y)
             hoveredIndex += 1
         end
 
+        local previousList = item._previousHovered
+        local previousIndex
+
+        if previousList then
+            local previousIndex = previousList._dragHoveredIndex
+
+            previousList._dragHoveredIndex = nil
+        end
+
+        -- Redraw if new list or the index changed on the same list
+        if previousList and previousList ~= hoveredList then
+            previousList:reflow()
+            previousList:redraw()
+        end
+
+        if previousList == hoveredList and previousIndex ~= hoveredIndex then
+            previousList:reflow()
+            previousList:redraw()
+        end
+
+        hoveredList._dragHoveredIndex = hoveredIndex
+        item._previousHovered = hoveredList
+
+        return moved
+    end
+end
+
+local function handleItemDragFinish(item, x, y)
+    local ourList, ourListItem = findListParent(item), item
+    local hoveredList = item._previousHovered
+
+    if hoveredList then
+        local ourIndex = findChildIndex(ourList, ourListItem)
+        local hoveredIndex = hoveredList._dragHoveredIndex
         local moved = moveListItem(ourList, ourListItem, hoveredList, hoveredListItem, ourIndex, hoveredIndex)
 
-        if moved then
-            ourList:reflow()
-            ourList:redraw()
+        hoveredList._previousHovered = nil
+        hoveredList._dragHoveredIndex = nil
 
-            if not sameList then
-                hoveredList:reflow()
-                hoveredList:redraw()
-            end
+        ourList:reflow()
+        ourList:redraw()
+
+        if not sameList then
+            hoveredList:reflow()
+            hoveredList:redraw()
         end
+
+        return moved
     end
+end
+
+local function prepareListDragHook()
+    return {
+        draw = function(orig, self)
+            orig(self)
+
+            -- Index 0 means before any items, index 2 is between item two and three
+            local hovered = self._dragHoveredIndex
+            local children = self.children
+
+            -- TODO - Work with empty lists
+            if hovered and #children > 0 then
+                local drawX = self.screenX
+                local drawY = self.screenY
+
+                local width = children[1].width
+                local height = self.style.spacing
+
+                local item = children[hovered]
+
+                if item then
+                    drawX = item.screenX
+                    drawY = item.screenY - height
+
+                else
+                    local lastChild = children[#children]
+
+                    drawX = lastChild.screenX
+                    drawY = lastChild.screenY + lastChild.height
+                end
+
+                local lineColor = self.style:get("dragLineColor") or {1.0, 1.0, 1.0, 1.0}
+                local previousColor = {love.graphics.getColor()}
+
+                love.graphics.setColor(lineColor)
+                love.graphics.rectangle("fill", drawX, drawY, width, height)
+                love.graphics.setColor(previousColor)
+            end
+        end,
+    }
 end
 
 local function prepareItemDragHook()
     return {
-        draw = function(orig, self)
-            orig(self)
-        end,
         onPress = function(orig, self, x, y, button, dragging)
             if button == 1 then
                 self.dragging = dragging
@@ -189,11 +274,19 @@ local function prepareItemDragHook()
                 orig(self, x, y, button, dragging)
             end
         end,
+        onDrag = function(orig, self, x, y)
+            if self.dragging then
+                handleItemDrag(self, x, y)
+
+            else
+                orig(self, x, y)
+            end
+        end,
         onRelease = function(orig, self, x, y, button, dragging)
             if button == 1 or not dragging then
                 self.dragging = dragging
 
-                handleItemDrag(self, x, y)
+                handleItemDragFinish(self, x, y)
 
             else
                 orig(self, x, y, button, dragging)
@@ -206,6 +299,12 @@ local function addDraggableHooks(list)
     local draggable = list.draggable
 
     if draggable then
+        if not list._addedDraggableHook then
+            list:hook(prepareListDragHook())
+
+            list._addedDraggableHook = true
+        end
+
         for _, item in ipairs(list.children or {}) do
             if not item._addedDraggableHook then
                 item:hook(prepareItemDragHook())

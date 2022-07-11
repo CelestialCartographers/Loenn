@@ -51,6 +51,9 @@ return {
     label = {
         color = {0, 0, 0, 1}
     },
+    list = {
+        dragLineColor = {0.2, 0.2, 0.2, 1.0}
+    },
     listItem = {
         disabledBG = {0.4, 0.4, 0.4, 0.9},
         disabledBorder = {0, 0, 0, 0, 1},
