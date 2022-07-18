@@ -1,3 +1,4 @@
+local xmlHandler = require("lib.xml2lua.xmlhandler.tree")
 local xml2lua = require("lib.xml2lua.xml2lua")
 local utils = require("utils")
 local matrix = require("utils.matrix")
@@ -304,8 +305,7 @@ local function readTilesetInfo(tileset, id, element)
 end
 
 function autotiler.loadTilesetXML(filename)
-    -- Rerequire is needed, the handler caches some data incorrectly and breaks the xml tree
-    local handler = utils.rerequire("lib.xml2lua.xmlhandler.tree")
+    local handler = xmlHandler:new()
     local parser = xml2lua.parser(handler)
     local xmlString = utils.readAll(filename, "rb")
 
