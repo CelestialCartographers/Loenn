@@ -276,7 +276,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     if not cache[tile] then
         local tilesetSpriteMeta = atlases.gameplay[texture]
         local tilesetSpriteWidth, tilesetSpriteHeight = tilesetSpriteMeta.realWidth, tilesetSpriteMeta.realHeight
-        local width, height = math.ceil(tilesetSpriteWidth / 8), math.ceil(tilesetSpriteWidth / 8)
+        local width, height = math.ceil(tilesetSpriteWidth / 8), math.ceil(tilesetSpriteHeight / 8)
 
         cache[tile] = {
             [false] = matrix.filled(nil, width, height),
@@ -287,7 +287,9 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     local quadCache = cache[tile][fg]
     local quadX, quadY = quad[1], quad[2]
 
-    if not quadCache:get0(quadX, quadY) then
+    local cachedQuad = quadCache:get0(quadX, quadY, false)
+
+    if not cachedQuad then
         local spriteMeta = atlases.gameplay[texture]
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions()
         local res = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
@@ -297,7 +299,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
         return res
     end
 
-    return quadCache:get0(quadX, quadY)
+    return cachedQuad
 end
 
 function celesteRender.getOrCacheScenerySpriteQuad(index)
