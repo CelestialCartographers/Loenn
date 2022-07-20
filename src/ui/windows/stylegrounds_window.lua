@@ -15,6 +15,7 @@ local formHelper = require("ui.forms.form")
 local parallax = require("parallax")
 local effects = require("effects")
 local formUtils = require("ui.utils.forms")
+local atlases = require("atlases")
 
 local stylegroundWindow = {}
 
@@ -94,6 +95,52 @@ local function getOptions(style)
     return options, dummyData
 end
 
+-- TODO - Localization
+local function getStylegroundPreview(interactionData)
+    local style = interactionData.listTarget and interactionData.listTarget.style or {}
+    local styleType = utils.typeof(style)
+
+    if styleType == "parallax" then
+        local texture = style.texture
+        local sprite = atlases.getResource(texture)
+
+        if sprite then
+            local color = style.color
+            local imageElement = uiElements.image(sprite.image, sprite.quad, sprite.layer)
+
+            if color then
+                local success, r, g, b, a = utils.parseHexColor(color)
+
+                if success then
+                    imageElement.style.color = {r, g, b, a}
+                end
+            end
+
+            return imageElement
+
+        else
+            return uiElements.label("Could not find texture")
+        end
+    end
+
+    return uiElements.label(style.texture or style._name or "No preview")
+end
+
+-- TODO - Improve in the future
+-- We can most likely reuse a previous image or label, but this works for now
+local function updateStylegroundPreview(interactionData)
+    local previewContainer = interactionData.stylegroundPreviewGroup
+    local newPreview = getStylegroundPreview(interactionData)
+
+    if previewContainer.children[1] then
+        previewContainer:removeChild(previewContainer.children[1])
+    end
+
+    if newPreview then
+        previewContainer:addChild(newPreview)
+    end
+end
+
 local function getStylegroundForm(interactionData)
     local listTarget = interactionData.listTarget
     local formData = listTarget and listTarget.style or {}
@@ -101,6 +148,16 @@ local function getStylegroundForm(interactionData)
 
     -- TODO - Add to config file?
     formOptions.columns = 8
+    formOptions.formFieldChanged = function(formFields, field)
+        local style = interactionData.listTarget.style
+        local newData = form.getFormData(formFields)
+
+        for k, v in pairs(newData) do
+            style[k] = v
+        end
+
+        updateStylegroundPreview(interactionData)
+    end
 
     return formHelper.getFormBody(dummyData, formOptions)
 end
@@ -114,14 +171,6 @@ local function updateStylegroundForm(interactionData)
     end
 
     formContainer:addChild(newForm)
-end
-
-local function updateStylegroundPreview(interactionData)
-    local stylegroundPreview = interactionData.stylegroundPreview
-    local listTarget = interactionData.listTarget
-    local style = listTarget and listTarget.style or {}
-
-    stylegroundPreview.text = style.texture or style._name or "No preview"
 end
 
 local function getStylegroundList(map, interactionData)
@@ -157,27 +206,20 @@ local function getStylegroundList(map, interactionData)
     return column, list
 end
 
--- TODO - Implement
-local function getStylegroundPreview(interactionData)
-    local style = interactionData.listTarget and interactionData.listTarget.style or {}
-
-    print("Preview", utils.serialize(style))
-
-    return uiElements.label(style.texture or style._name or "No preview")
-end
-
 local function getWindowContent(map)
     local interactionData = {}
 
     local stylegroundFormGroup = uiElements.group({}):with(uiUtils.bottombound)
     local stylegroundListColumn, stylegroundList = getStylegroundList(map, interactionData)
-    local stylegroundPreview = getStylegroundPreview(interactionData)
+    local stylegroundPreview = uiElements.group({
+        getStylegroundPreview(interactionData)
+    })
     local stylegroundForm = getStylegroundForm(interactionData)
 
     stylegroundFormGroup:addChild(stylegroundForm)
 
     interactionData.formContainerGroup = stylegroundFormGroup
-    interactionData.stylegroundPreview = stylegroundPreview
+    interactionData.stylegroundPreviewGroup = stylegroundPreview
 
     local stylegroundListPreviewRow = uiElements.row({
         stylegroundListColumn:with(uiUtils.fillHeight(false)),
