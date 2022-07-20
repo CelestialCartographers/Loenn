@@ -21,9 +21,15 @@ function booleanField._MT.__index:fieldValid()
     return type(self:getValue()) == "boolean"
 end
 
-local function dropdownChanged(self)
+local function dropdownChanged(formField)
     return function(element, new)
-        self.currentValue = new == "True"
+        local old = formField.currentValue
+
+        formField.currentValue = new == "True"
+
+        if formField.currentValue ~= old then
+            formField:notifyFieldChanged()
+        end
     end
 end
 

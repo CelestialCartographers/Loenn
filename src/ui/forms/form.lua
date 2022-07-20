@@ -30,8 +30,6 @@ function forms.getFieldOptions(name, options)
     return options.fields and options.fields[name] or {}
 end
 
--- TODO - Options
--- Dropdowns, editable, etc
 function forms.getFormFields(data, options)
     local ignored = table.flip(options.ignored or {})
     local ignoreUnordered = options.ignoreUnordered
@@ -40,6 +38,15 @@ function forms.getFormFields(data, options)
     local fieldOrder = options.fieldOrder or {}
 
     local elements = {}
+
+    local fieldChangedCallback = function(changedField)
+        elements._lastChange = love.timer.getTime()
+        elements._formValid = forms.formValid(elements)
+
+        if options.formFieldChanged then
+            options.formFieldChanged(elements, changedField)
+        end
+    end
 
     for _, name in ipairs(fieldOrder) do
         local fieldOptions = forms.getFieldOptions(name, options)
@@ -57,13 +64,25 @@ function forms.getFormFields(data, options)
                 local fieldOptions = forms.getFieldOptions(name, options)
                 local element = forms.getFieldElement(name, value, fieldOptions)
 
-                element._fieldType = name
-                element._hidden = hidden[name] or hideUnordered
+                if hidden[name] ~= nil then
+                    element._hidden = hidden[name]
+
+                else
+                    element._hidden = hideUnordered
+                end
 
                 table.insert(elements, element)
             end
         end
     end
+
+    -- Add extra fields
+    for _, element in ipairs(elements) do
+        element.notifyFieldChanged = fieldChangedCallback
+    end
+
+    -- Initial validation
+    elements._formValid = forms.formValid(elements)
 
     return elements
 end
@@ -196,11 +215,11 @@ function forms.formMustBeValidUpdate(formFields)
     return function(orig, self, dt)
         orig(self, dt)
 
-        self:setEnabled(forms.formValid(formFields))
+        self:setEnabled(formFields._formValid or false)
     end
 end
 
-function forms.packFormCallback(formFields, func)
+function forms.packFormButtonCallback(formFields, func)
     func = func or function() end
 
     return function(self, x, y, button)
@@ -208,19 +227,11 @@ function forms.packFormCallback(formFields, func)
     end
 end
 
--- TODO - Make body scrollable
-function forms.getForm(buttons, data, options)
-    buttons = buttons or {}
-    data = data or {}
-    options = options or {}
-
-    local body, formFields = forms.getFormBody(data, options)
-    local scrollableBody = uiElements.scrollbox(body)
-
+function forms.getFormButtonRow(buttons, formFields, options)
     local buttonElements = {}
 
     for i, button in ipairs(buttons) do
-        local callback = forms.packFormCallback(formFields, button.callback)
+        local callback = forms.packFormButtonCallback(formFields, button.callback)
         local formMustBeValid = button.formMustBeValid
         local buttonElement = uiElements.button(button.text, callback)
 
@@ -238,6 +249,19 @@ function forms.getForm(buttons, data, options)
             padding = 8
         }
     })
+
+    return buttonRow
+end
+
+-- TODO - Make body scrollable
+function forms.getForm(buttons, data, options)
+    buttons = buttons or {}
+    data = data or {}
+    options = options or {}
+
+    local body, formFields = forms.getFormBody(data, options)
+    local scrollableBody = uiElements.scrollbox(body)
+    local buttonRow = forms.getFormButtonRow(buttons, formFields, options)
 
     return uiElements.column({body, buttonRow})
 end

@@ -99,6 +99,8 @@ local function fieldChanged(formField)
 
             formField.field:repaint()
         end
+
+        formField:notifyFieldChanged()
     end
 end
 

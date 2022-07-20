@@ -51,12 +51,14 @@ local function fieldChanged(formField)
         formField.currentValue = formField.valueTransformer(new)
 
         updateFieldStyle(formField, wasValid, valid)
+        formField:notifyFieldChanged()
     end
 end
 
 local function dropdownChanged(formField, optionsFlattened)
     return function(element, new)
         local value
+        local old = formField.currentValue
 
         for _, option in ipairs(optionsFlattened) do
             if option[1] == new then
@@ -64,12 +66,15 @@ local function dropdownChanged(formField, optionsFlattened)
             end
         end
 
-        local wasValid = formField:fieldValid()
-        local valid = formField.validator(value)
+        if value ~= old then
+            local wasValid = formField:fieldValid()
+            local valid = formField.validator(value)
 
-        formField.currentValue = value
+            formField.currentValue = value
 
-        updateFieldStyle(formField, wasValid, valid)
+            updateFieldStyle(formField, wasValid, valid)
+            formField:notifyFieldChanged()
+        end
     end
 end
 
