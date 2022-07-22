@@ -31,6 +31,12 @@ local function checkForUpdates()
     updater.checkForUpdates(true)
 end
 
+local function getLayerToggleFunction(layer)
+    return function()
+        loadedState.setLayerVisible(layer, not loadedState.getLayerVisible(layer))
+    end
+end
+
 local function notYetImplementedNotification()
     local language = languageRegistry.getLanguage()
     local text = tostring(language.ui.menubar.not_yet_implemented)
@@ -81,7 +87,14 @@ menubar.menubar = {
         {},
         {"settings", notYetImplementedNotification}
     }},
-    {"view", notYetImplementedNotification},
+    {"view", {
+        {"view_tiles_fg", getLayerToggleFunction("tilesFg"), false},
+        {"view_tiles_bg", getLayerToggleFunction("tilesBg"), false},
+        {"view_entities", getLayerToggleFunction("entities"), false},
+        {"view_triggers", getLayerToggleFunction("triggers"), false},
+        {"view_decals_fg", getLayerToggleFunction("decalsFg"), false},
+        {"view_decals_bg", getLayerToggleFunction("decalsBg"), false},
+    }},
     {"map", {
         {"stylegrounds", stylegroundEditor.editStylegrounds},
         {"metadata", notYetImplementedNotification}
