@@ -241,6 +241,42 @@ function state.getRoomByName(name)
     end
 end
 
+function state.getLayerVisible(layer)
+    local info = state.layerInformation[layer]
+
+    if info then
+        if info.visible == nil then
+            return true
+        end
+
+        return info.visible
+    end
+
+    return true
+end
+
+function state.setLayerVisible(layer, visible, silent)
+    local info = state.layerInformation[layer]
+
+    if not info then
+        info = {}
+        state.layerInformation[layer] = info
+    end
+
+    info.visible = visible
+
+    if silent ~= false then
+        -- Clear target canvas and complete cache for all rooms
+        celesteRender.invalidateRoomCache(nil, {"canvas", "complete"})
+
+        -- Redraw any visible rooms
+        local selectedItem, selectedItemType = state.getSelectedItem()
+
+        celesteRender.clearBatchingTasks()
+        celesteRender.forceRedrawVisibleRooms(state.map.rooms, state, selectedItem, selectedItemType)
+    end
+end
+
 -- The currently loaded map
 state.map = nil
 
@@ -251,5 +287,8 @@ state.selectedRooms = {}
 
 -- The viewport for the map renderer
 state.viewport = viewportHandler.viewport
+
+-- Rendering information about layers
+state.layerInformation = {}
 
 return state
