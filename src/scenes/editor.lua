@@ -129,7 +129,7 @@ function editorScene:editorMapTargetChanged(item, itemType, previousItem, previo
         end
 
         if shouldForceRedraw then
-            self.celesteRender.forceRedrawRoom(previousItem, self.viewerState.viewport, false)
+            self.celesteRender.forceRedrawRoom(previousItem, self.viewerState, false)
         end
     end
 

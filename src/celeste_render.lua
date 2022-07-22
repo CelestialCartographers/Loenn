@@ -140,6 +140,7 @@ function celesteRender.processTasks(state, calcTime, maxTasks, backgroundTime, b
 end
 
 function celesteRender.clearBatchingTasks()
+    -- TODO - Check if this should release the ongoing tasks or if Lua GC is good enough
     batchingTasks = {}
 end
 
@@ -170,9 +171,18 @@ function celesteRender.invalidateRoomCache(roomName, key)
 
         if roomCache[roomName] then
             if key then
-                celesteRender.releaseBatch(roomName, key)
+                if type(key) == "table" then
+                    for _, k in ipairs(key) do
+                        celesteRender.releaseBatch(roomName, k)
 
-                roomCache[roomName][key] = nil
+                        roomCache[roomName][k] = nil
+                    end
+
+                else
+                    celesteRender.releaseBatch(roomName, key)
+
+                    roomCache[roomName][key] = nil
+                end
 
             else
                 for name, task in pairs(roomCache[roomName]) do
@@ -276,7 +286,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     if not cache[tile] then
         local tilesetSpriteMeta = atlases.gameplay[texture]
         local tilesetSpriteWidth, tilesetSpriteHeight = tilesetSpriteMeta.realWidth, tilesetSpriteMeta.realHeight
-        local width, height = math.ceil(tilesetSpriteWidth / 8), math.ceil(tilesetSpriteWidth / 8)
+        local width, height = math.ceil(tilesetSpriteWidth / 8), math.ceil(tilesetSpriteHeight / 8)
 
         cache[tile] = {
             [false] = matrix.filled(nil, width, height),
@@ -287,7 +297,9 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
     local quadCache = cache[tile][fg]
     local quadX, quadY = quad[1], quad[2]
 
-    if not quadCache:get0(quadX, quadY) then
+    local cachedQuad = quadCache:get0(quadX, quadY, false)
+
+    if not cachedQuad then
         local spriteMeta = atlases.gameplay[texture]
         local spritesWidth, spritesHeight = spriteMeta.image:getDimensions()
         local res = love.graphics.newQuad(spriteMeta.x - spriteMeta.offsetX + quadX * 8, spriteMeta.y - spriteMeta.offsetY + quadY * 8, 8, 8, spritesWidth, spritesHeight)
@@ -297,7 +309,7 @@ function celesteRender.getOrCacheTileSpriteQuad(cache, tile, texture, quad, fg)
         return res
     end
 
-    return quadCache:get0(quadX, quadY)
+    return cachedQuad
 end
 
 function celesteRender.getOrCacheScenerySpriteQuad(index)
@@ -685,13 +697,15 @@ local depthBatchingFunctions = {
 }
 
 -- Force all non finished room batch tasks to finish
-function celesteRender.forceRoomBatchRender(room, viewport)
+function celesteRender.forceRoomBatchRender(room, state)
+    local viewport = state.viewport
     for i, data in ipairs(depthBatchingFunctions) do
         local description, key, func, depth = data[1], data[2], data[3], data[4]
+        local layerVisible = state.getLayerVisible(key)
         local result = func(room, room[key], viewport)
         local task = roomCache[room.name][key]
 
-        if not result and task then
+        if layerVisible and not result and task then
             tasks.processTask(task)
         end
     end
@@ -720,9 +734,10 @@ local function addBatch(depthBatches, depth, batches)
     end
 end
 
-function celesteRender.getRoomBatches(room, viewport)
+function celesteRender.getRoomBatches(room, state)
     local roomName = room.name
     local cache = roomCache[roomName]
+    local viewport = state.viewport
 
     if not cache then
         cache = {}
@@ -735,7 +750,12 @@ function celesteRender.getRoomBatches(room, viewport)
 
         for i, data in ipairs(depthBatchingFunctions) do
             local description, key, func, depth = data[1], data[2], data[3], data[4]
-            local batches = func(room, room[key], viewport)
+            local layerVisible = state.getLayerVisible(key)
+            local batches
+
+            if layerVisible then
+                batches = func(room, room[key], viewport)
+            end
 
             if batches then
                 if depth then
@@ -748,7 +768,9 @@ function celesteRender.getRoomBatches(room, viewport)
                 end
 
             else
-                done = false
+                if layerVisible then
+                    done = false
+                end
             end
         end
 
@@ -778,8 +800,8 @@ function celesteRender.getRoomBatches(room, viewport)
     return cache.complete
 end
 
-local function drawRoomFromBatches(room, viewport, selected)
-    local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+local function drawRoomFromBatches(room, state, selected)
+    local orderedBatches = celesteRender.getRoomBatches(room, state)
 
     if orderedBatches then
         for depth, batch in ipairs(orderedBatches) do
@@ -791,8 +813,9 @@ local function drawRoomFromBatches(room, viewport, selected)
 end
 
 -- Return the canvas if it is ready, otherwise make a task for it
-local function getRoomCanvas(room, viewport, selected)
-    local orderedBatches = celesteRender.getRoomBatches(room, viewport)
+local function getRoomCanvas(room, state, selected)
+    local viewport = state.viewport
+    local orderedBatches = celesteRender.getRoomBatches(room, state)
     local roomName = room.name
 
     local cache = roomCache[roomName]
@@ -827,21 +850,46 @@ local function getRoomCanvas(room, viewport, selected)
 end
 
 -- Force the rooms canvas cache to be rendered
-function celesteRender.forceRoomCanvasRender(room, viewport, selected)
-    local task, canvas = getRoomCanvas(room, viewport, selected)
+function celesteRender.forceRoomCanvasRender(room, state, selected)
+    local viewport = state.viewport
+    local task, canvas = getRoomCanvas(room, state, selected)
 
     if task and not canvas then
         tasks.processTask(task)
     end
 end
 
-function celesteRender.forceRedrawRoom(room, viewport, selected)
+function celesteRender.forceRedrawRoom(room, state, selected)
+    local viewport = state.viewport
+
     celesteRender.invalidateRoomCache(room)
-    celesteRender.forceRoomBatchRender(room, viewport)
-    celesteRender.forceRoomCanvasRender(room, viewport, selected)
+    celesteRender.forceRoomBatchRender(room, state)
+    celesteRender.forceRoomCanvasRender(room, state, selected)
 end
 
-function celesteRender.drawRooms(rooms, viewport, selectedItem, selectedItemType)
+function celesteRender.forceRedrawVisibleRooms(rooms, state, selectedItem, selectedItemType)
+    local viewport = state.viewport
+
+    for _, room in ipairs(rooms) do
+        local roomVisible = viewportHandler.roomVisible(room, viewport)
+        local roomVisibleWidth, roomVisibleHeight = viewportHandler.getRoomVisibleSize(room, viewport)
+        local selected = room == selectedItem
+
+        if selectedItemType == "table" then
+            selected = selectedItem[room]
+        end
+
+        -- No need to redraw immidietly if only the borders are visible
+        if roomVisible and roomVisibleWidth > 2 and roomVisibleHeight > 2 then
+            celesteRender.forceRoomBatchRender(room, state)
+            celesteRender.forceRoomCanvasRender(room, state, selected)
+        end
+    end
+end
+
+function celesteRender.drawRooms(rooms, state, selectedItem, selectedItemType)
+    local viewport = state.viewport
+
     for _, room in ipairs(rooms) do
         local roomVisible = viewportHandler.roomVisible(room, viewport)
         local selected = room == selectedItem
@@ -851,16 +899,17 @@ function celesteRender.drawRooms(rooms, viewport, selectedItem, selectedItemType
         end
 
         if ALLOW_NON_VISIBLE_BACKGROUND_DRAWING or roomVisible then
-            celesteRender.drawRoom(room, viewport, selected, roomVisible)
+            celesteRender.drawRoom(room, state, selected, roomVisible)
         end
     end
 end
 
-function celesteRender.drawRoom(room, viewport, selected, visible)
+function celesteRender.drawRoom(room, state, selected, visible)
     -- Getting the canvas starts background drawing tasks
     -- This should start regardless of the room being visible or not
     local redrawRoom = selected or ALWAYS_REDRAW_UNSELECTED_ROOMS
-    local canvas = not redrawRoom and getRoomCanvas(room, viewport, selected)
+    local viewport = state.viewport
+    local canvas = not redrawRoom and getRoomCanvas(room, state, selected)
 
     if visible or selected then
         local roomX = room.x or 0
@@ -881,7 +930,7 @@ function celesteRender.drawRoom(room, viewport, selected, visible)
             end)
 
             if redrawRoom then
-                drawRoomFromBatches(room, viewport, selected)
+                drawRoomFromBatches(room, state, selected)
 
             else
                 if canvas then
@@ -902,10 +951,10 @@ end
 
 -- Iterate over twice
 -- Batch draw all selected and unselected fillers
-function celesteRender.drawFillers(fillers, viewport, selectedItem, selectedItemType)
+function celesteRender.drawFillers(fillers, state, selectedItem, selectedItemType)
     local pr, pb, pg, pa = love.graphics.getColor()
-
     local multipleSelections = selectedItemType == "table"
+    local viewport = state.viewport
 
     -- Unselected fillers
     love.graphics.setColor(colors.fillerColor)
@@ -945,15 +994,15 @@ function celesteRender.drawFiller(filler, viewport)
 end
 
 function celesteRender.drawMap(state)
-    if state.map then
+    if state and state.map then
         local map = state.map
         local viewport = state.viewport
 
         if viewport.visible then
             local selectedItem, selectedItemType = state.getSelectedItem()
 
-            celesteRender.drawFillers(map.fillers, viewport, selectedItem, selectedItemType)
-            celesteRender.drawRooms(map.rooms, viewport, selectedItem, selectedItemType)
+            celesteRender.drawFillers(map.fillers, state, selectedItem, selectedItemType)
+            celesteRender.drawRooms(map.rooms, state, selectedItem, selectedItemType)
         end
     end
 end

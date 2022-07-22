@@ -31,7 +31,7 @@ function toolUtils.redrawTargetLayer(room, layer)
     end
 
     celesteRender.invalidateRoomCache(room, "complete")
-    celesteRender.forceRoomBatchRender(room, state.viewport)
+    celesteRender.forceRoomBatchRender(room, state)
 end
 
 function toolUtils.getPersistenceKey(...)

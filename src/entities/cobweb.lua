@@ -7,6 +7,7 @@ local cobweb = {}
 cobweb.name = "cobweb"
 cobweb.nodeLimits = {1, -1}
 cobweb.depth = -1
+cobweb.nodeVisibility = "never"
 cobweb.fieldInformation = {
     color = {
         fieldType = "color"

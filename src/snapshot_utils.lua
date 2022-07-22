@@ -16,7 +16,7 @@ local function redrawLayer(room, layer)
         toolUtils.redrawTargetLayer(room, layer)
 
     else
-        celesteRender.forceRedrawRoom(room, state.viewport, false)
+        celesteRender.forceRedrawRoom(room, state, false)
     end
 end
 

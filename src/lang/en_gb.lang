@@ -1015,6 +1015,7 @@ triggers.everest/completeAreaTrigger.placements.name.complete_area=Complete Area
 # Core Mode (Everest)
 triggers.everest/coreModeTrigger.placements.name.core_mode=Core Mode
 triggers.everest/coreModeTrigger.attributes.description.mode=The core mode that should be used when the trigger is entered.
+triggers.everest/coreModeTrigger.attributes.description.playEffects=Whether the trigger should play effects when changing the mode.
 
 # Crystal Shatter (Everest)
 triggers.everest/crystalShatterTrigger.placements.name.crystal_shatter=Crystal Shatter

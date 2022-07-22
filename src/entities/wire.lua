@@ -6,6 +6,7 @@ local wire = {}
 
 wire.name = "wire"
 wire.nodeLimits = {1, 1}
+wire.nodeVisibility = "never"
 wire.fieldInformation = {
     color = {
         fieldType = "color"
