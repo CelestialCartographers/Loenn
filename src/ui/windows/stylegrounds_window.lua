@@ -27,6 +27,7 @@ local stylegroundWindowGroup = uiElements.group({}):with({
 
 })
 
+-- TODO - Add default data
 local function getStylegroundItems(targets, fg, items, parent)
     local language = languageRegistry.getLanguage()
 
@@ -59,9 +60,9 @@ local function getStylegroundItems(targets, fg, items, parent)
             })
 
         elseif styleType == "apply" then
-            -- TODO - Support later
+            -- TODO - Better visuals later
             if style.children then
-                --getStylegroundItems(style.children, fg, items, style)
+                getStylegroundItems(style.children, fg, items, style)
             end
         end
     end
@@ -97,15 +98,22 @@ end
 
 -- TODO - Localization
 local function getStylegroundPreview(interactionData)
-    local style = interactionData.listTarget and interactionData.listTarget.style or {}
+    local formData = interactionData.formData
+    local listTarget = interactionData.listTarget
+    local style = listTarget and listTarget.style or {}
     local styleType = utils.typeof(style)
 
+    -- Not ready yet
+    if not formData then
+        return
+    end
+
     if styleType == "parallax" then
-        local texture = style.texture
+        local texture = formData.texture
         local sprite = atlases.getResource(texture)
 
         if sprite then
-            local color = style.color
+            local color = formData.color
             local imageElement = uiElements.image(sprite.image, sprite.quad, sprite.layer)
 
             if color then
@@ -123,7 +131,7 @@ local function getStylegroundPreview(interactionData)
         end
     end
 
-    return uiElements.label(style.texture or style._name or "No preview")
+    return uiElements.label(formData.texture or formData._name or "No preview")
 end
 
 -- TODO - Improve in the future
@@ -141,20 +149,59 @@ local function updateStylegroundPreview(interactionData)
     end
 end
 
-local function getStylegroundForm(interactionData)
+local function prepareFormData(interactionData)
     local listTarget = interactionData.listTarget
-    local formData = listTarget and listTarget.style or {}
+    local formData = {}
+
+    if not listTarget then
+        return formData
+    end
+
+    local style = listTarget.style or {}
+    local parentStyle = listTarget.parentStyle or {}
+
+    -- Copy in parent style, clear name and type
+    for k, v in pairs(parentStyle) do
+        formData[k] = v
+    end
+
+    formData.__name = nil
+    formData._type = nil
+
+    -- Copy style
+    for k, v in pairs(style) do
+        formData[k] = v
+    end
+
+    -- Filter out apply children
+    if type(formData.children) == "table" then
+        formData.children = nil
+    end
+
+    return formData
+end
+
+local function applyFormChanges(interactionData, newData)
+    -- TODO - Handle parent better, ignore for now
+
+    local listTarget = interactionData
+    local style = interactionData.listTarget.style
+
+    for k, v in pairs(newData) do
+        style[k] = v
+    end
+end
+
+local function getStylegroundForm(interactionData)
+    local formData = prepareFormData(interactionData)
     local formOptions, dummyData = getOptions(formData)
 
     -- TODO - Add to config file?
     formOptions.columns = 8
     formOptions.formFieldChanged = function(formFields, field)
-        local style = interactionData.listTarget.style
         local newData = form.getFormData(formFields)
 
-        for k, v in pairs(newData) do
-            style[k] = v
-        end
+        interactionData.formData = newData
 
         updateStylegroundPreview(interactionData)
     end
@@ -180,12 +227,6 @@ local function getStylegroundList(map, interactionData)
     getStylegroundItems(map.stylesFg or {}, true, items)
     getStylegroundItems(map.stylesBg or {}, false, items)
 
-    if items[1] then
-        interactionData.listTarget = {
-            style = items[1].data.style
-        }
-    end
-
     for i, s in ipairs(items) do
         local item = uiElements.listItem({
             text = s,
@@ -195,10 +236,10 @@ local function getStylegroundList(map, interactionData)
         listItems[i] = item
     end
 
-    local column, list = listWidgets.getList(function(element, data)
-        interactionData.listTarget = data
+    local column, list = listWidgets.getList(function(element, listItem)
+        interactionData.listTarget = listItem
+        interactionData.formData = prepareFormData(interactionData)
 
-        print(utils.serialize(data))
         updateStylegroundForm(interactionData)
         updateStylegroundPreview(interactionData)
     end, items, {initialItem = 1})
