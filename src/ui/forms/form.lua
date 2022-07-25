@@ -159,7 +159,7 @@ function forms.getFormBody(data, options)
 
                     if centerVertically then
                         element.y = offsetY
-                        element.y += (rowHeight - element.height) / 2
+                        element.y += math.floor((rowHeight - element.height) / 2)
 
                     else
                         element.y = offsetY

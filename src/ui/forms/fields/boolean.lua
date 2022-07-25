@@ -21,11 +21,11 @@ function booleanField._MT.__index:fieldValid()
     return type(self:getValue()) == "boolean"
 end
 
-local function dropdownChanged(formField)
+local function fieldChanged(formField)
     return function(element, new)
         local old = formField.currentValue
 
-        formField.currentValue = new == "True"
+        formField.currentValue = new
 
         if formField.currentValue ~= old then
             formField:notifyFieldChanged()
@@ -33,41 +33,29 @@ local function dropdownChanged(formField)
     end
 end
 
--- TODO - Change to a proper checkbox when possible
 function booleanField.getElement(name, value, options)
     local formField = {}
 
     local minWidth = options.minWidth or options.width or 160
     local maxWidth = options.maxWidth or options.width or 160
 
-    local label = uiElements.label(options.displayName or name)
-    local dropdown = uiElements.dropdown({"True", "False"}, dropdownChanged(formField)):with({
-        minWidth = minWidth,
-        maxWidth = maxWidth
-    })
-
-    dropdown:setSelectedIndex(value and 1 or 2)
-
-    local element = uiElements.row({
-        label,
-        dropdown
-    })
+    local checkbox = uiElements.checkbox(options.displayName or name, value, fieldChanged(formField))
+    local element = checkbox
 
     if options.tooltipText then
-        label.interactive = 1
-        label.tooltipText = options.tooltipText
+        checkbox.interactive = 1
+        checkbox.tooltipText = options.tooltipText
     end
 
-    label.centerVertically = true
+    checkbox.centerVertically = true
 
-    formField.label = label
-    formField.dropdown = dropdown
+    formField.checkbox = checkbox
     formField.name = name
     formField.initialValue = value
     formField.currentValue = value
-    formField.width = 2
+    formField.width = 1
     formField.elements = {
-        label, dropdown
+        checkbox
     }
 
     return setmetatable(formField, booleanField._MT)
