@@ -37,6 +37,12 @@ local function getLayerToggleFunction(layer)
     end
 end
 
+local function getLayerValueFunction(layer)
+    return function()
+        return loadedState.getLayerVisible(layer) ~= false
+    end
+end
+
 local function notYetImplementedNotification()
     local language = languageRegistry.getLanguage()
     local text = tostring(language.ui.menubar.not_yet_implemented)
@@ -68,7 +74,8 @@ local debugMenu = {"debug", {
 -- Tree of menubar items
 -- First element is translation key
 -- Second element is a sub tree or a function callback
--- Third is whether or not the submenu should be closed after the callback is done
+-- Third is whether element type, by default it is plain text
+-- Any following elements are up to the element type to handle
 -- Closes by default, some menu items might not want to close the menu, for example "View" toggles
 menubar.menubar = {
     {"file", {
@@ -88,12 +95,12 @@ menubar.menubar = {
         {"settings", notYetImplementedNotification}
     }},
     {"view", {
-        {"view_tiles_fg", getLayerToggleFunction("tilesFg"), false},
-        {"view_tiles_bg", getLayerToggleFunction("tilesBg"), false},
-        {"view_entities", getLayerToggleFunction("entities"), false},
-        {"view_triggers", getLayerToggleFunction("triggers"), false},
-        {"view_decals_fg", getLayerToggleFunction("decalsFg"), false},
-        {"view_decals_bg", getLayerToggleFunction("decalsBg"), false},
+        {"view_tiles_fg", getLayerToggleFunction("tilesFg"), "checkbox", getLayerValueFunction("tilesFg")},
+        {"view_tiles_bg", getLayerToggleFunction("tilesBg"), "checkbox", getLayerValueFunction("tilesBg")},
+        {"view_entities", getLayerToggleFunction("entities"), "checkbox", getLayerValueFunction("entities")},
+        {"view_triggers", getLayerToggleFunction("triggers"), "checkbox", getLayerValueFunction("triggers")},
+        {"view_decals_fg", getLayerToggleFunction("decalsFg"), "checkbox", getLayerValueFunction("decalsFg")},
+        {"view_decals_bg", getLayerToggleFunction("decalsBg"), "checkbox", getLayerValueFunction("decalsBg")},
     }},
     {"map", {
         {"stylegrounds", stylegroundEditor.editStylegrounds},
@@ -113,8 +120,9 @@ menubar.menubar = {
     }}
 }
 
+-- TODO - Tooltip support
 local function addLanguageStrings(menu, language)
-    if type(menu) == "table" then
+    if utils.typeof(menu) == "table" then
         local languageKey = menu[1]
         local languageKeyType = type(languageKey)
 
@@ -129,10 +137,15 @@ local function addLanguageStrings(menu, language)
 end
 
 local function wrapInSubmenuClosers(menu)
-    if type(menu) == "table" then
+    if utils.typeof(menu) == "table" then
         local callback = menu[2]
-        local shouldCloseMenu = menu[3]
+        local elementType = menu[3]
+        local shouldCloseMenu = true
         local callbackType = type(callback)
+
+        if elementType == "checkbox" then
+            shouldCloseMenu = false
+        end
 
         if callbackType == "function" or callbackType == "nil" then
             menu[2] = function(self)
@@ -154,6 +167,41 @@ local function wrapInSubmenuClosers(menu)
     end
 end
 
+-- No element type means it is plain text
+-- Only other supported type is currently checkboxes
+local function handleElementTypes(menu)
+    if utils.typeof(menu) == "table" then
+        local elementType = menu[3]
+
+        if elementType == "checkbox" then
+            local visibilityFunction = menu[4]
+            local initialValue = true
+
+            if visibilityFunction then
+                initialValue = visibilityFunction()
+            end
+
+            menu[1] = uiElements.checkbox(menu[1], initialValue):hook({
+                update = function(orig, self, dt)
+                    orig(self, dt)
+
+                    if visibilityFunction then
+                        local newValue = visibilityFunction()
+
+                        if self.value ~= newValue then
+                            self.value = newValue
+                        end
+                    end
+                end
+            })
+        end
+
+        for _, sub in pairs(menu) do
+            handleElementTypes(sub)
+        end
+    end
+end
+
 local function removeFalseEntries(menu)
     for i = #menu, 1, -1 do
         if not menu[i] then
@@ -169,6 +217,7 @@ function menubar.getMenubar()
     removeFalseEntries(preparedMenubar)
     wrapInSubmenuClosers(preparedMenubar)
     addLanguageStrings(preparedMenubar, language)
+    handleElementTypes(preparedMenubar)
 
     return uiElements.topbar(preparedMenubar)
 end
