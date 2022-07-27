@@ -27,6 +27,11 @@ local stylegroundWindowGroup = uiElements.group({}):with({
 
 })
 
+-- TODO - Layouting variables that should be more dyanmic
+local PREVIEW_MAX_WIDTH = 320 * 3
+local PREVIEW_MAX_HEIGHT = 180 * 3
+local WINDOW_STATIC_HEIGHT = 640
+
 -- TODO - Add default data
 local function getStylegroundItems(targets, fg, items, parent)
     local language = languageRegistry.getLanguage()
@@ -96,6 +101,23 @@ local function getOptions(style)
     return options, dummyData
 end
 
+local function getBestScale(width, height, maxWidth, maxHeight)
+    local scaleX = 1
+    local scaleY = 1
+
+    while width >= maxWidth do
+        width /= 2
+        scaleX /= 2
+    end
+
+    while height >= maxHeight do
+        height /= 2
+        scaleY /= 2
+    end
+
+    return math.min(scaleX, scaleY)
+end
+
 -- TODO - Localization
 local function getStylegroundPreview(interactionData)
     local formData = interactionData.formData
@@ -123,6 +145,15 @@ local function getStylegroundPreview(interactionData)
                     imageElement.style.color = {r, g, b, a}
                 end
             end
+
+            -- Update image size
+            imageElement:layout()
+
+            local imageWidth, imageHeight = imageElement.width / imageElement.scaleX, imageElement.height / imageElement.scaleY
+            local bestScale = getBestScale(imageWidth, imageHeight, PREVIEW_MAX_WIDTH, PREVIEW_MAX_HEIGHT)
+
+            imageElement.scaleX = bestScale
+            imageElement.scaleY = bestScale
 
             return imageElement
 
@@ -294,8 +325,7 @@ function stylegroundWindow.editStylegrounds(map)
     -- Figure out some smart sizing things here, this is too hardcoded
     -- Still doesn't fit all the elements, good enough for now
     window = uiElements.window("Styleground Window", layout):with({
-        width = 1200,
-        height = 600
+        height = WINDOW_STATIC_HEIGHT
     })
 
     table.insert(activeWindows, window)
