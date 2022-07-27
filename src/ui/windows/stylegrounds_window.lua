@@ -178,6 +178,16 @@ local function prepareFormData(interactionData)
         formData.children = nil
     end
 
+    -- Add any missing default values
+    local handler = getHandler(style)
+    local defaultData = handler.defaultData(style) or {}
+
+    for k, v in pairs(defaultData) do
+        if formData[k] == nil then
+            formData[k] = v
+        end
+    end
+
     return formData
 end
 
