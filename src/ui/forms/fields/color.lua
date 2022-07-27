@@ -22,8 +22,18 @@ local invalidStyle = {
     focusedBorder = {0.9, 0.2, 0.2, 1.0, 2.0}
 }
 
+-- Vanilla accepts plain numbers here, these come from the packer making "000000" into 0, etc.
+-- Any other values passes straight through
+local function fixNumberColor(value)
+    if type(value) == "number" then
+        return string.format("%06d", value)
+    end
+
+    return value
+end
+
 function colorField._MT.__index:setValue(value)
-    self.currentValue = value or fallbackHexColor
+    self.currentValue = fixNumberColor(value) or fallbackHexColor
     self.field:setText(self.currentValue)
     self.field.index = #self.currentValue
 end
@@ -149,6 +159,8 @@ end
 
 function colorField.getElement(name, value, options)
     local formField = {}
+
+    value = fixNumberColor(value)
 
     local minWidth = options.minWidth or options.width or 160
     local maxWidth = options.maxWidth or options.width or 160
