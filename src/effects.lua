@@ -13,7 +13,7 @@ effects.defaultFieldOrder = {
 effects.defaultIgnored = {
     "_type", "_name"
 }
-effects.defaultData = {
+effects.commonDefaultData = {
     flag = "",
     notflag = "",
     tag = "",
@@ -72,7 +72,7 @@ function effects.loadExternalEffects(registerAt)
 end
 
 function effects.defaultData(style)
-    local data = utils.shallowcopy(effects.defaultData)
+    local data = table.shallowcopy(effects.commonDefaultData)
     local handler = effects.registeredEffects[style._name]
 
     if handler and handler.defaultData then
