@@ -121,7 +121,7 @@ end
 function effects.canForeground(style)
     local handler = effects.registeredEffects[style._name]
 
-    if handler and handler.canForeground then
+    if handler and handler.canForeground ~= nil then
         return utils.callIfFunction(handler.canForeground, style)
     end
 
@@ -131,7 +131,7 @@ end
 function effects.canBackground(style)
     local handler = effects.registeredEffects[style._name]
 
-    if handler and handler.canBackground then
+    if handler and handler.canBackground ~= nil then
         return utils.callIfFunction(handler.canBackground, style)
     end
 
