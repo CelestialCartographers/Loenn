@@ -45,7 +45,6 @@ local function listItemCheckbox(text, value)
     return checkbox
 end
 
--- TODO - Add default data
 local function getStylegroundItems(targets, fg, items, parent)
     local language = languageRegistry.getLanguage()
 
@@ -62,7 +61,8 @@ local function getStylegroundItems(targets, fg, items, parent)
                 text = listItem,
                 data = {
                     style = style,
-                    parentStyle = parent
+                    parentStyle = parent,
+                    foreground = fg
                 }
             })
 
@@ -74,7 +74,8 @@ local function getStylegroundItems(targets, fg, items, parent)
                 text = listItem,
                 data = {
                     style = style,
-                    parentStyle = parent
+                    parentStyle = parent,
+                    foreground = fg
                 }
             })
 
@@ -132,8 +133,8 @@ local function getBestScale(width, height, maxWidth, maxHeight)
     return math.min(scaleX, scaleY)
 end
 
--- TODO - Localization
 local function getStylegroundPreview(interactionData)
+    local language = languageRegistry.getLanguage()
     local formData = interactionData.formData
     local listTarget = interactionData.listTarget
     local style = listTarget and listTarget.style or {}
@@ -172,11 +173,11 @@ local function getStylegroundPreview(interactionData)
             return imageElement
 
         else
-            return uiElements.label("Could not find texture")
+            return uiElements.label(tostring(language.ui.styleground_window.preview.unknown_texture))
         end
     end
 
-    return uiElements.label(formData.texture or formData._name or "No preview")
+    return uiElements.label(formData.texture or formData._name or tostring(language.ui.styleground_window.preview.no_preview))
 end
 
 -- TODO - Improve in the future
@@ -247,6 +248,140 @@ local function applyFormChanges(interactionData, newData)
     end
 end
 
+local function addNewStyle(interactionData)
+    print("TODO - Add", utils.serialize(interactionData.addNewMethod))
+end
+
+local function removeStyle(interactionData)
+    print("TODO - Remove")
+end
+
+local function moveStyleUp(interactionData)
+    print("TODO - Move up")
+end
+
+local function moveStyleDown(interactionData)
+    print("TODO - Move down")
+end
+
+local function changeStyleForeground(interactionData)
+    local listTarget = interactionData.listTarget
+    local foreground = listTarget.foreground
+    print("TODO - Change foreground", foreground)
+end
+
+local function getNewDropdownOptions()
+    local language = languageRegistry.getLanguage()
+    local knownEffects = effects.registeredEffects
+
+    local options = {
+        {
+            text = tostring(language.ui.styleground_window.new_options.based_on_current),
+            data = {
+                method = "basedOnCurrent"
+            }
+        },
+        {
+            text = tostring(language.ui.styleground_window.new_options.parallax),
+            data = {
+                method = "parallax"
+            }
+        },
+    }
+
+    for name, handler in pairs(knownEffects) do
+        local fakeEffect = {_name = name}
+        local displayName = effects.displayName(language, fakeEffect)
+
+        table.insert(options, {
+            text = displayName,
+            data = {
+                method = "effect",
+                name = name
+            }
+        })
+    end
+
+    return options
+end
+
+local function getStylegroundFormButtons(interactionData, formFields, formOptions)
+    local listTarget = interactionData.listTarget
+
+    if not listTarget then
+        return
+    end
+
+    local language = languageRegistry.getLanguage()
+    local style = listTarget.style
+    local foreground = listTarget.foreground
+
+    local handler = getHandler(style)
+
+    local canForeground = handler.canForeground(style)
+    local canBackground = handler.canBackground(style)
+    local canChangeForeground = canForeground and canBackground
+
+    local moveToForegroundText = tostring(language.ui.styleground_window.form.move_to_foreground)
+    local moveToBackgroundText = tostring(language.ui.styleground_window.form.move_to_background)
+    local changeForegroundButton = {
+        text = foreground and moveToBackgroundText or moveToForegroundText,
+        callback = function(formFields)
+            changeStyleForeground(interactionData)
+        end
+    }
+
+    local buttons = {
+        {
+            text = tostring(language.ui.styleground_window.form.new),
+            callback = function(formFields)
+                addNewStyle(interactionData)
+            end
+        },
+        {
+            text = tostring(language.ui.styleground_window.form.remove),
+            callback = function(formFields)
+                removeStyle(interactionData)
+            end
+        },
+        {
+            text = tostring(language.ui.styleground_window.form.update),
+            formMustBeValid = true,
+            callback = function(formFields)
+                applyFormChanges(interactionData, form.getFormData(formFields))
+            end
+        },
+        {
+            text = tostring(language.ui.styleground_window.form.move_up),
+            callback = function(formFields)
+                moveStyleUp(interactionData)
+            end
+        },
+        {
+            text = tostring(language.ui.styleground_window.form.move_down),
+            callback = function(formFields)
+                moveStyleDown(interactionData)
+            end
+        },
+    }
+
+    if canChangeForeground then
+        table.insert(buttons, changeForegroundButton)
+    end
+
+    local buttonRow = formHelper.getFormButtonRow(buttons, formFields, formOptions)
+    local newDropdownItems = getNewDropdownOptions()
+    local newDropdown = uiElements.dropdown(newDropdownItems, function(item, data)
+        interactionData.addNewMethod = data
+    end)
+
+    interactionData.addNewMethod = newDropdownItems[1].data
+
+    table.insert(buttonRow.children, 1, newDropdown)
+
+    return buttonRow
+end
+
 local function getStylegroundForm(interactionData)
     local formData = prepareFormData(interactionData)
     local formOptions, dummyData = getOptions(formData)
@@ -261,7 +396,10 @@ local function getStylegroundForm(interactionData)
         updateStylegroundPreview(interactionData)
     end
 
-    return formHelper.getFormBody(dummyData, formOptions)
+    local formBody, formFields = formHelper.getFormBody(dummyData, formOptions, buttons)
+    local buttonRow = getStylegroundFormButtons(interactionData, formFields, formOptions)
+
+    return uiElements.column({formBody, buttonRow})
 end
 
 local function updateStylegroundForm(interactionData)
@@ -284,8 +422,7 @@ local function getStylegroundList(map, interactionData)
 
     for i, s in ipairs(items) do
         local item = uiElements.listItem({
-            text = s,
-            data = map.stylesBg[i]
+            text = s
         })
 
         listItems[i] = item

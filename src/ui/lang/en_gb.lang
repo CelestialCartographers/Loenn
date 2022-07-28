@@ -33,6 +33,22 @@ ui.notifications.updaterRemindMeLater=Remind me later
 ui.notifications.updaterDontRemindMeAgain=Don't ask me again
 
 
+# Styleground Window
+ui.styleground_window.preview.unknown_texture=No preview available
+ui.styleground_window.preview.no_preview=No preview available
+
+ui.styleground_window.form.update=Update
+ui.styleground_window.form.new=New
+ui.styleground_window.form.remove=Remove
+ui.styleground_window.form.move_up=Move up
+ui.styleground_window.form.move_down=Move down
+ui.styleground_window.form.move_to_foreground=Move to foreground
+ui.styleground_window.form.move_to_background=Move to background
+
+ui.styleground_window.new_options.based_on_current=Based on current
+ui.styleground_window.new_options.parallax=Parallax
+
+
 # Room Window
 ui.room_window.editing_room=Editing room - %s
 ui.room_window.creating_room=Creating room
