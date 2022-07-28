@@ -241,6 +241,10 @@ function forms.getFormButtonRow(buttons, formFields, options)
             })
         end
 
+        if button.enabled ~= nil then
+            buttonElement.enabled = button.enabled
+        end
+
         buttonElements[i] = buttonElement
     end
 

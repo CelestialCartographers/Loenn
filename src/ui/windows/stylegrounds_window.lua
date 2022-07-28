@@ -133,7 +133,7 @@ local function getBestScale(width, height, maxWidth, maxHeight)
     return math.min(scaleX, scaleY)
 end
 
-local function getStylegroundPreview(interactionData)
+function stylegroundWindow.getStylegroundPreview(interactionData)
     local language = languageRegistry.getLanguage()
     local formData = interactionData.formData
     local listTarget = interactionData.listTarget
@@ -182,9 +182,9 @@ end
 
 -- TODO - Improve in the future
 -- We can most likely reuse a previous image or label, but this works for now
-local function updateStylegroundPreview(interactionData)
+function stylegroundWindow.updateStylegroundPreview(interactionData)
     local previewContainer = interactionData.stylegroundPreviewGroup
-    local newPreview = getStylegroundPreview(interactionData)
+    local newPreview = stylegroundWindow.getStylegroundPreview(interactionData)
 
     if previewContainer.children[1] then
         previewContainer:removeChild(previewContainer.children[1])
@@ -248,25 +248,130 @@ local function applyFormChanges(interactionData, newData)
     end
 end
 
+-- Returns values as follows:
+-- First is fg/bg styles table from the map
+-- Second is the actual parent of the style (styles table or an apply)
+-- Third is the index in that parent
+local function findStyleInStylegrounds(interactionData)
+    local listTarget = interactionData.listTarget
+
+    if not listTarget then
+        return nil, nil, nil
+    end
+
+    local map = interactionData.map
+    local style = interactionData.listTarget.style
+    local foreground = interactionData.listTarget.foreground
+    local styles = foreground and map.stylesFg or map.stylesBg
+
+    for i, s in ipairs(styles) do
+        local styleType = utils.typeof(s)
+
+        if style == s then
+            return styles, styles, i
+        end
+
+        if styleType == "apply" then
+            for j, c in ipairs(s.children or {}) do
+                if style == c then
+                    return styles, s.children, j
+                end
+            end
+        end
+    end
+
+    return nil, nil, nil
+end
+
+local function findCurrentListItem(interactionData)
+    local listTarget = interactionData.listTarget
+    local listElement = interactionData.stylegroundListElement
+
+    for i, item in ipairs(listElement.children) do
+        if item.data == listTarget then
+            return item, i
+        end
+    end
+
+    return nil
+end
+
+local function setSelectionWithCallback(listElement, index)
+    listElement:setSelectedIndex(utils.clamp(index, 1, #listElement.children))
+
+    local newSelection = listElement.selected
+
+    if newSelection then
+        -- Trigger list item callback
+        newSelection:onClick(0, 0, 1)
+    end
+
+    return newSelection
+end
+
+function moveIndex(t, before, after)
+    local value = table.remove(t, before)
+
+    table.insert(t, after, value)
+end
+
+local function canMoveStyle(interactionData, offset)
+    local styles, parent, index = findStyleInStylegrounds(interactionData)
+
+    if parent and index then
+        local newIndex = utils.clamp(index + offset, 1, #parent)
+
+        return index ~= newIndex
+    end
+
+    return false
+end
+
+local function moveStyle(interactionData, offset, moveUpButton, moveDownButton)
+    local styles, parent, index = findStyleInStylegrounds(interactionData)
+
+    if parent and index then
+        local newIndex = utils.clamp(index + offset, 1, #parent)
+
+        if index ~= newIndex then
+            local listElement = interactionData.stylegroundListElement
+            local listItem, listIndex = findCurrentListItem(interactionData)
+
+            moveIndex(parent, index, newIndex)
+            moveIndex(listElement.children, listIndex, listIndex + offset)
+
+            listElement:reflow()
+
+            if moveUpButton and moveDownButton then
+                moveUpButton.enabled = canMoveStyle(interactionData, -1)
+                moveDownButton.enabled = canMoveStyle(interactionData, 1)
+            end
+        end
+    end
+end
+
 local function addNewStyle(interactionData)
     print("TODO - Add", utils.serialize(interactionData.addNewMethod))
 end
 
 local function removeStyle(interactionData)
-    print("TODO - Remove")
-end
+    local styles, parent, index = findStyleInStylegrounds(interactionData)
 
-local function moveStyleUp(interactionData)
-    print("TODO - Move up")
-end
+    if parent and index then
+        local listElement = interactionData.stylegroundListElement
+        local listItem, listIndex = findCurrentListItem(interactionData)
 
-local function moveStyleDown(interactionData)
-    print("TODO - Move down")
+        table.remove(parent, index)
+        listItem:removeSelf()
+
+        setSelectionWithCallback(listElement, listIndex)
+    end
 end
 
 local function changeStyleForeground(interactionData)
     local listTarget = interactionData.listTarget
     local foreground = listTarget.foreground
+
     print("TODO - Change foreground", foreground)
 end
 
@@ -331,6 +436,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
         end
     }
 
+    local movementButtonElements = {}
     local buttons = {
         {
             text = tostring(language.ui.styleground_window.form.new),
@@ -353,16 +459,18 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
         },
         {
             text = tostring(language.ui.styleground_window.form.move_up),
+            enabled = canMoveStyle(interactionData, -1),
             callback = function(formFields)
-                moveStyleUp(interactionData)
+                moveStyle(interactionData, -1, movementButtonElements.up, movementButtonElements.down)
             end
         },
         {
             text = tostring(language.ui.styleground_window.form.move_down),
+            enabled = canMoveStyle(interactionData, 1),
             callback = function(formFields)
-                moveStyleDown(interactionData)
+                moveStyle(interactionData, 1, movementButtonElements.up, movementButtonElements.down)
             end
-        },
+        }
     }
 
     if canChangeForeground then
@@ -375,6 +483,10 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
         interactionData.addNewMethod = data
     end)
 
+    -- Reference for movement button "enable" updates
+    movementButtonElements.up = buttonRow.children[4]
+    movementButtonElements.down = buttonRow.children[5]
+
     interactionData.addNewMethod = newDropdownItems[1].data
 
     table.insert(buttonRow.children, 1, newDropdown)
@@ -382,7 +494,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     return buttonRow
 end
 
-local function getStylegroundForm(interactionData)
+function stylegroundWindow.getStylegroundForm(interactionData)
     local formData = prepareFormData(interactionData)
     local formOptions, dummyData = getOptions(formData)
 
@@ -393,7 +505,7 @@ local function getStylegroundForm(interactionData)
 
         interactionData.formData = newData
 
-        updateStylegroundPreview(interactionData)
+        stylegroundWindow.updateStylegroundPreview(interactionData)
     end
 
     local formBody, formFields = formHelper.getFormBody(dummyData, formOptions, buttons)
@@ -402,9 +514,9 @@ local function getStylegroundForm(interactionData)
     return uiElements.column({formBody, buttonRow})
 end
 
-local function updateStylegroundForm(interactionData)
+function stylegroundWindow.updateStylegroundForm(interactionData)
     local formContainer = interactionData.formContainerGroup
-    local newForm = getStylegroundForm(interactionData)
+    local newForm = stylegroundWindow.getStylegroundForm(interactionData)
 
     if formContainer.children[1] then
         formContainer:removeChild(formContainer.children[1])
@@ -413,7 +525,7 @@ local function updateStylegroundForm(interactionData)
     formContainer:addChild(newForm)
 end
 
-local function getStylegroundList(map, interactionData)
+function stylegroundWindow.getStylegroundList(map, interactionData)
     local items = {}
     local listItems = {}
 
@@ -432,27 +544,29 @@ local function getStylegroundList(map, interactionData)
         interactionData.listTarget = listItem
         interactionData.formData = prepareFormData(interactionData)
 
-        updateStylegroundForm(interactionData)
-        updateStylegroundPreview(interactionData)
+        stylegroundWindow.updateStylegroundForm(interactionData)
+        stylegroundWindow.updateStylegroundPreview(interactionData)
     end, items, {initialItem = 1})
 
     return column, list
 end
 
-local function getWindowContent(map)
+function stylegroundWindow.getWindowContent(map)
     local interactionData = {}
 
     local stylegroundFormGroup = uiElements.group({}):with(uiUtils.bottombound)
-    local stylegroundListColumn, stylegroundList = getStylegroundList(map, interactionData)
+    local stylegroundListColumn, stylegroundList = stylegroundWindow.getStylegroundList(map, interactionData)
     local stylegroundPreview = uiElements.group({
-        getStylegroundPreview(interactionData)
+        stylegroundWindow.getStylegroundPreview(interactionData)
     })
-    local stylegroundForm = getStylegroundForm(interactionData)
+    local stylegroundForm = stylegroundWindow.getStylegroundForm(interactionData)
 
     stylegroundFormGroup:addChild(stylegroundForm)
 
+    interactionData.map = map
     interactionData.formContainerGroup = stylegroundFormGroup
     interactionData.stylegroundPreviewGroup = stylegroundPreview
+    interactionData.stylegroundListElement = stylegroundList
 
     local stylegroundListPreviewRow = uiElements.row({
         stylegroundListColumn:with(uiUtils.fillHeight(false)),
@@ -471,7 +585,7 @@ end
 
 function stylegroundWindow.editStylegrounds(map)
     local window
-    local layout, interactionData = getWindowContent(map)
+    local layout, interactionData = stylegroundWindow.getWindowContent(map)
 
     -- Figure out some smart sizing things here, this is too hardcoded
     -- Still doesn't fit all the elements, good enough for now
