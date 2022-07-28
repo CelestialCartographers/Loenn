@@ -32,6 +32,19 @@ local PREVIEW_MAX_WIDTH = 320 * 3
 local PREVIEW_MAX_HEIGHT = 180 * 3
 local WINDOW_STATIC_HEIGHT = 640
 
+-- List icon to indicate foreground vs background
+local function listItemCheckbox(text, value)
+    local checkbox = uiElements.checkbox(text, value)
+
+    checkbox.checkbox.style.disabledBG = {0.0, 0.0, 0.0, 0.0}
+    checkbox.checkbox.style.disabledFG = {0.0, 0.0, 0.0, 0.0}
+    checkbox.checkbox.style.disabledBorder = {0.0, 0.0, 0.0, 0.0}
+
+    checkbox.enabled = false
+
+    return checkbox
+end
+
 -- TODO - Add default data
 local function getStylegroundItems(targets, fg, items, parent)
     local language = languageRegistry.getLanguage()
@@ -43,9 +56,10 @@ local function getStylegroundItems(targets, fg, items, parent)
 
         if styleType == "parallax" then
             local displayName = parallax.displayName(language, style)
+            local listItem = listItemCheckbox(displayName, fg)
 
             table.insert(items, {
-                text = displayName,
+                text = listItem,
                 data = {
                     style = style,
                     parentStyle = parent
@@ -53,11 +67,11 @@ local function getStylegroundItems(targets, fg, items, parent)
             })
 
         elseif styleType == "effect" then
-            print(style)
             local displayName = effects.displayName(language, style)
+            local listItem = listItemCheckbox(displayName, fg)
 
             table.insert(items, {
-                text = displayName,
+                text = listItem,
                 data = {
                     style = style,
                     parentStyle = parent
