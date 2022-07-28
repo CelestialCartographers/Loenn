@@ -62,10 +62,19 @@ function parallax.fieldInformation(style)
     return fieldInformation
 end
 
+function parallax.canForeground(style)
+    return true
+end
+
+function parallax.canBackground(style)
+    return true
+end
+
 function parallax.languageData(language, style)
     return language.style.parallax
 end
 
+-- TODO - Language file
 function parallax.displayName(language, style)
     local texture = style.texture
 

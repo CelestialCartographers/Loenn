@@ -59,10 +59,11 @@ function templeGate.sprite(room, entity)
     local variant = entity.sprite or "default"
     local texture = textures[variant] or textures["default"]
     local sprite = drawableSprite.fromTexture(texture, entity)
+    local height = entity.height or 48
 
     -- Weird offset from the code, justifications are from sprites.xml
     sprite:setJustification(0.5, 0.0)
-    sprite:addPosition(4, -8)
+    sprite:addPosition(4, height - 48)
 
     return sprite
 end
