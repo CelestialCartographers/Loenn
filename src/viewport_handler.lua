@@ -144,7 +144,7 @@ function viewportHandler.drawRelativeTo(x, y, func)
     love.graphics.pop()
 end
 
-function viewportDevice.mousedragmoved(dx, dy, button, istouch)
+function viewportDevice.mousedragmoved(x, y, dx, dy, button, istouch)
     if button == movementButton then
         viewport.x -= dx
         viewport.y -= dy

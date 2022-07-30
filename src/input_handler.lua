@@ -26,7 +26,7 @@ function inputHandler.getMouseDragDelta(x, y, button, istouch)
     from[3] = x
     from[4] = y
 
-    return dx, dy, button, istouch
+    return x, y, dx, dy, button, istouch
 end
 
 function love.keypressed(key, scancode, isrepeat)

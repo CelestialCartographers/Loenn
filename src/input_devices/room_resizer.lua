@@ -280,7 +280,7 @@ function roomResizer.mousedragged(startX, startY, button, dx, dy)
     return not not dragging
 end
 
-function roomResizer.mousedragmoved(dx, dy, button, istouch)
+function roomResizer.mousedragmoved(x, y, dx, dy, button, istouch)
     return not not dragging
 end
 
