@@ -249,7 +249,7 @@ function roomResizer.mousemoved(x, y, dx, dy, istouch)
                 if itemType == "room" then
                     -- TODO - Improve this, very expensive update
                     celesteRender.invalidateRoomCache(item)
-                    celesteRender.forceRoomBatchRender(item, viewportHandler.viewport)
+                    celesteRender.forceRoomBatchRender(item, loadedState)
                 end
             end
 
