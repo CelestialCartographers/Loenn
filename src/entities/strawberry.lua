@@ -59,21 +59,27 @@ strawberry.placements = {
         name = "normal",
         data = {
             winged = false,
-            moon = false
+            moon = false,
+            checkpointID = -1,
+            order = -1
         },
     },
     {
         name = "normal_winged",
         data = {
             winged = true,
-            moon = false
+            moon = false,
+            checkpointID = -1,
+            order = -1
         },
     },
     {
         name = "moon",
         data = {
             winged = false,
-            moon = true
+            moon = true,
+            checkpointID = -1,
+            order = -1
         },
     }
 }
