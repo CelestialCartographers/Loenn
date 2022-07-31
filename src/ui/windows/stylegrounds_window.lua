@@ -252,6 +252,7 @@ end
 -- First is fg/bg styles table from the map
 -- Second is the actual parent of the style (styles table or an apply)
 -- Third is the index in that parent
+-- Fourth is the parent style, if it exists
 local function findStyleInStylegrounds(interactionData)
     local listTarget = interactionData.listTarget
 
@@ -274,7 +275,7 @@ local function findStyleInStylegrounds(interactionData)
         if styleType == "apply" then
             for j, c in ipairs(s.children or {}) do
                 if style == c then
-                    return styles, s.children, j
+                    return styles, s.children, j, s
                 end
             end
         end
@@ -294,6 +295,19 @@ local function findCurrentListItem(interactionData)
     end
 
     return nil
+end
+
+local function foregroundListItemCount(interactionData)
+    local listElement = interactionData.stylegroundListElement
+    local count = 0
+
+    for _, item in ipairs(listElement.children) do
+        if item.data.foreground then
+            count += 1
+        end
+    end
+
+    return count
 end
 
 local function setSelectionWithCallback(listElement, index)
@@ -368,11 +382,66 @@ local function removeStyle(interactionData)
     end
 end
 
-local function changeStyleForeground(interactionData)
+local function changeStyleForeground(interactionData, moveUpButton, moveDownButton)
     local listTarget = interactionData.listTarget
-    local foreground = listTarget.foreground
+    local listElement = interactionData.stylegroundListElement
+    local listItem, listIndex = findCurrentListItem(interactionData)
 
-    print("TODO - Change foreground", foreground)
+    local foreground = listTarget.foreground
+    local foregroundCount = foregroundListItemCount(interactionData)
+
+    local styles, parent, index, parentStyle = findStyleInStylegrounds(interactionData)
+    local parentType = utils.typeof(parentStyle)
+
+    local movedStyle = listTarget.style
+    local map = interactionData.map
+
+    local insertionIndex = foreground and #listElement.children or foregroundCount + 1
+    local firstIndex = listIndex
+    local lastIndex = listIndex
+
+    -- Move all related menu items
+    if parentType == "apply" then
+        movedStyle = parentStyle
+        firstIndex = listIndex - index + 1
+        lastIndex = firstIndex + #parent - 1
+    end
+
+    -- Reorder list items
+    local fromIndex = firstIndex
+
+    for i = firstIndex, lastIndex do
+        local movedItem = listElement.children[fromIndex]
+
+        movedItem.label.value = not foreground
+        movedItem.data.foreground = not foreground
+
+        moveIndex(listElement.children, fromIndex, insertionIndex)
+
+        -- The list only shifts around when going from background -> foreground
+        if not foreground then
+            fromIndex += 1
+            insertionIndex += 1
+        end
+
+    end
+
+    -- Update map style data
+    local fromStyles = foreground and map.stylesFg or map.stylesBg
+    local toStyles = foreground and map.stylesBg or map.stylesFg
+
+    for i, s in ipairs(fromStyles) do
+        if movedStyle == s then
+            table.remove(fromStyles, i)
+            table.insert(toStyles, movedStyle)
+
+            break
+        end
+    end
+
+    -- Update list and form fields
+    listElement:reflow()
+    listItem:onClick(0, 0, 1)
 end
 
 local function getNewDropdownOptions()
@@ -429,14 +498,14 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
 
     local moveToForegroundText = tostring(language.ui.styleground_window.form.move_to_foreground)
     local moveToBackgroundText = tostring(language.ui.styleground_window.form.move_to_background)
+
+    local movementButtonElements = {}
     local changeForegroundButton = {
         text = foreground and moveToBackgroundText or moveToForegroundText,
         callback = function(formFields)
-            changeStyleForeground(interactionData)
+            changeStyleForeground(interactionData, movementButtonElements.up, movementButtonElements.down)
         end
     }
-
-    local movementButtonElements = {}
     local buttons = {
         {
             text = tostring(language.ui.styleground_window.form.new),
