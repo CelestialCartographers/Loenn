@@ -135,6 +135,27 @@ function debugUtils.debug()
     debug.debug()
 end
 
+-- Simple string representation of the current call path
+function debugUtils.getCallPath(startLevel)
+    local parts = {}
+    local level = startLevel or 2
+
+    while true do
+        local info = debug.getinfo(level)
+
+        -- If line number is -1 we most likely hit Love2d internals
+        if not info or info.currentline == -1 then
+            break
+        end
+
+        level += 1
+
+        table.insert(parts, string.format("%s L%s", info.source, info.currentline))
+    end
+
+    return table.concat(parts, " <- ")
+end
+
 function debugUtils.disableYields()
     coroutine.yield = function() end
     tasks.yield = coroutine.yield
