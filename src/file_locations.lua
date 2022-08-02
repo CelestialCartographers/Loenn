@@ -11,35 +11,6 @@ fileLocations.loennWindowsFolderName = "L" .. string.char(246) .. "nn"
 fileLocations.loennLinuxFolderName = "Lönn"
 fileLocations.loennZipFolderName = "L" .. string.char(148) .. "nn"
 
--- Part of Lönn zip/windows config name deprecation, will be removed later
-function fileLocations.hasOldStorageDir()
-    local hasOld = filesystem.isDirectory(filesystem.joinpath(os.getenv("LocalAppData"), fileLocations.loennWindowsFolderName))
-    local hasNew = filesystem.isDirectory(filesystem.joinpath(os.getenv("LocalAppData"), fileLocations.loennSimpleFolderName))
-
-    return hasOld and not hasNew
-end
-
--- Part of Lönn zip/windows config name deprecation, will be removed later
-function fileLocations.handleWindowsStorageDeprecation()
-    if fileLocations.hasOldStorageDir() then
-        local deprecationMessage = "[Migration] Moving existing config to new location, old folder is deprecated due to encoding issues"
-
-        print(deprecationMessage)
-
-        fileLocations.migrateOldWindowsStorage()
-    end
-end
-
--- Part of Lönn zip/windows config name deprecation, will be removed later
-function fileLocations.migrateOldWindowsStorage()
-    local oldPath = filesystem.joinpath(os.getenv("LocalAppData"), fileLocations.loennWindowsFolderName)
-    local newPath = filesystem.joinpath(os.getenv("LocalAppData"), fileLocations.loennSimpleFolderName)
-
-    local success = pcall(filesystem.rename, oldPath, newPath)
-
-    return success
-end
-
 function fileLocations.getStorageDir()
     local userOS = utils.getOS()
 
@@ -48,8 +19,6 @@ function fileLocations.getStorageDir()
     local linuxFolderName = fileLocations.loennLinuxFolderName
 
     if userOS == "Windows" then
-        fileLocations.handleWindowsStorageDeprecation()
-
         return filesystem.joinpath(os.getenv("LocalAppData"), simpleFolderName)
 
     elseif userOS == "Linux" then
