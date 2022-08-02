@@ -13,7 +13,7 @@ function toolUtils.getCursorPositionInRoom(x, y)
     local px, py = nil, nil
 
     if room then
-        px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        px, py = viewportHandler.getRoomCoordinates(room, x, y)
     end
 
     return px, py

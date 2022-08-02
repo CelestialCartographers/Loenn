@@ -61,7 +61,7 @@ function brushToolUtils.handleActionClick(tool, x, y, force)
     local room = state.getSelectedRoom()
 
     if room then
-        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local px, py = viewportHandler.getRoomCoordinates(room, x, y)
         local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
         if tool.lastMaterial ~= tool.material or tool.lastTileX ~= tx + 1 or tool.lastTileY ~= ty + 1 or force then
@@ -81,7 +81,7 @@ function brushToolUtils.handleCloneClick(tool, x, y)
     local room = state.getSelectedRoom()
 
     if room then
-        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local px, py = viewportHandler.getRoomCoordinates(room, x, y)
         local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
         local material = brushHelper.getTile(room, tx + 1, ty + 1, tool.layer)

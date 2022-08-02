@@ -58,7 +58,7 @@ function viewportHandler.getMapCoordinates(x, y)
     return math.floor((x + viewport.x) / viewport.scale), math.floor((y + viewport.y) / viewport.scale)
 end
 
-function viewportHandler.getRoomCoordindates(room, x, y)
+function viewportHandler.getRoomCoordinates(room, x, y)
     local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
 
     return mapX - room.x, mapY - room.y

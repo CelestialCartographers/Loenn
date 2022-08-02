@@ -14,7 +14,7 @@ local bodyTexture = "danger/templeeye/body00"
 local pupilTexture = "danger/templeeye/pupil"
 
 function templeBigEyeball.draw(room, entity, viewport)
-    local roomX, roomY = viewportHandler.getRoomCoordindates(room)
+    local roomX, roomY = viewportHandler.getRoomCoordinates(room)
     local deltaX = roomX - entity.x
     local deltaY = roomY - entity.y
     local angle = math.atan2(deltaY, deltaX)

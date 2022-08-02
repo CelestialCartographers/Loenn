@@ -105,7 +105,7 @@ local function handleActionClick(x, y, force)
     local room = state.getSelectedRoom()
 
     if room then
-        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local px, py = viewportHandler.getRoomCoordinates(room, x, y)
         local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
         local tiles = room[tool.layer]
@@ -158,7 +158,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local room = state.getSelectedRoom()
 
     if room then
-        local px, py = viewportHandler.getRoomCoordindates(room, x, y)
+        local px, py = viewportHandler.getRoomCoordinates(room, x, y)
         local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
         if lastMouseX ~= tx or lastMouseY ~= ty then

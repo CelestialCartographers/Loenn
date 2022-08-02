@@ -220,7 +220,7 @@ function roomResizer.mousemoved(x, y, dx, dy, istouch)
 
         if dragging then
             local startX, startY = draggingStartX, draggingStartY
-            local tileX, tileY = viewportHandler.pixelToTileCoordinates(viewportHandler.getRoomCoordindates(itemPosition, x, y))
+            local tileX, tileY = viewportHandler.pixelToTileCoordinates(viewportHandler.getRoomCoordinates(itemPosition, x, y))
             local deltaX, deltaY = tileX - startX, tileY - startY
 
             if deltaX ~= 0 or deltaY ~= 0 then
@@ -257,7 +257,7 @@ function roomResizer.mousemoved(x, y, dx, dy, istouch)
 
         else
             local newItemPosition = {x = itemX, y = itemY}
-            local cursorX, cursorY = viewportHandler.getRoomCoordindates(newItemPosition, x, y)
+            local cursorX, cursorY = viewportHandler.getRoomCoordinates(newItemPosition, x, y)
 
             local tileX, tileY = viewportHandler.pixelToTileCoordinates(cursorX, cursorY)
             local side = draggingResizeTriangle(cursorX * viewport.scale, cursorY * viewport.scale, itemX, itemY, width, height, viewport)

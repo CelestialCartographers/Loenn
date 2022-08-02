@@ -78,7 +78,7 @@ function tool.draw()
     local room = state.getSelectedRoom()
 
     if room then
-        local px, py = viewportHandler.getRoomCoordindates(room)
+        local px, py = viewportHandler.getRoomCoordinates(room)
         local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
 
         viewportHandler.drawRelativeTo(room.x, room.y, function()
