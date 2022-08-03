@@ -14,6 +14,8 @@ local widgetUtils = require("ui.widgets.utils")
 local formHelper = require("ui.forms.form")
 local parallax = require("parallax")
 local effects = require("effects")
+local parallaxStruct = require("structs.parallax")
+local effectStruct = require("structs.effect")
 local formUtils = require("ui.utils.forms")
 local atlases = require("atlases")
 
@@ -257,7 +259,7 @@ local function findStyleInStylegrounds(interactionData)
     local listTarget = interactionData.listTarget
 
     if not listTarget then
-        return nil, nil, nil
+        return
     end
 
     local map = interactionData.map
@@ -280,8 +282,6 @@ local function findStyleInStylegrounds(interactionData)
             end
         end
     end
-
-    return nil, nil, nil
 end
 
 local function findCurrentListItem(interactionData)
@@ -293,8 +293,6 @@ local function findCurrentListItem(interactionData)
             return item, i
         end
     end
-
-    return nil
 end
 
 local function foregroundListItemCount(interactionData)
@@ -364,8 +362,83 @@ local function moveStyle(interactionData, offset, moveUpButton, moveDownButton)
     end
 end
 
+local function createParallax()
+    local style = parallaxStruct.decode()
+    local defaultData = parallax.defaultData(style) or {}
+
+    for k, v in pairs(defaultData) do
+        style[k] = v
+    end
+
+    return style
+end
+
+local function createEffect(name)
+    local style = effectStruct.decode({__name = name})
+    local defaultData = effects.defaultData(style) or {}
+
+    for k, v in pairs(defaultData) do
+        style[k] = v
+    end
+
+    return style
+end
+
 local function addNewStyle(interactionData)
-    print("TODO - Add", utils.serialize(interactionData.addNewMethod))
+    local listTarget = interactionData.listTarget
+
+    if not listTarget then
+        return false
+    end
+
+    local newStyle
+    local currentStyle = interactionData.listTarget.style
+    local parentStyle = interactionData.listTarget.parentStyle
+
+    local listElement = interactionData.stylegroundListElement
+    local foreground = listTarget.foreground
+    local map = interactionData.map
+    local method = interactionData.addNewMethod.method
+    local listItems = {}
+
+    if method == "basedOnCurrent" then
+        if currentStyle then
+            newStyle = table.shallowcopy(currentStyle)
+        end
+
+    elseif method == "parallax" then
+        newStyle = createParallax()
+
+    elseif method == "effect" then
+        local effectName = interactionData.addNewMethod.name
+
+        newStyle = createEffect(effectName)
+    end
+
+    if newStyle then
+        local styles, parentTable, index = findStyleInStylegrounds(interactionData)
+        local _, listIndex = findCurrentListItem(interactionData)
+        local listItems = getStylegroundItems({newStyle}, foreground, {}, nil)
+
+        for i, item in ipairs(listItems) do
+            local listItem = uiElements.listItem(item.text, item.data)
+
+            listItem.owner = listElement
+
+            table.insert(listElement.children, listIndex + i, listItem)
+        end
+
+        table.insert(parentTable, index + 1, newStyle)
+
+        if #listItems > 0 then
+            local lastItem = listElement.children[listIndex + #listItems]
+
+            listElement:reflow()
+            lastItem:onClick(0, 0, 1)
+        end
+    end
+
+    return not not newStyle
 end
 
 local function removeStyle(interactionData)
@@ -444,7 +517,7 @@ local function changeStyleForeground(interactionData, moveUpButton, moveDownButt
     listItem:onClick(0, 0, 1)
 end
 
-local function getNewDropdownOptions()
+local function getNewDropdownOptions(foreground)
     local language = languageRegistry.getLanguage()
     local knownEffects = effects.registeredEffects
 
@@ -466,14 +539,18 @@ local function getNewDropdownOptions()
     for name, handler in pairs(knownEffects) do
         local fakeEffect = {_name = name}
         local displayName = effects.displayName(language, fakeEffect)
+        local canForeground = effects.canForeground(fakeEffect)
+        local canBackground = effects.canBackground(fakeEffect)
 
-        table.insert(options, {
-            text = displayName,
-            data = {
-                method = "effect",
-                name = name
-            }
-        })
+        if foreground and canForeground or not foreground and canBackground then
+            table.insert(options, {
+                text = displayName,
+                data = {
+                    method = "effect",
+                    name = name
+                }
+            })
+        end
     end
 
     return options
@@ -547,7 +624,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     end
 
     local buttonRow = formHelper.getFormButtonRow(buttons, formFields, formOptions)
-    local newDropdownItems = getNewDropdownOptions()
+    local newDropdownItems = getNewDropdownOptions(foreground)
     local newDropdown = uiElements.dropdown(newDropdownItems, function(item, data)
         interactionData.addNewMethod = data
     end)
@@ -596,18 +673,9 @@ end
 
 function stylegroundWindow.getStylegroundList(map, interactionData)
     local items = {}
-    local listItems = {}
 
     getStylegroundItems(map.stylesFg or {}, true, items)
     getStylegroundItems(map.stylesBg or {}, false, items)
-
-    for i, s in ipairs(items) do
-        local item = uiElements.listItem({
-            text = s
-        })
-
-        listItems[i] = item
-    end
 
     local column, list = listWidgets.getList(function(element, listItem)
         interactionData.listTarget = listItem
