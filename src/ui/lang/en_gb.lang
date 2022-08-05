@@ -91,17 +91,17 @@ forms.fieldTypes.unknown_type.label=Unknown field for type '%s' in field '%s'
 
 # Menubar
 ui.menubar.file=File
-ui.menubar.new=New
-ui.menubar.open=Open
-ui.menubar.recent=Recent
-ui.menubar.save=Save
-ui.menubar.save_as=Save as
-ui.menubar.exit=Exit
+ui.menubar.file_new=New
+ui.menubar.file_open=Open
+ui.menubar.file_recent=Recent
+ui.menubar.file_save=Save
+ui.menubar.file_save_as=Save as
+ui.menubar.file_exit=Exit
 
 ui.menubar.edit=Edit
-ui.menubar.undo=Undo
-ui.menubar.redo=Redo
-ui.menubar.settings=Settings
+ui.menubar.edit_undo=Undo
+ui.menubar.edit_redo=Redo
+ui.menubar.edit_settings=Settings
 
 ui.menubar.view=View
 ui.menubar.view_tiles_fg=Foreground Tiles
@@ -112,29 +112,29 @@ ui.menubar.view_decals_fg=Foreground Decals
 ui.menubar.view_decals_bg=Background Decals
 
 ui.menubar.map=Map
-ui.menubar.stylegrounds=Stylegrounds
-ui.menubar.metadata=Metadata
+ui.menubar.map_stylegrounds=Stylegrounds
+ui.menubar.map_metadata=Metadata
 
 ui.menubar.room=Room
-ui.menubar.add=Add
-ui.menubar.configure=Configure
-ui.menubar.delete=Delete
+ui.menubar.room_add=Add
+ui.menubar.room_edit=Edit
+ui.menubar.room_delete=Delete
 
 ui.menubar.debug=Debug
-ui.menubar.reload=Reload
-ui.menubar.reload_everything=Everything
-ui.menubar.reload_scenes=Scenes
-ui.menubar.reload_tools=Tools
-ui.menubar.reload_entities=Entities
-ui.menubar.reload_triggers=Triggers
-ui.menubar.reload_effects=Effects
-ui.menubar.reload_user_interface=User Interface
-ui.menubar.reload_language_files=Language Files
-ui.menubar.redraw_map=Redraw Map
-ui.menubar.test_console=Test Console
+ui.menubar.debug_reload=Reload
+ui.menubar.debug_reload_everything=Everything
+ui.menubar.debug_reload_scenes=Scenes
+ui.menubar.debug_reload_tools=Tools
+ui.menubar.debug_reload_entities=Entities
+ui.menubar.debug_reload_triggers=Triggers
+ui.menubar.debug_reload_effects=Effects
+ui.menubar.debug_reload_user_interface=User Interface
+ui.menubar.debug_reload_language_files=Language Files
+ui.menubar.debug_redraw_map=Redraw Map
+ui.menubar.debug_test_console=Test Console
 
 ui.menubar.help=Help
-ui.menubar.about=About
-ui.menubar.check_for_updates=Check For Updates
+ui.menubar.help_about=About
+ui.menubar.help_check_for_updates=Check For Updates
 
 ui.menubar.not_yet_implemented=This feature is not implemented yet.
