@@ -59,6 +59,8 @@ function forms.getFormFields(data, options)
     end
 
     if not ignoreUnordered then
+        local unorderedElements = {}
+
         for name, value in pairs(data) do
             if not ignored[name] then
                 local fieldOptions = forms.getFieldOptions(name, options)
@@ -71,8 +73,29 @@ function forms.getFormFields(data, options)
                     element._hidden = hideUnordered
                 end
 
-                table.insert(elements, element)
+                element._options = fieldOptions
+
+                table.insert(unorderedElements, element)
             end
+        end
+
+        -- Sort by sortingPriority, if they match then the elements are alphabetically sorted
+        table.sort(unorderedElements, function(a, b)
+            local optionsA = a._options
+            local optionsB = b._options
+
+            local weightA = optionsA.sortingPriority or a.sortingPriority or 0
+            local weightB = optionsB.sortingPriority or b.sortingPriority or 0
+
+            if weightA ~= weightB then
+                return weightA < weightB
+            end
+
+            return optionsA.displayName < optionsB.displayName
+        end)
+
+        for _, element in ipairs(unorderedElements) do
+            table.insert(elements, element)
         end
     end
 

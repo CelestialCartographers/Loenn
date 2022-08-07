@@ -53,6 +53,7 @@ function booleanField.getElement(name, value, options)
     formField.name = name
     formField.initialValue = value
     formField.currentValue = value
+    formField.sortingPriority = 10
     formField.width = 1
     formField.elements = {
         checkbox

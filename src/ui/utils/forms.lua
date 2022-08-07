@@ -52,13 +52,14 @@ end
 
 -- Prepare for entities/triggers/decals etc.
 -- Sets up everything based on handler functions and options
--- TODO - Custom language path
 function formUtils.prepareFormData(handler, data, options, handlerArguments)
     local language = languageRegistry.getLanguage()
     local dummyData = {}
 
     local tooltipPath = options.tooltipPath or {"attributes", "description"}
     local namePath = options.namePath or {"attributes", "name"}
+
+    local addMissingToFieldOrder = options.addMissingToFieldOrder
 
     local fieldsAdded = {}
     local fieldInformation = getItemFieldInformation(handler, unpack(handlerArguments))
@@ -117,17 +118,21 @@ function formUtils.prepareFormData(handler, data, options, handlerArguments)
         end
     end
 
-    -- Sort by display name
-    table.sort(missingFields, function(a, b)
-        return a[3] < b[3]
-    end)
+    if addMissingToFieldOrder then
+        -- Sort by display name
+        table.sort(missingFields, function(a, b)
+            return a[3] < b[3]
+        end)
+    end
 
     -- Add all missing fields
     for _, missing in pairs(missingFields) do
         local field, value, displayName = unpack(missing)
         local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
 
-        table.insert(fieldOrder, field)
+        if addMissingToFieldOrder then
+            table.insert(fieldOrder, field)
+        end
 
         if not fieldInformation[field] then
             fieldInformation[field] = {}
