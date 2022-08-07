@@ -234,11 +234,27 @@ function forms.setFormData(formFields, data, alwaysUpdate)
     end
 end
 
-function forms.formMustBeValidUpdate(formFields)
+function forms.buttonUpdateHandler(formFields, button)
     return function(orig, self, dt)
-        orig(self, dt)
+        local formMustBeValid = button.formMustBeValid
+        local formValid = formFields._formValid or false
+        local enabled = utils.callIfFunction(button.enabled, formFields, button)
 
-        self:setEnabled(formFields._formValid or false)
+        if enabled ~= nil or formMustBeValid then
+            local newEnabled = true
+
+            if enabled ~= nil then
+                newEnabled = enabled
+            end
+
+            if formMustBeValid then
+                newEnabled = newEnabled and formValid
+            end
+
+            self:setEnabled(newEnabled)
+        end
+
+        orig(self, dt)
     end
 end
 
@@ -255,17 +271,14 @@ function forms.getFormButtonRow(buttons, formFields, options)
 
     for i, button in ipairs(buttons) do
         local callback = forms.packFormButtonCallback(formFields, button.callback)
-        local formMustBeValid = button.formMustBeValid
         local buttonElement = uiElements.button(button.text, callback)
 
-        if formMustBeValid then
-            buttonElement:hook({
-                update = forms.formMustBeValidUpdate(formFields)
-            })
-        end
+        buttonElement:hook({
+            update = forms.buttonUpdateHandler(formFields, button)
+        })
 
         if button.enabled ~= nil then
-            buttonElement.enabled = button.enabled
+            buttonElement.enabled = utils.callIfFunction(button.enable, formField, button)
         end
 
         buttonElements[i] = buttonElement

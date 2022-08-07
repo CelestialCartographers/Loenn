@@ -621,7 +621,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
         {
             text = tostring(language.ui.styleground_window.form.update),
             formMustBeValid = true,
-            enabled = listHasElements, -- TODO - This gets overwritten
+            enabled = listHasElements,
             callback = function(formFields)
                 applyFormChanges(style, form.getFormData(formFields))
             end
