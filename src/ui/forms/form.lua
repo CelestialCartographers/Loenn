@@ -129,6 +129,13 @@ function forms.getFormBody(data, options)
 
         if not field._hidden then
             if column + fieldWidth - 1 > columnCount then
+                -- Add blank elements in empty spaces
+                for i = column, columnCount do
+                    local targetColumn = columnElements[i]
+
+                    table.insert(targetColumn, uiElements.new({}))
+                end
+
                 column = 1
                 rows += 1
             end
