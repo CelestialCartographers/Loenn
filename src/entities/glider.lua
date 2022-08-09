@@ -17,7 +17,7 @@ glider.placements = {
     {
         name = "floating",
         data = {
-            tutorial = true,
+            tutorial = false,
             bubble = true
         }
     }

@@ -43,8 +43,20 @@ function filesystem.splitpath(s, sep)
     return string.split(s, sep)()
 end
 
-function filesystem.samePath(path1, path2)
+function filesystem.samePath(path1, path2, ignoreTrailingSeparator)
     local userOS = osUtils.getOS()
+
+    if ignoreTrailingSeparator ~= false then
+        local pathSeparator = physfs.getDirSeparator()
+
+        if path1:sub(-1) == pathSeparator then
+            path1 = path1:sub(1, -2)
+        end
+
+        if path2:sub(-1) == pathSeparator then
+            path2 = path2:sub(1, -2)
+        end
+    end
 
     if userOS == "Windows" then
         return path1:lower() == path2:lower()

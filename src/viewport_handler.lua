@@ -58,7 +58,7 @@ function viewportHandler.getMapCoordinates(x, y)
     return math.floor((x + viewport.x) / viewport.scale), math.floor((y + viewport.y) / viewport.scale)
 end
 
-function viewportHandler.getRoomCoordindates(room, x, y)
+function viewportHandler.getRoomCoordinates(room, x, y)
     local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
 
     return mapX - room.x, mapY - room.y
@@ -144,7 +144,7 @@ function viewportHandler.drawRelativeTo(x, y, func)
     love.graphics.pop()
 end
 
-function viewportDevice.mousedragmoved(dx, dy, button, istouch)
+function viewportDevice.mousedragmoved(x, y, dx, dy, button, istouch)
     if button == movementButton then
         viewport.x -= dx
         viewport.y -= dy

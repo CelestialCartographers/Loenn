@@ -30,9 +30,13 @@ This project is an unofficial map maker and level editor, it is merely a fan pro
 
 Download the [latest release][latest-release] for Windows and extract the `.zip` file you get into an empty directory. Run `Lönn.exe` to start the program.
 
+### MacOS
+
+Download the [latest release][latest-release] for MacOS and extract the `.zip` file you get into an empty directory (Safari might do this automatically). Launch the extracted `Lönn` app to start the program.
+
 ### Other Operating Systems
 
-First, [install love2d](https://love2d.org/). Lönn requires love2d version 11.3; make sure to download love2d from the official website.
+First, [install love2d](https://love2d.org/). Lönn requires love2d version 11.3 or later; make sure to download love2d from the official website.
 
 Download the [latest release][latest-release] for your operating system and extract the `.zip` file you get into an empty directory. Launch `Lönn.sh` to start the program, or run it directly using `love Lönn.love`.
 
