@@ -231,7 +231,7 @@ local function saveRoomCallback(formFields, room, editing, usingPixels)
         history.addSnapshot(snapshot)
         celesteRender.invalidateRoomCache(previousName)
         celesteRender.invalidateRoomCache(targetRoom)
-        celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
+        celesteRender.forceRoomBatchRender(targetRoom, loadedState)
 
         sceneHandler.sendEvent("uiRoomWindowRoomChanged", targetRoom)
 
