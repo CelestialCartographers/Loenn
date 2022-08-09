@@ -118,6 +118,15 @@ function modHandler.getFilenameModName(filename)
     end
 end
 
+function modHandler.getFilenameModPath(filename)
+    local modName = modHandler.getFilenameModName(filename)
+    local celesteDir = fileLocations.getCelesteDir()
+
+    if modName then
+        return utils.joinpath(celesteDir, "Mods", modName)
+    end
+end
+
 -- Assumes entity names are "modName/entityName"
 function modHandler.getEntityModPrefix(name)
     return name:match("^(.-)/")
