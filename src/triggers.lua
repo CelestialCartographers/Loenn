@@ -66,10 +66,27 @@ function triggers.loadExternalTriggers(registerAt)
     return triggers.loadTriggers(filenames, registerAt)
 end
 
+local humanizedNameCache = {}
+
+function triggers.getDrawableDisplayText(trigger)
+    local name = trigger._name
+    local displayName = humanizedNameCache[name]
+
+    if not displayName then
+        -- Humanize data name and then remove " Trigger" at the end if possible
+        displayName = utils.humanizeVariableName(name)
+        displayName = string.match(displayName, "(.-) Trigger$") or displayName
+
+        humanizedNameCache[name] = displayName
+    end
+
+    return displayName
+end
+
 -- Returns drawable, depth
 function triggers.getDrawable(name, handler, room, trigger, viewport)
     local func = function()
-        local displayName = utils.humanizeVariableName(name)
+        local displayName = triggers.getDrawableDisplayText(trigger)
 
         local x = trigger.x or 0
         local y = trigger.y or 0
@@ -93,8 +110,6 @@ function triggers.getDrawable(name, handler, room, trigger, viewport)
 
     return drawableFunction.fromFunction(func), 0
 end
-
-local humanizedNameCache = {}
 
 function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
     local font = love.graphics.getFont()
@@ -120,16 +135,7 @@ function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
     local textBatch = love.graphics.newText(font)
 
     for i, trigger in ipairs(targets) do
-        local name = trigger._name
-        local displayName = humanizedNameCache[name]
-
-        if not displayName then
-            -- Humanize data name and then remove " Trigger" at the end if possible
-            displayName = utils.humanizeVariableName(name)
-            displayName = string.match(displayName, "(.-) Trigger$") or displayName
-
-            humanizedNameCache[name] = displayName
-        end
+        local displayName = triggers.getDrawableDisplayText(trigger)
 
         local x = trigger.x or 0
         local y = trigger.y or 0
