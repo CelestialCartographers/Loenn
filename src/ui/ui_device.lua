@@ -35,7 +35,7 @@ function debugUtils.reloadUI()
     themes.unloadThemes()
     themes.loadInternalThemes()
     themes.loadExternalThemes()
-    themes.useTheme(themes.currentTheme)
+    themes.useTheme(themes.currentTheme.name)
 
     uiRoot.updateWindows(windows.getLoadedWindows())
 
@@ -62,7 +62,7 @@ function ui.initializeDevice()
     local appliedTheme = themes.useTheme(configTheme)
 
     if not appliedTheme then
-        themes.useTheme("dark")
+        themes.useTheme(themes.defaultThemeName)
     end
 end
 

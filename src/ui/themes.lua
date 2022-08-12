@@ -8,6 +8,7 @@ local themes = {}
 
 themes.themes = {}
 themes.currentTheme = nil
+themes.defaultThemeName = "dark"
 
 function themes.unloadThemes()
     themes.themes = {}
@@ -75,7 +76,7 @@ end
 
 function themes.useTheme(name)
     if name and themes.themes[name] then
-        themes.currentTheme = name
+        themes.currentTheme = themes.themes[name]
 
         themer.apply(themes.themes[name])
 
