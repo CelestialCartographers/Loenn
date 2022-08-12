@@ -63,7 +63,8 @@ function iconUtils.getIcon(name, maxSize, allowCustom)
         if size <= maxSize then
             table.insert(relevantSizes, size)
 
-            local path = utils.joinpath(iconsPath, string.format("%s-%s.png", name, size))
+            local filename = string.format("%s-%s.png", name, size)
+            local path = utils.convertToUnixPath(utils.joinpath(iconsPath, filename))
             local fileInfo = love.filesystem.getInfo(path) or utils.pathAttributes(path)
 
             if fileInfo then
