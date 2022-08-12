@@ -78,11 +78,11 @@ function pathField.getElement(name, value, options)
 
         local attributes = utils.pathAttributes(filename)
 
-        if not attributes and allowMissingPath ~= false then
+        if not attributes and allowMissingPath == false then
             return false
         end
 
-        local attributeMode = attributes.mode or "missing"
+        local attributeMode = attributes and attributes.mode or "missing"
 
         if attributeMode == "directory" and not allowFolders then
             return false
