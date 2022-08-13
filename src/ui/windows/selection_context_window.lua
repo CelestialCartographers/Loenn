@@ -151,6 +151,7 @@ function contextWindow.createContextMenu(selections)
     table.insert(activeWindows, window)
     contextGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window)
+    form.prepareScrollableWindow(window)
 
     return window
 end

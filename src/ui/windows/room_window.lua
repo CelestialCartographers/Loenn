@@ -398,6 +398,7 @@ function roomWindow.createRoomWindow(room, editing)
     table.insert(activeWindows, window)
     roomWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window)
+    form.prepareScrollableWindow(window)
 
     return window
 end

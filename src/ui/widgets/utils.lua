@@ -97,6 +97,67 @@ function widgetUtils.lerpWindowPosition(window, fromX, fromY, toX, toY, percent,
     widgetUtils.moveWindow(window, newX, newY, threshold, false, padding)
 end
 
+-- Based on OlympUI fillHeight
+-- Very naive, meant for very simple windows with scrollboxes (like forms)
+function widgetUtils.fillHeightIfNeeded(maxHeight)
+    local function apply(el)
+        uiUtils.hook(el, {
+            layoutLazy = function(orig, self)
+                -- Required to allow the container to shrink again.
+                orig(self)
+
+                self.height = 0
+            end,
+
+            layoutLateLazy = function(orig, self)
+                -- Always reflow this child whenever its parent gets reflowed.
+                self:layoutLate()
+                self:repaint()
+            end,
+
+            layoutLate = function(orig, self)
+                local spacing = self.parent.style:get("spacing") or 0
+                local height = 0
+                local children = self.children
+
+                -- Titlebar check
+                if #children > 1 and children[1].__type == "titlebar" then
+                    height += children[1].height + spacing
+                end
+
+                local column = children[#children]
+                local columnSpacing = column.style:get("spacing") or 0
+                local columnPadding = column.style:get("padding") or 0
+
+                height += columnPadding * 2
+
+                for i, child in ipairs(column.children) do
+                    local childType = child.__type
+
+                    if childType == "scrollbox" then
+                        height += child.inner.height
+
+                    else
+                        height += child.height
+                    end
+
+                    if i ~= #column.children then
+                        height += columnSpacing
+                    end
+                end
+
+                height = math.min(math.floor(height), maxHeight or self.parent.innerHeight)
+                self.height = height
+                self.innerHeight = height - (self.style:get("padding") or 0) * 2
+
+                orig(self)
+            end
+        })
+    end
+
+    return apply
+end
+
 function widgetUtils.focusMainEditor()
     ui.interactiveIterate(ui.focusing, "onUnfocus")
     ui.focusing = false

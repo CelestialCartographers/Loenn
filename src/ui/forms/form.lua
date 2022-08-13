@@ -8,6 +8,8 @@ local configs = require("configs")
 local modHandler = require("mods")
 local pluginLoader = require("plugin_loader")
 
+local widgetUtils = require("ui.widgets.utils")
+
 local forms = {}
 
 forms.registeredFieldTypes = {}
@@ -300,17 +302,29 @@ function forms.getFormButtonRow(buttons, formFields, options)
     return buttonRow
 end
 
--- TODO - Make body scrollable
 function forms.getForm(buttons, data, options)
     buttons = buttons or {}
     data = data or {}
     options = options or {}
 
     local body, formFields = forms.getFormBody(data, options)
-    local scrollableBody = uiElements.scrollbox(body)
     local buttonRow = forms.getFormButtonRow(buttons, formFields, options)
+    local scrollableBody = uiElements.scrollbox(body)
 
-    return uiElements.column({body, buttonRow})
+    if options.scrollable ~= false then
+        buttonRow:with(uiUtils.bottombound):with(uiUtils.fillWidth)
+        scrollableBody:hook({
+            calcWidth = function(orig, element)
+                return element.inner.width
+            end,
+        }):with(uiUtils.fillHeight(true))
+    end
+
+    return uiElements.column({scrollableBody, buttonRow}):with(uiUtils.fillHeight(true))
+end
+
+function forms.prepareScrollableWindow(window, maxHeight)
+    window:with(widgetUtils.fillHeightIfNeeded(maxHeight))
 end
 
 function forms.loadFieldType(filename, registerAt, verbose)
