@@ -16,6 +16,10 @@ pathField.fieldType = "path"
 local function openFileDialog(textField, options)
     local relativeToMod = options.relativeToMod
     local allowedExtensions = options.allowedExtensions
+    local allowFolders = options.allowFolders
+    local allowFiles = options.allowFiles
+
+    local useFolderDialog = not allowFiles and allowFolders
 
     local filter
     local startingPath = fileLocations.getCelesteDir()
@@ -34,7 +38,7 @@ local function openFileDialog(textField, options)
         startingPath = modPath
     end
 
-    utils.openDialog(startingPath, filter, function(filename)
+    local function dialogCallback(filename)
         if relativeToMod ~= false then
             local modPath = mods.getFilenameModPath(filename)
 
@@ -46,7 +50,14 @@ local function openFileDialog(textField, options)
         end
 
         textField:setText(filename)
-    end)
+    end
+
+    if useFolderDialog then
+        utils.openFolderDialog(startingPath, dialogCallback)
+
+    else
+        utils.openDialog(startingPath, filter, dialogCallback)
+    end
 end
 
 function pathField.getElement(name, value, options)
