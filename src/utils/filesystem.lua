@@ -319,6 +319,37 @@ function filesystem.openDialog(path, filter, callback)
     end
 end
 
+-- Return thread if called with callback
+-- Otherwise block and return the selected file
+function filesystem.openFolderDialog(path, callback)
+    path = fixNFDPath(path)
+
+    if callback then
+        if filesystem.supportWindowsInThreads() then
+            local code = [[
+                local args = {...}
+                local channelName, path = unpack(args)
+                local channel = love.thread.getChannel(channelName)
+
+                local nfd = require("nfd")
+
+                local res = nfd.openFolder(path)
+                channel:push(res)
+            ]]
+
+            return threadHandler.createStartWithCallback(code, callback, path)
+
+        else
+            callback(nfd.openFolder(path))
+
+            return false, false
+        end
+
+    else
+        return nfd.openFolder(path)
+    end
+end
+
 function filesystem.downloadURL(url, filename, headers)
     if not hasRequest then
         return false, nil
