@@ -5,8 +5,6 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
-uiElements.__label.__default.style.font = love.graphics.newFont(16)
-
 uiUtils.dataRoots["ui"] = "olympUI/ui/data"
 
 local debugUtils = require("debug_utils")
@@ -43,27 +41,27 @@ function debugUtils.reloadUI()
 end
 
 function ui.initializeDevice()
+    local configTheme = configs.ui.theme.themeName
+    local appliedTheme = themes.useTheme(configTheme)
+
+    themes.loadInternalThemes()
+    themes.loadExternalThemes()
+
+    if not appliedTheme then
+        themes.useTheme(themes.defaultThemeName)
+    end
+
     forms.loadInternalFieldTypes()
     forms.loadExternalFieldTypes()
 
     windows.loadInternalWindows()
     windows.loadExternalWindows()
 
-    themes.loadInternalThemes()
-    themes.loadExternalThemes()
-
     local uiRootElement = uiRoot.getRootElement(windows.getLoadedWindows())
 
     ui.init(uiRootElement, false)
     ui.features.eventProxies = true
     ui.features.megacanvas = false
-
-    local configTheme = configs.ui.theme.themeName
-    local appliedTheme = themes.useTheme(configTheme)
-
-    if not appliedTheme then
-        themes.useTheme(themes.defaultThemeName)
-    end
 end
 
 return ui

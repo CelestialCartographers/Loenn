@@ -36,8 +36,32 @@ function themer.apply(theme)
         return
     end
 
+    themer.applyFontInfo(theme)
+    themer.applyElementStyles(theme)
+end
+
+function themer.applyFontInfo(theme)
+    local labelFontSize = theme.labelFontSize or 12
+    local labelFilename = theme.labelFilename
+    local labelFont = theme.labelFont
+
+    if not labelFont then
+        if labelFilename then
+            labelFont = love.graphics.newFont(labelFilename, labelFontSize)
+
+        else
+            labelFont = love.graphics.newFont(labelFontSize)
+        end
+    end
+
+    if labelFont then
+        uiElements.__label.__default.style.font = labelFont
+    end
+end
+
+function themer.applyElementStyles(theme)
     if themer.current ~= themer.default and theme ~= themer.default then
-        themer.apply(themer.default)
+        themer.applyElementStyles(themer.default)
     end
 
     themer.current = theme
