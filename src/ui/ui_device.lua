@@ -41,11 +41,11 @@ function debugUtils.reloadUI()
 end
 
 function ui.initializeDevice()
-    local configTheme = configs.ui.theme.themeName
-    local appliedTheme = themes.useTheme(configTheme)
-
     themes.loadInternalThemes()
     themes.loadExternalThemes()
+
+    local configTheme = configs.ui.theme.themeName
+    local appliedTheme = themes.useTheme(configTheme)
 
     if not appliedTheme then
         themes.useTheme(themes.defaultThemeName)
