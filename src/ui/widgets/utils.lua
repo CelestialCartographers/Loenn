@@ -21,10 +21,20 @@ end
 function widgetUtils.addWindowCloseButton(window)
     if window and window.titlebar then
         local titlebar = window.titlebar
+        local labelFontHeight = window.titlebar.label.style.font:getHeight(" ")
         local closeButton = uiElements.buttonClose()
 
-        -- Fix off by one from button style
-        closeButton.style.padding -= 1
+        closeButton:layout()
+
+        if titlebar.height == -1 then
+            titlebar:layout()
+        end
+
+        local padding = closeButton.style.padding
+        local deltaHeight = titlebar.height - closeButton.height
+
+        -- Adjust padding to match titlebar height
+        closeButton.style.padding += math.floor(deltaHeight / 2)
         closeButton.cb = function()
             window:removeSelf()
         end
