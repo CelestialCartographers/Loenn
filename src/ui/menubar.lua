@@ -63,7 +63,7 @@ local debugMenu = {"debug", {
         {"reload_tools", debugUtils.reloadTools},
         {"reload_entities", debugUtils.reloadEntities},
         {"reload_triggers", debugUtils.reloadTriggers},
-        {"reload_effects", notYetImplementedNotification},
+        {"reload_effects", debugUtils.reloadEffects},
         {"reload_user_interface", reloadUI},
         {"reload_language_files", debugUtils.reloadLanguageFiles}
     }},
