@@ -14,7 +14,6 @@ colorField.fieldType = "color"
 colorField._MT = {}
 colorField._MT.__index = {}
 
-local previewOffset = 8
 local fallbackHexColor = "ffffff"
 
 local invalidStyle = {
@@ -114,23 +113,24 @@ local function fieldChanged(formField)
     end
 end
 
-local function getColorPreviewArea(widget)
-    local x, y = widget.screenX, widget.screenY
-    local width, height = widget.width, widget.height
-    local previewSize = height - previewOffset * 2
-    local drawX, drawY = x + width - previewSize - previewOffset, y + previewOffset
+local function getColorPreviewArea(element)
+    local x, y = element.screenX, element.screenY
+    local width, height = element.width, element.height
+    local padding = element.style:get("padding") or 0
+    local previewSize = height - padding * 2
+    local drawX, drawY = x + width - previewSize - padding, y + padding
 
     return drawX, drawY, previewSize, previewSize
 end
 
-local function fieldDrawColorPreview(orig, widget)
-    orig(widget)
+local function fieldDrawColorPreview(orig, element)
+    orig(element)
 
-    local parsed = widget and widget._parsed
-    local r, g, b, a = widget._r or 0, widget._g or 0, widget._b or 0, parsed and 1 or 0
+    local parsed = element and element._parsed
+    local r, g, b, a = element._r or 0, element._g or 0, element._b or 0, parsed and 1 or 0
     local pr, pg, pb, pa = love.graphics.getColor()
 
-    local drawX, drawY, width, height = getColorPreviewArea(widget)
+    local drawX, drawY, width, height = getColorPreviewArea(element)
 
     love.graphics.setColor(0, 0, 0)
     love.graphics.rectangle("fill",  drawX, drawY, width, height)
@@ -141,7 +141,7 @@ local function fieldDrawColorPreview(orig, widget)
     love.graphics.setColor(pr, pg, pb, pa)
 end
 
-local function shouldShowMenu(widget, x, y, button)
+local function shouldShowMenu(element, x, y, button)
     local menuButton = configs.editor.contextMenuButton
     local actionButton = configs.editor.toolActionButton
 
@@ -149,7 +149,7 @@ local function shouldShowMenu(widget, x, y, button)
         return true
 
     elseif button == actionButton then
-        local drawX, drawY, width, height = getColorPreviewArea(widget)
+        local drawX, drawY, width, height = getColorPreviewArea(element)
 
         return utils.aabbCheckInline(x, y, 1, 1, drawX, drawY, width, height)
     end
