@@ -59,8 +59,19 @@ end
 local fieldDropdown = {}
 
 function fieldDropdown.addDropdown(field, dropdown, currentText)
-    local icon = uiElements.icon("ui:icons/drop"):with(uiUtils.at(0.999 + 1, 0.5 + 5))
+    local icon = uiElements.icon("ui:icons/drop")
 
+    icon:layout()
+
+    if field.height == -1 then
+        field:layout()
+    end
+
+    local iconHeight = icon.height
+    local parentHeight = field.height
+    local centerOffset = math.floor((parentHeight - iconHeight) / 2)
+
+    icon:with(uiUtils.rightbound(0)):with(uiUtils.at(0, centerOffset))
     icon.style.color = {0.2, 0.2, 0.2}
 
     field.label.text = currentText
