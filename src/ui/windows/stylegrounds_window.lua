@@ -749,9 +749,12 @@ function stylegroundWindow.editStylegrounds(map)
     local window
     local layout, interactionData = stylegroundWindow.getWindowContent(map)
 
+    local language = languageRegistry.getLanguage()
+    local windowTitle = tostring(language.ui.styleground_window.window_title)
+
     -- Figure out some smart sizing things here, this is too hardcoded
     -- Still doesn't fit all the elements, good enough for now
-    window = uiElements.window("Styleground Window", layout):with({
+    window = uiElements.window(windowTitle, layout):with({
         height = WINDOW_STATIC_HEIGHT
     })
 

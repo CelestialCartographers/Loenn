@@ -34,6 +34,8 @@ ui.notifications.updaterDontRemindMeAgain=Don't ask me again
 
 
 # Styleground Window
+ui.styleground_window.window_title=Stylegrounds
+
 ui.styleground_window.preview.unknown_texture=No preview available
 ui.styleground_window.preview.no_preview=No preview available
 
