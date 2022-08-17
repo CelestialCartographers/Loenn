@@ -49,6 +49,9 @@ return {
     -- History
     historyEntryLimit = false,
 
+    -- Recent Files
+    recentFilesEntryLimit = 8,
+
     -- Debug
     displayFPS = false,
     warnOnMissingTexture = false,

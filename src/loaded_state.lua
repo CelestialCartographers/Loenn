@@ -8,6 +8,7 @@ local fileLocations = require("file_locations")
 local utils = require("utils")
 local history = require("history")
 local persistence = require("persistence")
+local configs = require("configs")
 local meta = require("meta")
 
 local sideStruct = require("structs.side")
@@ -18,6 +19,31 @@ local function getWindowTitle(side)
     local name = sideStruct.getMapName(side)
 
     return string.format("%s - %s", meta.title, name)
+end
+
+-- Add to persistence most recent files
+-- Ordered from most recently opened -> oldest, with no duplicates
+local function addToRecentFiles(filename)
+    if not filename or filename == "" then
+        return
+    end
+
+    local maxEntries = configs.editor.recentFilesEntryLimit
+    local recentFiles = persistence.recentFiles or {}
+
+    for i = #recentFiles, 1, -1 do
+        if recentFiles[i] == filename then
+            table.remove(recentFiles, i)
+        end
+    end
+
+    table.insert(recentFiles, 1, filename)
+
+    for i = maxEntries + 1, #recentFiles do
+        recentFiles[i] = nil
+    end
+
+    persistence.recentFiles = recentFiles
 end
 
 local function updateSideState(side, roomName, filename, eventName)
@@ -48,6 +74,8 @@ local function updateSideState(side, roomName, filename, eventName)
 
     persistence.lastLoadedFilename = filename
     persistence.lastSelectedRoomName = state.selectedItem and state.selectedItem.name
+
+    addToRecentFiles(filename)
 
     love.window.setTitle(getWindowTitle(side))
 
