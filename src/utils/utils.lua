@@ -541,21 +541,21 @@ end
 function utils.getPath(data, path, default, createIfMissing)
     local target = data
 
-    for i, key in ipairs(path) do
-        local lastKey = i == #path
-        local newTarget = target[key]
+    for i, part in ipairs(path) do
+        local lastPart = i == #path
+        local newTarget = target[part]
 
         if newTarget then
             target = newTarget
 
         else
             if createIfMissing then
-                if not lastKey then
-                    target[key] = {}
-                    target = target[key]
+                if not lastPart then
+                    target[part] = {}
+                    target = target[part]
 
                 else
-                    target[key] = default
+                    target[part] = default
                     target = default
                 end
 
@@ -566,6 +566,36 @@ function utils.getPath(data, path, default, createIfMissing)
     end
 
     return target
+end
+
+function utils.setPath(data, path, value, createIfMissing)
+    local target = data
+
+    for i, part in ipairs(path) do
+        local lastPart = i == #path
+
+        if lastPart then
+            target[part] = value
+
+        else
+            local newTarget = target[part]
+
+            if newTarget then
+                target = newTarget
+
+            else
+                if createIfMissing then
+                    target[part] = {}
+                    target = target[part]
+
+                else
+                    return false
+                end
+            end
+        end
+    end
+
+    return true
 end
 
 utils.countKeys = serialize.countKeys
