@@ -654,7 +654,7 @@ entities.cassetteBlock.placements.name.cassette_block_1=Cassette Block (1 - Rose
 entities.cassetteBlock.placements.name.cassette_block_2=Cassette Block (2 - Bright Sun)
 entities.cassetteBlock.placements.name.cassette_block_3=Cassette Block (3 - Malachite)
 entities.cassetteBlock.attributes.description.index=The colour of the cassette block.
-entities.cassetteBlock.attributes.description.tempo=The tempo of the cassette blocks. The first non 1 tempo cassette block decides the tempo for all cassette blocks in the room.
+entities.cassetteBlock.attributes.description.tempo=The tempo of the cassette blocks. The first cassette block with a tempo other than 1.0 decides the tempo for all cassette blocks in the room. A multiplier of 1.0 triggers one beat every 10 frames. Refer to the cassette section in map metadata for details.
 
 # Temple Gate
 entities.templeGate.placements.name.theo_holdingtheo=Temple Gate (Theo, Holding Theo)
@@ -1203,6 +1203,102 @@ room.description.color=The colour of the room border. Can also be seen in the ga
 room.description.cameraOffsetX=Global horizontal offset of camera in room.
 room.description.cameraOffsetY=Global vertical offset of camera in room.
 
+
+# -- Metadata #
+# metadata.type.attribute.Attribute=Attribute Display Name
+# metadata.type.description.Attribute=Tooltip
+
+# From side.meta
+metadata.meta.attribute.Icon=Title Banner Icon
+metadata.meta.attribute.Interlude=Interlude
+metadata.meta.attribute.CompleteScreenName=Complete Screen Name
+metadata.meta.attribute.TitleBaseColor=Title Base Colour
+metadata.meta.attribute.TitleAccentColor=Title Accent Colour
+metadata.meta.attribute.TitleTextColor=Title Text Colour
+metadata.meta.attribute.Dreaming=Dreaming
+metadata.meta.attribute.ColorGrade=Colour Grade
+metadata.meta.attribute.DarknessAlpha=Darkness Alpha
+metadata.meta.attribute.BloomBase=Bloom Base
+metadata.meta.attribute.BloomStrength=Bloom Strength
+metadata.meta.attribute.CoreMode=Core Mode
+metadata.meta.attribute.CassetteNoteColor=Cassette Note Colour
+metadata.meta.attribute.CassetteSong=Cassette Song
+metadata.meta.attribute.IntroType=Intro Type
+metadata.meta.attribute.Wipe=Wipe
+metadata.meta.attribute.AnimatedTiles=Animated Tiles
+metadata.meta.attribute.ForegroundTiles=Foreground Tiles
+metadata.meta.attribute.BackgroundTiles=Background Tiles
+metadata.meta.attribute.Sprites=Sprites
+metadata.meta.attribute.Portraits=Portraits
+metadata.meta.attribute.OverrideASideMeta=Override A-Side Meta
+metadata.meta.attribute.PostcardSoundID=Postcard Sound ID
+
+metadata.meta.description.Icon=Texture to display on the title banner in level selection representing the map.\nRelative to GUI Atlas folder.
+metadata.meta.description.Interlude=Whether the map is an interlude chapter. No B-sides, deaths aren't counted.
+metadata.meta.description.CompleteScreenName=Texture used for the complete screen after beating the level.
+metadata.meta.description.TitleBaseColor=Base colour of the title banner in level selection.
+metadata.meta.description.TitleAccentColor=Colour of the additional text of the title banner and its accent in level selection.
+metadata.meta.description.TitleTextColor=Colour of the main text of the title banner in level selection.
+metadata.meta.description.Dreaming=Whether Madeline starts the map dreaming. Enables starfield background.
+metadata.meta.description.ColorGrade=The global tinting of the map. Custom colour grades are relative to modRoot/Graphics/ColorGrading/.
+metadata.meta.description.DarknessAlpha=Alpha value used for darkness.
+metadata.meta.description.BloomBase=The base bloom level.
+metadata.meta.description.BloomStrength=The strength of the bloom.
+metadata.meta.description.CoreMode=Starting core mode (fire or ice). Can be changed in-game using core mode toggles.
+metadata.meta.description.CassetteSong=Song played in the cassette room.
+metadata.meta.description.IntroType=The way you enter the first room upon starting the map.
+metadata.meta.description.Wipe=The animation that plays when the player respawns.\nExample use cases from the game.\n Curtain - Prologue\n Angled - Forsaken City\n Dream - Old Site\n KeyDoor - Celestial Resort\n Wind - Golden Ridge\n Drop - Mirror Temple\n Fall - Reflection\n Mountain - Summit\n Heart - Core\n Fade - Cutscenes\n Spotlight - Cutscenes
+metadata.meta.description.AnimatedTiles=The XML file to use for custom Animated Tiles. Relative to mod root, temporarily used in place of the vanilla XML.
+metadata.meta.description.ForegroundTiles=The XML file to use for custom Foreground Tiles. Relative to mod root, temporarily used in place of the vanilla XML.
+metadata.meta.description.BackgroundTiles=The XML file to use for custom Background Tiles. Relative to mod root, temporarily used in place of the vanilla XML.
+metadata.meta.description.Sprites=The XML file to use for custom Sprites. Relative to mod root, temporarily used in place of the vanilla XML.
+metadata.meta.description.Portraits=The XML file to use for custom Portraits. Relative to mod root, temporarily used in place of the vanilla XML.
+metadata.meta.description.OverrideASideMeta=Whether to overwrite the metadata of the A Side.
+metadata.meta.description.PostcardSoundID=The postcard sound to use. Leave empty for default.\nExamples: 1, 2, 3, csides.
+
+
+# From side.meta.mode
+metadata.mode.attribute.IgnoreLevelAudioLayerData=Ignore Room Audio Layer Data
+metadata.mode.attribute.Inventory=Starting Inventory
+metadata.mode.attribute.StartLevel=Starting Room
+metadata.mode.attribute.HeartIsEnd=End Level on Heart
+metadata.mode.attribute.SeekerSlowdown=Seeker Slowdown
+metadata.mode.attribute.TheoInBubble=Theo In Booster
+
+metadata.mode.description.IgnoreLevelAudioLayerData=Whether the layer data set on individual rooms should be ignored.
+metadata.mode.description.Inventory=Your inventory starting the map. Changes the player's abilities.\n Prologue: 0 dashes, Dream blocks disabled, wearing a backpack, ground refills enabled\n Default: 1 dash, Dream blocks enabled, wearing a backpack, ground refills enabled\n OldSite: 1 dash, Dream blocks disabled, wearing a backpack, ground refills enabled\n CH6End: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills enabled\n TheSummit: 2 dashes, Dream blocks enabled, not wearing a backpack, ground refills enabled\n Core: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills disabled
+metadata.mode.description.StartLevel=The room to start the map in. By default, it will pick the room closest to absolute (0, 0).
+metadata.mode.description.HeartIsEnd=Whether collecting a heart counts as the end of the level. The easiest way to end a level.
+metadata.mode.description.SeekerSlowdown=Whether Seekers should be able to slow down time when attacking the player or not.
+metadata.mode.description.TheoInBubble=Whether player is allowed to hold crystal Theo while in a booster or not.
+
+
+# From side.meta.audiostate
+metadata.audiostate.attribute.Ambience=Ambience
+metadata.audiostate.attribute.Music=Music
+
+metadata.audiostate.description.Ambience=The ambience music track for the map.
+metadata.audiostate.description.Music=The default music track for the map. Music track set in room overrides this value.
+
+
+# From side.meta.cassettemodifier
+metadata.cassettemodifier.attribute.TempoMult=Tempo Multiplier
+metadata.cassettemodifier.attribute.LeadBeats=Leading Beats
+metadata.cassettemodifier.attribute.BeatsPerTick=Beats Per Tick
+metadata.cassettemodifier.attribute.TicksPerSwap=Ticks Per Swap
+metadata.cassettemodifier.attribute.Blocks=Number of Colours
+metadata.cassettemodifier.attribute.BeatsMax=Max Beats
+metadata.cassettemodifier.attribute.BeatIndexOffset=Beat Index Offset
+metadata.cassettemodifier.attribute.OldBehavior=Old Behaviour
+
+metadata.cassettemodifier.description.TempoMult=Cassette music tempo multiplier. Only used with Old Behaviour and overrides the Tempo attribute in cassette blocks. Defaults to 1.0 which triggers one beat every 10 frames.
+metadata.cassettemodifier.description.LeadBeats=Beats of silence after a room is loaded before the cassette music starts. Defaults to 16.
+metadata.cassettemodifier.description.BeatsPerTick=Number of beats to the next tick. Defaults to 4. Each tick triggers the cassette click sound when using per-room cassette music. At a tempo multiplier of 1.0, a beat is 10 frames in duration.
+metadata.cassettemodifier.description.TicksPerSwap=Number of ticks to the next cassette block swap. Defaults to 2. Each swap activates the next cassette block index.
+metadata.cassettemodifier.description.Blocks=Total number of distinct cassette block colours. Defaults to 2. Only used with Old Behaviour and otherwise determined by the highest cassette block index in the current room.
+metadata.cassettemodifier.description.BeatsMax=Maximum number of beats before the cassette music loops. Defaults to 256. The maximum value of the cassette music FMOD parameter is one less than this number.
+metadata.cassettemodifier.description.BeatIndexOffset=An offset in beats between the beat counter in the game and the FMOD music parameter. Defaults to 0. Allows changing the timing of cassette music.
+metadata.cassettemodifier.description.OldBehavior=Activates old cassette music behaviour. Makes Tempo Multiplier override the Tempo attribute in cassette blocks, makes Max Beats ignore cassette block indices, and changes how initial cassette block states are calculated.
 
 # -- Parallax --
 # style.parallax.attribute.Attribute=Attribute Display Name

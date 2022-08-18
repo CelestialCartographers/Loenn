@@ -230,6 +230,24 @@ function unorderedDrawingBatchMt.__index:remove(id, meta)
     table.insert(removedIndices, id)
 end
 
+function unorderedDrawingBatchMt.__index:setColor(meta, r, g, b, a)
+    if type(r) == "table" then
+        r, g, b, a = unpack(r)
+    end
+
+    local image = meta.image
+    local batch = self._lookup[image]
+
+    batch:setColor(r, g, b, a)
+end
+
+function unorderedDrawingBatchMt.__index:getColor(meta)
+    local image = meta.image
+    local batch = self._lookup[image]
+
+    return batch:getColor()
+end
+
 function unorderedDrawingBatchMt.__index:addFromDrawable(drawable)
     if utils.typeof(drawable) == "drawableSprite" then
         return self:add(drawable.meta, drawable.quad, drawable.x, drawable.y, drawable.rotation, drawable.scaleX, drawable.scaleY, drawable.justificationX, drawable.justificationY, drawable.offsetX, drawable.offsetY)
@@ -312,6 +330,18 @@ function matrixDrawingBatchMt.__index:remove(x, y, meta)
         self._idMatrix:set(x, y, false)
         self._matrix:set(x, y, false)
     end
+end
+
+function matrixDrawingBatchMt.__index:setColor(meta, r, g, b, a)
+    local batch = self._batch
+
+    return batch:setColor(meta, r, g, b, a)
+end
+
+function matrixDrawingBatchMt.__index:getColor(meta)
+    local batch = self._batch
+
+    return batch:getColor(meta)
 end
 
 function matrixDrawingBatchMt.__index:draw()
