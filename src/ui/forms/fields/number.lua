@@ -10,10 +10,15 @@ function numberField.getElement(name, value, options)
 
     local minimumValue = options.minimumValue or -math.huge
     local maximumValue = options.maximumValue or math.huge
+    local allowEmpty = options.allowEmpty or false
 
     options.valueTransformer = tonumber
     options.displayTransformer = utils.prettifyFloat
-    options.validator = function(v)
+    options.validator = function(v, raw)
+        if raw == "" then
+            return allowEmpty
+        end
+
         local number = tonumber(v)
 
         return number ~= nil and number >= minimumValue and number <= maximumValue

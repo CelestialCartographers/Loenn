@@ -17,16 +17,22 @@ local invalidStyle = {
 }
 
 function stringField._MT.__index:setValue(value)
-    self.field:setText(self.displayTransformer(value))
+    self.currentText = self.displayTransformer(value)
     self.currentValue = self.valueTransformer(value)
+    self.field:setText(currentText)
 end
 
 function stringField._MT.__index:getValue()
     return self.currentValue
 end
 
+-- Use currentText field if possible, needed to "delay" the value for fieldValid
+function stringField._MT.__index:getCurrentText()
+    return self.currentText or self.field.text or ""
+end
+
 function stringField._MT.__index:fieldValid()
-    return self.validator(self:getValue())
+    return self.validator(self:getValue(), self:getCurrentText())
 end
 
 local function updateFieldStyle(formField, wasValid, valid)
@@ -46,9 +52,11 @@ end
 local function fieldChanged(formField)
     return function(element, new, old)
         local wasValid = formField:fieldValid()
-        local valid = formField.validator(new)
 
         formField.currentValue = formField.valueTransformer(new)
+        formField.currentText = new
+
+        local valid = formField:fieldValid()
 
         updateFieldStyle(formField, wasValid, valid)
         formField:notifyFieldChanged()
@@ -68,9 +76,10 @@ local function dropdownChanged(formField, optionsFlattened)
 
         if value ~= old then
             local wasValid = formField:fieldValid()
-            local valid = formField.validator(value)
 
             formField.currentValue = value
+
+            local valid = formField:fieldValid()
 
             updateFieldStyle(formField, wasValid, valid)
             formField:notifyFieldChanged()

@@ -14,10 +14,15 @@ function integerField.getElement(name, value, options)
 
     local minimumValue = math.max(options.minimumValue or smallestInt, smallestInt)
     local maximumValue = math.min(options.maximumValue or largestInt, largestInt)
+    local allowEmpty = options.allowEmpty or false
 
     options.valueTransformer = tonumber
     options.displayTransformer = tostring
-    options.validator = function(v)
+    options.validator = function(v, raw)
+        if raw == "" then
+            return allowEmpty
+        end
+
         local number = tonumber(v)
 
         return utils.isInteger(number) and number >= minimumValue and number <= maximumValue
