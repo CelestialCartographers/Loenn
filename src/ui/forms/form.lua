@@ -32,6 +32,19 @@ function forms.getFieldOptions(name, options)
     return options.fields and options.fields[name] or {}
 end
 
+function forms.getNameParts(name, options)
+    local delimiter = options and options.nestedDataDelimiter
+
+    if delimiter == false then
+        return {name}
+
+    elseif delimiter == nil then
+        delimiter = "."
+    end
+
+    return name:split(delimiter)()
+end
+
 function forms.getFormFields(data, options)
     local ignored = table.flip(options.ignored or {})
     local ignoreUnordered = options.ignoreUnordered
@@ -51,8 +64,10 @@ function forms.getFormFields(data, options)
     end
 
     for _, name in ipairs(fieldOrder) do
+        local nameParts = forms.getNameParts(name, options)
+        local value = utils.getPath(data, nameParts)
         local fieldOptions = forms.getFieldOptions(name, options)
-        local element = forms.getFieldElement(name, data[name], fieldOptions)
+        local element = forms.getFieldElement(name, value, fieldOptions)
 
         ignored[name] = true
         element._hidden = hidden[name]
@@ -205,6 +220,8 @@ function forms.getFormBody(data, options)
         ui:reflow()
     end)
 
+    formFields._options = options
+
     return row, formFields
 end
 
@@ -225,7 +242,9 @@ function forms.getFormData(formFields)
 
     for _, field in ipairs(formFields) do
         if field.name then
-            data[field.name] = field:getValue()
+            local nameParts = forms.getNameParts(field.name, formFields._options)
+
+            utils.setPath(data, nameParts, field:getValue(), true)
         end
     end
 
@@ -234,11 +253,13 @@ end
 
 function forms.setFormData(formFields, data, alwaysUpdate)
     for _, field in ipairs(formFields) do
-        local name = field.name
-        local newValue = data[name]
+        if field.name then
+            local nameParts = forms.getNameParts(field.names, formFields._options)
+            local newValue = utils.getPath(data, nameParts)
 
-        if alwaysUpdate ~= false or newValue then
-            field:setValue(newValue)
+            if alwaysUpdate ~= false or newValue then
+                field:setValue(newValue)
+            end
         end
     end
 end
