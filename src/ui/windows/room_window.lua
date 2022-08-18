@@ -57,6 +57,10 @@ local defaultFieldInformation = {
         fieldType = "integer"
     },
 
+    name = {
+        fieldType = "room_name_unique"
+    },
+
     width = {
         fieldType = "integer",
         minimumValue = 1
@@ -87,10 +91,6 @@ local defaultFieldInformation = {
         options = enums.wind_patterns,
         editable = false
     }
-}
-
-local fieldTypes = {
-    name = "room_name_unique"
 }
 
 function roomWindow.editorRoomAdd(self, map, item)
@@ -360,10 +360,6 @@ function roomWindow.createRoomWindow(room, editing)
 
         fieldInformation[field].displayName = tostring(roomAttributes[field])
         fieldInformation[field].tooltipText = tostring(roomDescriptions[field])
-    end
-
-    for field, fieldType in pairs(fieldTypes) do
-        fieldInformation[field].fieldType = fieldType
     end
 
     -- Make sure new rooms can't use name from template room
