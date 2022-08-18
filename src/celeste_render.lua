@@ -6,6 +6,7 @@ local tasks = require("utils.tasks")
 local utils = require("utils")
 local atlases = require("atlases")
 local smartDrawingBatch = require("structs.smart_drawing_batch")
+local drawableRectangle = require("structs.drawable_rectangle")
 local viewportHandler = require("viewport_handler")
 local matrix = require("utils.matrix")
 local configs = require("configs")
@@ -356,6 +357,22 @@ function celesteRender.drawInvalidTiles(batch, missingTiles, fg)
 
             love.graphics.setCanvas(canvas)
             love.graphics.setColor(r, g, b, a)
+
+        elseif batchType == "matrixDrawingBatch" then
+            local pixelTexture = atlases.addInternalPrefix(drawableRectangle.tintingPixelTexture)
+            local pixelMeta = atlases.getResource(pixelTexture, "Gameplay")
+            local color = fg and colors.tileFGMissingColor or colors.tileBGMissingColor
+            local defaultColor = {1.0, 1.0, 1.0, 1.0}
+
+            for _, missing in ipairs(missingTiles) do
+                local x, y = missing[1], missing[2]
+                local drawX, drawY = x * 8 - 8, y * 8 - 8
+
+                batch:setColor(pixelMeta, color)
+                batch:set(x, y, pixelMeta, pixelMeta.quad, drawX, drawY, 0, 8, 8)
+            end
+
+            batch:setColor(pixelMeta, defaultColor)
         end
     end
 end
