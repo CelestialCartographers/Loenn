@@ -15,9 +15,10 @@ pathField.fieldType = "path"
 
 local function openFileDialog(textField, options)
     local relativeToMod = options.relativeToMod
-    local allowedExtensions = options.allowedExtensions
+    local allowedExtensions = options.filePickerExtensions or options.allowedExtensions
     local allowFolders = options.allowFolders
     local allowFiles = options.allowFiles
+    local filenameProcessor = options.filenameProcessor
 
     local useFolderDialog = not allowFiles and allowFolders
 
@@ -39,6 +40,8 @@ local function openFileDialog(textField, options)
     end
 
     local function dialogCallback(filename)
+        local rawFilename = filename
+
         if relativeToMod ~= false then
             local modPath = mods.getFilenameModPath(filename)
 
@@ -47,6 +50,14 @@ local function openFileDialog(textField, options)
             end
 
             filename = string.sub(filename, #modPath + 2)
+        end
+
+        if filenameProcessor then
+            filename = filenameProcessor(filename, rawFilename)
+
+            if not filename then
+                return false
+            end
         end
 
         textField:setText(filename)
@@ -69,8 +80,11 @@ function pathField.getElement(name, value, options)
     local allowFiles = options.allowFiles
     local allowedExtensions = options.allowedExtensions
     local relativeToMod = options.relativeToMod
+    local filenameResolver = options.filenameResolver
 
     options.validator = function(filename)
+        local rawFilename = filename
+        local prefix = ""
         local fieldEmpty = filename == nil or #filename == 0
 
         if fieldEmpty then
@@ -84,7 +98,12 @@ function pathField.getElement(name, value, options)
                 return false
             end
 
+            prefix = modPath
             filename = utils.joinpath(modPath, filename)
+        end
+
+        if filenameResolver then
+            filename = filenameResolver(filename, rawFilename, prefix)
         end
 
         local attributes = utils.pathAttributes(filename)
