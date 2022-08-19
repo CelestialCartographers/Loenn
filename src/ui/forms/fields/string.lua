@@ -18,8 +18,8 @@ local invalidStyle = {
 
 function stringField._MT.__index:setValue(value)
     self.currentText = self.displayTransformer(value)
-    self.currentValue = self.valueTransformer(value)
-    self.field:setText(currentText)
+    self.field:setText(self.currentText)
+    self.currentValue = value
 end
 
 function stringField._MT.__index:getValue()
