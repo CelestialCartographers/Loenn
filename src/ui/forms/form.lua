@@ -254,7 +254,7 @@ end
 function forms.setFormData(formFields, data, alwaysUpdate)
     for _, field in ipairs(formFields) do
         if field.name then
-            local nameParts = forms.getNameParts(field.names, formFields._options)
+            local nameParts = forms.getNameParts(field.name, formFields._options)
             local newValue = utils.getPath(data, nameParts)
 
             if alwaysUpdate ~= false or newValue then
