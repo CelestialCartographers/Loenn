@@ -64,4 +64,15 @@ defaultMetadata.audioState = {
     Music = "event:/music/lvl1/main"
 }
 
+defaultMetadata.cassetteModifiers = {
+    TempoMult = 1.0,
+    LeadBeats = 16,
+    BeatsPerTick = 4,
+    TicksPerSwap = 2,
+    Blocks = 2,
+    BeatsMax = 256,
+    BeatIndexOffset = 0,
+    OldBehavior = false
+}
+
 return defaultMetadata
