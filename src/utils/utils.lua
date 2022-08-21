@@ -545,7 +545,7 @@ function utils.getPath(data, path, default, createIfMissing)
         local lastPart = i == #path
         local newTarget = target[part]
 
-        if newTarget then
+        if newTarget ~= nil then
             target = newTarget
 
         else
