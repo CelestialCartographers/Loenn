@@ -51,6 +51,12 @@ ui.styleground_window.new_options.based_on_current=Based on current
 ui.styleground_window.new_options.parallax=Parallax
 
 
+# Metadata Window
+ui.metadata_window.window_title=Metadata
+
+ui.metadata_window.save_changes=Save changes
+
+
 # Room Window
 ui.room_window.editing_room=Editing room - %s
 ui.room_window.creating_room=Creating room

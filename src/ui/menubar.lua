@@ -15,6 +15,7 @@ local languageRegistry = require("language_registry")
 
 local roomEditor = require("ui.room_editor")
 local stylegroundEditor = require("ui.styleground_editor")
+local metadataEditor = require("ui.metadata_editor")
 
 local menubar = {}
 
@@ -104,7 +105,7 @@ menubar.menubar = {
     }},
     {"map", {
         {"stylegrounds", stylegroundEditor.editStylegrounds},
-        {"metadata", notYetImplementedNotification}
+        {"metadata", metadataEditor.editMetadata}
     }},
     {"room", {
         {"add", roomEditor.createNewRoom},
