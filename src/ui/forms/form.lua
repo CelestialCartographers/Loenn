@@ -8,6 +8,7 @@ local configs = require("configs")
 local modHandler = require("mods")
 local pluginLoader = require("plugin_loader")
 
+local gridElement = require("ui.widgets.grid")
 local widgetUtils = require("ui.widgets.utils")
 
 local forms = {}
@@ -45,6 +46,25 @@ function forms.getNameParts(name, options)
     return name:split(delimiter)()
 end
 
+local function fieldSortingFunction(a, b)
+    -- Sort by sortingPriority, if they match then the elements are alphabetically sorted
+
+    local optionsA = a._options
+    local optionsB = b._options
+
+    local weightA = optionsA.sortingPriority or a.sortingPriority or 0
+    local weightB = optionsB.sortingPriority or b.sortingPriority or 0
+
+    if weightA ~= weightB then
+        return weightA < weightB
+    end
+
+    local nameA = optionsA.displayName or a.name
+    local nameB = optionsB.displayName or b.name
+
+    return nameA < nameB
+end
+
 function forms.getFormFields(data, options)
     local ignored = table.flip(options.ignored or {})
     local ignoreUnordered = options.ignoreUnordered
@@ -71,6 +91,7 @@ function forms.getFormFields(data, options)
 
         ignored[name] = true
         element._hidden = hidden[name]
+        element._options = fieldOptions
 
         table.insert(elements, element)
     end
@@ -96,20 +117,7 @@ function forms.getFormFields(data, options)
             end
         end
 
-        -- Sort by sortingPriority, if they match then the elements are alphabetically sorted
-        table.sort(unorderedElements, function(a, b)
-            local optionsA = a._options
-            local optionsB = b._options
-
-            local weightA = optionsA.sortingPriority or a.sortingPriority or 0
-            local weightB = optionsB.sortingPriority or b.sortingPriority or 0
-
-            if weightA ~= weightB then
-                return weightA < weightB
-            end
-
-            return optionsA.displayName < optionsB.displayName
-        end)
+        table.sort(unorderedElements, fieldSortingFunction)
 
         for _, element in ipairs(unorderedElements) do
             table.insert(elements, element)
@@ -127,17 +135,9 @@ function forms.getFormFields(data, options)
     return elements
 end
 
-function forms.getFormBody(data, options)
-    -- Split form field elements into columns
-    local formFields = forms.getFormFields(data, options)
+function forms.getFormFieldsGrid(formFields, options)
     local columnCount = options.columns or 4
-    local columnElements = {}
-    local columns = {}
-
-    for i = 1, columnCount do
-        columnElements[i] = {}
-    end
-
+    local elements = {}
     local column = 1
     local rows = 0
 
@@ -146,11 +146,9 @@ function forms.getFormBody(data, options)
 
         if not field._hidden then
             if column + fieldWidth - 1 > columnCount then
-                -- Add blank elements in empty spaces
+                -- False gives us a blank grid cell
                 for i = column, columnCount do
-                    local targetColumn = columnElements[i]
-
-                    table.insert(targetColumn, uiElements.new({}))
+                    table.insert(elements, false)
                 end
 
                 column = 1
@@ -158,71 +156,23 @@ function forms.getFormBody(data, options)
             end
 
             for _, element in ipairs(field.elements) do
-                local targetColumn = columnElements[column]
-
-                table.insert(targetColumn, element)
+                table.insert(elements, element)
 
                 column += 1
             end
         end
     end
 
-    for i = 1, columnCount do
-        columns[i] = uiElements.group(columnElements[i]):with({
-            style = {
-                spacing = 8
-            }
-        })
-    end
+    return gridElement.getGrid(elements, columnCount)
+end
 
-    local row = uiElements.row(columns):with({
-        style = {
-            padding = 8
-        }
-    })
-
-    row:layout()
-
-    ui.runLate(function()
-        -- Adjust element Y positions to become more "grid like"
-        local offsetY = 0
-
-        for y = 1, rows + 1 do
-            local rowHeight = 0
-
-            for x = 1, columnCount do
-                local element = columnElements[x][y]
-
-                if element then
-                    rowHeight = math.max(rowHeight, element.height)
-                end
-            end
-
-            for x = 1, columnCount do
-                local element = columnElements[x][y]
-
-                if element then
-                    local centerVertically = rawget(element, "centerVertically")
-
-                    if centerVertically then
-                        element.y = offsetY
-                        element.y += math.floor((rowHeight - element.height) / 2)
-
-                    else
-                        element.y = offsetY
-                    end
-                end
-            end
-
-            offsetY += rowHeight + 8
-        end
-
-        ui:reflow()
-    end)
+function forms.getFormBody(data, options)
+    local formFields = forms.getFormFields(data, options)
+    local grid = forms.getFormFieldsGrid(formFields, options)
 
     formFields._options = options
 
-    return row, formFields
+    return grid, formFields
 end
 
 function forms.formValid(formFields)
