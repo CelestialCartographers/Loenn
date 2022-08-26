@@ -1,5 +1,8 @@
 return {
     __themeName = "light",
+    lineSeparator = {
+        color = {0.7, 0.7, 0.7, 1.0}
+    },
     button = {
         disabledBG = {0.4, 0.4, 0.4, 0.7},
         disabledBorder = {0, 0, 0, 0, 1},
