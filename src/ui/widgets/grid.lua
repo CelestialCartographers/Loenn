@@ -56,10 +56,6 @@ local function columnLayoutChilrenHook(columnElements, columnIndex, style)
                 offsetY += rowHeight + style.rowSpacing
             end
         end
-
-        self.height = offsetY + style.outerPadding * 2 - style.rowSpacing
-        self.innerHeight = offsetY - style.rowSpacing
-
     end
 end
 
