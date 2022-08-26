@@ -52,7 +52,7 @@ function lineSeparator.getLine(width)
     return line
 end
 
-function lineSeparator.getSeparator(label, thickness, leftWidth, rightWidth)
+function lineSeparator.getSeparator(label, leftWidth, rightWidth)
     local separatorStyle = uiElements.lineSeparator.__default.style or {}
 
     if type(label) == "string" then
