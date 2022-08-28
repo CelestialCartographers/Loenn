@@ -9,6 +9,7 @@ local modHandler = require("mods")
 local pluginLoader = require("plugin_loader")
 
 local gridElement = require("ui.widgets.grid")
+local separatorElement = require("ui.widgets.separator")
 local widgetUtils = require("ui.widgets.utils")
 
 local forms = {}
@@ -166,14 +167,75 @@ function forms.getFormFieldsGrid(formFields, options)
     return gridElement.getGrid(elements, columnCount)
 end
 
-function forms.getFormBody(data, options)
-    local formFields = forms.getFormFields(data, options)
-    local grid = forms.getFormFieldsGrid(formFields, options)
+function forms.getFormBodyGroups(data, options)
+    local groups = options.groups
+    local allFormFields = forms.getFormFields(data, options)
+    local grids = {}
+    local bodyColumn = uiElements.column({}):with({
+        style = {
+            padding = 0,
+            spacing = 0
+        }
+    })
 
-    formFields._options = options
+    for i, groupOptions in ipairs(groups) do
+        local newGroupOptions = {}
 
-    return grid, formFields
+        if newGroupOptions.inheritOptions ~= false then
+            newGroupOptions = utils.deepcopy(options)
+
+            -- Do not copy groups
+            newGroupOptions.groups = nil
+        end
+
+        for k, v in pairs(groupOptions) do
+            newGroupOptions[k] = v
+        end
+
+        local formFields = forms.getFormFields(data, newGroupOptions)
+        local grid = forms.getFormFieldsGrid(formFields, options)
+
+        if groupOptions.title then
+            local separator = uiElements.lineSeparator(groupOptions.title, 16, true)
+
+            -- If this is not the first title separator, add some space above
+            if i > 1 then
+                separator:addBottomPadding()
+            end
+
+            bodyColumn:addChild(separator)
+        end
+
+        bodyColumn:addChild(grid)
+        table.insert(grids, grid)
+
+        -- Move padding up a notch, makes our line separators match the content properly
+        bodyColumn.style.padding = grid.style.padding
+        grid.style.padding = 0
+    end
+
+    gridElement.alignColumns(grids)
+
+    allFormFields._options = options
+
+    return bodyColumn, allFormFields
 end
+
+function forms.getFormBody(data, options)
+    local groups = options.groups
+
+    if groups then
+        return forms.getFormBodyGroups(data, options)
+
+    else
+        local formFields = forms.getFormFields(data, options)
+        local grid = forms.getFormFieldsGrid(formFields, options)
+
+        formFields._options = options
+
+        return grid, formFields
+    end
+ end
 
 function forms.formValid(formFields)
     local invalidFields = {}
