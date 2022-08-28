@@ -1258,7 +1258,7 @@ metadata.meta.description.PostcardSoundID=The postcard sound to use. Leave empty
 
 
 # From side.meta.mode
-metadata.mode.attribute.IgnoreLevelAudioLayerData=Ignore Room Audio Layer Data
+metadata.mode.attribute.IgnoreLevelAudioLayerData=Ignore Room Layers
 metadata.mode.attribute.Inventory=Starting Inventory
 metadata.mode.attribute.StartLevel=Starting Room
 metadata.mode.attribute.HeartIsEnd=End Level on Heart
@@ -1274,8 +1274,8 @@ metadata.mode.description.TheoInBubble=Whether player is allowed to hold crystal
 
 
 # From side.meta.audiostate
-metadata.audiostate.attribute.Ambience=Ambience
-metadata.audiostate.attribute.Music=Music
+metadata.audiostate.attribute.Ambience=Map Ambience
+metadata.audiostate.attribute.Music=Map Music
 
 metadata.audiostate.description.Ambience=The ambience music track for the map.
 metadata.audiostate.description.Music=The default music track for the map. Music track set in room overrides this value.
