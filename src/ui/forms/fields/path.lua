@@ -142,7 +142,7 @@ function pathField.getElement(name, value, options)
         textfield:layout()
     end
 
-    local iconMaxSize = textfield.label.height
+    local iconMaxSize = textfield.height - textfield.style.padding
     local parentHeight = textfield.height
     local folderIcon, iconSize = iconUtils.getIcon("folder", iconMaxSize)
 
