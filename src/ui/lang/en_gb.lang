@@ -55,6 +55,10 @@ ui.styleground_window.new_options.parallax=Parallax
 ui.metadata_window.window_title=Metadata
 
 ui.metadata_window.save_changes=Save changes
+ui.metadata_window.group.general.name=General
+ui.metadata_window.group.overworld.name=Overworld
+ui.metadata_window.group.xml.name=XML
+ui.metadata_window.group.music.name=Music
 
 
 # Room Window

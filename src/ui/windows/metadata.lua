@@ -30,25 +30,45 @@ table.sort(songs)
 table.sort(cassetteSongs)
 table.sort(environmentalSounds)
 
-local defaultFieldOrder = {
-    "Name", "SID", "Icon",
-    "CompleteScreenName", "CassetteCheckpointIndex",
-    "CassetteNoteColor", "CassetteSong",
-    "TitleBaseColor", "TitleAccentColor",
-    "TitleTextColor", "IntroType",
-    "ColorGrade", "Wipe",
-    "DarknessAlpha", "BloomBase", "BloomStrength",
-    "Jumpthru", "CoreMode",
-    "ForegroundTiles", "BackgroundTiles", "AnimatedTiles",
-    "Portraits", "Sprites",
-    "mode.IgnoreLevelAudioLayerData", "mode.Inventory",
-    "mode.StartLevel", "mode.HeartIsEnd",
-    "mode.SeekerSlowdown", "mode.TheoInBubble",
-    "mode.audiostate.Music", "mode.audiostate.Ambience",
-    "mode.cassettemodifier.TempoMult", "mode.cassettemodifier.LeadBeats",
-    "mode.cassettemodifier.BeatsPerTick", "mode.cassettemodifier.TicksPerSwap",
-    "mode.cassettemodifier.Blocks", "mode.cassettemodifier.BeatsMax",
-    "mode.cassettemodifier.BeatIndexOffset", "mode.cassettemodifier.OldBehavior"
+local defaultFieldGroups = {
+    {
+        title = "ui.metadata_window.group.general",
+        fieldOrder = {
+            "IntroType", "ColorGrade", "Wipe",
+            "DarknessAlpha", "BloomBase", "BloomStrength",
+            "Jumpthru", "CoreMode", "mode.Inventory",
+            "mode.StartLevel", "mode.HeartIsEnd",
+            "mode.SeekerSlowdown", "mode.TheoInBubble",
+        }
+    },
+    {
+        title = "ui.metadata_window.group.overworld",
+        fieldOrder = {
+            "Name", "SID", "Icon",
+            "CompleteScreenName",
+            "TitleBaseColor", "TitleAccentColor",
+            "TitleTextColor"
+        }
+    },
+    {
+        title = "ui.metadata_window.group.xml",
+        fieldOrder = {
+            "ForegroundTiles", "BackgroundTiles", "AnimatedTiles",
+            "Portraits", "Sprites"
+        }
+    },
+    {
+        title = "ui.metadata_window.group.music",
+        fieldOrder = {
+            "mode.audiostate.Music", "mode.audiostate.Ambience",
+            "CassetteCheckpointIndex", "CassetteNoteColor", "CassetteSong",
+            "mode.cassettemodifier.BeatsMax", "mode.cassettemodifier.BeatsPerTick",
+            "mode.cassettemodifier.TicksPerSwap", "mode.cassettemodifier.LeadBeats",
+            "mode.cassettemodifier.BeatIndexOffset", "mode.cassettemodifier.TempoMult",
+            "mode.cassettemodifier.Blocks", "mode.cassettemodifier.OldBehavior",
+            "mode.IgnoreLevelAudioLayerData"
+        }
+    }
 }
 
 local defaultFieldInformation = {
@@ -265,10 +285,27 @@ function metadataWindow.editMetadata(side)
 
     local formData = prepareFormData(side)
     local fieldInformation = utils.deepcopy(defaultFieldInformation)
+    local fieldGroups = utils.deepcopy(defaultFieldGroups) -- TODO - Inject translations
 
     fieldInformation["mode.StartLevel"].options = getRoomOptions(side)
 
-    for _, field in ipairs(defaultFieldOrder) do
+    local fieldNames = {}
+
+    for _, group in ipairs(fieldGroups) do
+        -- Use title name as language path
+        if group.title then
+            local parts = group.title:split(".")()
+            local baseLanguage = utils.getPath(language, parts)
+
+            group.title = tostring(baseLanguage.name)
+        end
+
+        for _, name in ipairs(group.fieldOrder) do
+            table.insert(fieldNames, name)
+        end
+    end
+
+    for _, field in ipairs(fieldNames) do
         if not fieldInformation[field] then
             fieldInformation[field] = {}
         end
@@ -301,7 +338,7 @@ function metadataWindow.editMetadata(side)
 
     local metadataForm = form.getForm(buttons, formData, {
         fields = fieldInformation,
-        fieldOrder = defaultFieldOrder,
+        groups = fieldGroups,
         ignoreUnordered = true
     })
 
