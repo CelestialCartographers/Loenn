@@ -1,6 +1,6 @@
 return {
     __themeName = "light",
-    lineSeparator = {
+    horizontalLine = {
         color = {0.7, 0.7, 0.7, 1.0}
     },
     button = {

@@ -2,85 +2,99 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
+local utils = require("utils")
+
 local lineSeparator = {}
 
--- For styling
-uiElements.add("lineSeparator", {
-    base = "group",
-
+uiElements.add("horizontalLine", {
     style = {
         thickness = 3,
         radius = 3,
         color = {0.225, 0.225, 0.225, 1.0},
-        padding = 0,
-        spacing = 8
-    }
+    },
+
+    init = function(self, width)
+        self._width = width
+
+        if width == true then
+            self:with(uiUtils.fillWidth(false))
+        end
+    end,
+
+    calcWidth = function(self)
+        return self._width
+    end,
+
+    calcHeight = function(self)
+        return 1
+    end,
+
+    draw = function(self)
+        local separatorStyle = self.style
+        local thickness = separatorStyle.thickness
+        local radius = separatorStyle.radius
+        local color = separatorStyle.color
+
+        local parentHeight = self.parent.innerHeight
+        local offsetY = math.floor((parentHeight - thickness) / 2)
+
+        local pr, pg, pb, pa = love.graphics.getColor()
+
+        love.graphics.setColor(color)
+        love.graphics.rectangle("fill", self.screenX, self.screenY + offsetY, self.width, thickness, radius, radius)
+        love.graphics.setColor(pr, pg, pb, pa)
+    end
 })
 
-local function lineDrawHook(orig, self)
-    local separatorStyle = uiElements.lineSeparator.__default.style or {}
-    local thickness = separatorStyle.thickness
-    local radius = separatorStyle.radius
-    local color = separatorStyle.color
+-- For styling
+uiElements.add("lineSeparator", {
+    base = "row",
 
-    local parentHeight = self.parent.innerHeight
-    local offsetY = math.floor((parentHeight - thickness) / 2)
+    style = {
+        padding = {0, 0, 0, 2},
+        spacing = 8,
+        contentPadding = 8
+    },
 
-    local pr, pg, pb, pa = love.graphics.getColor()
+    init = function(self, label, leftWidth, rightWidth)
+        uiElements.row.init(self, {})
 
-    love.graphics.setColor(color)
-    love.graphics.rectangle("fill", self.screenX, self.screenY + offsetY, self.width, thickness, radius, radius)
-    love.graphics.setColor(pr, pg, pb, pa)
-end
+        if type(label) == "string" then
+            label = uiElements.label(label)
+        end
 
-function lineSeparator.getLine(width)
-    local line = uiElements.panel({}):hook({
-        draw = lineDrawHook
-    })
+        if leftWidth and leftWidth ~= 0 then
+            self:addChild(uiElements.horizontalLine(leftWidth))
+        end
 
-    if type(width) == "number" then
-        line:hook({
-            calcWidth = function(orig, self)
-                return width
-            end
-        })
+        if label then
+            self:addChild(label)
+        end
 
-    elseif width then
-        line:with(uiUtils.fillWidth(true))
+        if rightWidth and rightWidth ~= 0 then
+            self:addChild(uiElements.horizontalLine(rightWidth))
+        end
+
+        if leftWidth == true or rightWidth == true then
+            self:with(uiUtils.fillWidth(false))
+        end
+    end,
+
+    addBottomPadding = function(self, n)
+        local padding = self.style.padding
+        local paddingType = type(padding)
+
+        n = n or self.style.contentPadding or 8
+
+        if paddingType == "number" then
+            self.style.padding = {padding, padding + n, padding, padding}
+
+        elseif paddingType == "table" then
+            local lp, tp, rp, bp = unpack(padding)
+
+            self.style.padding = {lp, tp + n, rp, bp}
+        end
     end
+})
 
-    return line
-end
-
-function lineSeparator.getSeparator(label, leftWidth, rightWidth)
-    local separatorStyle = uiElements.lineSeparator.__default.style or {}
-
-    if type(label) == "string" then
-        label = uiElements.label(label)
-    end
-
-    local row = uiElements.row({})
-
-    row.style.padding = separatorStyle.padding
-    row.style.spacing = separatorStyle.spacing
-
-    if leftWidth and leftWidth ~= 0 then
-        row:addChild(lineSeparator.getLine(leftWidth))
-    end
-
-    if label then
-        row:addChild(label)
-    end
-
-    if leftWidth == true or rightWidth == true then
-        row:with(uiUtils.fillWidth(false))
-    end
-
-    if rightWidth and rightWidth ~= 0 then
-        row:addChild(lineSeparator.getLine(rightWidth))
-    end
-
-    return row
-end
-
-return lineSeparator
+return uiElements.lineSeparator
