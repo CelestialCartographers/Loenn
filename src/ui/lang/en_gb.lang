@@ -52,9 +52,10 @@ ui.styleground_window.new_options.parallax=Parallax
 
 
 # Metadata Window
-ui.metadata_window.window_title=Metadata
+ui.metadata_window.window_title=Map Metadata
 
 ui.metadata_window.save_changes=Save changes
+
 ui.metadata_window.group.general.name=General
 ui.metadata_window.group.overworld.name=Overworld
 ui.metadata_window.group.xml.name=XML
@@ -129,7 +130,7 @@ ui.menubar.metadata=Metadata
 
 ui.menubar.room=Room
 ui.menubar.add=Add
-ui.menubar.configure=Configure
+ui.menubar.configure=Edit
 ui.menubar.delete=Delete
 
 ui.menubar.debug=Debug
