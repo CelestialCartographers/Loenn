@@ -16,49 +16,6 @@ uiElements.add("grid", {
     }
 })
 
-local function columnLayoutChilrenHook(columnElements, columnIndex, style)
-    return function(orig, self)
-        -- Adjust element Y positions to become more "grid like"
-        local offsetY = 0
-        local lowestElement
-        local rows = #columnElements[1]
-        local columnCount = #columnElements
-
-        for y = 1, rows do
-            local rowHeight = 0
-
-            for x = 1, columnCount do
-                local element = columnElements[x][y]
-
-                if element then
-                    element.parent = self
-                    element:layoutLazy()
-
-                    rowHeight = math.max(rowHeight, element.height)
-                end
-            end
-
-            local element = columnElements[columnIndex][y]
-
-            if element then
-                local centerVertically = rawget(element, "centerVertically")
-
-                if centerVertically then
-                    element.y = offsetY
-                    element.y += math.floor((rowHeight - element.height) / 2)
-
-                else
-                    element.y = offsetY
-                end
-            end
-
-            if rowHeight > 0 then
-                offsetY += rowHeight + style.rowSpacing
-            end
-        end
-    end
-end
-
 local function columnWidthHook(grids, columnIndex)
     return function(orig, self)
         local width = 0
@@ -82,11 +39,9 @@ function gridElement.getGrid(elements, columnCount)
     local columnElements = {}
     local gridStyle = uiElements.grid.__default.style or {}
 
-    local style = {
-        outerPadding = gridStyle.outerPadding or 8,
-        columnSpacing = gridStyle.columnSpacing or gridStyle.spacing or 8,
-        rowSpacing = gridStyle.rowSpacing or gridStyle.spacing or 8
-    }
+    local outerPadding = gridStyle.outerPadding or 8
+    local columnSpacing = gridStyle.columnSpacing or gridStyle.spacing or 8
+    local rowSpacing = gridStyle.rowSpacing or gridStyle.spacing or 8
 
     local column = 1
     local rows = 1
@@ -104,6 +59,18 @@ function gridElement.getGrid(elements, columnCount)
 
         else
             table.insert(targetColumn, element)
+
+            element:hook({
+                layoutLateLazy = function(orig, self)
+                    orig(self)
+
+                    if self.__gridY then
+                        self.y = self.__gridY
+
+                        self.parent:layout()
+                    end
+                end
+            })
         end
 
         column += 1
@@ -120,16 +87,59 @@ function gridElement.getGrid(elements, columnCount)
             style = {
                 spacing = 0
             }
-        }):hook({
-            layoutChildren = columnLayoutChilrenHook(columnElements, i, style)
         })
     end
 
     local row = uiElements.row(columns):with({
         style = {
-            padding = style.outerPadding,
-            spacing = style.columnSpacing,
+            padding = outerPadding,
+            spacing = columnSpacing
         }
+    })
+
+    row:hook({
+        layout = function(orig, self)
+            orig(self)
+
+            -- Adjust element Y positions to become more "grid like"
+            local offsetY = 0
+            local lowestElement
+
+            for y = 1, rows + 1 do
+                local rowHeight = 0
+
+                for x = 1, columnCount do
+                    local element = columnElements[x][y]
+
+                    if element then
+                        rowHeight = math.max(rowHeight, element.height)
+                    end
+                end
+
+                for x = 1, columnCount do
+                    local element = columnElements[x][y]
+
+                    if element then
+                        local centerVertically = rawget(element, "centerVertically")
+
+                        if centerVertically then
+                            element.__gridY = offsetY
+                            element.__gridY += math.floor((rowHeight - element.height) / 2)
+
+                        else
+                            element.__gridY = offsetY
+                        end
+                    end
+                end
+
+                if rowHeight > 0 then
+                    offsetY += rowHeight + rowSpacing
+                end
+            end
+
+            self.height = offsetY + outerPadding * 2 - rowSpacing
+            self.innerHeight = offsetY - rowSpacing
+        end
     })
 
     row._columns = columns
