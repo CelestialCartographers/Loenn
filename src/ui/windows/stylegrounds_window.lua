@@ -1,3 +1,6 @@
+-- TODO - Add texture dropdown options
+-- Currently too slow both in window creation and when clicking around in the style list
+
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
@@ -21,6 +24,8 @@ local atlases = require("atlases")
 
 local stylegroundWindow = {}
 
+local parallaxTextureOptions
+
 local activeWindows = {}
 local windowPreviousX = 0
 local windowPreviousY = 0
@@ -33,6 +38,14 @@ local stylegroundWindowGroup = uiElements.group({}):with({
 local PREVIEW_MAX_WIDTH = 320 * 3
 local PREVIEW_MAX_HEIGHT = 180 * 3
 local WINDOW_STATIC_HEIGHT = 640
+
+local function cacheParallaxTextureOptions()
+    local options = parallax.getParallaxNames()
+
+    table.sort(options)
+
+    parallaxTextureOptions = options
+end
 
 -- List icon to indicate foreground vs background
 local function listItemCheckbox(text, value)
@@ -114,6 +127,11 @@ local function getOptions(style)
         fields = fieldInformation,
         fieldOrder = fieldOrder
     }
+
+    -- Add cached texture options
+    if utils.typeof(style) == "parallax" then
+        options.fields.texture.options = parallaxTextureOptions
+    end
 
     return options, dummyData
 end
@@ -713,6 +731,9 @@ end
 
 function stylegroundWindow.getWindowContent(map)
     local interactionData = {}
+
+    -- See TODO at top of file
+    --cacheParallaxTextureOptions()
 
     interactionData.map = map
     interactionData.listTarget = getDefaultListTarget()
