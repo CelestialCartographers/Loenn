@@ -1,9 +1,11 @@
+local celesteEnums = require("consts.celeste_enums")
+
 local planets = {}
 
 planets.name = "planets"
 planets.fieldInformation = {
     size = {
-        options = {"TODO", "Options"},
+        options = celesteEnums.planet_effect_sizes,
         editable = false
     },
     count = {
