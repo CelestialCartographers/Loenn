@@ -11,5 +11,4 @@ rain.defaultData = {
     color = ""
 }
 
-
 return rain
