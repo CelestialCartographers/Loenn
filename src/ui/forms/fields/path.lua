@@ -92,11 +92,7 @@ function pathField.getElement(name, value, options)
         end
 
         if relativeToMod ~= false then
-            local modPath = mods.getFilenameModPath(loadedState.filename)
-
-            if not modPath then
-                return false
-            end
+            local modPath = mods.commonModContent
 
             prefix = modPath
             filename = utils.joinpath(modPath, filename)
@@ -106,19 +102,19 @@ function pathField.getElement(name, value, options)
             filename = filenameResolver(filename, rawFilename, prefix)
         end
 
-        local attributes = utils.pathAttributes(filename)
+        local attributes = love.filesystem.getInfo(filename) or utils.pathAttributes(filename)
 
         if not attributes and allowMissingPath == false then
             return false
         end
 
-        local attributeMode = attributes and attributes.mode or "missing"
+        local attributeType = attributes and (attributes.type or attributes.mode) or "missing"
 
-        if attributeMode == "directory" and not allowFolders then
+        if attributeType == "directory" and not allowFolders then
             return false
         end
 
-        if attributeMode == "file" then
+        if attributeType == "file" then
             local fileExtension = utils.fileExtension(filename)
 
             if allowFiles == false then
