@@ -195,6 +195,10 @@ function forms.getFormBodyGroups(data, options)
         local formFields = forms.getFormFields(data, newGroupOptions)
         local grid = forms.getFormFieldsGrid(formFields, options)
 
+        for _, field in ipairs(formFields) do
+            table.insert(allFormFields, field)
+        end
+
         if groupOptions.title then
             local separator = uiElements.lineSeparator(groupOptions.title, 16, true)
 
