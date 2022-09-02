@@ -49,7 +49,7 @@ local function openFileDialog(textField, options)
                 return false
             end
 
-            filename = string.sub(filename, #modPath + 2)
+            filename = string.sub(filename, #modPath + 1)
         end
 
         if filenameProcessor then
