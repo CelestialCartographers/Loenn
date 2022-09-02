@@ -18,12 +18,16 @@ local function openFileDialog(textField, options)
     local allowedExtensions = options.filePickerExtensions or options.allowedExtensions
     local allowFolders = options.allowFolders
     local allowFiles = options.allowFiles
+    local useUnixSeparator = options.useUnixSeparator
     local filenameProcessor = options.filenameProcessor
 
     local useFolderDialog = not allowFiles and allowFolders
 
     local filter
     local startingPath = fileLocations.getCelesteDir()
+
+    local userOS = utils.getOS()
+    local usingWindows = userOS == "Windows"
 
     if allowedExtensions then
         filter = table.concat(allowedExtensions, ",")
@@ -50,6 +54,10 @@ local function openFileDialog(textField, options)
             end
 
             filename = string.sub(filename, #modPath + 1)
+        end
+
+        if usingWindows and useUnixSeparator ~= false then
+            filename = utils.convertToUnixPath(filename)
         end
 
         if filenameProcessor then
