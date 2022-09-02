@@ -272,10 +272,6 @@ function utils.unbackslashify(text)
     return text:gsub("\\n", "\n")
 end
 
-function utils.convertToUnixPath(path)
-    return path:gsub("\\", "/")
-end
-
 function utils.parseHexColor(color)
     color := match("^#?([0-9a-fA-F]+)$")
 

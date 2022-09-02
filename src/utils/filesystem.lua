@@ -43,27 +43,54 @@ function filesystem.splitpath(s, sep)
     return string.split(s, sep)()
 end
 
-function filesystem.samePath(path1, path2, ignoreTrailingSeparator)
+function filesystem.convertToUnixPath(path)
+    return path:gsub("\\", "/")
+end
+
+function filesystem.samePath(path1, path2, useUnixSeparator, ignoreTrailingSeparator)
+    local parts1
+    local parts2
+
     local userOS = osUtils.getOS()
+    local usingWindows = userOS == "Windows"
 
-    if ignoreTrailingSeparator ~= false then
-        local pathSeparator = physfs.getDirSeparator()
+    if usingWindows and useUnixSeparator ~= false then
+        path1 = filesystem.convertToUnixPath(path1)
+        path2 = filesystem.convertToUnixPath(path2)
 
-        if path1:sub(-1) == pathSeparator then
-            path1 = path1:sub(1, -2)
-        end
-
-        if path2:sub(-1) == pathSeparator then
-            path2 = path2:sub(1, -2)
-        end
-    end
-
-    if userOS == "Windows" then
-        return path1:lower() == path2:lower()
+        parts1 = filesystem.splitpath(path1, "/")
+        parts2 = filesystem.splitpath(path2, "/")
 
     else
-        return path1 == path2
+        parts1 = filesystem.splitpath(path1)
+        parts2 = filesystem.splitpath(path2)
     end
+
+    if ignoreTrailingSeparator ~= false then
+        for i = #parts1, 1, -1 do
+            if parts1[i] == "" then
+                parts1[i] = nil
+            end
+        end
+
+        for i = #parts2, 1, -1 do
+            if parts2[i] == "" then
+                parts2[i] = nil
+            end
+        end
+    end
+
+    if #parts1 ~= #parts2 then
+        return false
+    end
+
+    for i = 1, #parts1 do
+        if parts1[i] ~= parts2[i] then
+            return false
+        end
+    end
+
+    return true
 end
 
 -- Maunal iteration for performance
