@@ -29,18 +29,32 @@ function filesystem.joinpath(...)
     local paths = {...}
     local sep = physfs.getDirSeparator()
 
+    local userOS = osUtils.getOS()
+    local usingWindows = userOS == "Windows"
+
     -- Check for table argument
     if type(paths[1]) == "table" then
         paths = paths[1]
     end
 
-    return table.concat(paths, sep):gsub(sep .. sep, sep)
+    local result = table.concat(paths, sep)
+
+    -- Replace unix separator with Windows ones
+    -- This is just to aid double separator removal, and because Windows accepts both
+    if usingWindows then
+        result = result:gsub("/", "\\")
+    end
+
+    -- Remove double separators
+    result = result:gsub(sep .. sep, sep)
+
+    return result
 end
 
-function filesystem.splitpath(s, sep)
+function filesystem.splitpath(path, sep)
     sep = sep or physfs.getDirSeparator()
 
-    return string.split(s, sep)()
+    return string.split(path, sep)()
 end
 
 function filesystem.convertToUnixPath(path)
