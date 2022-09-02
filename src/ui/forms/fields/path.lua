@@ -53,7 +53,7 @@ local function openFileDialog(textField, options)
                 return false
             end
 
-            filename = string.sub(filename, #modPath + 1)
+            filename = string.sub(filename, #modPath + 2)
         end
 
         if usingWindows and useUnixSeparator ~= false then
@@ -104,6 +104,9 @@ function pathField.getElement(name, value, options)
 
             prefix = modPath
             filename = utils.joinpath(modPath, filename)
+
+            -- Has to use unix paths for Love2d to detect the file
+            filename = utils.convertToUnixPath(filename)
         end
 
         if filenameResolver then
