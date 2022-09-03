@@ -135,7 +135,7 @@ local function applyRoomChanges(data, target)
         end
 
         celesteRender.invalidateRoomCache(targetRoom)
-        celesteRender.forceRoomBatchRender(targetRoom, viewportHandler.viewport)
+        celesteRender.forceRoomBatchRender(targetRoom, state)
     end
 end
 
