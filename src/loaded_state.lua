@@ -284,6 +284,7 @@ function state.getLayerVisible(layer)
 end
 
 function state.setLayerVisible(layer, visible, silent)
+    local rooms = state.map and state.map.rooms or {}
     local info = state.layerInformation[layer]
 
     if not info then
@@ -301,7 +302,7 @@ function state.setLayerVisible(layer, visible, silent)
         local selectedItem, selectedItemType = state.getSelectedItem()
 
         celesteRender.clearBatchingTasks()
-        celesteRender.forceRedrawVisibleRooms(state.map.rooms, state, selectedItem, selectedItemType)
+        celesteRender.forceRedrawVisibleRooms(rooms, state, selectedItem, selectedItemType)
     end
 end
 
