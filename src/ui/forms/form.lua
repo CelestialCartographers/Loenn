@@ -297,7 +297,9 @@ function forms.buttonUpdateHandler(formFields, button)
                 newEnabled = newEnabled and formValid
             end
 
-            self:setEnabled(newEnabled)
+            if self.enabled ~= newEnabled then
+                self.enabled = newEnabled
+            end
         end
 
         orig(self, dt)
@@ -319,12 +321,19 @@ function forms.getFormButtonRow(buttons, formFields, options)
         local callback = forms.packFormButtonCallback(formFields, button.callback)
         local buttonElement = uiElements.button(button.text, callback)
 
+        buttonElement.__formButtonInfo = button
         buttonElement:hook({
             update = forms.buttonUpdateHandler(formFields, button)
+        }):with({
+            formSetEnabled = function(self, value)
+                -- Make sure the button and form both get the new enabled value
+                self.enabled = value
+                self.__formButtonInfo.enabled = value
+            end
         })
 
         if button.enabled ~= nil then
-            buttonElement.enabled = utils.callIfFunction(button.enable, formField, button)
+            buttonElement.enabled = utils.callIfFunction(button.enabled, formField, button)
         end
 
         buttonElements[i] = buttonElement

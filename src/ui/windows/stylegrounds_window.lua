@@ -370,8 +370,8 @@ local function moveStyle(interactionData, offset, moveUpButton, moveDownButton)
             listElement:reflow()
 
             if moveUpButton and moveDownButton then
-                moveUpButton.enabled = canMoveStyle(interactionData, -1)
-                moveDownButton.enabled = canMoveStyle(interactionData, 1)
+                moveUpButton:formSetEnabled(canMoveStyle(interactionData, -1))
+                moveDownButton:formSetEnabled(canMoveStyle(interactionData, 1))
             end
         end
     end
