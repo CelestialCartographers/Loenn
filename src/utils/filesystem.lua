@@ -350,7 +350,11 @@ function filesystem.openDialog(path, filter, callback)
             return threadHandler.createStartWithCallback(code, callback, path, filter)
 
         else
-            callback(nfd.open(filter, path))
+            local result = nfd.open(filter, path)
+
+            if result then
+                callback(result)
+            end
 
             return false, false
         end
@@ -381,7 +385,11 @@ function filesystem.openFolderDialog(path, callback)
             return threadHandler.createStartWithCallback(code, callback, path)
 
         else
-            callback(nfd.openFolder(path))
+            local result = nfd.openFolder(path)
+
+            if result then
+                callback(result)
+            end
 
             return false, false
         end
