@@ -3,7 +3,7 @@ local utils = require("utils")
 
 local iconUtils = {}
 
-local iconSizes = {64, 32, 24, 16}
+local iconSizes = {64, 32, 24, 16, 12}
 local iconCache = {}
 
 local previousThemeName = themes.defaultThemeName

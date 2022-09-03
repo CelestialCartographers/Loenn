@@ -1,5 +1,6 @@
 return {
     __themeName = "light",
+    iconsPath = "ui/themes/light/icons/",
     horizontalLine = {
         color = {0.7, 0.7, 0.7, 1.0}
     },
