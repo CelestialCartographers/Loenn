@@ -282,6 +282,10 @@ local function getRoomOptions(side)
 end
 
 function metadataWindow.editMetadata(side)
+    if not side then
+        return
+    end
+
     local language = languageRegistry.getLanguage()
     local windowTitle = tostring(language.ui.metadata_window.window_title)
 

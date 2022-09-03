@@ -767,6 +767,10 @@ function stylegroundWindow.getWindowContent(map)
 end
 
 function stylegroundWindow.editStylegrounds(map)
+    if not map then
+        return
+    end
+
     local window
     local layout, interactionData = stylegroundWindow.getWindowContent(map)
 

@@ -309,6 +309,10 @@ local function getWindowTitle(language, room, editing)
 end
 
 function roomWindow.createRoomWindow(room, editing)
+    if not loadedState.map then
+        return
+    end
+
     if editing then
         room = utils.deepcopy(room or loadedState.getSelectedRoom())
 
