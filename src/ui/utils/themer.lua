@@ -1,5 +1,7 @@
 local ui, uiUtils, uiElements = require("ui").quick()
 
+local configs = require("configs")
+
 local themer = {}
 
 function themer.dump()
@@ -41,7 +43,8 @@ function themer.apply(theme)
 end
 
 function themer.applyFontInfo(theme)
-    local labelFontSize = theme.labelFontSize or 12
+    local labelFontSizeFallback = configs.ui.theme.defaultFontSize or 12
+    local labelFontSize = theme.labelFontSize or labelFontSizeFallback
     local labelFilename = theme.labelFilename
     local labelFont = theme.labelFont
 

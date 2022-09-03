@@ -1,3 +1,4 @@
 return {
-    themeName = "dark"
+    themeName = "dark",
+    defaultFontSize = false
 }
