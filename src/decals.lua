@@ -70,6 +70,8 @@ function decals.getDecalNames(removeAnimationFrames, yield)
                     local resourceName = nameNoExt:sub(firstSlashIndex + decalPathLength - 5)
 
                     if not added[resourceName] then
+                        added[resourceName] = true
+
                         table.insert(res, resourceName)
                     end
                 end
