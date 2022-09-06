@@ -1,5 +1,7 @@
 -- love.load() is not called again, put stuff here.
 
+local meta = require("meta")
+local utils = require("utils")
 local logging = require("logging")
 
 love.keyboard.setKeyRepeat(true)
@@ -36,7 +38,17 @@ end
 local originalErrorHandler = love.errorhandler or love.errhand
 
 function love.errorhandler(message)
-    logging.error(debug.traceback(message))
+    local major, minor, revision, codename = love.getVersion()
+    local installInfoLines = {
+        string.format("Editor version: %s", meta.version),
+        string.format("Love2d version: %d.%d.%d - %s", major, minor, revision, codename),
+        string.format("Operating system: %s", utils.getOS())
+    }
 
-    return originalErrorHandler(message)
+    local installInfo = table.concat(installInfoLines, "\n")
+    local errorMessage = string.format("%s\n\n%s", installInfo, message)
+
+    logging.error(debug.traceback(errorMessage))
+
+    return originalErrorHandler(errorMessage)
 end
