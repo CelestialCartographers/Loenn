@@ -124,11 +124,14 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
     return snapshot.create(description, data, backward, forward)
 end
 
-local function applyRoomChanges(data, target)
+-- TODO - Does this always need to redraw?
+local function applyRoomChanges(data, target, clearFirst)
     local targetRoom = state.getRoomByName(data.room)
 
     if targetRoom then
-        table.clear(targetRoom)
+        if clearFirst then
+            table.clear(targetRoom)
+        end
 
         for k, v in pairs(target) do
             targetRoom[k] = utils.deepcopy(v)
@@ -139,13 +142,13 @@ local function applyRoomChanges(data, target)
     end
 end
 
-function snapshotUtils.roomSnapshot(room, description, before, after)
+function snapshotUtils.roomSnapshot(room, description, before, after, clearFirst)
     local function forward(data)
-        applyRoomChanges(data, after)
+        applyRoomChanges(data, after, clearFirst)
     end
 
     local function backward(data)
-        applyRoomChanges(data, before)
+        applyRoomChanges(data, before, clearFirst)
     end
 
     local data = {
@@ -157,16 +160,17 @@ end
 
 local function applyFillerChanges(data, target)
     local filler = data.filler
-    if filler then
-        filler.x = target.x
-        filler.y = target.y
 
-        filler.width = target.width
-        filler.height = target.height
+    if filler then
+        filler.x = target.x or filler.x
+        filler.y = target.y or filler.y
+
+        filler.width = target.width or filler.width
+        filler.height = target.height or filler.height
     end
 end
 
-function snapshotUtils.fillerSnapshot(filler, description, before, after)
+function snapshotUtils.fillerSnapshot(filler, description, before, after, clearFirst)
     local function forward(data)
         applyFillerChanges(data, after)
     end
