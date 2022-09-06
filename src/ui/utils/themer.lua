@@ -38,8 +38,8 @@ function themer.apply(theme)
         return
     end
 
-    themer.applyFontInfo(theme)
     themer.applyElementStyles(theme)
+    themer.applyFontInfo(theme)
 end
 
 function themer.applyFontInfo(theme)
