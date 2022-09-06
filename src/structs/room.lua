@@ -107,7 +107,7 @@ end
 function roomStruct.directionalResize(room, side, amount)
     room.tilesFg = tilesStruct.directionalResize(room.tilesFg, side, amount)
     room.tilesBg = tilesStruct.directionalResize(room.tilesBg, side, amount)
-    room.tilesObj = objectTilesStruct.directionalResize(room.tilesObj, side, amount)
+    room.sceneryObj = objectTilesStruct.directionalResize(room.sceneryObj, side, amount)
     room.sceneryFg = objectTilesStruct.directionalResize(room.sceneryFg, side, amount)
     room.sceneryBg = objectTilesStruct.directionalResize(room.sceneryBg, side, amount)
 
