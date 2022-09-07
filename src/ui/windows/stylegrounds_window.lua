@@ -491,6 +491,29 @@ local function removeStyle(interactionData)
     end
 end
 
+local function updateListItemText(listItem, style)
+    if not listItem then
+        return
+    end
+
+    local styleType = utils.typeof(style)
+
+    if styleType == "parallax" then
+        listItem.text = parallax.displayName(language, style)
+
+    elseif styleType == "effect" then
+        listItem.text = effects.displayName(language, style)
+    end
+end
+
+local function updateStyle(interactionData, style, newData)
+    local listElement = interactionData.stylegroundListElement
+    local listItem = listElement and listElement.selected
+
+    applyFormChanges(style, newData)
+    updateListItemText(listItem, style)
+end
+
 local function changeStyleForeground(interactionData, moveUpButton, moveDownButton)
     local listTarget = interactionData.listTarget
     local listElement = interactionData.stylegroundListElement
@@ -641,7 +664,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
             formMustBeValid = true,
             enabled = listHasElements,
             callback = function(formFields)
-                applyFormChanges(style, form.getFormData(formFields))
+                updateStyle(interactionData, style, form.getFormData(formFields))
             end
         },
         {
