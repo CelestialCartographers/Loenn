@@ -497,6 +497,7 @@ local function updateListItemText(listItem, style)
     end
 
     local styleType = utils.typeof(style)
+    local language = languageRegistry.getLanguage()
 
     if styleType == "parallax" then
         listItem.text = parallax.displayName(language, style)
