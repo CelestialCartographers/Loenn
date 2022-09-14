@@ -403,7 +403,8 @@ end
 local function getDefaultListTarget()
     return {
         style = createParallax(),
-        foreground = true
+        foreground = true,
+        defaultTarget = true
     }
 end
 
@@ -577,12 +578,12 @@ local function changeStyleForeground(interactionData, moveUpButton, moveDownButt
     listItem:onClick(0, 0, 1)
 end
 
-local function getNewDropdownOptions(style, foreground)
+local function getNewDropdownOptions(style, foreground, usingDefault)
     local language = languageRegistry.getLanguage()
     local knownEffects = effects.registeredEffects
     local options = {}
 
-    if style then
+    if style and not usingDefault then
         table.insert(options, {
             text = tostring(language.ui.styleground_window.new_options.based_on_current),
             data = {
@@ -640,6 +641,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     local language = languageRegistry.getLanguage()
     local style = listTarget.style
     local foreground = listTarget.foreground
+    local isDefaultTarget = listTarget.defaultTarget
 
     local handler = getHandler(style)
 
@@ -700,7 +702,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     end
 
     local buttonRow = formHelper.getFormButtonRow(buttons, formFields, formOptions)
-    local newDropdownItems = getNewDropdownOptions(style, foreground)
+    local newDropdownItems = getNewDropdownOptions(style, foreground, isDefaultTarget)
     local newDropdown = uiElements.dropdown(newDropdownItems, function(item, data)
         interactionData.addNewMethod = data
     end)
