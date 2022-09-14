@@ -598,6 +598,9 @@ local function getNewDropdownOptions(style, foreground)
         }
     })
 
+    -- Find all effects and add them in sorted order (by display name)
+    local effectOptions = {}
+
     for name, handler in pairs(knownEffects) do
         local fakeEffect = {_name = name}
         local displayName = effects.displayName(language, fakeEffect)
@@ -605,7 +608,7 @@ local function getNewDropdownOptions(style, foreground)
         local canBackground = effects.canBackground(fakeEffect)
 
         if foreground and canForeground or not foreground and canBackground then
-            table.insert(options, {
+            table.insert(effectOptions, {
                 text = displayName,
                 data = {
                     method = "effect",
@@ -613,6 +616,14 @@ local function getNewDropdownOptions(style, foreground)
                 }
             })
         end
+    end
+
+    effectOptions = table.sortby(effectOptions, function(option)
+        return option.text
+    end)()
+
+    for _, option in ipairs(effectOptions) do
+        table.insert(options, option)
     end
 
     return options
