@@ -179,7 +179,11 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
         return drawable
 
     elseif handler.draw then
-        return drawableFunction.fromFunction(handler.draw, room, entity, viewport)
+        local drawable = drawableFunction.fromFunction(handler.draw, room, entity, viewport)
+
+        drawable.depth = defaultDepth
+
+        return drawable
 
     elseif handler.rectangle or entity.width and entity.height then
         local rectangle
