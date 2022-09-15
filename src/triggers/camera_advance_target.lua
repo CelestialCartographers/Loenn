@@ -19,8 +19,8 @@ cameraAdvanceTarget.placements = {
     data = {
         lerpStrengthX = 1.0,
         lerpStrengthY = 1.0,
-        positionModeX = 0.0,
-        positionModeY = 0.0,
+        positionModeX = "NoEffect",
+        positionModeY = "NoEffect",
         xOnly = false,
         yOnly = false
     }
