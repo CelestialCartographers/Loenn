@@ -89,6 +89,33 @@ function state.defaultSaveCallback(filename)
     history.madeChanges = false
 end
 
+function state.verifyFile(filename, successCallback, errorCallback)
+    tasks.newTask(
+        (-> filename and mapcoder.decodeFile(filename)),
+        function(binTask)
+            if binTask.result then
+                tasks.newTask(
+                    (-> sideStruct.decodeTaskable(binTask.result)),
+                    function(decodeTask)
+                        successCallback()
+                    end
+                )
+
+            else
+                sceneHandler.sendEvent("editorMapVerificationFailed", filename)
+
+                if errorCallback then
+                    errorCallback()
+                end
+            end
+        end
+    )
+end
+
+function state.getTemporaryFilename(filename)
+    return filename .. ".saving"
+end
+
 function state.loadFile(filename, roomName)
     if not filename then
         return
@@ -98,6 +125,20 @@ function state.loadFile(filename, roomName)
         sceneHandler.sendEvent("editorLoadWithChanges", state.filename, filename)
 
         return
+    end
+
+    -- Check for temporary save exists
+    local temporaryFilename = state.getTemporaryFilename(filename)
+    local targetInfo = filesystem.pathAttributes(filename)
+    local temporaryInfo = filesystem.pathAttributes(temporaryFilename)
+
+    if temporaryInfo and not targetInfo then
+        -- Temporary exists but not our actual target, move temporary as actual
+        filesystem.rename(temporaryFilename, filename)
+
+    elseif temporaryInfo and targetInfo then
+        -- Both exists, delete temporary
+        filesystem.remove(temporaryFilename)
     end
 
     sceneHandler.changeScene("Loading")
@@ -122,7 +163,7 @@ function state.loadFile(filename, roomName)
     )
 end
 
-function state.saveFile(filename, callback, addExtIfMissing)
+function state.saveFile(filename, callback, addExtIfMissing, verifyMap)
     if filename and state.side then
         if addExtIfMissing ~= false and filesystem.fileExtension(filename) ~= "bin" then
             filename ..= ".bin"
@@ -132,21 +173,39 @@ function state.saveFile(filename, callback, addExtIfMissing)
             callback = callback or state.defaultSaveCallback
         end
 
-        filesystem.mkpath(filesystem.dirname(filename))
+        local temporaryFilename = state.getTemporaryFilename(filename)
+
+        filesystem.mkpath(filesystem.dirname(temporaryFilename))
 
         tasks.newTask(
             (-> sideStruct.encodeTaskable(state.side)),
             function(encodeTask)
                 if encodeTask.result then
                     tasks.newTask(
-                        (-> mapcoder.encodeFile(filename, encodeTask.result)),
+                        (-> mapcoder.encodeFile(temporaryFilename, encodeTask.result)),
                         function(binTask)
                             if binTask.done and binTask.success then
-                                if callback then
-                                    callback(filename)
-                                end
+                                if verifyMap ~= false then
+                                    state.verifyFile(filename, function()
+                                        filesystem.remove(filename)
+                                        filesystem.rename(temporaryFilename, filename)
 
-                                sceneHandler.sendEvent("editorMapSaved", filename)
+                                        if callback then
+                                            callback(filename)
+                                        end
+
+                                        sceneHandler.sendEvent("editorMapSaved", filename)
+                                    end)
+
+                                else
+                                    filesystem.rename(temporaryFilename, filename)
+
+                                    if callback then
+                                        callback(filename)
+                                    end
+
+                                    sceneHandler.sendEvent("editorMapSaved", filename)
+                                end
 
                             else
                                 sceneHandler.sendEvent("editorMapSaveFailed", filename)

@@ -276,10 +276,11 @@ function mapcoder.encodeFile(path, data, header)
 
     mapcoder.encodeTable(writer, data, lookupTable)
 
+    local content = writer:getString()
     local fh = io.open(path, "wb")
 
     if fh then
-        fh:write(writer:getString())
+        fh:write(content)
         fh:close()
         writer:close()
     end
