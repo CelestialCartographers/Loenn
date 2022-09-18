@@ -369,9 +369,11 @@ function roomWindow.createRoomWindow(room, editing)
     -- Make sure new rooms can't use name from template room
     fieldInformation.name.editedRoom = editing and room.name or false
 
+    local languageKey = editing and "save_changes_update" or "save_changes_create"
+    local saveText = tostring(language.ui.room_window[languageKey])
     local buttons = {
         {
-            text = tostring(language.ui.room_window.save_changes),
+            text = saveText,
             formMustBeValid = true,
             callback = function(formFields)
                 saveRoomCallback(formFields, room, editing, usingPixels)
