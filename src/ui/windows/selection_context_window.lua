@@ -127,7 +127,7 @@ function contextWindow.createContextMenu(selections)
     local dummyData, fieldInformation, fieldOrder = prepareFormData(targetLayer, targetItem, language)
     local buttons = {
         {
-            text = tostring(language.ui.room_window.save_changes),
+            text = tostring(language.ui.selection_context_window.save_changes),
             formMustBeValid = true,
             callback = contextWindow.saveChangesCallback(selections, dummyData)
         }
