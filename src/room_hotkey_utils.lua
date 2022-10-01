@@ -28,15 +28,58 @@ local snapshotFunctions = {
     filler = snapshotUtils.fillerSnapshot
 }
 
+local historyRelevantFields = {
+    filler = {
+        directionalMove = {
+            "x",
+            "y"
+        },
+        directionResize = {
+            "x",
+            "y",
+            "width",
+            "height",
+        }
+    },
+    room = {
+        directionalMove = {
+            "x",
+            "y"
+        },
+        directionResize = {
+            "x",
+            "y",
+            "width",
+            "height",
+            "tilesFg",
+            "tilesBg",
+            "sceneryFg",
+            "sceneryBg",
+            "sceneryObj"
+        }
+    }
+}
+
+local function prepareItemHistoryData(functionName, itemType, item)
+    local result = {}
+    local fields = historyRelevantFields[itemType][functionName]
+
+    for _, field in ipairs(fields) do
+        result[field] = utils.deepcopy(item[field])
+    end
+
+    return result
+end
+
 local function callWithSnapshot(functionName, itemType, item, ...)
     local itemStruct = itemStructs[itemType]
     local func = itemStruct[functionName]
     local snapshotFunction = snapshotFunctions[itemType]
 
     if item then
-        local itemBefore = utils.deepcopy(item)
+        local itemBefore = prepareItemHistoryData(functionName, itemType, item)
         local res = func(item, ...)
-        local itemAfter = utils.deepcopy(item)
+        local itemAfter = prepareItemHistoryData(functionName, itemType, item)
 
         local snapshot = snapshotFunction(item, "Room movement", itemBefore, itemAfter)
 

@@ -2,6 +2,7 @@ local celesteEnums = {}
 
 celesteEnums.cassette_songs = require("consts.cassette_songs")
 celesteEnums.environmental_sounds = require("consts.environmental_sounds")
+celesteEnums.ambient_sounds = require("consts.ambient_sounds")
 celesteEnums.songs = require("consts.songs")
 
 celesteEnums.depths = require("consts.object_depths")

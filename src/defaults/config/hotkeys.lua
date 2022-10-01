@@ -1,4 +1,6 @@
-return {
+local utils = require("utils")
+
+local defaultHotkeys = {
     undo = "ctrl + z",
     redo = "ctrl + shift + z",
     new = "ctrl + n",
@@ -51,3 +53,15 @@ return {
     -- Window
     toggleFullscreen = "f11"
 }
+
+-- Use command instead of control on Mac
+-- Don't need to replace control -> command, we only use ctrl for defaults
+if utils.getOS() == "OS X" then
+    for name, activator in pairs(defaultHotkeys) do
+        if type(activator) == "string" then
+            defaultHotkeys[name] = activator:gsub("ctrl", "cmd")
+        end
+    end
+end
+
+return defaultHotkeys
