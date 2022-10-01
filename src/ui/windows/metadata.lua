@@ -79,9 +79,9 @@ local defaultFieldInformation = {
         filenameProcessor = function(filename)
             -- Discard leading "Graphics/Atlases/Gui/" and file extension
             local filename, ext = utils.splitExtension(filename)
-            local parts = utils.splitpath(filename)
+            local parts = utils.splitpath(filename, "/")
 
-            return utils.joinpath(unpack(parts, 4))
+            return utils.convertToUnixPath(utils.joinpath(unpack(parts, 4)))
         end,
         filenameResolver = function(filename, text, prefix)
             return string.format("%s/Graphics/Atlases/Gui/%s.png", prefix, text)
