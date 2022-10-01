@@ -22,13 +22,13 @@ local metadataWindow = {}
 
 local activeWindows = {}
 
-local songs = table.keys(enums.songs)
-local cassetteSongs = table.keys(enums.cassette_songs)
-local environmentalSounds = table.keys(enums.environmental_sounds)
+local songs = enums.songs
+local cassetteSongs = enums.cassette_songs
+local ambientSounds = enums.ambient_sounds
 
 table.sort(songs)
 table.sort(cassetteSongs)
-table.sort(environmentalSounds)
+table.sort(ambientSounds)
 
 local defaultFieldGroups = {
     {
@@ -161,7 +161,7 @@ local defaultFieldInformation = {
         options = songs
     },
     ["mode.audiostate.Ambience"] = {
-        options = environmentalSounds
+        options = ambientSounds
     },
 
     ["mode.cassettemodifier.TempoMult"] = {
