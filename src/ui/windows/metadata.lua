@@ -39,6 +39,7 @@ local defaultFieldGroups = {
             "Jumpthru", "CoreMode", "mode.Inventory",
             "mode.StartLevel", "mode.HeartIsEnd",
             "mode.SeekerSlowdown", "mode.TheoInBubble",
+            "Dreaming", "OverrideASideMeta", "Interlude"
         }
     },
     {
