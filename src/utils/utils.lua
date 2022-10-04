@@ -685,6 +685,17 @@ function utils.setRandomSeed(v)
     end
 end
 
+function utils.distanceSquared(x1, y1, x2, y2)
+    local deltaX = x1 - x2
+    local deltaY = y1 - y2
+
+    return deltaX * deltaX + deltaY * deltaY
+end
+
+function utils.distance(x1, y1, x2, y2)
+    return math.sqrt(utils.distance(x1, y1, x2, y2))
+end
+
 function utils.getSimpleCoordinateSeed(x, y)
     return math.abs(bit.lshift(x, math.ceil(utils.logn(2, math.abs(y) + 1)))) + math.abs(y)
 end
