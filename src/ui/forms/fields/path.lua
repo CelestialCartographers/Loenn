@@ -36,11 +36,8 @@ local function openFileDialog(textField, options)
     if relativeToMod ~= false then
         local modPath = mods.getFilenameModPath(loadedState.filename)
 
-        if not modPath then
-            return false
-        end
-
-        startingPath = modPath
+        -- Use current mod root if posible, otherwise use Celeste root
+        startingPath = modPath or startingPath
     end
 
     local function dialogCallback(filename)
