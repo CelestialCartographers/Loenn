@@ -95,16 +95,14 @@ function decals.getDrawable(texture, handler, room, decal, viewport)
     local scaleX = decal.scaleX or 1
     local scaleY = decal.scaleY or 1
 
+    local rotation = math.rad(decal.rotation or 0)
+
     if meta then
         local drawable = drawableSprite.fromTexture(texture, decal)
 
+        drawable.rotation = rotation
         drawable:setScale(scaleX, scaleY)
-        drawable:setJustification(0, 0)
-        drawable:setOffset(0, 0)
-        drawable:setPosition(
-            x - meta.offsetX * scaleX - math.floor(meta.realWidth / 2) * scaleX,
-            y - meta.offsetY * scaleY - math.floor(meta.realHeight / 2) * scaleY
-        )
+        drawable:setJustification(0.5, 0.5)
 
         return drawable
     end
@@ -201,7 +199,9 @@ function decals.getPlacements(layer)
                 y = 0,
 
                 scaleX = 1,
-                scaleY = 1
+                scaleY = 1,
+
+                rotation = 0
             }
         }
     end
@@ -242,7 +242,7 @@ function decals.ignoredFields(layer, decal)
 end
 
 function decals.fieldOrder(layer, decal)
-    return {"x", "y", "scaleX", "scaleY", "texture"}
+    return {"x", "y", "scaleX", "scaleY", "texture", "rotation"}
 end
 
 function decals.languageData(language, layer, decal)
