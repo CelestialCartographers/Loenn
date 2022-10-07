@@ -98,8 +98,15 @@ end
 
 local function prepareFormData(layer, item, language)
     local handler = layerHandlers.getHandler(layer)
+    local options = {}
 
-    return formUtils.prepareFormData(handler, item, {}, {layer, item})
+    -- Decals have a simpler path than the default for entities/trigger
+    if layer == "decalsFg" or layer == "decalsBg" then
+        options.namePath = {"attribute"}
+        options.tooltipPath = {"description"}
+    end
+
+    return formUtils.prepareFormData(handler, item, options, {layer, item})
 end
 
 function contextWindow.createContextMenu(selections)
