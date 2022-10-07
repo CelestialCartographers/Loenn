@@ -120,7 +120,7 @@ local function layerCallback(list, layer)
 
     if not sameLayer then
         toolWindow.eventStates.layer = layer
-        toolWindow.eventStates.searchTerm = ""
+        toolWindow.eventStates.searchTerm = nil
         toolWindow.eventStates.material = nil
 
         toolHandler.setLayer(layer)
