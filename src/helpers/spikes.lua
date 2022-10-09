@@ -19,9 +19,9 @@ local originalTriggerSpikeOffsets = {
 }
 
 local spikeOffsets = {
-    up = {0, 1},
-    down = {0, -1},
-    right = {-1, 0},
+    up = {-1, 1},
+    down = {-1, -1},
+    right = {-1, -1},
     left = {1, -1}
 }
 

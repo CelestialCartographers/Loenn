@@ -69,11 +69,13 @@ decals.attribute.y=Y
 decals.attribute.scaleX=Scale X
 decals.attribute.scaleY=Scale Y
 decals.attribute.texture=Texture
+decals.attribute.rotation=Rotation
 decals.description.x=X position of decal.
 decals.description.y=Y position of decal.
 decals.description.scaleX=Horizontal scale of decal.
 decals.description.scaleY=Vertical scale of decal.
-decals.description.texture=Texture path forof the decal.
+decals.description.texture=Texture path of the decal.
+decals.description.rotation=Rotation of the decal in degrees.
 
 
 # -- Entities --
@@ -1340,7 +1342,7 @@ style.parallax.description.speedx=Automatically moves the styleground along the 
 style.parallax.description.speedy=Automatically moves the styleground along the Y axis in-game.
 style.parallax.description.x=Determines the position of the styleground's appearance on screen in-game on the X axis.
 style.parallax.description.y=Determines the position of the styleground's appearance on screen in-game on the Y axis.
-style.parallax.description.blendmode=Determines whether the colours from overlaping stylegrounds should be added ontop of each other or multiplied.
+style.parallax.description.blendmode=Determines whether the colours from overlapping stylegrounds should be added on top of each other or multiplied.
 style.parallax.description.texture=The texture that the styleground should use.
 style.parallax.description.fadeIn=Determines whether the styleground should fade in when transitioning to it.
 style.parallax.description.flipx=Flips the styleground on the X axis.

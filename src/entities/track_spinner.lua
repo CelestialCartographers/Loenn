@@ -3,6 +3,8 @@ local enums = require("consts.celeste_enums")
 
 local trackSpinner = {}
 
+local dustEdgeColor = {1.0, 0.0, 0.0}
+
 local speeds = {
     slow = "Slow",
     normal = "Normal",
@@ -46,7 +48,7 @@ for typeName, typeAttributes in pairs(trackSpinnerTypes) do
 end
 
 function trackSpinner.sprite(room, entity)
-    local dust = entity.dust
+    local dust = entity.dust or true
     local star = entity.star
 
     if star then
@@ -56,11 +58,15 @@ function trackSpinner.sprite(room, entity)
 
     elseif dust then
         local dustBaseTexture = "danger/dustcreature/base00"
-        local dustCenterTexture = "danger/dustcreature/center00"
+        local dustBaseOutlineTexture = "dust_creature_outlines/base00"
+        local dustBaseSprite = drawableSpriteStruct.fromTexture(dustBaseTexture, entity)
+        local dustBaseOutlineSprite = drawableSpriteStruct.fromInternalTexture(dustBaseOutlineTexture, entity)
+
+        dustBaseOutlineSprite:setColor(dustEdgeColor)
 
         return {
-            drawableSpriteStruct.fromTexture(dustBaseTexture, entity),
-            drawableSpriteStruct.fromTexture(dustCenterTexture, entity),
+            dustBaseOutlineSprite,
+            dustBaseSprite
         }
 
     else

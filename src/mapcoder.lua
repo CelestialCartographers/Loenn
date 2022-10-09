@@ -216,7 +216,9 @@ function mapcoder.encodeTable(writer, data, lookup)
 
     for attr, value in pairs(data) do
         if attr ~= "__children" and attr ~= "__name" then
-            attributes[attr] = value
+            table.insert(attributes, attr)
+            table.insert(attributes, value)
+
             attributeCount += 1
         end
     end
@@ -224,7 +226,9 @@ function mapcoder.encodeTable(writer, data, lookup)
     writer:writeShort(index - 1)
     writer:writeByte(attributeCount)
 
-    for attr, value in pairs(attributes) do
+    for i = 1, #attributes, 2 do
+        local attr = attributes[i]
+        local value = attributes[i + 1]
         local attrIndex = findInLookup(lookup, attr)
 
         writer:writeShort(attrIndex - 1)

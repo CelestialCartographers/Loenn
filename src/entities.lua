@@ -1009,11 +1009,15 @@ function entities.fieldOrder(layer, entity)
     else
         local fields = {"x", "y"}
 
-        if entity.width ~= nil then
+        local ignoredFields = entities.ignoredFields(layer, entity)
+        local ignoredLookup = table.flip(ignoredFields)
+
+        -- Automatically add width/height if it exists and is not explicitly ignored
+        if entity.width ~= nil and not ignoredLookup.width then
             table.insert(fields, "width")
         end
 
-        if entity.height ~= nil then
+        if entity.height ~= nil and not ignoredLookup.height then
             table.insert(fields, "height")
         end
 

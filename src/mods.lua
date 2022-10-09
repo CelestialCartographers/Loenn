@@ -104,6 +104,10 @@ function modHandler.mountable(path)
 end
 
 function modHandler.getFilenameModName(filename)
+    if not filename then
+        return
+    end
+
     local celesteDir = fileLocations.getCelesteDir()
     local parts = utils.splitpath(filename)
 

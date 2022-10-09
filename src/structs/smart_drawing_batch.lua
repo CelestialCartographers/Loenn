@@ -535,7 +535,7 @@ function gridCanvasBatchMt.__index:release()
 end
 
 -- Works like the matrix drawing batch, but assumes that a "cell" can be replaced by painting over its space and then drawn again
--- Does not work when the grid items can cause overlaping
+-- Does not work when the grid items can cause overlapping
 -- ignoreSettingSameValue doesn't cause redraws when the value seemingly hasn't changed
 function smartDrawingBatch.createGridCanvasBatch(default, width, height, cellWidth, cellHeight, ignoreSettingSameValue)
     local res = {

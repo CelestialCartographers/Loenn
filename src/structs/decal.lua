@@ -23,6 +23,8 @@ function decalStruct.decode(data)
     decal.scaleX = data.scaleX or 0
     decal.scaleY = data.scaleY or 0
 
+    decal.rotation = data.rotation or 0
+
     return decal
 end
 
@@ -36,6 +38,10 @@ function decalStruct.encode(decal)
 
     res.x = decal.x
     res.y = decal.y
+
+    if decal.rotation ~= 0 then
+        res.rotation = decal.rotation
+    end
 
     res.texture = decalStruct.encodeDecalTexture(decal.texture)
 

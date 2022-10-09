@@ -369,6 +369,7 @@ celesteEnums.intro_types = {
     "WakeUp",
     "Fall",
     "TempleMirrorVoid",
+    "ThinkForABit",
     "None"
 }
 
