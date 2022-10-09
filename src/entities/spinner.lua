@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 local utils = require("utils")
 
 local spinnerConnectionDistanceSquared = 24 * 24
+local dustEdgeColor = {1.0, 0.0, 0.0}
 
 local defaultSpinnerColor = "blue"
 local unknownSpinnerColor = "blue"
@@ -125,12 +126,21 @@ function spinner.sprite(room, entity)
     local dusty = entity.dust
 
     if dusty then
-        local textureBase = "danger/dustcreature/base00"
-        local textureCenter = "danger/dustcreature/center00"
+        local position = {
+            x = entity.x,
+            y = entity.y
+        }
+
+        local baseTexture = "danger/dustcreature/base00"
+        local baseOutlineTexture = "dust_creature_outlines/base00"
+        local baseSprite = drawableSpriteStruct.fromTexture(baseTexture, position)
+        local baseOutlineSprite = drawableSpriteStruct.fromInternalTexture(baseOutlineTexture, entity)
+
+        baseOutlineSprite:setColor(dustEdgeColor)
 
         return {
-            drawableSpriteStruct.fromTexture(textureBase, entity),
-            drawableSpriteStruct.fromTexture(textureCenter, entity)
+            baseOutlineSprite,
+            baseSprite
         }
 
     else
