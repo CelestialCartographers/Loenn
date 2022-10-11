@@ -19,17 +19,17 @@ local originalTriggerSpikeOffsets = {
 }
 
 local spikeOffsets = {
-    up = {-1, 1},
-    down = {-1, -1},
-    right = {-1, -1},
-    left = {1, -1}
+    up = {4, 1},
+    down = {4, -1},
+    right = {-1, 4},
+    left = {1, 4}
 }
 
 local spikeJustifications = {
-    up = {0.0, 1.0},
-    down = {0.0, 0.0},
-    right = {0.0, 0.0},
-    left = {1.0, 0.0}
+    up = {0.5, 1.0},
+    down = {0.5, 0.0},
+    right = {0.0, 0.5},
+    left = {1.0, 0.5}
 }
 
 local tentacleRotations = {
