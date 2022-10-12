@@ -2,6 +2,9 @@ local drawableSpriteStruct = require("structs.drawable_sprite")
 
 local rotateSpinner = {}
 
+local nodeAlpha = 0.3
+local dustEdgeColor = {1.0, 0.0, 0.0}
+
 local speeds = {
     slow = "Slow",
     normal = "Normal",
@@ -51,10 +54,14 @@ local function getSprite(room, entity, alpha)
 
     elseif dust then
         local dustBaseTexture = "danger/dustcreature/base00"
-        local dustCenterTexture = "danger/dustcreature/center00"
+        local dustBaseOutlineTexture = "dust_creature_outlines/base00"
+        local dustBaseSprite = drawableSpriteStruct.fromTexture(dustBaseTexture, entity)
+        local dustBaseOutlineSprite = drawableSpriteStruct.fromInternalTexture(dustBaseOutlineTexture, entity)
 
-        table.insert(sprites, drawableSpriteStruct.fromTexture(dustBaseTexture, entity))
-        table.insert(sprites, drawableSpriteStruct.fromTexture(dustCenterTexture, entity))
+        dustBaseOutlineSprite:setColor(dustEdgeColor)
+
+        table.insert(sprites, dustBaseOutlineSprite)
+        table.insert(sprites, dustBaseSprite)
 
     else
         local bladeTexture = "danger/blade00"
@@ -64,7 +71,7 @@ local function getSprite(room, entity, alpha)
 
     if alpha then
         for _, sprite in ipairs(sprites) do
-            sprite:setColor({1.0, 1.0, 1.0, alpha})
+            sprite:setAlpha(alpha)
         end
     end
 
@@ -81,7 +88,7 @@ function rotateSpinner.nodeSprite(room, entity, node)
     entityCopy.x = node.x
     entityCopy.y = node.y
 
-    return getSprite(room, entityCopy, 0.3)
+    return getSprite(room, entityCopy, nodeAlpha)
 end
 
 return rotateSpinner

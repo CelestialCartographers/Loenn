@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 
 local trackSpinner = {}
 
+local nodeAlpha = 0.3
 local dustEdgeColor = {1.0, 0.0, 0.0}
 
 local speeds = {
@@ -47,14 +48,16 @@ for typeName, typeAttributes in pairs(trackSpinnerTypes) do
     end
 end
 
-function trackSpinner.sprite(room, entity)
-    local dust = entity.dust or true
+function getSprite(room, entity, alpha)
+    local sprites = {}
+
+    local dust = entity.dust
     local star = entity.star
 
     if star then
         local starfishTexture = "danger/starfish13"
 
-        return drawableSpriteStruct.fromTexture(starfishTexture, entity)
+        table.insert(sprites, drawableSpriteStruct.fromTexture(starfishTexture, entity))
 
     elseif dust then
         local dustBaseTexture = "danger/dustcreature/base00"
@@ -64,16 +67,35 @@ function trackSpinner.sprite(room, entity)
 
         dustBaseOutlineSprite:setColor(dustEdgeColor)
 
-        return {
-            dustBaseOutlineSprite,
-            dustBaseSprite
-        }
+        table.insert(sprites, dustBaseOutlineSprite)
+        table.insert(sprites, dustBaseSprite)
 
     else
         local bladeTexture = "danger/blade00"
 
-        return drawableSpriteStruct.fromTexture(bladeTexture, entity)
+        table.insert(sprites, drawableSpriteStruct.fromTexture(bladeTexture, entity))
     end
+
+    if alpha then
+        for _, sprite in ipairs(sprites) do
+            sprite:setAlpha(alpha)
+        end
+    end
+
+    return sprites
+end
+
+function trackSpinner.sprite(room, entity)
+    return getSprite(room, entity)
+end
+
+function trackSpinner.nodeSprite(room, entity, node)
+    local entityCopy = table.shallowcopy(entity)
+
+    entityCopy.x = node.x
+    entityCopy.y = node.y
+
+    return getSprite(room, entityCopy, nodeAlpha)
 end
 
 return trackSpinner
