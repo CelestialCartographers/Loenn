@@ -110,6 +110,13 @@ local function updatePoints()
     end
 end
 
+local function resetDrag()
+    startX, startY = nil, nil
+    dragX, dragY = nil, nil
+    points = {}
+    pointsConnectedLines = nil
+end
+
 function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
     local room = state.getSelectedRoom()
@@ -154,11 +161,20 @@ function tool.mousereleased(x, y, button)
     if button == actionButton then
         handleDragFinished()
         brushToolUtils.stopTileSnapshot(tool)
+        resetDrag()
+    end
+end
 
-        startX, startY = nil, nil
-        dragX, dragY = nil, nil
-        points = {}
-        pointsConnectedLines = nil
+function tool.editorMapTargetChanged()
+    resetDrag()
+
+    local room = state.getSelectedRoom()
+
+    if room then
+        local px, py = viewportHandler.getRoomCoordinates(room)
+        local tx, ty = viewportHandler.pixelToTileCoordinates(px, py)
+
+        lastMouseX, lastMouseY = tx, ty
     end
 end
 
