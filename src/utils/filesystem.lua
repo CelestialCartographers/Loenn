@@ -246,13 +246,13 @@ end
 function filesystem.isFile(path)
     local attrs = lfs.attributes(path)
 
-    return attrs and attrs.mode == "file"
+    return attrs and attrs.mode == "file" or false
 end
 
 function filesystem.isDirectory(path)
     local attrs = lfs.attributes(path)
 
-    return attrs and attrs.mode == "directory"
+    return attrs and attrs.mode == "directory" or false
 end
 
 function filesystem.mtime(path)
