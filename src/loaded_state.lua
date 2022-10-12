@@ -89,6 +89,7 @@ function state.defaultSaveCallback(filename)
     history.madeChanges = false
 end
 
+-- Check that the target file can be loaded again
 function state.verifyFile(filename, successCallback, errorCallback)
     tasks.newTask(
         (-> filename and mapcoder.decodeFile(filename)),
@@ -186,7 +187,7 @@ function state.saveFile(filename, callback, addExtIfMissing, verifyMap)
                         function(binTask)
                             if binTask.done and binTask.success then
                                 if verifyMap ~= false then
-                                    state.verifyFile(filename, function()
+                                    state.verifyFile(temporaryFilename, function()
                                         filesystem.remove(filename)
                                         filesystem.rename(temporaryFilename, filename)
 
