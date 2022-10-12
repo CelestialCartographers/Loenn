@@ -56,6 +56,13 @@ function drawableSpriteMt.__index:setColor(color)
     return setColor(self, color)
 end
 
+function drawableSpriteMt.__index:setAlpha(alpha)
+    local r, g, b = unpack(self.color or {})
+    local newColor = {r or 1, g or 1, b or 1, alpha}
+
+    return setColor(self, newColor)
+end
+
 -- TODO - Verify that scales are correct
 function drawableSpriteMt.__index:getRectangleRaw()
     local x = self.x

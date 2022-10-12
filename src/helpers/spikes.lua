@@ -12,10 +12,10 @@ local triggerSpikeTexture1 = "danger/triggertentacle/wiggle_v06"
 local triggerSpikeTexture2 = "danger/triggertentacle/wiggle_v03"
 
 local originalTriggerSpikeOffsets = {
-    up = {-1, 5},
-    down = {-1, -5},
-    right = {-5, -1},
-    left = {5, -1}
+    up = {4, 5},
+    down = {4, -5},
+    right = {-5, 4},
+    left = {5, 4}
 }
 
 local spikeOffsets = {

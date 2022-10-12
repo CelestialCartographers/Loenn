@@ -91,7 +91,7 @@ local function getSpinnerSprite(entity, foreground)
 end
 
 local function getConnectionSprites(room, entity)
-    -- TODO: This can create some overlaps, can be improved later
+    -- TODO - This can create some overlaps, can be improved later
 
     local sprites = {}
 
@@ -102,11 +102,12 @@ local function getConnectionSprites(room, entity)
 
         if entity._name == target._name and entity.attachToSolid == target.attachToSolid then
             if utils.distanceSquared(entity.x, entity.y, target.x, target.y) < spinnerConnectionDistanceSquared then
-                local connectorPosition = {
+                local connectorData = {
                     x = math.floor((entity.x + target.x) / 2),
                     y = math.floor((entity.y + target.y) / 2),
+                    color = entity.color
                 }
-                local sprite = getSpinnerSprite(connectorPosition, false)
+                local sprite = getSpinnerSprite(connectorData, false)
 
                 sprite.depth = -8499
 
