@@ -89,8 +89,15 @@ function state.defaultSaveCallback(filename)
     history.madeChanges = false
 end
 
+function state.defaultVerifyErrorCallback(filename)
+    sceneHandler.sendEvent("editorMapVerificationFailed", filename)
+
+    filesystem.remove(filename)
+end
+
 -- Check that the target file can be loaded again
 function state.verifyFile(filename, successCallback, errorCallback)
+    errorCallback = errorCallback or state.defaultVerifyErrorCallback
     tasks.newTask(
         (-> filename and mapcoder.decodeFile(filename)),
         function(binTask)
@@ -103,11 +110,7 @@ function state.verifyFile(filename, successCallback, errorCallback)
                 )
 
             else
-                sceneHandler.sendEvent("editorMapVerificationFailed", filename)
-
-                if errorCallback then
-                    errorCallback()
-                end
+                errorCallback(filename)
             end
         end
     )
