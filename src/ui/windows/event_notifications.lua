@@ -32,6 +32,12 @@ function notificationHandlers:editorMapSaveFailed(filename)
     notifications.notify(string.format(tostring(language.ui.notifications.editorMapSaveFailed), filename))
 end
 
+function notificationHandlers:editorMapVerificationFailed(filename)
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(string.format(tostring(language.ui.notifications.editorMapVerificationFailed), filename))
+end
+
 function notificationHandlers:editorMapLoaded(filename)
     local language = languageRegistry.getLanguage()
 

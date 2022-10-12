@@ -13,6 +13,7 @@ ui.button.quit=Quit
 # Notifications
 ui.notifications.editorMapSaved=Saved map: %s
 ui.notifications.editorMapSaveFailed=Failed to save map: %s
+ui.notifications.editorMapVerificationFailed=Failed to save map: %s
 ui.notifications.editorMapLoaded=Loaded map: %s
 ui.notifications.editorMapLoadFailed=Failed to load map: %s
 ui.notifications.editorMapNew=Created new map
