@@ -1,5 +1,8 @@
 local nodeStruct = {}
 
+nodeStruct.nodeType = "node"
+nodeStruct.nodesType = "nodes"
+
 function nodeStruct.decodeNodes(children)
     local res = {
         _type = "nodes"

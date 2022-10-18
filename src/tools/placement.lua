@@ -299,14 +299,14 @@ local function updatePlacementNodes()
         -- Make the nodes table the correct type, makes it less tedious in plugins
         if item.nodes then
             for _, node in ipairs(item.nodes) do
-                node.__type = nodeStruct.nodeTypeName
+                node._type = nodeStruct.nodeType
             end
 
         else
             item.nodes = nodeStruct.decodeNodes({})
         end
 
-        item.nodes.__type = nodeStruct.nodesTypeName
+        item.nodes._type = nodeStruct.nodesType
 
         -- Add nodes until placement has minimum amount of nodes
         while #item.nodes < minimumNodes do
@@ -314,6 +314,7 @@ local function updatePlacementNodes()
             local nodeOffset = (#item.nodes + 1) * 16
 
             local node = {
+                _type = nodeStruct.nodeType,
                 x = item.x + widthOffset + nodeOffset,
                 y = item.y
             }
