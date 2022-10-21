@@ -107,10 +107,13 @@ function backups.getMapBackups(map)
     if backupPath then
         -- utils.getFilenames only works on mounted paths
         for filename in lfs.dir(backupPath) do
+            -- Make sure the filename has the expected format
             if utils.fileExtension(filename) == "bin" then
-                local fullPath = utils.joinpath(backupPath, filename)
+                if string.match(filename, timestampPattern) then
+                    local fullPath = utils.joinpath(backupPath, filename)
 
-                table.insert(filenames, fullPath)
+                    table.insert(filenames, fullPath)
+                end
             end
         end
     end
