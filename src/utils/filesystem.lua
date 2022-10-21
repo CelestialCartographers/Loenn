@@ -207,8 +207,10 @@ local function findRecursive(filenames, path, recursive, predicate, useYields, c
 
         if fileInfo then
             if fileInfo.type == "file" then
-                if predicate and predicate(filename) then
-                    table.insert(filenames, fullPath)
+                if predicate then
+                    if predicate(filename) then
+                        table.insert(filenames, fullPath)
+                    end
 
                 else
                     table.insert(filenames, fullPath)
@@ -223,6 +225,8 @@ local function findRecursive(filenames, path, recursive, predicate, useYields, c
             end
         end
     end
+
+    return filenames
 end
 
 function filesystem.getFilenames(path, recursive, filenames, predicate, useYields)
