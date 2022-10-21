@@ -16,10 +16,7 @@ modHandler.everestYamlFilenames = {
 modHandler.specificModContentSymbol = "$"
 modHandler.specificModContent = "$%s$"
 modHandler.pluginFolderNames = {
-    fileLocations.loennSimpleFolderName,
-    fileLocations.loennWindowsFolderName,
-    fileLocations.loennLinuxFolderName,
-    fileLocations.loennZipFolderName
+    fileLocations.loennSimpleFolderName
 }
 
 modHandler.loadedMods = {}

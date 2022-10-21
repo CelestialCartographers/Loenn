@@ -7,9 +7,7 @@ local fileLocations = {}
 local sourceDirectory = love.filesystem.getSource()
 
 fileLocations.loennSimpleFolderName = "Loenn"
-fileLocations.loennWindowsFolderName = "L" .. string.char(246) .. "nn"
 fileLocations.loennLinuxFolderName = "Lönn"
-fileLocations.loennZipFolderName = "L" .. string.char(148) .. "nn"
 
 function fileLocations.getStorageDir()
     local userOS = utils.getOS()
