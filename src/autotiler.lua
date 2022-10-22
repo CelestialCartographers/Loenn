@@ -343,7 +343,7 @@ function autotiler.loadTilesetXML(filename)
         end
 
         if ignores then
-            tileset.ignores = table.flip($(ignores):split(";"))
+            tileset.ignores = table.flip($(ignores):split(","))
         end
 
         tilesetsMeta[id] = tileset
