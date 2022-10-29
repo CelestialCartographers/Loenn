@@ -73,6 +73,10 @@ function entities.registerEntity(filename, registerAt, verbose)
     local filenameNoExt = utils.filename(pathNoExt, "/")
 
     local handler = utils.rerequire(pathNoExt)
+    local modMetadata = modHandler.getModMetadataFromPath(filename)
+
+    handler._loadedFrom = filename
+    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
 
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
@@ -1065,6 +1069,21 @@ function entities.languageData(language, layer, entity)
 
     else
         return language.entities[name], language.entities.default
+    end
+end
+
+-- TODO - Use for placement name
+function entities.associatedMods(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler then
+        if handler.associatedMods then
+            return utils.callIfFunction(handler.associatedMods, entity)
+        end
+
+        -- Fallback to mod containing the plugin
+        return handler._loadedFromModName
     end
 end
 

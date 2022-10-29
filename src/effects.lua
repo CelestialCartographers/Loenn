@@ -53,6 +53,11 @@ function effects.registerEffect(filename, registerAt, verbose)
     local filenameNoExt = utils.filename(pathNoExt, "/")
 
     local handler = utils.rerequire(pathNoExt)
+    local modMetadata = modHandler.getModMetadataFromPath(filename)
+
+    handler._loadedFrom = filename
+    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
+
 
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
@@ -163,6 +168,21 @@ function effects.displayName(language, style)
     end
 
     return displayName
+end
+
+-- TODO - Use for placement name
+function effects.associatedMods(effect)
+    local name = effect._name
+    local handler = effects.registeredEffects[name]
+
+    if handler then
+        if handler.associatedMods then
+            return utils.callIfFunction(handler.associatedMods, effect)
+        end
+
+        -- Fallback to mod containing the plugin
+        return handler._loadedFromModName
+    end
 end
 
 effects.initDefaultRegistry()
