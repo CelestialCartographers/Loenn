@@ -796,14 +796,6 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         tooltipText = tostring(tooltipTextLanguage)
     end
 
-    if modPrefix then
-        local modPrefixLanguage = language.mods[modPrefix].name
-
-        if modPrefixLanguage._exists then
-            displayName = string.format("%s [%s]", displayName, modPrefixLanguage)
-        end
-    end
-
     local itemTemplate = {
         _name = name,
         _id = 0
@@ -823,6 +815,13 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
 
     itemTemplate.x = itemTemplate.x or 0
     itemTemplate.y = itemTemplate.y or 0
+
+    local associatedMods = entities.associatedMods(itemTemplate)
+    local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
+
+    if modsString then
+        displayName = string.format("%s %s", displayName, modsString)
+    end
 
     local placement = {
         name = simpleName,
@@ -1072,8 +1071,7 @@ function entities.languageData(language, layer, entity)
     end
 end
 
--- TODO - Use for placement name
-function entities.associatedMods(layer, entity)
+function entities.associatedMods(entity, layer)
     local name = entity._name
     local handler = entities.registeredEntities[name]
 

@@ -407,14 +407,6 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         tooltipText = tostring(tooltipTextLanguage)
     end
 
-    if modPrefix then
-        local modPrefixLanguage = language.mods[modPrefix].name
-
-        if modPrefixLanguage._exists then
-            displayName = string.format("%s [%s]", displayName, modPrefixLanguage)
-        end
-    end
-
     local itemTemplate = {
         _name = name,
         _id = 0
@@ -437,6 +429,13 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
 
     itemTemplate.width = itemTemplate.width or 16
     itemTemplate.height = itemTemplate.height or 16
+
+    local associatedMods = triggers.associatedMods(itemTemplate)
+    local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
+
+    if modsString then
+        displayName = string.format("%s %s", displayName, modsString)
+    end
 
     local placement = {
         name = simpleName,
@@ -631,14 +630,13 @@ function triggers.languageData(language, layer, entity)
     end
 end
 
--- TODO - Use for placement name
-function triggers.associatedMods(layer, entity)
-    local name = entity._name
+function triggers.associatedMods(trigger, layer)
+    local name = trigger._name
     local handler = triggers.registeredTriggers[name]
 
     if handler then
         if handler.associatedMods then
-            return utils.callIfFunction(handler.associatedMods, entity)
+            return utils.callIfFunction(handler.associatedMods, trigger)
         end
 
         -- Fallback to mod containing the plugin

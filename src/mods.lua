@@ -25,6 +25,9 @@ modHandler.modMetadata = {}
 modHandler.modSettings = {}
 modHandler.modPersistence = {}
 
+modHandler.modNamesFormat = "[%s]"
+modHandler.modNamesSeparator = " + "
+
 modHandler.persistenceBufferTime = 300
 
 -- Finds files in all folders that are recognized as plugin folders
@@ -429,6 +432,37 @@ function modHandler.getModNamesFromMetadata(metadata)
                 end
             end
         end
+    end
+end
+
+function modHandler.formatAssociatedMods(language, modNames, modPrefix)
+    local displayNames = {}
+
+    -- TODO - Should this be deprecated later?
+    if modPrefix then
+        local modPrefixLanguage = language.mods[modPrefix].name
+
+        if modPrefixLanguage._exists then
+            displayNames[tostring(modPrefixLanguage)] = true
+        end
+    end
+
+    for _, modName in ipairs(modNames or {}) do
+        local modNameLanguage = language.mods[modName].name
+
+        if modNameLanguage._exists then
+            displayNames[tostring(modNameLanguage)] = true
+        end
+    end
+
+    displayNames = table.keys(displayNames)
+
+    if #displayNames > 0 then
+        table.sort(displayNames)
+
+        local joinedNames = table.concat(displayNames, modHandler.modNamesSeparator)
+
+        return string.format(modHandler.modNamesFormat, joinedNames)
     end
 end
 

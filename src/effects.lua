@@ -159,18 +159,16 @@ function effects.displayName(language, style)
         displayName = tostring(displayNameLanguage)
     end
 
-    if modPrefix then
-        local modPrefixLanguage = language.mods[modPrefix].name
+    local associatedMods = effects.associatedMods(style)
+    local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
 
-        if modPrefixLanguage._exists then
-            displayName = string.format("%s [%s]", displayName, modPrefixLanguage)
-        end
+    if modsString then
+        displayName = string.format("%s %s", displayName, modsString)
     end
 
     return displayName
 end
 
--- TODO - Use for placement name
 function effects.associatedMods(effect)
     local name = effect._name
     local handler = effects.registeredEffects[name]
