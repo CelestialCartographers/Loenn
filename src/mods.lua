@@ -382,12 +382,52 @@ function modHandler.mountMods(directory, force)
     end
 end
 
-function modHandler.getModForPath(path)
-    local mountPoint = love.filesystem.getRealDirectory(modHandler.commonModContent .. "/" .. path)
+function modHandler.getModMetadataFromPath(path)
+    if not path then
+        return
+    end
 
-    for modFolder, metadata in pairs(modHandler.modMetadata) do
-        if metadata._path == mountPoint then
-            return metadata
+    if utils.startsWith(path, modHandler.specificModContentSymbol) then
+        local parts = utils.splitpath(path, "/")
+        local firstPart = parts[1]
+
+        for modFolder, metadata in pairs(modHandler.modMetadata) do
+            if metadata._mountPoint == firstPart then
+                return metadata
+            end
+        end
+
+    elseif utils.startsWith(path, modHandler.commonModContent) then
+        local realFilename = love.filesystem.getRealDirectory(path)
+
+        for modFolder, metadata in pairs(modHandler.modMetadata) do
+            if utils.samePath(metadata._path, realFilename) then
+                return metadata
+            end
+        end
+
+    else
+        for modFolder, metadata in pairs(modHandler.modMetadata) do
+            if metadata._path == path or metadata._folderName == path then
+                return metadata
+            end
+        end
+    end
+end
+
+function modHandler.getModNamesFromMetadata(metadata)
+    if metadata then
+        if #metadata == 1 then
+            return {metadata[1].Name}
+
+        else
+            local names = {}
+
+            for _, metadata in ipairs(metadata) do
+                if metadata.Name then
+                    table.insert(names, metadata.Name)
+                end
+            end
         end
     end
 end
