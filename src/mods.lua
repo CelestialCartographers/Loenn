@@ -403,6 +403,10 @@ function modHandler.getModMetadataFromPath(path)
     elseif utils.startsWith(path, modHandler.commonModContent) then
         local realFilename = love.filesystem.getRealDirectory(path)
 
+        if not realFilename then
+            return
+        end
+
         for modFolder, metadata in pairs(modHandler.modMetadata) do
             if utils.samePath(metadata._path, realFilename) then
                 return metadata
