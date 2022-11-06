@@ -5,6 +5,7 @@ local libraries = require("libraries")
 local celesteRender = require("celeste_render")
 local toolHandler = require("tools")
 local sceneHandler = require("scene_handler")
+local saveSanitizers = require("save_sanitizers")
 local languageRegistry = require("language_registry")
 local modHandler = require("mods")
 local tasks = require("utils.tasks")
@@ -91,12 +92,21 @@ function debugUtils.reloadLanguageFiles()
 end
 
 function debugUtils.reloadLibraries()
-    logging.info("Reloading Libraries")
+    logging.info("Reloading libraries")
 
     libraries.initDefaultRegistry()
 
     libraries.loadInternalLibraries()
     libraries.loadExternalLibraries()
+end
+
+function debugUtils.reloadSaveSanitizers()
+    logging.info("Reloading save sanitizers")
+
+    saveSanitizers.initDefaultRegistry()
+
+    saveSanitizers.loadInternalSanitizers()
+    saveSanitizers.loadExternalSanitizers()
 end
 
 function debugUtils.reloadUI()
@@ -117,6 +127,7 @@ function debugUtils.reloadEverything()
 
     debugUtils.reloadLanguageFiles()
     debugUtils.reloadLibraries()
+    debugUtils.reloadSaveSanitizers()
     debugUtils.reloadMods()
     debugUtils.reloadEntities()
     debugUtils.reloadTriggers()
