@@ -1,4 +1,5 @@
 local drawableSprite = require("structs.drawable_sprite")
+local celesteEnums = require("consts.celeste_enums")
 local utils = require("utils")
 
 local templeGate = {}
@@ -19,14 +20,10 @@ local textures = {
 }
 
 local textureOptions = {}
-local typeOptions = {}
+local typeOptions = celesteEnums.temple_gate_modes
 
 for texture, _ in pairs(textures) do
     textureOptions[utils.titleCase(texture)] = texture
-end
-
-for _, preset in pairs(placementPresets) do
-    typeOptions[preset[2]] = preset[2]
 end
 
 templeGate.name = "templeGate"

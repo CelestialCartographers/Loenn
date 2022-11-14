@@ -14,13 +14,11 @@ end
 local dashSwitchHorizontal = {}
 
 dashSwitchHorizontal.name = "dashSwitchH"
-dashSwitchHorizontal.texture = "objects/temple/dashButton00"
 dashSwitchHorizontal.depth = 0
 dashSwitchHorizontal.justification = {0.5, 0.5}
 dashSwitchHorizontal.fieldInformation = {
     sprite = {
-        options = textureOptions,
-        editable = false
+        options = textureOptions
     }
 }
 dashSwitchHorizontal.placements = {}
@@ -45,13 +43,11 @@ end
 local dashSwitchVertical = {}
 
 dashSwitchVertical.name = "dashSwitchV"
-dashSwitchVertical.texture = "objects/temple/dashButton00"
 dashSwitchVertical.depth = 0
 dashSwitchVertical.justification = {0.5, 0.5}
 dashSwitchVertical.fieldInformation = {
     sprite = {
-        options = textureOptions,
-        editable = false
+        options = textureOptions
     }
 }
 dashSwitchVertical.placements = {}
