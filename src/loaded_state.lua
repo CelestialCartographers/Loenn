@@ -188,7 +188,13 @@ function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtI
         if beforeSaveCallback ~= false then
             beforeSaveCallback = beforeSaveCallback or state.defaultBeforeSaveCallback
 
-            beforeSaveCallback(filename, state)
+            local callbackResult = beforeSaveCallback(filename, state)
+
+            if not callbackResult then
+                sceneHandler.sendEvent("editorMapSaveInterrupted", filename)
+
+                return false
+            end
         end
 
         local temporaryFilename = state.getTemporaryFilename(filename)

@@ -75,11 +75,11 @@ local function safeHandlerCall(functionName, ...)
 end
 
 function sanitizers.beforeSave(filename, state)
-    safeHandlerCall("beforeSave", filename, state)
+    return safeHandlerCall("beforeSave", filename, state)
 end
 
 function sanitizers.afterSave(filename, state)
-    safeHandlerCall("afterSave", filename, state)
+    return safeHandlerCall("afterSave", filename, state)
 end
 
 return sanitizers
