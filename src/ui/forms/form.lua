@@ -86,8 +86,9 @@ function forms.getFormFields(data, options)
 
     for _, name in ipairs(fieldOrder) do
         local nameParts = forms.getNameParts(name, options)
-        local value = utils.getPath(data, nameParts)
         local fieldOptions = forms.getFieldOptions(name, options)
+        local defaultValue = fieldOptions.default
+        local value = utils.getPath(data, nameParts, defaultValue)
         local element = forms.getFieldElement(name, value, fieldOptions)
 
         ignored[name] = true

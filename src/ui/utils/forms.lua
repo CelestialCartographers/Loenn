@@ -73,9 +73,10 @@ function formUtils.prepareFormData(handler, data, options, handlerArguments)
     local fallbackNames = utils.getPath(fallbackLanguage, namePath)
 
     for _, field in ipairs(fieldOrder) do
+        local fieldInfo = fieldInformation[field]
         local value = data[field]
 
-        if value ~= nil or fieldInformation.options then
+        if value ~= nil or fieldInfo then
             local humanizedName = utils.humanizeVariableName(field)
             local displayName = getLanguageKey(field, languageNames, getLanguageKey(field, fallbackNames, humanizedName))
             local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
