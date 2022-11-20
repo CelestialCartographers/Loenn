@@ -8,6 +8,10 @@ local drawableSpriteMt = {}
 drawableSpriteMt.__index = {}
 
 function drawableSpriteMt.__index:setJustification(justificationX, justificationY)
+    if type(justificationX) == "table" then
+        justificationX, justificationY = justificationX[1], justificationX[2]
+    end
+
     self.justificationX = justificationX
     self.justificationY = justificationY
 
@@ -15,6 +19,10 @@ function drawableSpriteMt.__index:setJustification(justificationX, justification
 end
 
 function drawableSpriteMt.__index:setPosition(x, y)
+    if type(x) == "table" then
+        x, y = x[1] or x.x, x[2] or x.y
+    end
+
     self.x = x
     self.y = y
 
@@ -22,6 +30,10 @@ function drawableSpriteMt.__index:setPosition(x, y)
 end
 
 function drawableSpriteMt.__index:addPosition(x, y)
+    if type(x) == "table" then
+        x, y = x[1] or x.x, x[2] or x.y
+    end
+
     self.x += x
     self.y += y
 
@@ -29,6 +41,10 @@ function drawableSpriteMt.__index:addPosition(x, y)
 end
 
 function drawableSpriteMt.__index:setScale(scaleX, scaleY)
+    if type(scaleX) == "table" then
+        scaleX, scaleY = scaleX[1], scaleX[2]
+    end
+
     self.scaleX = scaleX
     self.scaleY = scaleY
 
@@ -36,6 +52,10 @@ function drawableSpriteMt.__index:setScale(scaleX, scaleY)
 end
 
 function drawableSpriteMt.__index:setOffset(offsetX, offsetY)
+    if type(offsetX) == "table" then
+        offsetX, offsetY = offsetX[1], offsetX[2]
+    end
+
     self.offsetX = offsetX
     self.offsetY = offsetY
 
