@@ -100,7 +100,7 @@ local function getConnectionSprites(room, entity)
             break
         end
 
-        if entity._name == target._name and entity.attachToSolid == target.attachToSolid then
+        if entity._name == target._name and not target.dust and entity.attachToSolid == target.attachToSolid then
             if utils.distanceSquared(entity.x, entity.y, target.x, target.y) < spinnerConnectionDistanceSquared then
                 local connectorData = {
                     x = math.floor((entity.x + target.x) / 2),
