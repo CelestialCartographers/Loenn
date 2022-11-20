@@ -104,7 +104,7 @@ local function addAutomaticDrawableFields(handler, drawable, room, entity, isNod
     local depthKey = isNode and "nodeDepth" or "depth"
 
     if handler[justificationKey] then
-        if type(handler[justificationKey]) == "function" then
+        if utils.isCallable(handler[justificationKey]) then
             drawable:setJustification(handler[justificationKey](room, entity))
 
         else
@@ -113,7 +113,7 @@ local function addAutomaticDrawableFields(handler, drawable, room, entity, isNod
     end
 
     if handler[scaleKey] then
-        if type(handler[scaleKey]) == "function" then
+        if utils.isCallable(handler[scaleKey]) then
             drawable:setScale(handler[scaleKey](room, entity))
 
         else
@@ -122,7 +122,7 @@ local function addAutomaticDrawableFields(handler, drawable, room, entity, isNod
     end
 
     if handler[offsetKey] then
-        if type(handler[offsetKey]) == "function" then
+        if utils.isCallable(handler[offsetKey]) then
             drawable:setOffset(handler[offsetKey](room, entity))
 
         else
@@ -905,7 +905,7 @@ function entities.canResize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.canResize then
-        if type(handler.canResize) == "function" then
+        if utils.isCallable(handler.canResize) then
             return handler.canResize(room, entity)
 
         else
@@ -922,7 +922,7 @@ function entities.minimumSize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.minimumSize then
-        if type(handler.minimumSize) == "function" then
+        if utils.isCallable(handler.minimumSize) then
             return handler.minimumSize(room, entity)
 
         else
@@ -938,7 +938,7 @@ function entities.maximumSize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.maximumSize then
-        if type(handler.maximumSize) == "function" then
+        if utils.isCallable(handler.maximumSize) then
             return handler.maximumSize(room, entity)
 
         else
@@ -954,7 +954,7 @@ function entities.nodeLimits(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler and handler.nodeLimits then
-        if type(handler.nodeLimits) == "function" then
+        if utils.isCallable(handler.nodeLimits) then
             return handler.nodeLimits(room, entity)
 
         else

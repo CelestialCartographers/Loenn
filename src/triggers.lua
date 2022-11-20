@@ -527,7 +527,7 @@ function triggers.nodeLimits(room, layer, trigger)
     local handler = triggers.registeredTriggers[name]
 
     if handler and handler.nodeLimits then
-        if type(handler.nodeLimits) == "function" then
+        if utils.isCallable(handler.nodeLimits) then
             return handler.nodeLimits(room, trigger)
 
         else
