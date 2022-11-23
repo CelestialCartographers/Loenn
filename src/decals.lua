@@ -259,10 +259,7 @@ function decals.associatedMods(decal, layer)
             return
         end
 
-        local filename = sprite.filename
-        local modMetadata = mods.getModMetadataFromPath(filename)
-
-        return mods.getModNamesFromMetadata(modMetadata)
+        return sprite.associatedMods
     end
 end
 
