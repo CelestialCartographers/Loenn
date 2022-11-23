@@ -395,7 +395,7 @@ function modHandler.getModMetadataFromPath(path)
         local firstPart = parts[1]
 
         for modFolder, metadata in pairs(modHandler.modMetadata) do
-            if metadata._mountPoint == firstPart then
+            if utils.samePath(metadata._mountPoint, firstPart) then
                 return metadata
             end
         end
@@ -415,7 +415,7 @@ function modHandler.getModMetadataFromPath(path)
 
     else
         for modFolder, metadata in pairs(modHandler.modMetadata) do
-            if metadata._path == path or metadata._folderName == path then
+            if utils.samePath(metadata._path, path) or utils.samePath(metadata._folderName, path) then
                 return metadata
             end
         end
