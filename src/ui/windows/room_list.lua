@@ -142,6 +142,12 @@ function roomList:editorRoomAdded()
     end
 end
 
+function roomList:editorRoomOrderChanged()
+    return function()
+        updateList(self)
+    end
+end
+
 function roomList:uiRoomWindowRoomChanged()
     return function(list, room)
         updateList(self, room.name)
