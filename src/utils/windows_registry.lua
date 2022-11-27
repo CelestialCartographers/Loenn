@@ -21,9 +21,13 @@ end
 -- Does not validate that the key exists or not
 function registry.getKey(key)
     local cmd = string.format([[reg.exe query "%s" /z 2>NUL]], key)
-    local rawResult = io.popen(cmd):read("*all")
+    local process = io.popen(cmd)
 
-    return registry.parseResult(rawResult)
+    if process then
+        local rawResult = process:read("*all")
+
+        return registry.parseResult(rawResult)
+    end
 end
 
 return registry
