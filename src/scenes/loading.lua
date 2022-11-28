@@ -42,6 +42,7 @@ function loadingScene:firstEnter()
     local triggers = require("triggers")
     local effects = require("effects")
     local libraries = require("libraries")
+    local saveSanitizers = require("save_sanitizers")
 
     local atlases = require("atlases")
 
@@ -86,6 +87,9 @@ function loadingScene:firstEnter()
 
             toolHandler.loadInternalTools()
             toolHandler.loadExternalTools()
+
+            saveSanitizers.loadInternalSanitizers()
+            saveSanitizers.loadExternalSanitizers()
 
             if userInterfaceDevice.initializeDevice then
                 userInterfaceDevice.initializeDevice()

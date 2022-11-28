@@ -16,10 +16,7 @@ modHandler.everestYamlFilenames = {
 modHandler.specificModContentSymbol = "$"
 modHandler.specificModContent = "$%s$"
 modHandler.pluginFolderNames = {
-    fileLocations.loennSimpleFolderName,
-    fileLocations.loennWindowsFolderName,
-    fileLocations.loennLinuxFolderName,
-    fileLocations.loennZipFolderName
+    fileLocations.loennSimpleFolderName
 }
 
 modHandler.loadedMods = {}
@@ -27,6 +24,9 @@ modHandler.knownPluginRequires = {}
 modHandler.modMetadata = {}
 modHandler.modSettings = {}
 modHandler.modPersistence = {}
+
+modHandler.modNamesFormat = "[%s]"
+modHandler.modNamesSeparator = " + "
 
 modHandler.persistenceBufferTime = 300
 
@@ -385,13 +385,88 @@ function modHandler.mountMods(directory, force)
     end
 end
 
-function modHandler.getModForPath(path)
-    local mountPoint = love.filesystem.getRealDirectory(modHandler.commonModContent .. "/" .. path)
+function modHandler.getModMetadataFromPath(path)
+    if not path then
+        return
+    end
 
-    for modFolder, metadata in pairs(modHandler.modMetadata) do
-        if metadata._path == mountPoint then
-            return metadata
+    if utils.startsWith(path, modHandler.specificModContentSymbol) then
+        local parts = utils.splitpath(path, "/")
+        local firstPart = parts[1]
+
+        for modFolder, metadata in pairs(modHandler.modMetadata) do
+            if utils.samePath(metadata._mountPoint, firstPart) then
+                return metadata
+            end
         end
+
+    elseif utils.startsWith(path, modHandler.commonModContent) then
+        local realFilename = love.filesystem.getRealDirectory(path)
+
+        if not realFilename then
+            return
+        end
+
+        for modFolder, metadata in pairs(modHandler.modMetadata) do
+            if utils.samePath(metadata._path, realFilename) then
+                return metadata
+            end
+        end
+
+    else
+        for modFolder, metadata in pairs(modHandler.modMetadata) do
+            if utils.samePath(metadata._path, path) or utils.samePath(metadata._folderName, path) then
+                return metadata
+            end
+        end
+    end
+end
+
+function modHandler.getModNamesFromMetadata(metadata)
+    if metadata then
+        if #metadata == 1 then
+            return {metadata[1].Name}
+
+        else
+            local names = {}
+
+            for _, metadata in ipairs(metadata) do
+                if metadata.Name then
+                    table.insert(names, metadata.Name)
+                end
+            end
+        end
+    end
+end
+
+function modHandler.formatAssociatedMods(language, modNames, modPrefix)
+    local displayNames = {}
+
+    -- TODO - Should this be deprecated later?
+    if modPrefix then
+        local modPrefixLanguage = language.mods[modPrefix].name
+
+        if modPrefixLanguage._exists then
+            displayNames[tostring(modPrefixLanguage)] = true
+        end
+    end
+
+    for _, modName in ipairs(modNames or {}) do
+        local modNameLanguage = language.mods[modName].name
+
+        if modNameLanguage._exists then
+            displayNames[tostring(modNameLanguage)] = true
+        end
+    end
+
+    displayNames = table.keys(displayNames)
+
+    if #displayNames > 0 then
+        table.sort(displayNames)
+
+        local joinedNames = table.concat(displayNames, modHandler.modNamesSeparator)
+
+        return string.format(modHandler.modNamesFormat, joinedNames)
     end
 end
 

@@ -424,18 +424,26 @@ function utils.sameColor(color1, color2)
     return false
 end
 
-function utils.callIfFunction(f, ...)
+function utils.isCallable(f)
     local argType = type(f)
 
     if argType == "function" then
-        return f(...)
+        return true
 
     elseif argType == "table" then
         local metatable = getmetatable(f)
 
         if metatable and metatable.__call then
-            return f(...)
+            return true
         end
+    end
+
+    return false
+end
+
+function utils.callIfFunction(f, ...)
+    if utils.isCallable(f) then
+        return f(...)
     end
 
     return f

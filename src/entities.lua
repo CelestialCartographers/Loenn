@@ -73,6 +73,10 @@ function entities.registerEntity(filename, registerAt, verbose)
     local filenameNoExt = utils.filename(pathNoExt, "/")
 
     local handler = utils.rerequire(pathNoExt)
+    local modMetadata = modHandler.getModMetadataFromPath(filename)
+
+    handler._loadedFrom = filename
+    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
 
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
@@ -100,7 +104,7 @@ local function addAutomaticDrawableFields(handler, drawable, room, entity, isNod
     local depthKey = isNode and "nodeDepth" or "depth"
 
     if handler[justificationKey] then
-        if type(handler[justificationKey]) == "function" then
+        if utils.isCallable(handler[justificationKey]) then
             drawable:setJustification(handler[justificationKey](room, entity))
 
         else
@@ -109,7 +113,7 @@ local function addAutomaticDrawableFields(handler, drawable, room, entity, isNod
     end
 
     if handler[scaleKey] then
-        if type(handler[scaleKey]) == "function" then
+        if utils.isCallable(handler[scaleKey]) then
             drawable:setScale(handler[scaleKey](room, entity))
 
         else
@@ -118,7 +122,7 @@ local function addAutomaticDrawableFields(handler, drawable, room, entity, isNod
     end
 
     if handler[offsetKey] then
-        if type(handler[offsetKey]) == "function" then
+        if utils.isCallable(handler[offsetKey]) then
             drawable:setOffset(handler[offsetKey](room, entity))
 
         else
@@ -792,14 +796,6 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         tooltipText = tostring(tooltipTextLanguage)
     end
 
-    if modPrefix then
-        local modPrefixLanguage = language.mods[modPrefix].name
-
-        if modPrefixLanguage._exists then
-            displayName = string.format("%s [%s]", displayName, modPrefixLanguage)
-        end
-    end
-
     local itemTemplate = {
         _name = name,
         _id = 0
@@ -819,6 +815,13 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
 
     itemTemplate.x = itemTemplate.x or 0
     itemTemplate.y = itemTemplate.y or 0
+
+    local associatedMods = entities.associatedMods(itemTemplate)
+    local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
+
+    if modsString then
+        displayName = string.format("%s %s", displayName, modsString)
+    end
 
     local placement = {
         name = simpleName,
@@ -902,7 +905,7 @@ function entities.canResize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.canResize then
-        if type(handler.canResize) == "function" then
+        if utils.isCallable(handler.canResize) then
             return handler.canResize(room, entity)
 
         else
@@ -919,7 +922,7 @@ function entities.minimumSize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.minimumSize then
-        if type(handler.minimumSize) == "function" then
+        if utils.isCallable(handler.minimumSize) then
             return handler.minimumSize(room, entity)
 
         else
@@ -935,7 +938,7 @@ function entities.maximumSize(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler.maximumSize then
-        if type(handler.maximumSize) == "function" then
+        if utils.isCallable(handler.maximumSize) then
             return handler.maximumSize(room, entity)
 
         else
@@ -951,7 +954,7 @@ function entities.nodeLimits(room, layer, entity)
     local handler = entities.registeredEntities[name]
 
     if handler and handler.nodeLimits then
-        if type(handler.nodeLimits) == "function" then
+        if utils.isCallable(handler.nodeLimits) then
             return handler.nodeLimits(room, entity)
 
         else
@@ -1065,6 +1068,20 @@ function entities.languageData(language, layer, entity)
 
     else
         return language.entities[name], language.entities.default
+    end
+end
+
+function entities.associatedMods(entity, layer)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler then
+        if handler.associatedMods then
+            return utils.callIfFunction(handler.associatedMods, entity)
+        end
+
+        -- Fallback to mod containing the plugin
+        return handler._loadedFromModName
     end
 end
 

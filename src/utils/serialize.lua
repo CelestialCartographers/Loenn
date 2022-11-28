@@ -273,7 +273,11 @@ function serialize.serialize(t, pretty, sortKeys, useMetaKeys, seen, depth, succ
 end
 
 function serialize.unserialize(s, safe, timeout)
-    local func = assert(loadstring("return " .. s))
+    local func = loadstring("return " .. s)
+
+    if not func then
+        return false, "Failed to unserialize data"
+    end
 
     if safe ~= false then
         setfenv(func, {})

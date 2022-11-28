@@ -141,4 +141,21 @@ function parallax.displayName(language, style)
     return string.format("Parallax - %s", texture)
 end
 
+function parallax.associatedMods(style)
+    local texture = style.texture
+    local sprite = atlases.gameplay[texture]
+
+    if sprite then
+        -- Skip internal files, they don't belong to a mod
+        if sprite.internalFile then
+            return
+        end
+
+        local filename = sprite.filename
+        local modMetadata = mods.getModMetadataFromPath(filename)
+
+        return mods.getModNamesFromMetadata(modMetadata)
+    end
+end
+
 return parallax

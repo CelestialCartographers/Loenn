@@ -146,6 +146,8 @@ function spriteLoader.loadExternalSprite(filename)
     local realFolderExt = utils.fileExtension(realFilenameFolder)
     local fromZipFile = realFolderExt == "zip" or realFolderExt == "love"
     local realFilename
+    local modMetadata = modHandler.getModMetadataFromPath(filename)
+    local modNames = modHandler.getModNamesFromMetadata(modMetadata)
 
     if fromZipFile then
         realFilename = realFilenameFolder
@@ -188,6 +190,7 @@ function spriteLoader.loadExternalSprite(filename)
         realFilename = realFilename,
         internalFile = internalFile,
         fromZipFile = fromZipFile,
+        associatedMods = modNames,
 
         loadedAt = os.time()
     }

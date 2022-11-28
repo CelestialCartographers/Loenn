@@ -48,6 +48,10 @@ function triggers.registerTrigger(filename, registerAt, verbose)
     local filenameNoExt = utils.filename(pathNoExt, "/")
 
     local handler = utils.rerequire(pathNoExt)
+    local modMetadata = modHandler.getModMetadataFromPath(filename)
+
+    handler._loadedFrom = filename
+    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
 
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
@@ -403,14 +407,6 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         tooltipText = tostring(tooltipTextLanguage)
     end
 
-    if modPrefix then
-        local modPrefixLanguage = language.mods[modPrefix].name
-
-        if modPrefixLanguage._exists then
-            displayName = string.format("%s [%s]", displayName, modPrefixLanguage)
-        end
-    end
-
     local itemTemplate = {
         _name = name,
         _id = 0
@@ -433,6 +429,13 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
 
     itemTemplate.width = itemTemplate.width or 16
     itemTemplate.height = itemTemplate.height or 16
+
+    local associatedMods = triggers.associatedMods(itemTemplate)
+    local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
+
+    if modsString then
+        displayName = string.format("%s %s", displayName, modsString)
+    end
 
     local placement = {
         name = simpleName,
@@ -524,7 +527,7 @@ function triggers.nodeLimits(room, layer, trigger)
     local handler = triggers.registeredTriggers[name]
 
     if handler and handler.nodeLimits then
-        if type(handler.nodeLimits) == "function" then
+        if utils.isCallable(handler.nodeLimits) then
             return handler.nodeLimits(room, trigger)
 
         else
@@ -624,6 +627,20 @@ function triggers.languageData(language, layer, entity)
 
     else
         return language.triggers[name], language.triggers.default
+    end
+end
+
+function triggers.associatedMods(trigger, layer)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler then
+        if handler.associatedMods then
+            return utils.callIfFunction(handler.associatedMods, trigger)
+        end
+
+        -- Fallback to mod containing the plugin
+        return handler._loadedFromModName
     end
 end
 

@@ -32,7 +32,8 @@ for i, texture in ipairs(textures) do
         data = {
             width = 16,
             height = 16,
-            sprite = texture
+            sprite = texture,
+            persistent = false
         }
     }
 end

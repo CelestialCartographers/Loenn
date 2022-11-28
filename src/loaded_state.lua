@@ -10,6 +10,7 @@ local history = require("history")
 local persistence = require("persistence")
 local configs = require("configs")
 local meta = require("meta")
+local saveSanitizers = require("save_sanitizers")
 
 local sideStruct = require("structs.side")
 
@@ -83,10 +84,17 @@ local function updateSideState(side, roomName, filename, eventName)
     sceneHandler.sendEvent(eventName, filename)
 end
 
+-- Calls before save functions
+function state.defaultBeforeSaveCallback(filename, state)
+    return saveSanitizers.beforeSave(filename, state)
+end
+
 -- Updates state filename and flags history with no changes
-function state.defaultSaveCallback(filename)
+function state.defaultAfterSaveCallback(filename, state)
     state.filename = filename
     history.madeChanges = false
+
+    return saveSanitizers.afterSave(filename, state)
 end
 
 function state.defaultVerifyErrorCallback(filename)
@@ -167,14 +175,26 @@ function state.loadFile(filename, roomName)
     )
 end
 
-function state.saveFile(filename, callback, addExtIfMissing, verifyMap)
+function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtIfMissing, verifyMap)
     if filename and state.side then
         if addExtIfMissing ~= false and filesystem.fileExtension(filename) ~= "bin" then
             filename ..= ".bin"
         end
 
-        if callback ~= false then
-            callback = callback or state.defaultSaveCallback
+        if afterSaveCallback ~= false then
+            afterSaveCallback = afterSaveCallback or state.defaultAfterSaveCallback
+        end
+
+        if beforeSaveCallback ~= false then
+            beforeSaveCallback = beforeSaveCallback or state.defaultBeforeSaveCallback
+
+            local callbackResult = beforeSaveCallback(filename, state)
+
+            if not callbackResult then
+                sceneHandler.sendEvent("editorMapSaveInterrupted", filename)
+
+                return false
+            end
         end
 
         local temporaryFilename = state.getTemporaryFilename(filename)
@@ -194,8 +214,8 @@ function state.saveFile(filename, callback, addExtIfMissing, verifyMap)
                                         filesystem.remove(filename)
                                         filesystem.rename(temporaryFilename, filename)
 
-                                        if callback then
-                                            callback(filename)
+                                        if afterSaveCallback then
+                                            afterSaveCallback(filename, state)
                                         end
 
                                         sceneHandler.sendEvent("editorMapSaved", filename)
@@ -204,8 +224,8 @@ function state.saveFile(filename, callback, addExtIfMissing, verifyMap)
                                 else
                                     filesystem.rename(temporaryFilename, filename)
 
-                                    if callback then
-                                        callback(filename)
+                                    if afterSaveCallback then
+                                        afterSaveCallback(filename, state)
                                     end
 
                                     sceneHandler.sendEvent("editorMapSaved", filename)
@@ -302,21 +322,21 @@ function state.newMap()
     updateSideState(newSide, nil, nil, "editorMapNew")
 end
 
-function state.saveAsCurrentMap(callback, addExtIfMissing)
+function state.saveAsCurrentMap(afterSaveCallback, beforeSaveCallback, addExtIfMissing)
     if state.side then
         filesystem.saveDialog(state.filename, "bin", function(filename)
-            state.saveFile(filename, callback, addExtIfMissing)
+            state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtIfMissing)
         end)
     end
 end
 
-function state.saveCurrentMap(callback, addExtIfMissing)
+function state.saveCurrentMap(afterSaveCallback, beforeSaveCallback, addExtIfMissing)
     if state.side then
         if state.filename then
-            state.saveFile(state.filename, callback, addExtIfMissing)
+            state.saveFile(state.filename, afterSaveCallback, beforeSaveCallback, addExtIfMissing)
 
         else
-            state.saveAsCurrentMap(callback, addExtIfMissing)
+            state.saveAsCurrentMap(afterSaveCallback, beforeSaveCallback, addExtIfMissing)
         end
     end
 end

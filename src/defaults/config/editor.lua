@@ -59,4 +59,7 @@ return {
 
     -- Persistence
     toolsPersistUsingGroup = true,
+
+    -- Save sanitizers
+    sortRoomsOnSave = true,
 }

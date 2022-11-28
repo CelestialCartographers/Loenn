@@ -249,5 +249,18 @@ function decals.languageData(language, layer, decal)
     return language.decals
 end
 
+function decals.associatedMods(decal, layer)
+    local texture = decal.texture
+    local sprite = atlases.gameplay[texture]
+
+    if sprite then
+        -- Skip internal files, they don't belong to a mod
+        if sprite.internalFile then
+            return
+        end
+
+        return sprite.associatedMods
+    end
+end
 
 return decals
