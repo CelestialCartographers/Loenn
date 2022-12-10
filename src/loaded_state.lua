@@ -109,11 +109,13 @@ function state.verifyFile(filename, successCallback, errorCallback)
     tasks.newTask(
         (-> filename and mapcoder.decodeFile(filename)),
         function(binTask)
-            if binTask.result then
+            if binTask.success and binTask.result then
                 tasks.newTask(
                     (-> sideStruct.decodeTaskable(binTask.result)),
                     function(decodeTask)
-                        successCallback()
+                        if decodeTask.success then
+                            successCallback()
+                        end
                     end
                 )
 
@@ -158,7 +160,7 @@ function state.loadFile(filename, roomName)
     tasks.newTask(
         (-> filename and mapcoder.decodeFile(filename)),
         function(binTask)
-            if binTask.result then
+            if binTask.success and binTask.result then
                 tasks.newTask(
                     (-> sideStruct.decodeTaskable(binTask.result)),
                     function(decodeTask)
@@ -204,11 +206,11 @@ function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtI
         tasks.newTask(
             (-> sideStruct.encodeTaskable(state.side)),
             function(encodeTask)
-                if encodeTask.result then
+                if encodeTask.success and encodeTask.result then
                     tasks.newTask(
                         (-> mapcoder.encodeFile(temporaryFilename, encodeTask.result)),
                         function(binTask)
-                            if binTask.done and binTask.success then
+                            if binTask.success then
                                 if verifyMap ~= false then
                                     state.verifyFile(temporaryFilename, function()
                                         filesystem.remove(filename)
