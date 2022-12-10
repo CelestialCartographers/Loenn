@@ -201,6 +201,11 @@ function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtI
 
         local temporaryFilename = state.getTemporaryFilename(filename)
 
+        -- Don't need temporary filename if we don't verify the map
+        if verifyMap == false then
+            temporaryFilename = filename
+        end
+
         filesystem.mkpath(filesystem.dirname(temporaryFilename))
 
         tasks.newTask(
@@ -224,8 +229,6 @@ function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtI
                                     end)
 
                                 else
-                                    filesystem.rename(temporaryFilename, filename)
-
                                     if afterSaveCallback then
                                         afterSaveCallback(filename, state)
                                     end
