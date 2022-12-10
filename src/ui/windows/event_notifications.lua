@@ -84,7 +84,7 @@ function notificationHandlers:editorQuitWithChanges()
             uiElements.row({
                 uiElements.button(tostring(language.ui.notifications.editorSaveAndQuit), function()
                     loadedState.saveCurrentMap(function(filename)
-                        loadedState.defaultSaveCallback(filename)
+                        loadedState.defaultAfterSaveCallback(previousFilename, loadedState)
 
                         love.event.quit()
                     end)
@@ -113,7 +113,7 @@ function notificationHandlers:editorLoadWithChanges(currentFile, filename)
             uiElements.row({
                 uiElements.button(tostring(language.ui.notifications.editorSaveFirst), function()
                     loadedState.saveCurrentMap(function(previousFilename)
-                        loadedState.defaultSaveCallback(previousFilename)
+                        loadedState.defaultAfterSaveCallback(previousFilename, loadedState)
 
                         loadedState.loadFile(filename)
                         closePopup(popup)
@@ -144,7 +144,7 @@ function notificationHandlers:editorNewMapWithChanges()
             uiElements.row({
                 uiElements.button(tostring(language.ui.notifications.editorSaveFirst), function()
                     loadedState.saveCurrentMap(function(previousFilename)
-                        loadedState.defaultSaveCallback(previousFilename)
+                        loadedState.defaultAfterSaveCallback(previousFilename, loadedState)
 
                         loadedState.newMap()
                         closePopup(popup)
