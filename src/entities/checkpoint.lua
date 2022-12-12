@@ -50,6 +50,14 @@ checkpoint.fieldInformation = {
     }
 }
 
+-- Make sure the optional (nil) values are always included
+checkpoint.fieldOrder = {
+    "x", "y",
+    "bg", "checkpointID",
+    "coreMode", "inventory", "dreaming",
+    "allowOrigin"
+}
+
 function checkpoint.texture(room, entity)
     local bg = entity.bg
 

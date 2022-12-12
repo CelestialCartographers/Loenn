@@ -86,10 +86,9 @@ function sideStruct.decodeTaskable(data, tasksTarget)
     local sideTask = tasks.newTask(
         function(task)
             local side = {}
-            local mapTask = tasks.newTask(-> mapStruct.decode(data), nil, tasksTarget)
+            local mapResult = mapStruct.decode(data)
 
-            task:waitFor(mapTask)
-            side.map = mapTask.result
+            side.map = mapResult
 
             for i, v in ipairs(data.__children or {}) do
                 local name = v.__name
@@ -124,18 +123,15 @@ end
 function sideStruct.encodeTaskable(side, tasksTarget)
     local sideTask = tasks.newTask(
         function(task)
-            local mapTask = tasks.newTask(-> mapStruct.encode(side.map), nil, tasksTarget)
-
-            tasks.waitFor(mapTask)
-            local res = mapTask.result
+            local mapResult = mapStruct.encode(side.map)
 
             for k, v in pairs(side) do
                 if not encoderBlacklist[k] then
-                    table.insert(res.__children, binfileify(k, v))
+                    table.insert(mapResult.__children, binfileify(k, v))
                 end
             end
 
-            tasks.update(res)
+            tasks.update(mapResult)
         end,
         nil,
         tasksTarget
