@@ -327,6 +327,7 @@ entities.seekerBarrier.placements.name.seeker_barrier=Seeker Barrier
 entities.playerSeeker.placements.name.player_seeker=Player Seeker
 
 # Chapter Checkpoint
+entities.checkpoint.attributes.name.bg=Background
 entities.checkpoint.attributes.description.inventory=Determines the player's inventory when loading from the given chapter.\n Automatic keeps the inventory from Metadata\n Prologue: 0 dashes, Dream blocks disabled, wearing a backpack, ground refills enabled\n Default: 1 dash, Dream blocks enabled, wearing a backpack, ground refills enabled\n OldSite: 1 dash, Dream blocks disabled, wearing a backpack, ground refills enabled\n CH6End: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills enabled\n TheSummit: 2 dashes, Dream blocks enabled, not wearing a backpack, ground refills enabled\n Core: 2 dashes, Dream blocks enabled, wearing a backpack, ground refills disabled
 entities.checkpoint.attributes.description.dreaming=Determines the dreaming state when loading from the given chapter.\nAutomatic keeps the dreaming state from Metadata.
 entities.checkpoint.attributes.description.checkpointID=Manually determine the order in which the checkpoints are placed on the level selection screen. Overrides Everest's automatic checkpoint system. (Default= -1)
