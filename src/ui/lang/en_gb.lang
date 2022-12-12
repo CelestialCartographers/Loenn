@@ -63,6 +63,14 @@ ui.metadata_window.group.xml.name=XML
 ui.metadata_window.group.music.name=Music
 
 
+# Dependency Generator
+ui.dependency_window.window_title=Dependencies
+ui.dependency_window.group.missing_mods=Missing from dependencies
+ui.dependency_window.group.depended_on=Dependencies
+ui.dependency_window.add_dependency=Add dependency
+ui.dependency_window.remove_dependency=Remove dependency
+
+
 # Room Window
 ui.room_window.editing_room=Editing room - %s
 ui.room_window.creating_room=Creating room
@@ -128,6 +136,7 @@ ui.menubar.view_decals_bg=Background Decals
 
 ui.menubar.map=Map
 ui.menubar.stylegrounds=Stylegrounds
+ui.menubar.dependencies=Dependencies
 ui.menubar.metadata=Metadata
 
 ui.menubar.room=Room

@@ -16,6 +16,7 @@ local languageRegistry = require("language_registry")
 local roomEditor = require("ui.room_editor")
 local stylegroundEditor = require("ui.styleground_editor")
 local metadataEditor = require("ui.metadata_editor")
+local dependencyEditor = require("ui.dependency_editor")
 
 local menubar = {}
 
@@ -105,7 +106,8 @@ menubar.menubar = {
     }},
     {"map", {
         {"stylegrounds", stylegroundEditor.editStylegrounds},
-        {"metadata", metadataEditor.editMetadata}
+        {"metadata", metadataEditor.editMetadata},
+        {"dependencies", dependencyEditor.editDependencies}
     }},
     {"room", {
         {"add", roomEditor.createNewRoom},
