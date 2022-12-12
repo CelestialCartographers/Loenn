@@ -1478,3 +1478,11 @@ style.effects.windsnow.name=Wind Snow
 style.effects.windsnow.attribute.color=Colour
 
 style.effects.windsnow.description.color=The colour of the snow.
+
+
+# -- Dependencies --
+dependencies.layerItemReason="%s" found in room "%s" at (%s, %s)
+dependencies.foundModFile=Uses file "%s"
+dependencies.category.metadata=Metadata
+dependencies.category.parallax=Parallax
+dependencies.category.effect=Effects
