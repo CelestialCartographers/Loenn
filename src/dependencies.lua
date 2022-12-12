@@ -5,6 +5,8 @@ local layerHandlers = require("layer_handlers")
 local parallaxHandler = require("parallax")
 local effectHandler = require("effects")
 local utils = require("utils")
+local celesteRender = require("celeste_render")
+local atlases = require("atlases")
 local languageRegistry = require("language_registry")
 
 local dependencyFinder = {}
@@ -71,6 +73,15 @@ local function addAssociatedMods(path, associated, reason, modNames)
     return modNames
 end
 
+-- Filenames without common mod content prefix
+local function cleanFilename(filename)
+    if utils.startsWith(filename, mods.commonModContent) then
+        return filename:sub(#mods.commonModContent + 2)
+    end
+
+    return filename
+end
+
 local function modsForFilename(filename)
     if not filename then
         return
@@ -109,13 +120,31 @@ function dependencyFinder.analyzeSide(side)
     return modNames
 end
 
+function dependencyFinder.analyzeTilesMetadata(metadata, modNames)
+    -- TODO - Animated tiles, can wait until we render them
+
+    local language = languageRegistry.getLanguage()
+    local localizedCategory = localizeCategoryName("metadata")
+
+    -- Add tileset paths
+    for id, meta in pairs(metadata) do
+        if meta.path then
+            local tilesetSpriteMeta = atlases.gameplay[meta.path]
+
+            if not tilesetSpriteMeta.internalFile then
+                local cleanFilename = cleanFilename(tilesetSpriteMeta.filename)
+
+                addAssociatedModsFromFilename(localizedCategory, cleanFilename, modNames)
+            end
+        end
+    end
+end
+
 function dependencyFinder.analyzeMetadata(metadata, modNames)
     modNames = modNames or {}
 
     local language = languageRegistry.getLanguage()
     local localizedCategory = localizeCategoryName("metadata")
-
-    -- TODO - Tileset paths
 
     local iconFilename = metadata.Icon and string.format("Graphics/Atlases/Gui/%s.png", metadata.Icon)
 
@@ -125,6 +154,9 @@ function dependencyFinder.analyzeMetadata(metadata, modNames)
     addAssociatedModsFromFilename(localizedCategory, metadata.Portraits, modNames)
     addAssociatedModsFromFilename(localizedCategory, metadata.Sprites, modNames)
     addAssociatedModsFromFilename(localizedCategory, iconFilename, modNames)
+
+    dependencyFinder.analyzeTilesMetadata(celesteRender.tilesMetaFg, modNames)
+    dependencyFinder.analyzeTilesMetadata(celesteRender.tilesMetaBg, modNames)
 
     return modNames
 end
