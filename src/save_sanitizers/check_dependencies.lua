@@ -1,3 +1,4 @@
+local sceneHandler = require("scene_handler")
 local dependencyFinder = require("dependencies")
 local utils = require("utils")
 local configs = require("configs")
