@@ -16,17 +16,6 @@ local analyzeLayers = {
     "triggers"
 }
 
-local function localizeModName(modName, language)
-    local language = language or languageRegistry.getLanguage()
-    local modNameLanguage = language.mods[modName].name
-
-    if modNameLanguage._exists then
-        return tostring(modNameLanguage)
-    end
-
-    return modName
-end
-
 local function localizeCategoryName(category, language)
     -- Try dependency specific first, fall back to layer names
 
@@ -53,6 +42,8 @@ local function localizeFilenameReason(filename, language)
 end
 
 local function addAssociatedMods(path, associated, reason, modNames)
+    -- Mod name should be raw for easier lookups on the other end, do not localize here
+
     if not associated then
         return modNames
     end
@@ -61,7 +52,7 @@ local function addAssociatedMods(path, associated, reason, modNames)
     local parts = $(path):split(".")()
 
     if associatedType == "string" then
-        local localizedModName = associated--localizeModName(associated)
+        local localizedModName = associated
         local target = utils.getPath(modNames, {localizedModName}, {}, true)
         local reasons = utils.getPath(target, parts, {}, true)
 
@@ -69,7 +60,7 @@ local function addAssociatedMods(path, associated, reason, modNames)
 
     elseif associatedType == "table" then
         for _, name in ipairs(associated) do
-            local localizedModName = name--localizeModName(name)
+            local localizedModName = name
             local target = utils.getPath(modNames, {localizedModName}, {}, true)
             local reasons = utils.getPath(target, parts, {}, true)
 
