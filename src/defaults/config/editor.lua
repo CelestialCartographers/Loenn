@@ -62,4 +62,5 @@ return {
 
     -- Save sanitizers
     sortRoomsOnSave = true,
+    checkDependenciesOnSave = true,
 }
