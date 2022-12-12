@@ -111,6 +111,11 @@ function collapsable.getCollapsable(text, content, options)
         interactive = 1,
         contentCollapsed = not options.startOpen,
         onClick = function(self, x, y, button)
+            -- Only allow left click
+            if button ~= 1 then
+                return
+            end
+
             if self.contentCollapsed then
                 widget:addChild(content)
                 content.screenX = widget.screenX + options.indent
@@ -122,6 +127,8 @@ function collapsable.getCollapsable(text, content, options)
             self.contentCollapsed = not self.contentCollapsed
 
             headerCollapseIndicator:collapsed(self.contentCollapsed)
+
+            self:reflow()
         end
     })
 
