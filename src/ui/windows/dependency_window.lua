@@ -168,7 +168,7 @@ function dependencyWindow.getWindowContent(modPath, side)
     local scrollableColumn = uiElements.scrollbox(column)
 
     if hasMissingMods then
-        column:addChild(missingMods)
+        column:addChild(missingModsSection)
     end
 
     if hasDependedOnMods then
