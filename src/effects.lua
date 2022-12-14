@@ -36,6 +36,10 @@ end
 
 local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
     local name = handler.name or filenameNoExt
+    local modMetadata = modHandler.getModMetadataFromPath(filename)
+
+    handler._loadedFrom = filename
+    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
 
     registerAt[name] = handler
 
@@ -51,13 +55,7 @@ function effects.registerEffect(filename, registerAt, verbose)
 
     local pathNoExt = utils.stripExtension(filename)
     local filenameNoExt = utils.filename(pathNoExt, "/")
-
     local handler = utils.rerequire(pathNoExt)
-    local modMetadata = modHandler.getModMetadataFromPath(filename)
-
-    handler._loadedFrom = filename
-    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
-
 
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end

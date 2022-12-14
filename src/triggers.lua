@@ -31,6 +31,10 @@ end
 
 local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
     local name = handler.name or filenameNoExt
+    local modMetadata = modHandler.getModMetadataFromPath(filename)
+
+    handler._loadedFrom = filename
+    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
 
     registerAt[name] = handler
 
@@ -46,12 +50,7 @@ function triggers.registerTrigger(filename, registerAt, verbose)
 
     local pathNoExt = utils.stripExtension(filename)
     local filenameNoExt = utils.filename(pathNoExt, "/")
-
     local handler = utils.rerequire(pathNoExt)
-    local modMetadata = modHandler.getModMetadataFromPath(filename)
-
-    handler._loadedFrom = filename
-    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
 
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
@@ -443,7 +442,8 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         tooltipText = tooltipText,
         layer = "triggers",
         placementType = placementType,
-        itemTemplate = itemTemplate
+        itemTemplate = itemTemplate,
+        associatedMods = associatedMods
     }
 
     return placement
