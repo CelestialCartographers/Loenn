@@ -419,20 +419,29 @@ local function cloneSelection(selections)
     return false
 end
 
-function tool.setLayer(layer)
-    if layer ~= tool.layer or not placementsAvailable then
-        tool.layer = layer
-        placementsAvailable = placementUtils.getPlacements(layer)
+local function updatePlacements(layer)
+    placementsAvailable = placementUtils.getPlacements(layer)
 
-        selectPlacement(nil, 1)
-        toolUtils.sendLayerEvent(tool, layer)
+    selectPlacement(nil, 1)
+    toolUtils.sendLayerEvent(tool, layer)
 
-        local persistenceMaterial = toolUtils.getPersistenceMaterial(tool, layer)
+    local persistenceMaterial = toolUtils.getPersistenceMaterial(tool, layer)
 
-        if persistenceMaterial then
-            tool.setMaterial(persistenceMaterial)
-        end
+    if persistenceMaterial then
+        tool.setMaterial(persistenceMaterial)
     end
+end
+
+function tool.setLayer(layer)
+    if layer ~= tool.layer or not placementsAvailable and state.map then
+        tool.layer = layer
+
+        updatePlacements(layer)
+    end
+end
+
+function tool.editorMapLoaded()
+    updatePlacements(tool.layer)
 end
 
 function tool.setMaterial(material)
