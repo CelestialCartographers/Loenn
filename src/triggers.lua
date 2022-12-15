@@ -449,8 +449,25 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
     return placement
 end
 
-local function addPlacement(placementInfo, defaultPlacement, res, name, handler, language)
-    table.insert(res, getPlacement(placementInfo, defaultPlacement, name, handler, language))
+local function addPlacement(placementInfo, defaultPlacement, res, name, handler, language, specificMods)
+    local placement = getPlacement(placementInfo, defaultPlacement, name, handler, language)
+
+    -- Check if this placement should be ignored
+    -- Always keep vanilla and Everest
+    if specificMods and placement.associatedMods then
+        local lookup = table.flip(placement.associatedMods)
+
+        for _, specific in ipairs(specificMods) do
+            if lookup[specific] then
+                table.insert(res, placement)
+
+                return
+            end
+        end
+
+    else
+        table.insert(res, placement)
+    end
 end
 
 -- TODO - Make more sophisticated? Works for now
@@ -467,7 +484,7 @@ local function guessPlacementFromData(item, name, handler)
     end
 end
 
-function triggers.getPlacements(layer)
+function triggers.getPlacements(layer, specificMods)
     local res = {}
     local language = languageRegistry.getLanguage()
 
@@ -478,7 +495,7 @@ function triggers.getPlacements(layer)
             if placements then
                 local defaultPlacement = getDefaultPlacement(handler, placements)
 
-                utils.callIterateFirstIfTable(addPlacement, placements, defaultPlacement, res, name, handler, language)
+                utils.callIterateFirstIfTable(addPlacement, placements, defaultPlacement, res, name, handler, language, specificMods)
             end
         end
     end
