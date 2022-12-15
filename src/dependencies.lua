@@ -247,14 +247,12 @@ function dependencyFinder.getDependencyModNames(modMetadata, addSelf)
 
     for _, metadata in ipairs(modMetadata) do
         if addSelf ~= false and metadata.Name then
-            dependedOnMods[metadata.Name] = true
+            table.insert(dependedOnMods, metadata.Name)
         end
 
         for _, dependency in ipairs(metadata.Dependencies or {}) do
             if dependency.Name then
-                local localizedName = mod
-
-                dependedOnMods[dependency.Name] = true
+                table.insert(dependedOnMods, dependency.Name)
             end
         end
     end
