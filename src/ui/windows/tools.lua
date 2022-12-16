@@ -288,7 +288,12 @@ local function toolChangedCallback(self, tool)
 end
 
 local function editorMapLoadedCallback(list, filename)
-    listWidgets.updateItems(toolWindow.layerList, getLayerItems())
+    -- We get the event before the main editor
+    -- Placements for example will be out of date if we update now
+    ui.runLate(function()
+        listWidgets.updateItems(toolWindow.layerList, getLayerItems())
+        listWidgets.updateItems(toolWindow.materialList, getMaterialItems())
+    end)
 end
 
 local function materialSearchFieldChanged(element, new, old)
