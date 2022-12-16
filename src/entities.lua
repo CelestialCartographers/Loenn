@@ -56,6 +56,10 @@ end
 
 local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
     local name = handler.name or filenameNoExt
+    local modMetadata = modHandler.getModMetadataFromPath(filename)
+
+    handler._loadedFrom = filename
+    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
 
     registerAt[name] = handler
 
@@ -71,12 +75,7 @@ function entities.registerEntity(filename, registerAt, verbose)
 
     local pathNoExt = utils.stripExtension(filename)
     local filenameNoExt = utils.filename(pathNoExt, "/")
-
     local handler = utils.rerequire(pathNoExt)
-    local modMetadata = modHandler.getModMetadataFromPath(filename)
-
-    handler._loadedFrom = filename
-    handler._loadedFromModName = modHandler.getModNamesFromMetadata(modMetadata)
 
     utils.callIterateFirstIfTable(addHandler, handler, registerAt, filenameNoExt, filename, verbose)
 end
@@ -816,7 +815,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
     itemTemplate.x = itemTemplate.x or 0
     itemTemplate.y = itemTemplate.y or 0
 
-    local associatedMods = entities.associatedMods(itemTemplate)
+    local associatedMods = placementInfo.associatedMods or entities.associatedMods(itemTemplate)
     local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
 
     if modsString then
@@ -829,14 +828,32 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         tooltipText = tooltipText,
         layer = "entities",
         placementType = placementType,
-        itemTemplate = itemTemplate
+        itemTemplate = itemTemplate,
+        associatedMods = associatedMods
     }
 
     return placement
 end
 
-local function addPlacement(placementInfo, defaultPlacement, res, name, handler, language)
-    table.insert(res, getPlacement(placementInfo, defaultPlacement, name, handler, language))
+local function addPlacement(placementInfo, defaultPlacement, res, name, handler, language, specificMods)
+    local placement = getPlacement(placementInfo, defaultPlacement, name, handler, language)
+
+    -- Check if this placement should be ignored
+    -- Always keep vanilla and Everest
+    if specificMods and placement.associatedMods then
+        local lookup = table.flip(placement.associatedMods)
+
+        for _, specific in ipairs(specificMods) do
+            if lookup[specific] then
+                table.insert(res, placement)
+
+                return
+            end
+        end
+
+    else
+        table.insert(res, placement)
+    end
 end
 
 -- TODO - Make more sophisticated? Works for now
@@ -853,7 +870,7 @@ local function guessPlacementFromData(item, name, handler)
     end
 end
 
-function entities.getPlacements(layer)
+function entities.getPlacements(layer, specificMods)
     local res = {}
     local language = languageRegistry.getLanguage()
 
@@ -864,7 +881,7 @@ function entities.getPlacements(layer)
             if placements then
                 local defaultPlacement = getDefaultPlacement(handler, placements)
 
-                utils.callIterateFirstIfTable(addPlacement, placements, defaultPlacement, res, name, handler, language)
+                utils.callIterateFirstIfTable(addPlacement, placements, defaultPlacement, res, name, handler, language, specificMods)
             end
         end
     end

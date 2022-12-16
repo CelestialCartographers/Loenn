@@ -5,6 +5,8 @@ local layerHandlers = require("layer_handlers")
 local parallaxHandler = require("parallax")
 local effectHandler = require("effects")
 local utils = require("utils")
+local celesteRender = require("celeste_render")
+local atlases = require("atlases")
 local languageRegistry = require("language_registry")
 
 local dependencyFinder = {}
@@ -15,17 +17,6 @@ local analyzeLayers = {
     "entities",
     "triggers"
 }
-
-local function localizeModName(modName, language)
-    local language = language or languageRegistry.getLanguage()
-    local modNameLanguage = language.mods[modName].name
-
-    if modNameLanguage._exists then
-        return tostring(modNameLanguage)
-    end
-
-    return modName
-end
 
 local function localizeCategoryName(category, language)
     -- Try dependency specific first, fall back to layer names
@@ -53,6 +44,8 @@ local function localizeFilenameReason(filename, language)
 end
 
 local function addAssociatedMods(path, associated, reason, modNames)
+    -- Mod name should be raw for easier lookups on the other end, do not localize here
+
     if not associated then
         return modNames
     end
@@ -61,7 +54,7 @@ local function addAssociatedMods(path, associated, reason, modNames)
     local parts = $(path):split(".")()
 
     if associatedType == "string" then
-        local localizedModName = associated--localizeModName(associated)
+        local localizedModName = associated
         local target = utils.getPath(modNames, {localizedModName}, {}, true)
         local reasons = utils.getPath(target, parts, {}, true)
 
@@ -69,7 +62,7 @@ local function addAssociatedMods(path, associated, reason, modNames)
 
     elseif associatedType == "table" then
         for _, name in ipairs(associated) do
-            local localizedModName = name--localizeModName(name)
+            local localizedModName = name
             local target = utils.getPath(modNames, {localizedModName}, {}, true)
             local reasons = utils.getPath(target, parts, {}, true)
 
@@ -78,6 +71,15 @@ local function addAssociatedMods(path, associated, reason, modNames)
     end
 
     return modNames
+end
+
+-- Filenames without common mod content prefix
+local function cleanFilename(filename)
+    if utils.startsWith(filename, mods.commonModContent) then
+        return filename:sub(#mods.commonModContent + 2)
+    end
+
+    return filename
 end
 
 local function modsForFilename(filename)
@@ -118,13 +120,31 @@ function dependencyFinder.analyzeSide(side)
     return modNames
 end
 
+function dependencyFinder.analyzeTilesMetadata(metadata, modNames)
+    -- TODO - Animated tiles, can wait until we render them
+
+    local language = languageRegistry.getLanguage()
+    local localizedCategory = localizeCategoryName("metadata")
+
+    -- Add tileset paths
+    for id, meta in pairs(metadata) do
+        if meta.path then
+            local tilesetSpriteMeta = atlases.gameplay[meta.path]
+
+            if not tilesetSpriteMeta.internalFile then
+                local cleanFilename = cleanFilename(tilesetSpriteMeta.filename)
+
+                addAssociatedModsFromFilename(localizedCategory, cleanFilename, modNames)
+            end
+        end
+    end
+end
+
 function dependencyFinder.analyzeMetadata(metadata, modNames)
     modNames = modNames or {}
 
     local language = languageRegistry.getLanguage()
     local localizedCategory = localizeCategoryName("metadata")
-
-    -- TODO - Tileset paths
 
     local iconFilename = metadata.Icon and string.format("Graphics/Atlases/Gui/%s.png", metadata.Icon)
 
@@ -134,6 +154,9 @@ function dependencyFinder.analyzeMetadata(metadata, modNames)
     addAssociatedModsFromFilename(localizedCategory, metadata.Portraits, modNames)
     addAssociatedModsFromFilename(localizedCategory, metadata.Sprites, modNames)
     addAssociatedModsFromFilename(localizedCategory, iconFilename, modNames)
+
+    dependencyFinder.analyzeTilesMetadata(celesteRender.tilesMetaFg, modNames)
+    dependencyFinder.analyzeTilesMetadata(celesteRender.tilesMetaBg, modNames)
 
     return modNames
 end
@@ -224,14 +247,12 @@ function dependencyFinder.getDependencyModNames(modMetadata, addSelf)
 
     for _, metadata in ipairs(modMetadata) do
         if addSelf ~= false and metadata.Name then
-            dependedOnMods[metadata.Name] = true
+            table.insert(dependedOnMods, metadata.Name)
         end
 
         for _, dependency in ipairs(metadata.Dependencies or {}) do
             if dependency.Name then
-                local localizedName = mod
-
-                dependedOnMods[dependency.Name] = true
+                table.insert(dependedOnMods, dependency.Name)
             end
         end
     end

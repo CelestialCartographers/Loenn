@@ -186,23 +186,26 @@ function decals.getPlacements(layer)
 
     for i, name in ipairs(names) do
         local nameNoDecalsPrefix = name:sub(8)
+        local itemTemplate = {
+            texture = name,
+
+            x = 0,
+            y = 0,
+
+            scaleX = 1,
+            scaleY = 1,
+
+            rotation = 0
+        }
+        local associatedMods = decals.associatedMods(itemTemplate, layer)
 
         res[i] = {
             name = name,
             displayName = nameNoDecalsPrefix,
             layer = layer,
             placementType = "point",
-            itemTemplate = {
-                texture = name,
-
-                x = 0,
-                y = 0,
-
-                scaleX = 1,
-                scaleY = 1,
-
-                rotation = 0
-            }
+            itemTemplate = itemTemplate,
+            associatedMods = associatedMods
         }
     end
 

@@ -408,4 +408,7 @@ state.viewport = viewportHandler.viewport
 -- Rendering information about layers
 state.layerInformation = {}
 
+-- Hide content that is not in Everest.yaml
+state.onlyShowDependedOnMods = false
+
 return state

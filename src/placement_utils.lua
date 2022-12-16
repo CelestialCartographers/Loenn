@@ -3,14 +3,36 @@ local utils = require("utils")
 local keyboardHelper = require("utils.keyboard")
 local configs = require("configs")
 local state = require("loaded_state")
+local mods = require("mods")
+local dependencies = require("dependencies")
 
 local placementUtils = {}
 
-function placementUtils.getPlacements(layer)
+local function currentDependedOnMods()
+    local modPath = mods.getFilenameModPath(state.filename)
+
+    -- Make sure mod is packaged
+    if modPath then
+        local currentModMetadata = mods.getModMetadataFromPath(modPath) or {}
+        local dependedOnMods = dependencies.getDependencyModNames(currentModMetadata)
+
+        return dependedOnMods
+    end
+end
+
+function placementUtils.getPlacements(layer, specificMods)
     local handler = layerHandlers.getHandler(layer)
 
     if handler and handler.getPlacements then
-        return handler.getPlacements(layer)
+        if specificMods == nil then
+            local dependedOnOnly = state.onlyShowDependedOnMods
+
+            if dependedOnOnly then
+                specificMods = currentDependedOnMods()
+            end
+        end
+
+        return handler.getPlacements(layer, specificMods)
     end
 
     return {}

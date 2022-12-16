@@ -1,3 +1,4 @@
+local sceneHandler = require("scene_handler")
 local dependencyFinder = require("dependencies")
 local utils = require("utils")
 local configs = require("configs")
@@ -15,7 +16,8 @@ function sanitizer.beforeSave(filename, state)
             local side = state.side
 
             local usedMods = dependencyFinder.analyzeSide(side)
-            local dependedOnMods = dependencyFinder.getDependencyModNames(currentModMetadata)
+            local dependedOnModNames = dependencyFinder.getDependencyModNames(currentModMetadata)
+            local dependedOnLookup = table.flip(dependedOnModNames)
             local missingMods = {}
 
             for modName, _ in pairs(usedMods) do
