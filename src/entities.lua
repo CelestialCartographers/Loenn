@@ -815,7 +815,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
     itemTemplate.x = itemTemplate.x or 0
     itemTemplate.y = itemTemplate.y or 0
 
-    local associatedMods = entities.associatedMods(itemTemplate)
+    local associatedMods = placementInfo.associatedMods or entities.associatedMods(itemTemplate)
     local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
 
     if modsString then

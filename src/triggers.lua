@@ -429,7 +429,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
     itemTemplate.width = itemTemplate.width or 16
     itemTemplate.height = itemTemplate.height or 16
 
-    local associatedMods = triggers.associatedMods(itemTemplate)
+    local associatedMods = placementInfo.associatedMods or triggers.associatedMods(itemTemplate)
     local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
 
     if modsString then
