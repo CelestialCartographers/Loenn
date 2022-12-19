@@ -67,44 +67,38 @@ function filesystem.samePath(path1, path2, useUnixSeparator, ignoreTrailingSepar
 
     local userOS = osUtils.getOS()
     local usingWindows = userOS == "Windows"
+    local separator = physfs.getDirSeparator()
+
+    if path1 == path2 then
+        return true
+    end
 
     if usingWindows and useUnixSeparator ~= false then
         path1 = filesystem.convertToUnixPath(path1)
         path2 = filesystem.convertToUnixPath(path2)
 
-        parts1 = filesystem.splitpath(path1, "/")
-        parts2 = filesystem.splitpath(path2, "/")
+        separator = "/"
 
-    else
-        parts1 = filesystem.splitpath(path1)
-        parts2 = filesystem.splitpath(path2)
+        if path1 == path2 then
+            return true
+        end
     end
 
     if ignoreTrailingSeparator ~= false then
-        for i = #parts1, 1, -1 do
-            if parts1[i] == "" then
-                parts1[i] = nil
-            end
+        if path1:sub(-#separator, -1) == separator then
+            path1 = path1:sub(1, #path1 - #separator)
         end
 
-        for i = #parts2, 1, -1 do
-            if parts2[i] == "" then
-                parts2[i] = nil
-            end
+        if path2:sub(-#separator, -1) == separator then
+            path2 = path2:sub(1, #path2 - #separator)
         end
     end
 
-    if #parts1 ~= #parts2 then
-        return false
+    if path1 == path2 then
+        return true
     end
 
-    for i = 1, #parts1 do
-        if parts1[i] ~= parts2[i] then
-            return false
-        end
-    end
-
-    return true
+    return false
 end
 
 -- Maunal iteration for performance
