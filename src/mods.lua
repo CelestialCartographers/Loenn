@@ -446,6 +446,11 @@ function modHandler.getModMetadataFromPath(path)
         end
 
         return getModMetadataFromRealFilename(realFilename)
+
+    else
+        -- Assume anything left over is a real filename
+
+        return getModMetadataFromRealFilename(path)
     end
 end
 
