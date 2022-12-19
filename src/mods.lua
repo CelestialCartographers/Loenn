@@ -363,8 +363,12 @@ function modHandler.mountMod(path, force)
 
             local modMetadata = modHandler.readModMetadata(path, specificMountPoint, modFolderName)
 
-            modHandler.loadedMods[modFolderName] = true
             modHandler.modMetadata[modFolderName] = modMetadata
+            modHandler.loadedMods[modFolderName] = {
+                zipFile = filesystem.isFile(path),
+                metadata = modMetadata
+            }
+
         end
     end
 
@@ -383,6 +387,31 @@ function modHandler.mountMods(directory, force)
             end
         end
     end
+end
+
+local zipFileMetadataCache = {}
+
+local function getModMetadataFromRealFilename(filename)
+    local modFolder = zipFileMetadataCache[filename]
+
+    if not modFolder then
+        for modFolder, metadata in pairs(modHandler.modMetadata) do
+            local path = metadata._path
+
+            if utils.samePath(path, filename) then
+                local loadedModInfo = modHandler.loadedMods[modFolder]
+
+                -- Cache zipfile metadata lookup
+                if loadedModInfo and loadedModInfo.zipFile then
+                    zipFileMetadataCache[filename] = modFolder
+                end
+
+                return metadata
+            end
+        end
+    end
+
+    return modHandler.modMetadata[modFolder]
 end
 
 function modHandler.getModMetadataFromPath(path)
@@ -407,11 +436,7 @@ function modHandler.getModMetadataFromPath(path)
             return
         end
 
-        for modFolder, metadata in pairs(modHandler.modMetadata) do
-            if utils.samePath(metadata._path, realFilename) then
-                return metadata
-            end
-        end
+        return getModMetadataFromRealFilename(realFilename)
 
     else
         for modFolder, metadata in pairs(modHandler.modMetadata) do
