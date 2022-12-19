@@ -113,8 +113,15 @@ function modHandler.getFilenameModName(filename)
     local celesteParts = utils.splitpath(utils.convertToUnixPath(celesteDir), "/")
     local filenameParts = utils.splitpath(utils.convertToUnixPath(filename), "/")
 
+    -- Remove empty parts from end of celesteParts
+    for i = #celesteParts, 1, -1 do
+        if celesteParts[i] == "" then
+            celesteParts[i] = nil
+        end
+    end
+
     for i, part in ipairs(celesteParts) do
-        if filenameParts[i] ~= part and part ~= "" then
+        if filenameParts[i] ~= part then
             return
         end
     end
