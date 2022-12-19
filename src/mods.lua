@@ -20,6 +20,7 @@ modHandler.pluginFolderNames = {
 }
 
 modHandler.loadedMods = {}
+modHandler.loadedNameLookup = {}
 modHandler.knownPluginRequires = {}
 modHandler.modMetadata = {}
 modHandler.modSettings = {}
@@ -109,17 +110,17 @@ function modHandler.getFilenameModName(filename)
     end
 
     local celesteDir = fileLocations.getCelesteDir()
-    local parts = utils.splitpath(filename)
+    local celesteParts = utils.splitpath(utils.convertToUnixPath(celesteDir), "/")
+    local filenameParts = utils.splitpath(utils.convertToUnixPath(filename), "/")
 
-    for i = #parts, 1, -1 do
-        local testPath = utils.joinpath(unpack(parts, 1, i))
-
-        if utils.samePath(testPath, celesteDir) then
-            -- Go back up two steps to get mod name, this checks for Celeste root
-
-            return parts[i + 2]
+    for i, part in ipairs(celesteParts) do
+        if filenameParts[i] ~= part and part ~= "" then
+            return
         end
     end
+
+    -- Go back up two steps past Celeste root for mod directory
+    return filenameParts[#celesteParts + 2]
 end
 
 function modHandler.getFilenameModPath(filename)
@@ -389,21 +390,18 @@ function modHandler.mountMods(directory, force)
     end
 end
 
-local zipFileMetadataCache = {}
-
-local function getModMetadataFromRealFilename(filename)
-    local modFolder = zipFileMetadataCache[filename]
+local function getModMetadataByKeyCached(value, key)
+    local modFolder = modHandler.loadedNameLookup[value]
 
     if not modFolder then
         for modFolder, metadata in pairs(modHandler.modMetadata) do
-            local path = metadata._path
+            local metadataValue = metadata[key]
 
-            if utils.samePath(path, filename) then
+            if utils.samePath(metadataValue, value) then
                 local loadedModInfo = modHandler.loadedMods[modFolder]
 
-                -- Cache zipfile metadata lookup
-                if loadedModInfo and loadedModInfo.zipFile then
-                    zipFileMetadataCache[filename] = modFolder
+                if loadedModInfo then
+                    modHandler.loadedNameLookup[value] = modFolder
                 end
 
                 return metadata
@@ -412,6 +410,14 @@ local function getModMetadataFromRealFilename(filename)
     end
 
     return modHandler.modMetadata[modFolder]
+end
+
+local function getModMetadataFromRealFilename(filename)
+    return getModMetadataByKeyCached(filename, "_path")
+end
+
+local function getModMetadataFromSpecific(filename)
+    return getModMetadataByKeyCached(filename, "_mountPoint")
 end
 
 function modHandler.getModMetadataFromPath(path)
@@ -423,11 +429,7 @@ function modHandler.getModMetadataFromPath(path)
         local parts = utils.splitpath(path, "/")
         local firstPart = parts[1]
 
-        for modFolder, metadata in pairs(modHandler.modMetadata) do
-            if utils.samePath(metadata._mountPoint, firstPart) then
-                return metadata
-            end
-        end
+        return getModMetadataFromSpecific(firstPart)
 
     elseif utils.startsWith(path, modHandler.commonModContent) then
         local realFilename = love.filesystem.getRealDirectory(path)
@@ -437,13 +439,6 @@ function modHandler.getModMetadataFromPath(path)
         end
 
         return getModMetadataFromRealFilename(realFilename)
-
-    else
-        for modFolder, metadata in pairs(modHandler.modMetadata) do
-            if utils.samePath(metadata._path, path) or utils.samePath(metadata._folderName, path) then
-                return metadata
-            end
-        end
     end
 end
 
