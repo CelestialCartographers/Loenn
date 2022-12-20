@@ -57,25 +57,33 @@ function modHandler.findPluginFiletype(startFolder, filetype)
     return filenames
 end
 
+-- Fine tuned search for exactly one mod folder
+function modHandler.findModFolderFiletype(modFolderName, filenames, startFolder, fileType)
+    local path = utils.convertToUnixPath(utils.joinpath(
+        string.format(modHandler.specificModContent, modFolderName),
+        startFolder
+    ))
+
+    if filetype then
+        return utils.getFilenames(path, true, filenames, function(filename)
+            return utils.fileExtension(filename) == filetype
+        end)
+
+    else
+        return utils.getFilenames(path, true, filenames)
+    end
+end
+
 -- Finds files relative to the root of every loaded mod
 -- This is more performant than using the common mount point when looking for files recursively
-function modHandler.findModFiletype(startFolder, filetype)
+function modHandler.findModFiletype(startFolder, filetype, folderNames)
+    -- Fall back to all loaded mods
+    folderNames = folderNames and table.flip(folderNames) or modHandler.loadedMods
+
     local filenames = {}
 
-    for modFolderName, _ in pairs(modHandler.loadedMods) do
-        local path = utils.convertToUnixPath(utils.joinpath(
-            string.format(modHandler.specificModContent, modFolderName),
-            startFolder
-        ))
-
-        if filetype then
-            utils.getFilenames(path, true, filenames, function(filename)
-                return utils.fileExtension(filename) == filetype
-            end)
-
-        else
-            utils.getFilenames(path, true, filenames)
-        end
+    for modFolderName, _ in pairs(folderNames) do
+        modHandler.findModFolderFiletype(modFolderName, filenames, startFolder, filetype)
     end
 
     return filenames
