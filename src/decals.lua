@@ -259,7 +259,7 @@ function decals.deleteSelection(room, layer, selection)
 end
 
 function decals.getPlacements(layer, specificMods)
-    local names = {}
+    local placements = {}
     local names, fromMods = decals.getDecalNames(specificMods)
 
     for i, name in ipairs(names) do
@@ -276,7 +276,7 @@ function decals.getPlacements(layer, specificMods)
             rotation = 0
         }
 
-        names[i] = {
+        placements[i] = {
             name = name,
             displayName = nameNoDecalsPrefix,
             layer = layer,
@@ -286,7 +286,7 @@ function decals.getPlacements(layer, specificMods)
         }
     end
 
-    return names
+    return placements
 end
 
 function decals.cloneItem(room, layer, item)
