@@ -20,6 +20,7 @@ modHandler.pluginFolderNames = {
 }
 
 modHandler.loadedMods = {}
+modHandler.loadedNameLookup = {}
 modHandler.knownPluginRequires = {}
 modHandler.modMetadata = {}
 modHandler.modSettings = {}
@@ -56,25 +57,33 @@ function modHandler.findPluginFiletype(startFolder, filetype)
     return filenames
 end
 
+-- Fine tuned search for exactly one mod folder
+function modHandler.findModFolderFiletype(modFolderName, filenames, startFolder, fileType)
+    local path = utils.convertToUnixPath(utils.joinpath(
+        string.format(modHandler.specificModContent, modFolderName),
+        startFolder
+    ))
+
+    if filetype then
+        return utils.getFilenames(path, true, filenames, function(filename)
+            return utils.fileExtension(filename) == filetype
+        end)
+
+    else
+        return utils.getFilenames(path, true, filenames)
+    end
+end
+
 -- Finds files relative to the root of every loaded mod
 -- This is more performant than using the common mount point when looking for files recursively
-function modHandler.findModFiletype(startFolder, filetype)
+function modHandler.findModFiletype(startFolder, filetype, folderNames)
+    -- Fall back to all loaded mods
+    folderNames = folderNames and table.flip(folderNames) or modHandler.loadedMods
+
     local filenames = {}
 
-    for modFolderName, _ in pairs(modHandler.loadedMods) do
-        local path = utils.convertToUnixPath(utils.joinpath(
-            string.format(modHandler.specificModContent, modFolderName),
-            startFolder
-        ))
-
-        if filetype then
-            utils.getFilenames(path, true, filenames, function(filename)
-                return utils.fileExtension(filename) == filetype
-            end)
-
-        else
-            utils.getFilenames(path, true, filenames)
-        end
+    for modFolderName, _ in pairs(folderNames) do
+        modHandler.findModFolderFiletype(modFolderName, filenames, startFolder, filetype)
     end
 
     return filenames
@@ -109,17 +118,24 @@ function modHandler.getFilenameModName(filename)
     end
 
     local celesteDir = fileLocations.getCelesteDir()
-    local parts = utils.splitpath(filename)
+    local celesteParts = utils.splitpath(utils.convertToUnixPath(celesteDir), "/")
+    local filenameParts = utils.splitpath(utils.convertToUnixPath(filename), "/")
 
-    for i = #parts, 1, -1 do
-        local testPath = utils.joinpath(unpack(parts, 1, i))
-
-        if utils.samePath(testPath, celesteDir) then
-            -- Go back up two steps to get mod name, this checks for Celeste root
-
-            return parts[i + 2]
+    -- Remove empty parts from end of celesteParts
+    for i = #celesteParts, 1, -1 do
+        if celesteParts[i] == "" then
+            celesteParts[i] = nil
         end
     end
+
+    for i, part in ipairs(celesteParts) do
+        if filenameParts[i] ~= part then
+            return
+        end
+    end
+
+    -- Go back up two steps past Celeste root for mod directory
+    return filenameParts[#celesteParts + 2]
 end
 
 function modHandler.getFilenameModPath(filename)
@@ -363,8 +379,12 @@ function modHandler.mountMod(path, force)
 
             local modMetadata = modHandler.readModMetadata(path, specificMountPoint, modFolderName)
 
-            modHandler.loadedMods[modFolderName] = true
             modHandler.modMetadata[modFolderName] = modMetadata
+            modHandler.loadedMods[modFolderName] = {
+                zipFile = filesystem.isFile(path),
+                metadata = modMetadata
+            }
+
         end
     end
 
@@ -385,6 +405,36 @@ function modHandler.mountMods(directory, force)
     end
 end
 
+local function getModMetadataByKeyCached(value, key)
+    local modFolder = modHandler.loadedNameLookup[value]
+
+    if not modFolder then
+        for modFolder, metadata in pairs(modHandler.modMetadata) do
+            local metadataValue = metadata[key]
+
+            if utils.samePath(metadataValue, value) then
+                local loadedModInfo = modHandler.loadedMods[modFolder]
+
+                if loadedModInfo then
+                    modHandler.loadedNameLookup[value] = modFolder
+                end
+
+                return metadata
+            end
+        end
+    end
+
+    return modHandler.modMetadata[modFolder]
+end
+
+local function getModMetadataFromRealFilename(filename)
+    return getModMetadataByKeyCached(filename, "_path")
+end
+
+local function getModMetadataFromSpecific(filename)
+    return getModMetadataByKeyCached(filename, "_mountPoint")
+end
+
 function modHandler.getModMetadataFromPath(path)
     if not path then
         return
@@ -394,11 +444,7 @@ function modHandler.getModMetadataFromPath(path)
         local parts = utils.splitpath(path, "/")
         local firstPart = parts[1]
 
-        for modFolder, metadata in pairs(modHandler.modMetadata) do
-            if utils.samePath(metadata._mountPoint, firstPart) then
-                return metadata
-            end
-        end
+        return getModMetadataFromSpecific(firstPart)
 
     elseif utils.startsWith(path, modHandler.commonModContent) then
         local realFilename = love.filesystem.getRealDirectory(path)
@@ -407,18 +453,12 @@ function modHandler.getModMetadataFromPath(path)
             return
         end
 
-        for modFolder, metadata in pairs(modHandler.modMetadata) do
-            if utils.samePath(metadata._path, realFilename) then
-                return metadata
-            end
-        end
+        return getModMetadataFromRealFilename(realFilename)
 
     else
-        for modFolder, metadata in pairs(modHandler.modMetadata) do
-            if utils.samePath(metadata._path, path) or utils.samePath(metadata._folderName, path) then
-                return metadata
-            end
-        end
+        -- Assume anything left over is a real filename
+
+        return getModMetadataFromRealFilename(path)
     end
 end
 
@@ -456,6 +496,9 @@ function modHandler.formatAssociatedMods(language, modNames, modPrefix)
 
         if modNameLanguage._exists then
             displayNames[tostring(modNameLanguage)] = true
+
+        else
+            displayNames[modName] = true
         end
     end
 

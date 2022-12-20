@@ -3,9 +3,15 @@ local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
 local mods = require("mods")
 
+local languageRegistry = require("language_registry")
+
 local decals = {}
 
+local zipFileNamesCache = {}
+local zipFileNamesNoAnimationsCache = {}
+
 local decalsPrefix = "decals/"
+local gameplayPath = "Graphics/Atlases/Gameplay"
 local decalsPath = "Graphics/Atlases/Gameplay/decals"
 
 -- A frame should only be kept if it has no trailing number
@@ -33,29 +39,44 @@ local function keepFrame(name, removeAnimationFrames)
     return true
 end
 
-function decals.getDecalNames(removeAnimationFrames, yield)
-    removeAnimationFrames = removeAnimationFrames ~= false
-    yield = yield ~= false
+function decals.getDecalNamesFromMod(modFolder, removeAnimationFrames, yield, names, associatedMods, added)
+    names = names or {}
+    associatedMods = associatedMods or {}
 
-    local res = {}
-    local added = {}
+    local loadedModInfo = mods.loadedMods[modFolder]
+    local canCache = loadedModInfo.zipFile
+    local cachableNames = {}
+    local cacheTarget = removeAnimationFrames and zipFileNamesCache or zipFileNamesNoAnimationsCache
 
-    -- Any loaded sprites
-    for name, sprite in pairs(atlases.gameplay) do
-        if utils.startsWith(name, decalsPrefix) then
-            if keepFrame(name, removeAnimationFrames) then
-                added[name] = true
-                added[sprite.meta.filename] = true
+    local filenames = mods.findModFolderFiletype(modFolder, {}, decalsPath, "png")
+    local decalPathLength = #decalsPath
 
-                table.insert(res, name)
-            end
-        end
+    local modSpecificPath = string.format(mods.specificModContent, modFolder)
+    local modMetadata = mods.getModMetadataFromPath(modSpecificPath)
+    local modAssociatedMods = false
+
+    if modMetadata then
+        modAssociatedMods = mods.getModNamesFromMetadata(modMetadata)
     end
 
-    -- Mod content sprites
-    -- Some of these might have already been loaded
-    local filenames = mods.findModFiletype(decalsPath, "png")
-    local decalPathLength = #decalsPath
+    if canCache and cacheTarget[modFolder] then
+        local cachedNames = cacheTarget[modFolder]
+
+        for _, name in ipairs(cachedNames) do
+            if not added[resourceName] then
+                added[name] = true
+
+                table.insert(names, name)
+                table.insert(associatedMods, modAssociatedMods)
+            end
+        end
+
+        return names, associatedMods
+    end
+
+    if yield then
+        coroutine.yield()
+    end
 
     for i, name in ipairs(filenames) do
         if not added[name] then
@@ -72,7 +93,12 @@ function decals.getDecalNames(removeAnimationFrames, yield)
                     if not added[resourceName] then
                         added[resourceName] = true
 
-                        table.insert(res, resourceName)
+                        table.insert(names, resourceName)
+                        table.insert(associatedMods, modAssociatedMods)
+
+                        if canCache then
+                            table.insert(cachableNames, resourceName)
+                        end
                     end
                 end
             end
@@ -83,7 +109,61 @@ function decals.getDecalNames(removeAnimationFrames, yield)
         end
     end
 
-    return res
+    if canCache then
+        cacheTarget[modFolder] = cachableNames
+    end
+
+    return names, associatedMods
+end
+
+function decals.getDecalNames(specificMods, removeAnimationFrames, yield)
+    removeAnimationFrames = removeAnimationFrames ~= false
+    yield = yield ~= false
+
+    local names = {}
+    local associatedMods = {}
+    local added = {}
+
+    local specificModsLookup = {}
+
+    if specificMods then
+        specificModsLookup = table.flip(specificMods)
+    end
+
+    -- Any internal sprites, these are from vanilla
+    for name, sprite in pairs(atlases.gameplay) do
+        if type(sprite) == "table" and sprite.internalFile then
+            if utils.startsWith(name, decalsPrefix) and keepFrame(name, removeAnimationFrames) then
+                added[name] = true
+                added[sprite.meta.filename] = true
+
+                table.insert(names, name)
+                table.insert(associatedMods, false)
+            end
+        end
+    end
+
+    -- Figure out which mod folders we should load
+    for modFolder, metadata in pairs(mods.modMetadata) do
+        local modNames = mods.getModNamesFromMetadata(metadata)
+        local useModResources = not specificMods
+
+        if not useModResources and modNames then
+            for _, modName in ipairs(modNames) do
+                if specificModsLookup[modName] then
+                    useModResources = true
+
+                    break
+                end
+            end
+        end
+
+        if useModResources then
+            decals.getDecalNamesFromMod(modFolder, removeAnimationFrames, yield, names, associatedMods, added)
+        end
+    end
+
+    return names, associatedMods
 end
 
 function decals.getDrawable(texture, handler, room, decal, viewport)
@@ -180,12 +260,21 @@ function decals.deleteSelection(room, layer, selection)
     return false
 end
 
-function decals.getPlacements(layer)
-    local res = {}
-    local names = decals.getDecalNames()
+function decals.getPlacements(layer, specificMods)
+    local placements = {}
+    local language = languageRegistry.getLanguage()
+    local names, fromMods = decals.getDecalNames(specificMods)
 
     for i, name in ipairs(names) do
         local nameNoDecalsPrefix = name:sub(8)
+        local displayName = nameNoDecalsPrefix
+        local associatedMods = fromMods[i]
+        local modsString = mods.formatAssociatedMods(language, associatedMods)
+
+        if modsString then
+            displayName = string.format("%s %s", displayName, modsString)
+        end
+
         local itemTemplate = {
             texture = name,
 
@@ -197,11 +286,10 @@ function decals.getPlacements(layer)
 
             rotation = 0
         }
-        local associatedMods = decals.associatedMods(itemTemplate, layer)
 
-        res[i] = {
+        placements[i] = {
             name = name,
-            displayName = nameNoDecalsPrefix,
+            displayName = displayName,
             layer = layer,
             placementType = "point",
             itemTemplate = itemTemplate,
@@ -209,7 +297,7 @@ function decals.getPlacements(layer)
         }
     end
 
-    return res
+    return placements
 end
 
 function decals.cloneItem(room, layer, item)
@@ -253,9 +341,11 @@ function decals.languageData(language, layer, decal)
 end
 
 function decals.associatedMods(decal, layer)
+    -- Make sure we don't load the image from disk!
     local texture = decal.texture
-    local sprite = atlases.gameplay[texture]
+    local sprite = rawget(atlases.gameplay, texture)
 
+    -- Sprites that are loaded already have the associated mods data
     if sprite then
         -- Skip internal files, they don't belong to a mod
         if sprite.internalFile then
@@ -263,6 +353,14 @@ function decals.associatedMods(decal, layer)
         end
 
         return sprite.associatedMods
+
+    else
+        local fullFilename = string.format("%s/%s/%s.png", mods.commonModContent, gameplayPath, texture)
+        local modMetadata = mods.getModMetadataFromPath(fullFilename)
+
+        if modMetadata then
+            return mods.getModNamesFromMetadata(modMetadata)
+        end
     end
 end
 
