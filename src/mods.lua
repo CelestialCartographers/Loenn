@@ -496,6 +496,9 @@ function modHandler.formatAssociatedMods(language, modNames, modPrefix)
 
         if modNameLanguage._exists then
             displayNames[tostring(modNameLanguage)] = true
+
+        else
+            displayNames[modName] = true
         end
     end
 

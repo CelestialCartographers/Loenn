@@ -3,6 +3,8 @@ local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
 local mods = require("mods")
 
+local languageRegistry = require("language_registry")
+
 local decals = {}
 
 local zipFileNamesCache = {}
@@ -260,10 +262,19 @@ end
 
 function decals.getPlacements(layer, specificMods)
     local placements = {}
+    local language = languageRegistry.getLanguage()
     local names, fromMods = decals.getDecalNames(specificMods)
 
     for i, name in ipairs(names) do
         local nameNoDecalsPrefix = name:sub(8)
+        local displayName = nameNoDecalsPrefix
+        local associatedMods = fromMods[i]
+        local modsString = mods.formatAssociatedMods(language, associatedMods)
+
+        if modsString then
+            displayName = string.format("%s %s", displayName, modsString)
+        end
+
         local itemTemplate = {
             texture = name,
 
@@ -278,11 +289,11 @@ function decals.getPlacements(layer, specificMods)
 
         placements[i] = {
             name = name,
-            displayName = nameNoDecalsPrefix,
+            displayName = displayName,
             layer = layer,
             placementType = "point",
             itemTemplate = itemTemplate,
-            associatedMods = fromMods[i]
+            associatedMods = associatedMods
         }
     end
 
