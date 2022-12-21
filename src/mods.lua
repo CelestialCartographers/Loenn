@@ -125,6 +125,9 @@ function modHandler.getFilenameModName(filename)
     for i = #celesteParts, 1, -1 do
         if celesteParts[i] == "" then
             celesteParts[i] = nil
+
+        else
+            break
         end
     end
 
