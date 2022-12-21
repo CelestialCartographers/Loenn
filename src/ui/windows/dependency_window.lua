@@ -63,17 +63,25 @@ local function getModSection(modName, reasons, groupName)
     -- TODO - Implement callback (also needs to refresh the window content)
 
     local language = languageRegistry.getLanguage()
-    local buttonLanguageKey = groupName == "missing_mods" and "add_dependency" or "remove_dependency"
+    local buttonLanguageKey = groupName == "depended_on" and "remove_dependency" or "add_dependency"
     local buttonText = tostring(language.ui.dependency_window[buttonLanguageKey])
 
     local function buttonCallback()
         print("Not yet implemented")
     end
 
-    local reasonTree = generateCollapsableTree({[modName] = reasons})
+    local modContent
+
+    if reasons then
+        modContent = generateCollapsableTree({[modName] = reasons})
+
+    else
+        modContent = uiElements.label(modName)
+    end
+
     local actionButton = uiElements.button(buttonText, buttonCallback)
     local column = uiElements.column({
-        reasonTree,
+        modContent,
         actionButton
     })
 
@@ -141,14 +149,17 @@ end
 
 function dependencyWindow.getWindowContent(modPath, side)
     local currentModMetadata = mods.getModMetadataFromPath(modPath) or {}
-    local dependedOnModNames = dependencyFinder.getDependencyModNames(currentModMetadata)
+    local dependedOnModNames = mods.getDependencyModNames(currentModMetadata)
+    local availableModNames = mods.getAvailableModNames()
+    local dependedOnModsLookup = table.flip(dependedOnModNames)
 
     local usedMods = dependencyFinder.analyzeSide(side)
     local missingMods = {}
     local dependedOnMods = {}
+    local uncategorized = {}
 
     for modName, reasons in pairs(usedMods) do
-        if not dependedOnModNames[modName] then
+        if not dependedOnModsLookup[modName] then
             missingMods[modName] = reasons
 
         else
@@ -156,11 +167,19 @@ function dependencyWindow.getWindowContent(modPath, side)
         end
     end
 
+    for _, modName in ipairs(availableModNames) do
+        if not missingMods[modName] and not dependedOnMods[modName] then
+            uncategorized[modName] = false
+        end
+    end
+
     local hasMissingMods = utils.countKeys(missingMods) > 0
     local hasDependedOnMods = utils.countKeys(dependedOnMods) > 0
+    local hasUncategorized = utils.countKeys(uncategorized) > 0
 
     local missingModsSection = getModSections("missing_mods", missingMods)
     local dependedOnSection = getModSections("depended_on", dependedOnMods, hasMissingMods)
+    local uncategorizedSection = getModSections("available_mods", uncategorized, hasUncategorized)
 
     -- TODO - Sections need to have the same width, otherwise the lineSeparator is cut off
 
@@ -173,6 +192,10 @@ function dependencyWindow.getWindowContent(modPath, side)
 
     if hasDependedOnMods then
         column:addChild(dependedOnSection)
+    end
+
+    if hasUncategorized then
+        column:addChild(uncategorizedSection)
     end
 
     scrollableColumn:hook({
