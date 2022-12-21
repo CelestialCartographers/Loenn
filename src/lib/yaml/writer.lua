@@ -33,7 +33,8 @@ function writer.serialize(data, options, depth, firstDepth)
     options = options or {}
     depth = depth or 0
     firstDepth = firstDepth or depth
-    indentationStep = options.indentationStep or 2
+    local indentationStep = options.indentationStep or 2
+    local sortKeys = options.sortKeys ~= false
 
     local dataType = type(data)
 
@@ -49,7 +50,6 @@ function writer.serialize(data, options, depth, firstDepth)
         return tostring(data)
 
     elseif dataType == "table" then
-        -- TODO - Support some simple ordering
         local lines = {}
         local isList = #data > 0
         local spacingPrefix = string.rep(" ", depth * indentationStep)
@@ -60,14 +60,37 @@ function writer.serialize(data, options, depth, firstDepth)
                 table.insert(lines, string.format("- %s", writer.serialize(v, options, depth + 1, 0)))
             end
 
+        elseif sortKeys then
+            -- Scalars sorted alphabetically followed by tables sorted alphabetically
+            local sortedScalars = {}
+            local sortedTables = {}
+
+            for k, v in pairs(data) do
+                local sorted = type(v) == "table" and sortedTables or sortedScalars
+                local pos = #sorted + 1
+
+                for i, sv in ipairs(sorted) do
+                    if k < sv[1] then
+                        pos = i
+
+                        break
+                    end
+                end
+
+                table.insert(sorted, pos, {k, v})
+            end
+
+            for _, v in ipairs(sortedScalars) do
+                table.insert(lines, string.format("%s: %s", v[1], writer.serialize(v[2], options, depth + 1)))
+            end
+
+            for _, v in ipairs(sortedTables) do
+                table.insert(lines, string.format("%s:\n%s", v[1], writer.serialize(v[2], options, depth + 1)))
+            end
+
         else
             for k, v in pairs(data) do
-                if type(v) == "table" then
-                    table.insert(lines, string.format("%s: \n%s", k, writer.serialize(v, options, depth + 1)))
-
-                else
-                    table.insert(lines, string.format("%s: %s", k, writer.serialize(v, options, depth + 1)))
-                end
+                table.insert(lines, string.format("%s:%s%s", k, type(v) == "table" and "\n" or " ", writer.serialize(v, options, depth + 1)))
             end
         end
 
@@ -76,7 +99,6 @@ function writer.serialize(data, options, depth, firstDepth)
 
             lines[i] = spacing .. line
         end
-
 
         return table.concat(lines, "\n")
 
