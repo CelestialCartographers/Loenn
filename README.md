@@ -36,7 +36,7 @@ Download the [latest release][latest-release] for MacOS and extract the `.zip` f
 
 ### Other Operating Systems
 
-First, [install love2d](https://love2d.org/). Lönn requires love2d version 11.3 or later; make sure to download love2d from the official website.
+First, [install love2d](https://love2d.org/). Lönn requires love2d version 11.3 or later; make sure to download love2d from the official website. Also make sure that the `love` command is in your `PATH`.
 
 Download the [latest release][latest-release] for your operating system and extract the `.zip` file you get into an empty directory. Launch `Lönn.sh` to start the program, or run it directly using `love Lönn.love`.
 

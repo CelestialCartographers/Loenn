@@ -125,6 +125,9 @@ function modHandler.getFilenameModName(filename)
     for i = #celesteParts, 1, -1 do
         if celesteParts[i] == "" then
             celesteParts[i] = nil
+
+        else
+            break
         end
     end
 
@@ -169,7 +172,7 @@ function modHandler.findEverestYaml(mountPoint)
         local info = love.filesystem.getInfo(yamlTestPath)
 
         if info and info.type == "file" then
-            return yamlTestPath
+            return yamlTestPath, filename
         end
     end
 end
