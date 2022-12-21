@@ -45,6 +45,14 @@ local function getLayerValueFunction(layer)
     end
 end
 
+local function toggleOnlyShowDependencies()
+    loadedState.setShowDependendedOnMods(not loadedState.onlyShowDependedOnMods)
+end
+
+local function getOnlyShowDependencies()
+    return loadedState.onlyShowDependedOnMods
+end
+
 local function notYetImplementedNotification()
     local language = languageRegistry.getLanguage()
     local text = tostring(language.ui.menubar.not_yet_implemented)
@@ -97,12 +105,15 @@ menubar.menubar = {
         {"settings", notYetImplementedNotification}
     }},
     {"view", {
-        {"view_tiles_fg", getLayerToggleFunction("tilesFg"), "checkbox", getLayerValueFunction("tilesFg")},
-        {"view_tiles_bg", getLayerToggleFunction("tilesBg"), "checkbox", getLayerValueFunction("tilesBg")},
-        {"view_entities", getLayerToggleFunction("entities"), "checkbox", getLayerValueFunction("entities")},
-        {"view_triggers", getLayerToggleFunction("triggers"), "checkbox", getLayerValueFunction("triggers")},
-        {"view_decals_fg", getLayerToggleFunction("decalsFg"), "checkbox", getLayerValueFunction("decalsFg")},
-        {"view_decals_bg", getLayerToggleFunction("decalsBg"), "checkbox", getLayerValueFunction("decalsBg")},
+        {"view_layer", {
+            {"view_tiles_fg", getLayerToggleFunction("tilesFg"), "checkbox", getLayerValueFunction("tilesFg")},
+            {"view_tiles_bg", getLayerToggleFunction("tilesBg"), "checkbox", getLayerValueFunction("tilesBg")},
+            {"view_entities", getLayerToggleFunction("entities"), "checkbox", getLayerValueFunction("entities")},
+            {"view_triggers", getLayerToggleFunction("triggers"), "checkbox", getLayerValueFunction("triggers")},
+            {"view_decals_fg", getLayerToggleFunction("decalsFg"), "checkbox", getLayerValueFunction("decalsFg")},
+            {"view_decals_bg", getLayerToggleFunction("decalsBg"), "checkbox", getLayerValueFunction("decalsBg")},
+        }},
+        {"view_only_depended_on", toggleOnlyShowDependencies, "checkbox", getOnlyShowDependencies},
     }},
     {"map", {
         {"stylegrounds", stylegroundEditor.editStylegrounds},

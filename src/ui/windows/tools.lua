@@ -287,7 +287,7 @@ local function toolChangedCallback(self, tool)
     updateToolModeList(tool.name)
 end
 
-local function editorMapLoadedCallback(list, filename)
+local function updateLayerAndPlacementsCallback(list, filename)
     -- We get the event before the main editor
     -- Placements for example will be out of date if we update now
     ui.runLate(function()
@@ -367,7 +367,8 @@ function toolWindow.getWindow()
         editorToolLayerChanged = toolLayerChangedCallback,
         editorToolMaterialChanged = toolMaterialChangedCallback,
         editorToolModeChanged = toolModeChangedCallback,
-        editorMapLoaded = editorMapLoadedCallback,
+        editorMapLoaded = updateLayerAndPlacementsCallback,
+        editorShownDependenciesChanged = updateLayerAndPlacementsCallback,
 
         interactive = 0
     })

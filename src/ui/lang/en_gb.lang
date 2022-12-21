@@ -127,12 +127,14 @@ ui.menubar.redo=Redo
 ui.menubar.settings=Settings
 
 ui.menubar.view=View
+ui.menubar.view_layer=View
 ui.menubar.view_tiles_fg=Foreground Tiles
 ui.menubar.view_tiles_bg=Background Tiles
 ui.menubar.view_entities=Entities
 ui.menubar.view_triggers=Triggers
 ui.menubar.view_decals_fg=Foreground Decals
 ui.menubar.view_decals_bg=Background Decals
+ui.menubar.view_only_depended_on=Dependencies Only
 
 ui.menubar.map=Map
 ui.menubar.stylegrounds=Stylegrounds
