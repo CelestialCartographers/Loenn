@@ -464,19 +464,53 @@ end
 
 function modHandler.getModNamesFromMetadata(metadata)
     if metadata then
-        if #metadata == 1 then
+        if #metadata == 1 and metadata[1].Name then
             return {metadata[1].Name}
 
         else
             local names = {}
 
-            for _, metadata in ipairs(metadata) do
-                if metadata.Name then
-                    table.insert(names, metadata.Name)
+            for _, info in ipairs(metadata) do
+                if info.Name then
+                    table.insert(names, info.Name)
                 end
             end
         end
     end
+end
+
+function modHandler.getDependencyModNames(metadata, addSelf)
+    local dependedOnMods = {}
+
+    for _, info in ipairs(metadata) do
+        if addSelf ~= false and info.Name then
+            table.insert(dependedOnMods, info.Name)
+        end
+
+        for _, dependency in ipairs(info.Dependencies or {}) do
+            if dependency.Name then
+                table.insert(dependedOnMods, dependency.Name)
+            end
+        end
+    end
+
+    return dependedOnMods
+end
+
+function modHandler.getAvailableModNames()
+    local availableNames = {}
+
+    for _, metadata in pairs(modHandler.modMetadata) do
+        local modNames = modHandler.getModNamesFromMetadata(metadata)
+
+        if modNames then
+            for _, modName in ipairs(modNames) do
+                table.insert(availableNames, modName)
+            end
+        end
+    end
+
+    return availableNames
 end
 
 function modHandler.formatAssociatedMods(language, modNames, modPrefix)

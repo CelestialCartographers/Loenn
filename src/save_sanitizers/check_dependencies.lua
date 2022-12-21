@@ -16,7 +16,7 @@ function sanitizer.beforeSave(filename, state)
             local side = state.side
 
             local usedMods = dependencyFinder.analyzeSide(side)
-            local dependedOnModNames = dependencyFinder.getDependencyModNames(currentModMetadata)
+            local dependedOnModNames = mods.getDependencyModNames(currentModMetadata)
             local dependedOnLookup = table.flip(dependedOnModNames)
             local missingMods = {}
 

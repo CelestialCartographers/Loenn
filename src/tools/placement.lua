@@ -444,6 +444,10 @@ function tool.editorMapLoaded()
     updatePlacements(tool.layer)
 end
 
+function tool.editorShownDependenciesChanged()
+    updatePlacements(tool.layer)
+end
+
 function tool.setMaterial(material)
     local materialType = type(material)
 
