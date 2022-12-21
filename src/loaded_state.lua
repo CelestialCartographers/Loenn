@@ -394,6 +394,13 @@ function state.setLayerVisible(layer, visible, silent)
     end
 end
 
+function state.setShowDependendedOnMods(value)
+    state.onlyShowDependedOnMods = value
+
+    -- Send event to notify changes in shown dependencies
+    sceneHandler.sendEvent("editorShownDependenciesChanged", value)
+end
+
 -- The currently loaded map
 state.map = nil
 
