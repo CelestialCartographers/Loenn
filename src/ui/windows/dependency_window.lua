@@ -1,4 +1,5 @@
 -- TODO - Should work without Everest.yaml
+-- TODO - Makeit possible to update versions
 
 local ui = require("ui")
 local uiElements = require("ui.elements")
@@ -9,6 +10,7 @@ local languageRegistry = require("language_registry")
 local utils = require("utils")
 local form = require("ui.forms.form")
 local configs = require("configs")
+local yaml = require("lib.yaml")
 
 local mods = require("mods")
 local dependencyEditor = require("ui.dependency_editor")
@@ -28,6 +30,91 @@ local windowPreviousY = 0
 local dependencyWindowGroup = uiElements.group({}):with({
 
 })
+
+local function prepareMetadataForSaving(metadata, newDependencies)
+    local newMetadata = utils.deepcopy(metadata)
+
+    -- Remove editor specific information
+    for k, v in pairs(newMetadata) do
+        if type(k) == "string" and utils.startsWith(k, "_") then
+            newMetadata[k] = nil
+        end
+    end
+
+    -- Sort dependencies by name
+    newDependencies = table.sortby(newDependencies, function(dependency)
+        return dependency.Name
+    end)()
+
+    local firstMetadata = newMetadata[1] or {}
+
+    firstMetadata.Dependencies = newDependencies
+
+    return newMetadata
+end
+
+local function updateMetadataFile(modName, metadata, newDependencies)
+    local mountPoint = metadata._mountPoint
+    local mountedFilename, filename = mods.findEverestYaml(mountPoint)
+
+    if filename then
+        local realFilename = utils.joinpath(love.filesystem.getRealDirectory(mountPoint), filename)
+        local newMetadata = prepareMetadataForSaving(metadata, newDependencies)
+        local success, reason = yaml.write(realFilename, newMetadata)
+
+        return success
+    end
+
+    return false
+end
+
+local function updateSections(interactionData)
+    -- "Move" sections from one category to the other
+    -- Probably easier to delete and then generate a new one, potentially keeping expand status?
+
+    -- TODO - Implement
+end
+
+local function getDependenciesList(modName)
+    local currentModMetadata = mods.getModMetadataFromPath(modName)
+    local firstMetadata = currentModMetadata and currentModMetadata[1] or {}
+    local dependencies = firstMetadata.Dependencies or {}
+
+    return dependencies, currentModMetadata
+end
+
+local function addDependencyCallback(modName, interactionData)
+    return function()
+        local dependencies, currentModMetadata = getDependenciesList(interactionData.modPath)
+        local modInfo, modMetadata = mods.findLoadedMod(modName)
+        local modVersion = modInfo and modInfo.Version
+
+        table.insert(dependencies, {
+            Name = modName,
+            Version = modVersion
+        })
+
+        updateMetadataFile(modName, currentModMetadata, dependencies)
+        updateSections(interactionData)
+    end
+end
+
+local function removeDependencyCallback(modName, interactionData)
+    return function()
+        local dependencies, currentModMetadata = getDependenciesList(interactionData.modPath)
+
+        for i = #dependencies, 1, -1 do
+            local dependency = dependencies[i]
+
+            if dependency.Name == modName then
+                table.remove(dependencies, i)
+            end
+        end
+
+        updateMetadataFile(modName, currentModMetadata, dependencies)
+        updateSections(interactionData)
+    end
+end
 
 local function generateCollapsableTree(data)
     local dataType = type(data)
@@ -59,24 +146,22 @@ local function generateCollapsableTree(data)
     end
 end
 
-local function getModSection(modName, reasons, groupName)
-    -- TODO - Implement callback (also needs to refresh the window content)
-
+local function getModSection(modName, localizedModName, reasons, groupName, interactionData)
     local language = languageRegistry.getLanguage()
-    local buttonLanguageKey = groupName == "depended_on" and "remove_dependency" or "add_dependency"
+    local buttonAdds = groupName ~= "depended_on"
+    local buttonLanguageKey = buttonAdds and "add_dependency" or "remove_dependency"
     local buttonText = tostring(language.ui.dependency_window[buttonLanguageKey])
 
-    local function buttonCallback()
-        print("Not yet implemented")
-    end
+    local buttonCallbackWrapper = buttonAdds and addDependencyCallback or removeDependencyCallback
+    local buttonCallback = buttonCallbackWrapper(modName, interactionData)
 
     local modContent
 
     if reasons then
-        modContent = generateCollapsableTree({[modName] = reasons})
+        modContent = generateCollapsableTree({[localizedModName] = reasons})
 
     else
-        modContent = uiElements.label(modName)
+        modContent = uiElements.label(localizedModName)
     end
 
     local actionButton = uiElements.button(buttonText, buttonCallback)
@@ -113,7 +198,7 @@ local function localizeModName(modName, language)
     return modName
 end
 
-local function getModSections(groupName, mods, addPadding)
+local function getModSections(groupName, mods, addPadding, interactionData)
     local language = languageRegistry.getLanguage()
     local labelText = tostring(language.ui.dependency_window.group[groupName])
 
@@ -129,7 +214,7 @@ local function getModSections(groupName, mods, addPadding)
     -- Sort by mod name
     for modName, reasons in pairs(mods) do
         local localizedModName = localizeModName(modName)
-        local modSection = getModSection(localizedModName, reasons, groupName)
+        local modSection = getModSection(modName, localizedModName, reasons, groupName, interactionData)
 
         if modSection then
             table.insert(orderedSections, {localizedModName, modSection})
@@ -147,7 +232,9 @@ local function getModSections(groupName, mods, addPadding)
     return column
 end
 
-function dependencyWindow.getWindowContent(modPath, side)
+function dependencyWindow.getWindowContent(modPath, side, interactionData)
+    -- TODO - Hide current mod
+
     local currentModMetadata = mods.getModMetadataFromPath(modPath) or {}
     local dependedOnModNames = mods.getDependencyModNames(currentModMetadata)
     local availableModNames = mods.getAvailableModNames()
@@ -177,9 +264,9 @@ function dependencyWindow.getWindowContent(modPath, side)
     local hasDependedOnMods = utils.countKeys(dependedOnMods) > 0
     local hasUncategorized = utils.countKeys(uncategorized) > 0
 
-    local missingModsSection = getModSections("missing_mods", missingMods)
-    local dependedOnSection = getModSections("depended_on", dependedOnMods, hasMissingMods)
-    local uncategorizedSection = getModSections("available_mods", uncategorized, hasUncategorized)
+    local missingModsSection = getModSections("missing_mods", missingMods, false, interactionData)
+    local dependedOnSection = getModSections("depended_on", dependedOnMods, hasMissingMods, interactionData)
+    local uncategorizedSection = getModSections("available_mods", uncategorized, hasUncategorized, interactionData)
 
     -- TODO - Sections need to have the same width, otherwise the lineSeparator is cut off
 
@@ -216,7 +303,12 @@ function dependencyWindow.editDependencies(filename, side)
     end
 
     local window
-    local layout = dependencyWindow.getWindowContent(modPath, side)
+    local interactionData = {
+        modPath = modPath,
+        side = side,
+    }
+
+    local layout = dependencyWindow.getWindowContent(modPath, side, interactionData)
 
     local language = languageRegistry.getLanguage()
     local windowTitle = tostring(language.ui.dependency_window.window_title)
@@ -233,6 +325,8 @@ function dependencyWindow.editDependencies(filename, side)
         x = windowX,
         y = windowY
     })
+
+    interactionData.window = window
 
     table.insert(activeWindows, window)
     dependencyWindowGroup.parent:addChild(window)
