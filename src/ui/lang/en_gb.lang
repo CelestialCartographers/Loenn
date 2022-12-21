@@ -128,7 +128,7 @@ ui.menubar.redo=Redo
 ui.menubar.settings=Settings
 
 ui.menubar.view=View
-ui.menubar.view_layer=View
+ui.menubar.view_layer=Layers
 ui.menubar.view_tiles_fg=Foreground Tiles
 ui.menubar.view_tiles_bg=Background Tiles
 ui.menubar.view_entities=Entities
