@@ -242,22 +242,4 @@ function dependencyFinder.analyzeRoom(room, modNames)
     return modNames
 end
 
-function dependencyFinder.getDependencyModNames(modMetadata, addSelf)
-    local dependedOnMods = {}
-
-    for _, metadata in ipairs(modMetadata) do
-        if addSelf ~= false and metadata.Name then
-            table.insert(dependedOnMods, metadata.Name)
-        end
-
-        for _, dependency in ipairs(metadata.Dependencies or {}) do
-            if dependency.Name then
-                table.insert(dependedOnMods, dependency.Name)
-            end
-        end
-    end
-
-    return dependedOnMods
-end
-
 return dependencyFinder

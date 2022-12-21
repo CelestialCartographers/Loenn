@@ -14,7 +14,7 @@ local function currentDependedOnMods()
     -- Make sure mod is packaged
     if modPath then
         local currentModMetadata = mods.getModMetadataFromPath(modPath) or {}
-        local dependedOnMods = dependencies.getDependencyModNames(currentModMetadata)
+        local dependedOnMods = mods.getDependencyModNames(currentModMetadata)
 
         return dependedOnMods
     end
