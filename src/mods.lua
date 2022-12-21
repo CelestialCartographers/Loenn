@@ -172,7 +172,7 @@ function modHandler.findEverestYaml(mountPoint)
         local info = love.filesystem.getInfo(yamlTestPath)
 
         if info and info.type == "file" then
-            return yamlTestPath
+            return yamlTestPath, filename
         end
     end
 end
