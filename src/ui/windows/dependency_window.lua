@@ -11,6 +11,7 @@ local utils = require("utils")
 local form = require("ui.forms.form")
 local configs = require("configs")
 local yaml = require("lib.yaml")
+local notifications = require("ui.notification")
 
 local mods = require("mods")
 local dependencyEditor = require("ui.dependency_editor")
@@ -54,13 +55,18 @@ local function prepareMetadataForSaving(metadata, newDependencies)
 end
 
 local function updateMetadataFile(modName, metadata, newDependencies)
+    local path = metadata._path
     local mountPoint = metadata._mountPoint
+    local folderName = metadata._folderName
     local mountedFilename, filename = mods.findEverestYaml(mountPoint)
 
     if filename then
         local realFilename = utils.joinpath(love.filesystem.getRealDirectory(mountPoint), filename)
         local newMetadata = prepareMetadataForSaving(metadata, newDependencies)
         local success, reason = yaml.write(realFilename, newMetadata)
+
+        -- Update metadata in cache
+        mods.readModMetadata(path, mountPoint, folderName)
 
         return success
     end
@@ -69,10 +75,21 @@ local function updateMetadataFile(modName, metadata, newDependencies)
 end
 
 local function updateSections(interactionData)
-    -- "Move" sections from one category to the other
-    -- Probably easier to delete and then generate a new one, potentially keeping expand status?
+    -- TODO - Keep expand status when moving?
+    -- TODO - Attempt to keep scroll, jumps to top
 
-    -- TODO - Implement
+    local window = interactionData.window
+    local windowContent = interactionData.windowContent
+    local modPath = interactionData.modPath
+    local side = interactionData.side
+
+    local newContent = dependencyWindow.getWindowContent(modPath, side, interactionData)
+
+    interactionData.windowContent = newContent
+
+    windowContent:removeSelf()
+    window:addChild(newContent)
+    window:reflow()
 end
 
 local function getDependenciesList(modName)
@@ -292,7 +309,14 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     })
     scrollableColumn:with(uiUtils.fillHeight(true))
 
-    return scrollableColumn
+    interactionData.sectionsColumn = column
+    interactionData.missingModsSection = missingModsSection
+    interactionData.dependedOnSection = dependedOnSection
+    interactionData.uncategorizedSection = uncategorizedSection
+    interactionData.windowContentScrollable = scrollableColumn
+    interactionData.windowContent = column
+
+    return scrollableColumn, column
 end
 
 function dependencyWindow.editDependencies(filename, side)
