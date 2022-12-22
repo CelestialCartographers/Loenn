@@ -357,6 +357,12 @@ function state.getRoomByName(name)
     end
 end
 
+function state.initFromPersistence()
+    if persistence.onlyShowDependedOnMods ~= nil then
+        state.onlyShowDependedOnMods = persistence.onlyShowDependedOnMods
+    end
+end
+
 function state.getLayerVisible(layer)
     local info = state.layerInformation[layer]
 
@@ -396,6 +402,7 @@ end
 
 function state.setShowDependendedOnMods(value)
     state.onlyShowDependedOnMods = value
+    persistence.onlyShowDependedOnMods = value
 
     -- Send event to notify changes in shown dependencies
     sceneHandler.sendEvent("editorShownDependenciesChanged", value)
