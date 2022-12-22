@@ -118,7 +118,8 @@ function modHandler.getFilenameModName(filename)
     end
 
     local celesteDir = fileLocations.getCelesteDir()
-    local celesteParts = utils.splitpath(utils.convertToUnixPath(celesteDir), "/")
+    local celesteModsDir = utils.joinpath(celesteDir, "Mods")
+    local celesteParts = utils.splitpath(utils.convertToUnixPath(celesteModsDir), "/")
     local filenameParts = utils.splitpath(utils.convertToUnixPath(filename), "/")
 
     -- Remove empty parts from end of celesteParts

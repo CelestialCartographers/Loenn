@@ -11,12 +11,16 @@ local placementUtils = {}
 local function currentDependedOnMods()
     local modPath = mods.getFilenameModPath(state.filename)
 
-    -- Make sure mod is packaged
+    -- Make sure mod is packaged and has metadata
+    -- Otherwise fall back to allowing all mods
     if modPath then
-        local currentModMetadata = mods.getModMetadataFromPath(modPath) or {}
-        local dependedOnMods = mods.getDependencyModNames(currentModMetadata)
+        local currentModMetadata = mods.getModMetadataFromPath(modPath)
 
-        return dependedOnMods
+        if currentModMetadata then
+            local dependedOnMods = mods.getDependencyModNames(currentModMetadata)
+
+            return dependedOnMods
+        end
     end
 end
 
