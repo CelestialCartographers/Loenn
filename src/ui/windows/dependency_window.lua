@@ -250,9 +250,9 @@ local function getModSections(groupName, mods, addPadding, interactionData)
 end
 
 function dependencyWindow.getWindowContent(modPath, side, interactionData)
-    -- TODO - Hide current mod
-
     local currentModMetadata = mods.getModMetadataFromPath(modPath) or {}
+    local currentModNames = mods.getModNamesFromMetadata(currentModMetadata)
+    local currentModNamesLookup = table.flip(currentModNames)
     local dependedOnModNames = mods.getDependencyModNames(currentModMetadata)
     local availableModNames = mods.getAvailableModNames()
     local dependedOnModsLookup = table.flip(dependedOnModNames)
@@ -263,17 +263,22 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     local uncategorized = {}
 
     for modName, reasons in pairs(usedMods) do
-        if not dependedOnModsLookup[modName] then
-            missingMods[modName] = reasons
+        if not currentModNamesLookup[modName] then
+            if not dependedOnModsLookup[modName] then
+                missingMods[modName] = reasons
 
-        else
-            dependedOnMods[modName] = reasons
+            else
+                dependedOnMods[modName] = reasons
+            end
         end
     end
 
     for _, modName in ipairs(availableModNames) do
-        if not missingMods[modName] and not dependedOnMods[modName] then
-            uncategorized[modName] = false
+        if not currentModNamesLookup[modName] then
+            -- Anything not already added to the other categories
+            if not missingMods[modName] and not dependedOnMods[modName] then
+                uncategorized[modName] = false
+            end
         end
     end
 
