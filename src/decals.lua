@@ -271,6 +271,18 @@ function decals.flipSelection(room, layer, selection, horizontal, vertical)
     return horizontal or vertical
 end
 
+function decals.rotateSelection(room, layer, selection, direction)
+    local decal = selection.item
+
+    if direction ~= 0 then
+        decal.rotation = ((decal.rotation or 0) + direction * 90) % 360
+
+        updateSelection(selection, room, decal, layer)
+    end
+
+    return direction ~= 0
+end
+
 function decals.deleteSelection(room, layer, selection)
     local targets = decals.getRoomItems(room, layer)
     local target = selection.item
