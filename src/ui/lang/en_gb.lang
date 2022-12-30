@@ -163,5 +163,6 @@ ui.menubar.test_console=Test Console
 ui.menubar.help=Help
 ui.menubar.about=About
 ui.menubar.check_for_updates=Check For Updates
+ui.menubar.open_storage_directory=Open Config Directory
 
 ui.menubar.not_yet_implemented=This feature is not implemented yet.

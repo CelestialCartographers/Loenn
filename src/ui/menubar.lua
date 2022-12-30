@@ -9,6 +9,7 @@ local notifications = require("ui.notification")
 local sceneHandler = require("scene_handler")
 local updater = require("updater")
 local configs = require("configs")
+local fileLocations = require("file_locations")
 
 local utils = require("utils")
 local languageRegistry = require("language_registry")
@@ -31,6 +32,12 @@ end
 
 local function checkForUpdates()
     updater.checkForUpdates(true)
+end
+
+local function openStorageDirectory()
+    local fileUrl = string.format("file://%s", fileLocations.getStorageDir())
+
+    love.system.openURL(fileUrl)
 end
 
 local function getLayerToggleFunction(layer)
@@ -130,6 +137,7 @@ menubar.menubar = {
     addDebug and debugMenu or false,
     {"help", {
         {"check_for_updates", checkForUpdates},
+        {"open_storage_directory", openStorageDirectory},
         {"about", notYetImplementedNotification}
     }}
 }
