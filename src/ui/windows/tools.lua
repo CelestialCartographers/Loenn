@@ -116,9 +116,11 @@ local function getLayerItems(toolName)
 end
 
 local function layerCallback(list, layer)
+    local sameTool = toolWindow.eventStates.tool == toolHandler.currentToolName
     local sameLayer = toolWindow.eventStates.layer == layer
 
-    if not sameLayer then
+    if not sameLayer or not sameTool then
+        toolWindow.eventStates.tool = toolHandler.currentToolName
         toolWindow.eventStates.layer = layer
         toolWindow.eventStates.searchTerm = nil
         toolWindow.eventStates.material = nil
