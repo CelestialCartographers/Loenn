@@ -21,7 +21,7 @@ function sanitizer.beforeSave(filename, state)
             local missingMods = {}
 
             for modName, _ in pairs(usedMods) do
-                if not dependedOnMods[modName] then
+                if not dependedOnLookup[modName] then
                     table.insert(missingMods, modName)
                 end
             end
