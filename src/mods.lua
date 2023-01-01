@@ -138,8 +138,8 @@ function modHandler.getFilenameModName(filename)
         end
     end
 
-    -- Go back up two steps past Celeste root for mod directory
-    return filenameParts[#celesteParts + 2]
+    -- Fetch part after CelesteRoot/Mods/
+    return filenameParts[#celesteParts + 1]
 end
 
 function modHandler.getFilenameModPath(filename)
