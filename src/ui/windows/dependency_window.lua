@@ -76,20 +76,23 @@ end
 
 local function updateSections(interactionData)
     -- TODO - Keep expand status when moving?
-    -- TODO - Attempt to keep scroll, jumps to top
 
     local window = interactionData.window
-    local windowContent = interactionData.windowContent
+    local windowContentScrollable = interactionData.windowContentScrollable
     local modPath = interactionData.modPath
     local side = interactionData.side
 
-    local newContent = dependencyWindow.getWindowContent(modPath, side, interactionData)
+    local previousScrollAmount = windowContentScrollable.inner.y
+    local newContentScrollable, newContent = dependencyWindow.getWindowContent(modPath, side, interactionData)
+
+    newContentScrollable.inner.y = previousScrollAmount
 
     interactionData.windowContent = newContent
+    interactionData.windowContentScrollable = newContentScrollable
 
-    windowContent:removeSelf()
-    window:addChild(newContent)
-    window:reflow()
+    windowContentScrollable:removeSelf()
+    window:addChild(newContentScrollable)
+    window:layout()
 end
 
 local function getDependenciesList(modName)
@@ -190,20 +193,6 @@ local function getModSection(modName, localizedModName, reasons, groupName, inte
     return column
 end
 
-local function calculateSecitonWidthHook(sections)
-    return function(orig, self)
-        local width = 0
-
-        for _, section in ipairs(sections) do
-            section:layoutLazy()
-
-            width = math.max(width, section.width)
-        end
-
-        return width
-    end
-end
-
 local function localizeModName(modName, language)
     local language = language or languageRegistry.getLanguage()
     local modNameLanguage = language.mods[modName].name
@@ -262,6 +251,7 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     local dependedOnMods = {}
     local uncategorized = {}
 
+    -- Mods with known usage
     for modName, reasons in pairs(usedMods) do
         if not currentModNamesLookup[modName] then
             if not dependedOnModsLookup[modName] then
@@ -273,9 +263,18 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
         end
     end
 
+    -- Anything depended on but with no known usage
+    for _, modName in ipairs(dependedOnModNames) do
+        if not dependedOnMods[modName] then
+            if not currentModNamesLookup[modName] then
+                dependedOnMods[modName] = false
+            end
+        end
+    end
+
+    -- Anything not already added to the other categories
     for _, modName in ipairs(availableModNames) do
         if not currentModNamesLookup[modName] then
-            -- Anything not already added to the other categories
             if not missingMods[modName] and not dependedOnMods[modName] then
                 uncategorized[modName] = false
             end
@@ -290,27 +289,37 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     local dependedOnSection = getModSections("depended_on", dependedOnMods, hasMissingMods, interactionData)
     local uncategorizedSection = getModSections("available_mods", uncategorized, hasUncategorized, interactionData)
 
-    -- TODO - Sections need to have the same width, otherwise the lineSeparator is cut off
+    local sections = {}
 
     local column = uiElements.column({})
     local scrollableColumn = uiElements.scrollbox(column)
 
+    column.style.padding = 8
+
     if hasMissingMods then
-        column:addChild(missingModsSection)
+        table.insert(sections, missingModsSection)
     end
 
     if hasDependedOnMods then
-        column:addChild(dependedOnSection)
+        table.insert(sections, dependedOnSection)
     end
 
     if hasUncategorized then
-        column:addChild(uncategorizedSection)
+        table.insert(sections, uncategorizedSection)
+    end
+
+    -- Add all section children to our main column
+    -- Ended up being easier than figuring out layouting to match column widths
+    for _, section in ipairs(sections) do
+        for _, child in ipairs(section.children) do
+            column:addChild(child)
+        end
     end
 
     scrollableColumn:hook({
-        calcWidth = function(orig, element)
-            return element.inner.width
-        end,
+        calcWidth = function(orig, self)
+            return self.inner.width
+        end
     })
     scrollableColumn:with(uiUtils.fillHeight(true))
 
@@ -328,6 +337,8 @@ function dependencyWindow.editDependencies(filename, side)
     local modPath = mods.getFilenameModPath(filename)
 
     if not side or not modPath then
+        -- TODO - Notifications
+
         return
     end
 
