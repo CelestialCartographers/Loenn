@@ -11,10 +11,37 @@ local mapItemUtils = require("map_item_utils")
 local updater = require("updater")
 local tasks = require("utils.tasks")
 
+local dependencyEditor = require("ui.dependency_editor")
 local notifications = require("ui.notification")
 
 local eventNotifications = {}
 local notificationHandlers = {}
+
+local function closePopup(popup)
+    if popup.stateIndex == 2 then
+        popup.durations[popup.stateIndex] = 0
+    end
+end
+
+function notificationHandlers:saveSanitizerDependenciesMissing(missingMods, usedMods, dependedOnMods)
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(function(popup)
+        return uiElements.column({
+            uiElements.label(tostring(language.ui.notifications.saveSanitizerDependenciesMissing)),
+            uiElements.row({
+                uiElements.button(tostring(language.ui.button.yes), function()
+                    loadedState.saveCurrentMap(function(filename)
+                        dependencyEditor.editDependencies()
+                    end)
+                end),
+                uiElements.button(tostring(language.ui.button.no), function()
+                    closePopup(popup)
+                end),
+            })
+        })
+    end, -1)
+end
 
 function notificationHandlers:editorMapSaved(filename)
     local language = languageRegistry.getLanguage()
@@ -66,12 +93,6 @@ function notificationHandlers:editorHistoryRedoEmpty()
     local language = languageRegistry.getLanguage()
 
     notifications.notify(tostring(language.ui.notifications.editorHistoryRedoEmpty))
-end
-
-local function closePopup(popup)
-    if popup.stateIndex == 2 then
-        popup.durations[popup.stateIndex] = 0
-    end
 end
 
 -- TODO - Move over to modal when those are implemented
