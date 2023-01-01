@@ -199,6 +199,18 @@ function decals.getSelection(room, decal)
     end
 end
 
+local function updateSelection(selection, room, decal, layer)
+    local newSelectionRectangle = decals.getSelection(room, decal)
+
+    selection.x = newSelectionRectangle.x
+    selection.y = newSelectionRectangle.y
+
+    selection.width = newSelectionRectangle.width
+    selection.height = newSelectionRectangle.height
+
+    selection.layer = layer or selection.layer
+end
+
 function decals.moveSelection(room, layer, selection, x, y)
     local decal = selection.item
 
@@ -214,21 +226,31 @@ end
 function decals.resizeSelection(room, layer, selection, offsetX, offsetY, directionX, directionY)
     local decal = selection.item
 
+    local absX = math.abs(decal.scaleX)
+    local absY = math.abs(decal.scaleY)
+
+    local signX = utils.sign(decal.scaleX)
+    local signY = utils.sign(decal.scaleY)
+
     if offsetX < 0 then
-        decal.scaleX = math.max(decal.scaleX / 2, 1.0)
+        decal.scaleX = math.max(absX / 2, 1.0) * signX
 
     elseif offsetX > 0 then
-        decal.scaleX = math.min(decal.scaleX * 2, 2^4)
+        decal.scaleX = math.min(absX * 2, 2^4) * signX
     end
 
     if offsetY < 0 then
-        decal.scaleY = math.max(decal.scaleY / 2, 1.0)
+        decal.scaleY = math.max(absY / 2, 1.0) * signY
 
     elseif offsetY > 0 then
-        decal.scaleY = math.min(decal.scaleY * 2, 2^4)
+        decal.scaleY = math.min(absY * 2, 2^4) * signY
     end
 
-    return true
+    if offsetX ~= 0 or offsetY ~= 0 then
+        updateSelection(selection, room, decal, layer)
+    end
+
+    return offsetX ~= 0 or offsetY ~= 0
 end
 
 function decals.flipSelection(room, layer, selection, horizontal, vertical)
@@ -242,7 +264,23 @@ function decals.flipSelection(room, layer, selection, horizontal, vertical)
         decal.scaleY *= -1
     end
 
+    if horizontal or vertical then
+        updateSelection(selection, room, decal, layer)
+    end
+
     return horizontal or vertical
+end
+
+function decals.rotateSelection(room, layer, selection, direction)
+    local decal = selection.item
+
+    if direction ~= 0 then
+        decal.rotation = ((decal.rotation or 0) + direction * 90) % 360
+
+        updateSelection(selection, room, decal, layer)
+    end
+
+    return direction ~= 0
 end
 
 function decals.deleteSelection(room, layer, selection)

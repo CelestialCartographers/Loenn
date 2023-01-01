@@ -16,6 +16,9 @@ local sideStruct = require("structs.side")
 
 local state = {}
 
+state.currentSaves = {}
+state.pendingSaves = {}
+
 local function getWindowTitle(side)
     local name = sideStruct.getMapName(side)
 
@@ -177,11 +180,51 @@ function state.loadFile(filename, roomName)
     )
 end
 
+-- Prevent overlapping saves, add data to reschedule after current save is finished
+-- Any new save while we already have a queued save is considered obsolete, only the latest save matters
+local function queueDelayedSave(...)
+    local arguments = {...}
+    local filename = arguments[1]
+
+    state.pendingSaves[filename] = arguments
+end
+
+local function resumeQueuedSave(filename)
+    if state.pendingSaves[filename] then
+        state.saveFile(unpack(state.pendingSaves[filename]))
+
+        state.pendingSaves[filename] = nil
+    end
+end
+
+local function mapSaveSuccess(filename)
+    state.currentSaves[filename] = nil
+
+    sceneHandler.sendEvent("editorMapSaved", filename)
+    resumeQueuedSave(filename)
+end
+
+local function mapSaveFailed(filename)
+    state.currentSaves[filename] = nil
+
+    sceneHandler.sendEvent("editorMapSaveFailed", filename)
+    resumeQueuedSave(filename)
+end
+
 function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtIfMissing, verifyMap)
     if filename and state.side then
         if addExtIfMissing ~= false and filesystem.fileExtension(filename) ~= "bin" then
             filename ..= ".bin"
         end
+
+        -- Check if we are already saving, queue save and delay this
+        if state.currentSaves[filename] then
+            queueDelayedSave(filename, afterSaveCallback, beforeSaveCallback, addExtIfMissing, verifyMap)
+
+            return
+        end
+
+        state.currentSaves[filename] = true
 
         if afterSaveCallback ~= false then
             afterSaveCallback = afterSaveCallback or state.defaultAfterSaveCallback
@@ -225,7 +268,7 @@ function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtI
                                             afterSaveCallback(filename, state)
                                         end
 
-                                        sceneHandler.sendEvent("editorMapSaved", filename)
+                                        mapSaveSuccess(filename)
                                     end)
 
                                 else
@@ -233,17 +276,17 @@ function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtI
                                         afterSaveCallback(filename, state)
                                     end
 
-                                    sceneHandler.sendEvent("editorMapSaved", filename)
+                                    mapSaveSuccess(filename)
                                 end
 
                             else
-                                sceneHandler.sendEvent("editorMapSaveFailed", filename)
+                                mapSaveFailed(filename)
                             end
                         end
                     )
 
                 else
-                    sceneHandler.sendEvent("editorMapSaveFailed", filename)
+                    mapSaveFailed(filename)
                 end
             end
         )
@@ -357,6 +400,12 @@ function state.getRoomByName(name)
     end
 end
 
+function state.initFromPersistence()
+    if persistence.onlyShowDependedOnMods ~= nil then
+        state.onlyShowDependedOnMods = persistence.onlyShowDependedOnMods
+    end
+end
+
 function state.getLayerVisible(layer)
     local info = state.layerInformation[layer]
 
@@ -396,6 +445,7 @@ end
 
 function state.setShowDependendedOnMods(value)
     state.onlyShowDependedOnMods = value
+    persistence.onlyShowDependedOnMods = value
 
     -- Send event to notify changes in shown dependencies
     sceneHandler.sendEvent("editorShownDependenciesChanged", value)

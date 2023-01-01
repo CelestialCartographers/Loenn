@@ -89,7 +89,7 @@ function drawing.printCenteredText(text, x, y, width, height, font, fontSize, tr
     local textHeight = (#lines - 1) * (fontHeight * fontLineHeight) + fontHeight
 
     local offsetX = 1
-    local offsetY = math.floor((height - textHeight) / 2) + 1
+    local offsetY = math.floor((height - textHeight * fontSize) / 2) + 1
 
     love.graphics.push()
 
@@ -115,7 +115,7 @@ function drawing.addCenteredText(batch, text, x, y, width, height, font, fontSiz
     local textHeight = (#lines - 1) * (fontHeight * fontLineHeight) + fontHeight
 
     local offsetX = 1
-    local offsetY = math.floor((height - textHeight) / 2) + 1
+    local offsetY = math.floor((height - textHeight * fontSize) / 2) + 1
     local wrapLimit = math.floor(width / fontSize)
 
     batch:addf(text, wrapLimit, "center", x + offsetX, y + offsetY, 0, fontSize, fontSize)

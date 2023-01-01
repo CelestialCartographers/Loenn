@@ -143,6 +143,10 @@ end
 function dependencyFinder.analyzeMetadata(metadata, modNames)
     modNames = modNames or {}
 
+    if not metadata then
+        return modNames
+    end
+
     local language = languageRegistry.getLanguage()
     local localizedCategory = localizeCategoryName("metadata")
 

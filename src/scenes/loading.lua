@@ -109,6 +109,7 @@ function loadingScene:firstEnter()
 
     viewerState.loadFile(lastMapFilename or defaultMapFilename, lastRoomName)
     viewportHandler.cameraFromPersistence()
+    viewerState.initFromPersistence()
 end
 
 function loadingScene:draw()
