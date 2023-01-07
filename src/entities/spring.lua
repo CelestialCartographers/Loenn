@@ -28,6 +28,14 @@ springRight.placements = {
     }
 }
 
+function springRight.flip(room, entity, horizontal, vertical)
+    if horizontal then
+        entity._name = "wallSpringRight"
+    end
+
+    return horizontal
+end
+
 local springLeft = {}
 
 springLeft.name = "wallSpringRight"
@@ -41,6 +49,14 @@ springLeft.placements = {
         playerCanUse = true
     }
 }
+
+function springLeft.flip(room, entity, horizontal, vertical)
+    if horizontal then
+        entity._name = "wallSpringLeft"
+    end
+
+    return horizontal
+end
 
 return {
     springUp,

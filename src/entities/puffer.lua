@@ -24,4 +24,12 @@ function puffer.scale(room, entity)
     return right and 1 or -1, 1
 end
 
+function puffer.flip(room, entity, horizontal, vertical)
+    if horizontal then
+        entity.right = not entity.right
+    end
+
+    return horizontal
+end
+
 return puffer

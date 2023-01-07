@@ -513,6 +513,89 @@ function entities.drawSelected(room, layer, entity, color)
     end
 end
 
+-- Update the selection by calling getSelections
+-- This is absolute worst case way to update the selection, movement for example can easily offset the rectangle
+local function updateSelectionNaive(room, entity, node, selection)
+    local rectangle, nodeRectangles = entities.getSelection(room, entity)
+    local newSelectionRectangle = node == 0 and rectangle or nodeRectangles[node]
+
+    selection.x = newSelectionRectangle.x
+    selection.y = newSelectionRectangle.y
+
+    selection.width = newSelectionRectangle.width
+    selection.height = newSelectionRectangle.height
+end
+
+function entities.flipSelection(room, layer, selection, horizontal, vertical)
+    local entity, node = selection.item, selection.node
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler.onFlip then
+        local handled = handler.onFlip(room, entity, horizontal, vertical)
+
+        if handled == false then
+            return false
+        end
+    end
+
+    if handler.flip then
+        local madeChanges = handler.flip(room, entity, horizontal, vertical)
+
+        if madeChanges == false then
+            return false
+        end
+    end
+
+    -- Name might have changed
+    name = entity._name
+    handler = entities.registeredEntities[name]
+
+    if handler.updateFlipSelection then
+        handler.updateFlipSelection(room, entity, node, selection, horizontal, vertical)
+
+    else
+        updateSelectionNaive(room, entity, node, selection)
+    end
+
+    return true
+end
+
+function entities.rotateSelection(room, layer, selection, direction)
+    local entity, node = selection.item, selection.node
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler.onRotate then
+        local handled = handler.onRotate(room, entity, direction)
+
+        if handled == false then
+            return false
+        end
+    end
+
+    if handler.rotate then
+        local madeChanges = handler.rotate(room, entity, direction)
+
+        if madeChanges == false then
+            return false
+        end
+    end
+
+    -- Name might have changed
+    name = entity._name
+    handler = entities.registeredEntities[name]
+
+    if handler.updateRotateSelection then
+        handler.updateRotateSelection(room, entity, node, selection, direction)
+
+    else
+        updateSelectionNaive(room, entity, node, selection)
+    end
+
+    return true
+end
+
 function entities.moveSelection(room, layer, selection, offsetX, offsetY)
     local entity, node = selection.item, selection.node
     local name = entity._name
