@@ -15,13 +15,21 @@ function history.reset()
 end
 
 function history.undo()
-    if not history.timeline:backward() then
+    if history.timeline:backward() then
+        history.madeChanges = true
+        history.lastChange = os.time()
+
+    else
         sceneHandler.sendEvent("editorHistoryUndoEmpty")
     end
 end
 
 function history.redo()
-    if not history.timeline:forward() then
+    if history.timeline:forward() then
+        history.madeChanges = true
+        history.lastChange = os.time()
+
+    else
         sceneHandler.sendEvent("editorHistoryRedoEmpty")
     end
 end

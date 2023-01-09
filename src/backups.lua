@@ -8,6 +8,8 @@ local history = require("history")
 
 local backups = {}
 
+backups.lastBackup = 0
+
 local timestampFormat = "%Y-%m-%d %H-%M-%S"
 local timestampPattern = "(%d%d%d%d)-(%d%d)-(%d%d) (%d%d)-(%d%d)-(%d%d)"
 
@@ -15,10 +17,11 @@ local function saveCallback(filename)
     logging.debug(string.format("Created map backup to '%s'", filename))
 end
 
-function backups.getBackupMapName(map)
-    map = map or loadedState.map
+function backups.getBackupMapName(side)
+    side = side or loadedState.side
 
-    if map then
+    if side then
+        local map = side.map
         local mapName = map.package
 
         if not mapName and loadedState.filename then
@@ -30,9 +33,9 @@ function backups.getBackupMapName(map)
 end
 
 -- Folder to put the backup in
-function backups.getBackupPath(map)
+function backups.getBackupPath(side)
     local backupsPath = fileLocations.getBackupPath()
-    local mapName = backups.getBackupMapName(map)
+    local mapName = backups.getBackupMapName(side)
 
     if mapName then
         return utils.joinpath(backupsPath, mapName)
@@ -66,8 +69,8 @@ local function getTimeFromFilename(filename)
     return os.time({year=year, month=month, day=day, hour=hour, min=minute, sec=second})
 end
 
-function backups.cleanupBackups(map)
-    local backupFilenames = backups.getMapBackups(map)
+function backups.cleanupBackups(side)
+    local backupFilenames = backups.getMapBackups(side)
     local backupCount = #backupFilenames
     local maximumBackups = configs.backups.maximumFiles
 
@@ -100,9 +103,9 @@ function backups.cleanupBackups(map)
     end
 end
 
-function backups.getMapBackups(map)
+function backups.getMapBackups(side)
     local filenames = {}
-    local backupPath = backups.getBackupPath(map)
+    local backupPath = backups.getBackupPath(side)
 
     if backupPath then
         -- utils.getFilenames only works on mounted paths
@@ -121,15 +124,17 @@ function backups.getMapBackups(map)
     return filenames
 end
 
-function backups.createBackup(map)
-    local backupPath = backups.getBackupPath(map)
+function backups.createBackup(side, lastChange)
+    local backupPath = backups.getBackupPath(side)
 
     if backupPath then
         local timestamp = os.date(timestampFormat, os.time())
         local filename = utils.joinpath(backupPath, timestamp .. ".bin")
 
+        backups.lastBackup = os.time()
+
         loadedState.saveFile(filename, saveCallback)
-        backups.cleanupBackups(map)
+        backups.cleanupBackups(side)
     end
 end
 
@@ -151,8 +156,10 @@ function backups.createBackupDevice()
             device.deltaTimeAcc -= device.backupRate
             device.backupRate = configs.backups.backupRate
 
-            if configs.backups.enabled and history.madeChanges then
-                backups.createBackup()
+            if configs.backups.enabled then
+                if history.lastChange > backups.lastBackup then
+                    backups.createBackup(loadedState.side, history.lastChange)
+                end
             end
         end
     end
