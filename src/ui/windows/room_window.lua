@@ -29,6 +29,7 @@ local windowPreviousX = 0
 local windowPreviousY = 0
 
 local songs = table.keys(enums.songs)
+local ambientSounds = table.keys(enums.ambient_sounds)
 local colorOptions = {}
 
 for i = 1, #colors.roomBorderColors do
@@ -36,6 +37,7 @@ for i = 1, #colors.roomBorderColors do
 end
 
 table.sort(songs)
+table.sort(ambientSounds)
 
 local defaultFieldOrder = {
     "name", "color",
@@ -45,8 +47,8 @@ local defaultFieldOrder = {
     "windPattern", "underwater", "space",
     "disableDownTransition", "checkpoint", "dark", "whisper",
     "musicLayer1", "musicLayer2", "musicLayer3", "musicLayer4",
-    "ambienceProgress", "musicProgress",
-    "music",
+    "music", "musicProgress",
+    "ambience", "ambienceProgress",
 }
 
 local defaultFieldInformation = {
@@ -85,6 +87,9 @@ local defaultFieldInformation = {
 
     music = {
         options = songs
+    },
+    ambience = {
+        options = ambientSounds
     },
 
     windPattern = {
