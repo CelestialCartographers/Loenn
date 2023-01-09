@@ -42,7 +42,7 @@ for typeName, typeAttributes in pairs(trackSpinnerTypes) do
                 speed = speedValue,
                 dust = dust,
                 star = star,
-                startCentered = false
+                startCenter = false
             }
         })
     end
