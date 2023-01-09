@@ -948,6 +948,17 @@ triggers.ambienceParamTrigger.attributes.description.from=Determines the volume 
 triggers.ambienceParamTrigger.attributes.description.parameter=Uses the ambience properties if left blank, otherwise uses FMOD's escape property.
 triggers.ambienceParamTrigger.attributes.description.direction=Determines which direction the ambience comes from.
 
+# Ambience
+triggers.everest/ambienceTrigger.placements.name.ambience=Ambience
+triggers.everest/ambienceTrigger.attributes.description.resetOnLeave=Resets the ambience when the player leaves the current zone after entering the trigger zone.
+triggers.everest/ambienceTrigger.attributes.description.track=Changes the ambience track that plays when the player enters the trigger zone.
+
+# Ambience Volume
+triggers.everest/ambienceVolumeTrigger.placements.name.ambience_volume=Ambience Volume
+triggers.everest/ambienceVolumeTrigger.attributes.description.to=Determines the volume of the ambience at farther distances.
+triggers.everest/ambienceVolumeTrigger.attributes.description.from=Determines the volume of the ambience at closer distances.
+triggers.everest/ambienceVolumeTrigger.attributes.description.direction=Determines which direction the ambience comes from.
+
 # Bird Path
 triggers.birdPathTrigger.placements.name.bird_path=Bird Path
 
@@ -1175,7 +1186,8 @@ room.attribute.musicLayer3=Music Layer 3
 room.attribute.musicLayer4=Music Layer 4
 room.attribute.delayAltMusicFade=Delay Alternative Music Fade
 room.attribute.music=Music
-room.attribute.altMusic=Alternative Music
+room.attribute.musicAlternative=Alternative Music
+room.attribute.ambience=Ambience
 room.attribute.windPattern=Wind Pattern
 room.attribute.color=Colour
 room.attribute.cameraOffsetX=Camera Offset X
@@ -1199,8 +1211,9 @@ room.description.musicLayer2=Whether the room has the second music layer enabled
 room.description.musicLayer3=Whether the room has the third music layer enabled.
 room.description.musicLayer4=Whether the room has the fourth music layer enabled.
 room.description.delayAltMusicFade=Delay the alternative music fade.
-room.description.music=What song should be playing in the room, uses previous if left empty.
-room.description.altMusic=What alternative song should be playing. It is unsure what this means, as it seems to not be hooked up in the game anymore.
+room.description.music=Which song should be playing in the room. Uses previous if left empty.
+room.description.musicAlternative=Which alternative song should be playing. It is unsure what this means, as it seems to not be hooked up in the game anymore.
+room.description.ambience=Which ambience should be playing in the room. Uses previous if left empty.
 room.description.windPattern=The type of wind in the room.
 room.description.color=The colour of the room border. Can also be seen in the game's debug map viewer.\n0 - White\n1 - Red\n2 - Green\n3 - Light Blue\n4 - Dark Blue\n5 - Purple\n6 - Pink
 room.description.cameraOffsetX=Global horizontal offset of camera in room.

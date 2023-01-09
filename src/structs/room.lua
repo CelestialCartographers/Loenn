@@ -55,6 +55,7 @@ function roomStruct.decode(data)
 
     room.music = data.music or "music_oldsite_awake"
     room.musicAlternative = data.alt_music or ""
+    room.ambience = data.ambience or ""
 
     room.windPattern = data.windPattern or "None"
 
@@ -195,6 +196,7 @@ function roomStruct.encode(room)
 
     res.music = room.music
     res.alt_music = room.musicAlternative
+    res.ambience = room.ambience
 
     res.windPattern = room.windPattern
 

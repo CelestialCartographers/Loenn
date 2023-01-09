@@ -104,4 +104,13 @@ function wallBooster.rectangle(room, entity)
     return utils.rectangle(entity.x, entity.y, 8, entity.height or 8)
 end
 
+function wallBooster.flip(room, entity, horizontal, vertical)
+    if horizontal then
+        entity.left = not entity.left
+        entity.x += (entity.left and 8 or -8)
+    end
+
+    return horizontal
+end
+
 return wallBooster

@@ -138,6 +138,11 @@ function modHandler.getFilenameModName(filename)
         end
     end
 
+    -- Make sure this is a folder and not a map file directly in mods folder
+    if not filenameParts[#celesteParts + 2] then
+        return
+    end
+
     -- Fetch part after CelesteRoot/Mods/
     return filenameParts[#celesteParts + 1]
 end

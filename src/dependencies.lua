@@ -131,7 +131,7 @@ function dependencyFinder.analyzeTilesMetadata(metadata, modNames)
         if meta.path then
             local tilesetSpriteMeta = atlases.gameplay[meta.path]
 
-            if not tilesetSpriteMeta.internalFile then
+            if tilesetSpriteMeta and not tilesetSpriteMeta.internalFile then
                 local cleanFilename = cleanFilename(tilesetSpriteMeta.filename)
 
                 addAssociatedModsFromFilename(localizedCategory, cleanFilename, modNames)
