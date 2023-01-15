@@ -334,10 +334,17 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
 end
 
 function dependencyWindow.editDependencies(filename, side)
+    local language = languageRegistry.getLanguage()
     local modPath = mods.getFilenameModPath(filename)
 
-    if not side or not modPath then
-        -- TODO - Notifications
+    if not side then
+        notifications.notify(tostring(language.ui.dependency_window.no_map_loaded))
+
+        return
+    end
+
+    if not modPath then
+        notifications.notify(tostring(language.ui.dependency_window.requires_packaged_mod))
 
         return
     end

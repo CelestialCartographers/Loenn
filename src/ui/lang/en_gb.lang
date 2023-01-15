@@ -65,13 +65,15 @@ ui.metadata_window.group.xml.name=XML
 ui.metadata_window.group.music.name=Music
 
 
-# Dependency Generator
+# Dependency Window
 ui.dependency_window.window_title=Dependencies
 ui.dependency_window.group.missing_mods=Missing from dependencies
 ui.dependency_window.group.depended_on=Dependencies
 ui.dependency_window.group.available_mods=Available Mods
 ui.dependency_window.add_dependency=Add dependency
 ui.dependency_window.remove_dependency=Remove dependency
+ui.dependency_window.no_map_loaded=No map loaded.
+ui.dependency_window.requires_packaged_mod=Cannot edit dependencies of an unpackaged mod.
 
 
 # Room Window

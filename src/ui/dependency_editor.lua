@@ -7,7 +7,6 @@ local dependencyEditor = {}
 
 dependencyEditor.dependencyWindow = nil
 
--- TODO - Toast about map not loaded etc
 function dependencyEditor.editDependencies(element)
     local filename = loadedState.filename
     local side = loadedState.side
