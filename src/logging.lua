@@ -55,26 +55,40 @@ function logging.bufferWrite(filename)
 end
 
 function logging.log(status, message, filename)
-    -- These don't exist when the program has just started
-    local fileLocations = require("file_locations")
-    local configs = require("configs")
+    local formattedMessage = string.format("[%s] %s", status, message)
+    local shouldLog = true
+    local shouldFlush = true
 
-    local levelThreshold = configs.debug.loggingLevel
-    local flushImmediatelyLevel = configs.debug.loggingFlushImmediatelyLevel
-    local level = logging.logLevels[status]
+    -- These might not be loaded yet, and we can not load them early
+    local fileLocations = package.loaded["file_locations"]
+    local configs = package.loaded["configs"]
 
-    if level >= levelThreshold then
-        filename = filename or fileLocations.getLogPath()
+    -- Fallback to log path if posible, file_locations might not be loaded yet
+    if not filename and fileLocations then
+        filename = fileLocations.getLogPath()
+    end
 
-        local formattedMessage = string.format("[%s] %s", status, message)
+    -- Always log if configs is not loaded yet
+    if configs then
+        local levelThreshold = configs.debug.loggingLevel
+        local flushImmediatelyLevel = configs.debug.loggingFlushImmediatelyLevel
+        local level = logging.logLevels[status]
 
+        shouldLog = level >= levelThreshold
+        shouldFlush = level >= flushImmediatelyLevel
+    end
+
+    if shouldLog then
         -- Both print the message and add it to the queue
         print(formattedMessage)
-        logging.bufferAddMessage(filename, formattedMessage)
 
-        -- In case of errors the log must be flushed immediately
-        if level >= flushImmediatelyLevel then
-            logging.bufferWrite(filename)
+        if filename then
+            logging.bufferAddMessage(filename, formattedMessage)
+
+            -- In case of errors the log must be flushed immediately
+            if shouldFlush then
+                logging.bufferWrite(filename)
+            end
         end
     end
 end
