@@ -63,10 +63,10 @@ local defaultFieldGroups = {
         fieldOrder = {
             "mode.audiostate.Music", "mode.audiostate.Ambience",
             "CassetteCheckpointIndex", "CassetteNoteColor", "CassetteSong",
-            "mode.cassettemodifier.BeatsMax", "mode.cassettemodifier.BeatsPerTick",
-            "mode.cassettemodifier.TicksPerSwap", "mode.cassettemodifier.LeadBeats",
-            "mode.cassettemodifier.BeatIndexOffset", "mode.cassettemodifier.TempoMult",
-            "mode.cassettemodifier.Blocks", "mode.cassettemodifier.OldBehavior",
+            "cassettemodifier.BeatsMax", "cassettemodifier.BeatsPerTick",
+            "cassettemodifier.TicksPerSwap", "cassettemodifier.LeadBeats",
+            "cassettemodifier.BeatIndexOffset", "cassettemodifier.TempoMult",
+            "cassettemodifier.Blocks", "cassettemodifier.OldBehavior",
             "mode.IgnoreLevelAudioLayerData"
         }
     }
@@ -165,25 +165,25 @@ local defaultFieldInformation = {
         options = ambientSounds
     },
 
-    ["mode.cassettemodifier.TempoMult"] = {
+    ["cassettemodifier.TempoMult"] = {
         fieldType = "number"
     },
-    ["mode.cassettemodifier.LeadBeats"] = {
+    ["cassettemodifier.LeadBeats"] = {
         fieldType = "integer"
     },
-    ["mode.cassettemodifier.BeatsPerTick"] = {
+    ["cassettemodifier.BeatsPerTick"] = {
         fieldType = "integer"
     },
-    ["mode.cassettemodifier.TicksPerSwap"] = {
+    ["cassettemodifier.TicksPerSwap"] = {
         fieldType = "integer"
     },
-    ["mode.cassettemodifier.Blocks"] = {
+    ["cassettemodifier.Blocks"] = {
         fieldType = "integer"
     },
-    ["mode.cassettemodifier.BeatsMax"] = {
+    ["cassettemodifier.BeatsMax"] = {
         fieldType = "integer"
     },
-    ["mode.cassettemodifier.BeatIndexOffset"] = {
+    ["cassettemodifier.BeatIndexOffset"] = {
         fieldType = "integer"
     }
 }
@@ -238,8 +238,8 @@ local function prepareFormData(side)
     end
 
     mergeDefaults(data, "mode", defaultMetadata.mode)
+    mergeDefaults(data, "cassettemodifier", defaultMetadata.cassetteModifiers)
     mergeDefaults(data.mode, "audiostate", defaultMetadata.audioState)
-    mergeDefaults(data.mode, "cassettemodifier", defaultMetadata.cassetteModifiers)
 
     return data
 end
