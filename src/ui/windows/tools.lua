@@ -74,9 +74,9 @@ local function getMaterialItems(layer, sortItems)
 end
 
 local function materialCallback(list, material)
-    local sameMaterial = material ~= toolWindow.eventStates.material
+    local sameMaterial = material == toolWindow.eventStates.material
 
-    if sameMaterial then
+    if not sameMaterial then
         toolWindow.eventStates.material = material
 
         toolHandler.setMaterial(material)
@@ -197,9 +197,9 @@ local function getModeItems(toolName)
 end
 
 local function modeCallback(list, mode)
-    local sameMode = mode ~= toolWindow.eventStates.mode
+    local sameMode = mode == toolWindow.eventStates.mode
 
-    if sameMode then
+    if not sameMode then
         toolWindow.eventStates.mode = mode
         toolWindow.eventStates.layer = nil
         toolWindow.eventStates.searchTerm = ""
@@ -269,9 +269,9 @@ local function getToolItems(sortItems)
 end
 
 local function toolCallback(list, toolName)
-    local sameTool = toolName ~= toolWindow.eventStates.tool
+    local sameTool = toolName == toolWindow.eventStates.tool
 
-    if sameTool then
+    if not sameTool then
         toolWindow.eventStates.tool = toolName
         toolWindow.eventStates.mode = nil
         toolWindow.eventStates.searchTerm = ""
