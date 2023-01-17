@@ -84,6 +84,9 @@ local function materialCallback(list, material)
 end
 
 local function toolMaterialChangedCallback(self, tool, layer, material)
+    toolWindow.eventStates.layer = layer
+    toolWindow.eventStates.material = material
+
     listWidgets.setSelection(toolWindow.layerList, layer, true)
     listWidgets.setSelection(toolWindow.materialList, material, true)
 end
@@ -210,6 +213,8 @@ local function modeCallback(list, mode)
 end
 
 local function toolModeChangedCallback(self, tool, mode)
+    toolWindow.eventStates.mode = mode
+
     listWidgets.setSelection(toolWindow.modeList, mode, true)
 end
 
@@ -284,6 +289,8 @@ local function toolCallback(list, toolName)
 end
 
 local function toolChangedCallback(self, tool)
+    toolWindow.eventStates.tool = tool.name
+
     listWidgets.setSelection(toolWindow.toolList, tool.name, true)
     updateLayerList(tool.name)
     updateToolModeList(tool.name)
