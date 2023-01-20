@@ -71,6 +71,10 @@ function toolUtils.getPersistenceSearch(tool, layer)
     return toolUtils.getPersistenceValue(toolUtils.getToolPersistenceIdentifier(tool), layer, "search")
 end
 
+function toolUtils.getPersistenceFavorites(tool, layer)
+    return toolUtils.getPersistenceValue(toolUtils.getToolPersistenceIdentifier(tool), layer, "favorites")
+end
+
 function toolUtils.setPersistenceMode(tool, mode)
     return toolUtils.setPersistenceValue(mode, toolUtils.getToolPersistenceIdentifier(tool), "mode")
 end
@@ -85,6 +89,36 @@ end
 
 function toolUtils.setPersistenceSearch(tool, layer, search)
     return toolUtils.setPersistenceValue(search, toolUtils.getToolPersistenceIdentifier(tool), layer, "search")
+end
+
+function toolUtils.setPersistenceFavorites(tool, layer, favorites)
+    return toolUtils.setPersistenceValue(favorites, toolUtils.getToolPersistenceIdentifier(tool), layer, "favorites")
+end
+
+function toolUtils.addPersistenceFavorites(tool, layer, material)
+    local favorites = toolUtils.getPersistenceFavorites(tool, layer) or {}
+
+    for _, favorite in ipairs(favorites) do
+        if favorite == material then
+            return
+        end
+    end
+
+    table.insert(favorites, material)
+
+    toolUtils.setPersistenceFavorites(tool, layer, favorites)
+end
+
+function toolUtils.removePersistenceFavorites(tool, layer, material)
+    local favorites = toolUtils.getPersistenceFavorites(tool, layer) or {}
+
+    for i = #favorites, 1, -1 do
+        if favorites[i] == material then
+            table.remove(favorites, i)
+        end
+    end
+
+    toolUtils.setPersistenceFavorites(tool, layer, favorites)
 end
 
 function toolUtils.sendToolEvent(tool)

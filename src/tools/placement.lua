@@ -361,7 +361,7 @@ local function setPlacement(placement)
     updatePlacementNodes()
     updatePlacementDrawable()
 
-    toolUtils.sendMaterialEvent(tool, tool.layer, placement.displayName)
+    toolUtils.sendMaterialEvent(tool, tool.layer, placement.name)
 end
 
 local function selectPlacement(name, index)
@@ -422,10 +422,10 @@ end
 local function updatePlacements(layer)
     placementsAvailable = placementUtils.getPlacements(layer)
 
+    local persistenceMaterial = toolUtils.getPersistenceMaterial(tool, layer)
+
     selectPlacement(nil, 1)
     toolUtils.sendLayerEvent(tool, layer)
-
-    local persistenceMaterial = toolUtils.getPersistenceMaterial(tool, layer)
 
     if persistenceMaterial then
         tool.setMaterial(persistenceMaterial)

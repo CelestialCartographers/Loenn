@@ -77,6 +77,10 @@ function toolHandler.unloadTools()
 end
 
 local function getHandler(name)
+    if type(name) == "table" then
+        return name
+    end
+
     name = name or toolHandler.currentToolName
 
     return toolHandler.tools[name], name

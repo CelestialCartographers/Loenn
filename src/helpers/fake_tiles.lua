@@ -161,7 +161,7 @@ local function getEntityMaterialFromKey(entity, materialKey)
         return materialKey
     end
 
-    return "3"
+    return fakeTilesHelper.getMaterialMatrix(entity, "3")
 end
 
 -- Blend mode key can also be a boolean
