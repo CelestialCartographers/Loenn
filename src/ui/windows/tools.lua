@@ -7,6 +7,8 @@ local uiUtils = require("ui.utils")
 local widgetUtils = require("ui.widgets.utils")
 local listWidgets = require("ui.widgets.lists")
 local simpleDocks = require("ui.widgets.simple_docks")
+local contextMenu = require("ui.context_menu")
+local iconUtils = require("ui.utils.icons")
 
 local languageRegistry = require("language_registry")
 local toolHandler = require("tools")
@@ -39,9 +41,76 @@ local function getLanguageOrDefault(languagePath, default)
     return default
 end
 
+local function updateListItemFavoriteVisuals(listItem)
+    local favorite = listItem.itemFavorited
+    local text = listItem.originalText
+    local children = listItem.children
+    local label = uiElements.label(text)
+
+    listItem.label = label
+
+    for i = 1, #children do
+        children[i] = nil
+    end
+
+    if favorite then
+        local iconMaxSize = listItem.height - listItem.style.padding * 2
+        local favoriteIcon, iconSize = iconUtils.getIcon("favorite", iconMaxSize)
+
+        if favoriteIcon then
+            local centerOffset = math.floor((listItem.height - iconSize) / 2)
+            local imageElement = uiElements.image(favoriteIcon)
+
+            imageElement = imageElement:with(uiUtils.at(listItem.style.padding, centerOffset))
+
+            table.insert(children, imageElement)
+        end
+    end
+
+    table.insert(children, label)
+    listItem:reflow()
+end
+
+local function materialSortFunction(lhs, rhs)
+    if lhs.itemFavorited ~= rhs.itemFavorited then
+        return lhs.itemFavorited
+    end
+
+    return lhs.originalText < rhs.originalText
+end
+
+local function addMaterialContextMenu(tool, layer, listItem)
+    local material = listItem.data
+    local favorite = listItem.itemFavorited
+
+    local content = uiElements.checkbox("FAVORITE", favorite, function(checkbox, newFavorite)
+        local materialList = listItem.parent
+        local materialListItems = materialList.children
+
+        if newFavorite then
+            toolUtils.removePersistenceFavorites(tool, layer, material)
+
+        else
+            toolUtils.addPersistenceFavorites(tool, layer, material)
+        end
+
+        listItem.itemFavorited = newFavorite
+
+        updateListItemFavoriteVisuals(listItem)
+        table.sort(materialListItems, materialSortFunction)
+        materialList:layout()
+    end)
+
+    return contextMenu.addContextMenu(listItem, content)
+end
+
 local function getMaterialItems(layer, sortItems)
-    local materials = toolHandler.getMaterials(nil, layer)
+    local currentTool = toolHandler.currentTool
+    local currentLayer = layer or toolHandler.getLayer(currentTool)
+    local materials = toolHandler.getMaterials(nil, layer or currentLayer)
     local materialItems = {}
+    local favorites = toolUtils.getPersistenceFavorites(currentTool, currentLayer) or {}
+    local favoritesLookup = table.flip(favorites)
 
     for i, material in ipairs(materials or {}) do
         local materialTooltip
@@ -55,20 +124,28 @@ local function getMaterialItems(layer, sortItems)
             materialTooltip = material.tooltipText
         end
 
+        local itemFavorited = not not favoritesLookup[materialData]
         local listItem = uiElements.listItem({
             text = materialText,
-            data = materialData
+            data = materialData,
         })
 
+        listItem.itemFavorited = itemFavorited
         listItem.tooltipText = materialTooltip
-        table.insert(materialItems, listItem)
+        listItem.originalText = materialText
+
+        table.insert(materialItems, addMaterialContextMenu(currentTool, currentLayer, listItem))
     end
 
     if sortItems ~= false then
-        table.sort(materialItems, function(lhs, rhs)
-            return lhs.text < rhs.text
-        end)
+        table.sort(materialItems, materialSortFunction)
     end
+
+    ui.runLate(function()
+        for _, listItem in ipairs(materialItems) do
+            updateListItemFavoriteVisuals(listItem)
+        end
+    end)
 
     return materialItems
 end
