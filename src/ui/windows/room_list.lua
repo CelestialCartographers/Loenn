@@ -154,6 +154,11 @@ function roomList:uiRoomWindowRoomChanged()
     end
 end
 
+function roomList:editorRoomSorted()
+    return function(list, room, by)
+        updateList(self)
+    end
+end
 function roomList.getWindow()
     local search = ""
 
@@ -171,6 +176,7 @@ function roomList.getWindow()
         editorMapNew = roomList.editorMapNew(list),
         editorRoomDeleted = roomList.editorRoomDeleted(list),
         editorRoomAdded = roomList.editorRoomAdded(list),
+        editorRoomSorted = roomList.editorRoomSorted(list),
         uiRoomWindowRoomChanged = roomList.uiRoomWindowRoomChanged(list)
     })
 

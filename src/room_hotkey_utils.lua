@@ -10,7 +10,7 @@ local history = require("history")
 local utils = require("utils")
 local sceneHandler = require("scene_handler")
 local configs = require("configs")
-
+local mapItemUtils = require("map_item_utils")
 local directions = {
     Left = "left",
     Right = "right",
@@ -169,4 +169,17 @@ function roomHotkeyUtils.configureSelectedRoom()
     end
 end
 
+local function moveRoom(dir) 
+    local map = loadedState.map
+    local item = loadedState.getSelectedItem()
+    if map and item then
+      mapItemUtils.moveRoomBy(map, item, dir) 
+    end
+end
+function roomHotkeyUtils.moveRoomUp()
+    moveRoom(-1)
+end
+function roomHotkeyUtils.moveRoomDown()
+    moveRoom(1)
+end
 return roomHotkeyUtils

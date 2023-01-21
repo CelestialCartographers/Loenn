@@ -37,6 +37,10 @@ local defaultHotkeys = {
     roomResizeUpShrink = false,
     roomResizeDownShrink = false,
 
+    -- Room sorting
+    roomSortUp = "pageup",
+    roomSortDown = "pageDown",
+
     -- Rooms
     roomAddNew = "ctrl + t",
     roomConfigureCurrent = "ctrl + shift + t",

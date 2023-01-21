@@ -42,6 +42,10 @@ local rawHotkeys = {
     {configs.hotkeys.roomResizeUpShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileUp, "Shrink room one tile up"},
     {configs.hotkeys.roomResizeDownShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileDown, "Shrink room one tile down"},
 
+    -- Room Sorting
+    {configs.hotkeys.roomSortUp, roomHotkeyUtils.moveRoomUp, "Sort room up"},
+    {configs.hotkeys.roomSortDown, roomHotkeyUtils.moveRoomDown, "Sort room down"},
+
     -- Room
     {configs.hotkeys.roomDelete, roomHotkeyUtils.deleteSelectedRoom, "Delete selected room"},
     {configs.hotkeys.roomAddNew, roomHotkeyUtils.addRoom, "Add new room"},

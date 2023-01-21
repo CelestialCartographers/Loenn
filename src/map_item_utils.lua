@@ -83,4 +83,26 @@ function mapItemUtils.addItem(map, item)
     end
 end
 
+function mapItemUtils.moveRoomWith(map, room, getDest)
+    for i, r in ipairs(map.rooms) do
+        if r.name == room.name then
+            local dest = getDest(i)
+            -- Prevent moving out of bounds
+            if dest <= 0 or dest > #map.rooms then 
+                return false
+            end
+            table.remove(map.rooms, i)
+            
+            table.insert(map.rooms, dest, r)
+            sceneHandler.sendEvent("editorRoomSorted", room, dest)
+
+            return true
+        end
+    end
+
+    return false
+end
+function mapItemUtils.moveRoomBy(map, item, n) 
+    mapItemUtils.moveRoomWith(map, item, function (i) return i + n end)
+end
 return mapItemUtils
