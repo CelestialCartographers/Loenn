@@ -7,6 +7,8 @@ local logging = require("logging")
 
 local modHandler = {}
 
+local everestBuildNumberMatch = "EverestBuild(%d*)"
+
 modHandler.internalModContent = "@Internal@"
 modHandler.commonModContent = "@ModsCommon@"
 modHandler.everestYamlFilenames = {
@@ -172,6 +174,28 @@ function modHandler.findPluginLoennFolder(mountPoint)
     end
 end
 
+function modHandler.getEverestBuildNumber()
+    local celesteExe = utils.joinpath(fileLocations.getCelesteDir(), "Celeste.exe")
+    local fh = io.open(celesteExe, "rb")
+
+    if fh then
+        local data = fh:read("*a")
+        local buildNumber = string.match(data, everestBuildNumberMatch)
+
+        fh:close()
+
+        return buildNumber
+    end
+end
+
+function modHandler.getEverestVersion()
+    local buildNumber = modHandler.getEverestBuildNumber()
+
+    if buildNumber then
+        return string.format("1.%s.0", buildNumber)
+    end
+end
+
 function modHandler.findEverestYaml(mountPoint)
     for _, filename in ipairs(modHandler.everestYamlFilenames) do
         local yamlTestPath = mountPoint .. "/" .. filename
@@ -183,7 +207,22 @@ function modHandler.findEverestYaml(mountPoint)
     end
 end
 
-function modHandler.readModMetadata(path, mountPoint, folderName)
+-- Find existing or fall back to first search filename
+function modHandler.findEverestYamlOrDefault(mountPoint)
+    local yamlTestPath, filename = modHandler.findEverestYaml(mountPoint)
+
+    return filename or modHandler.everestYamlFilenames[1]
+end
+
+function modHandler.updateModMetadataCache(modMetadata, folderName)
+    modHandler.modMetadata[folderName] = modMetadata
+
+    if modHandler.loadedMods[folderName] then
+        modHandler.loadedMods[folderName].metadata = modMetadata
+    end
+end
+
+function modHandler.readModMetadata(path, mountPoint, folderName, updateCache)
     local result = {}
     local yamlFilename = modHandler.findEverestYaml(mountPoint)
 
@@ -203,6 +242,10 @@ function modHandler.readModMetadata(path, mountPoint, folderName)
     result._mountPoint = mountPoint
     result._path = path
     result._folderName = folderName
+
+    if updateCache ~= false then
+        modHandler.updateModMetadataCache(result, folderName)
+    end
 
     return result
 end
@@ -393,7 +436,6 @@ function modHandler.mountMod(path, force)
                 zipFile = filesystem.isFile(path),
                 metadata = modMetadata
             }
-
         end
     end
 
