@@ -17,12 +17,6 @@ local notifications = require("ui.notification")
 local eventNotifications = {}
 local notificationHandlers = {}
 
-local function closePopup(popup)
-    if popup.stateIndex == 2 then
-        popup.durations[popup.stateIndex] = 0
-    end
-end
-
 function notificationHandlers:saveSanitizerDependenciesMissing(missingMods, usedMods, dependedOnMods)
     local language = languageRegistry.getLanguage()
 
@@ -33,10 +27,11 @@ function notificationHandlers:saveSanitizerDependenciesMissing(missingMods, used
                 uiElements.button(tostring(language.ui.button.yes), function()
                     loadedState.saveCurrentMap(function(filename)
                         dependencyEditor.editDependencies()
+                        popup:close()
                     end)
                 end),
                 uiElements.button(tostring(language.ui.button.no), function()
-                    closePopup(popup)
+                    popup:close()
                 end),
             })
         })
@@ -117,7 +112,7 @@ function notificationHandlers:editorQuitWithChanges()
                     love.event.quit()
                 end),
                 uiElements.button(tostring(language.ui.button.cancel), function()
-                    closePopup(popup)
+                    popup:close()
                 end),
             })
         })
@@ -137,7 +132,7 @@ function notificationHandlers:editorLoadWithChanges(currentFile, filename)
                         loadedState.defaultAfterSaveCallback(previousFilename, loadedState)
 
                         loadedState.loadFile(filename)
-                        closePopup(popup)
+                        popup:close()
                     end)
                 end),
                 uiElements.button(tostring(language.ui.notifications.editorDiscardChanges), function()
@@ -145,10 +140,10 @@ function notificationHandlers:editorLoadWithChanges(currentFile, filename)
                     history.madeChanges = false
 
                     loadedState.loadFile(filename)
-                    closePopup(popup)
+                    popup:close()
                 end),
                 uiElements.button(tostring(language.ui.button.cancel), function()
-                    closePopup(popup)
+                    popup:close()
                 end),
             })
         })
@@ -168,7 +163,7 @@ function notificationHandlers:editorNewMapWithChanges()
                         loadedState.defaultAfterSaveCallback(previousFilename, loadedState)
 
                         loadedState.newMap()
-                        closePopup(popup)
+                        popup:close()
                     end)
                 end),
                 uiElements.button(tostring(language.ui.notifications.editorDiscardChanges), function()
@@ -176,10 +171,10 @@ function notificationHandlers:editorNewMapWithChanges()
                     history.madeChanges = false
 
                     loadedState.newMap()
-                    closePopup(popup)
+                    popup:close()
                 end),
                 uiElements.button(tostring(language.ui.button.cancel), function()
-                    closePopup(popup)
+                    popup:close()
                 end),
             })
         })
@@ -198,10 +193,10 @@ function notificationHandlers:editorRoomDelete(map, item)
                     mapItemUtils.deleteItem(map, item)
                     loadedState.selectItem(nil)
 
-                    closePopup(popup)
+                    popup:close()
                 end),
                 uiElements.button(tostring(language.ui.button.cancel), function()
-                    closePopup(popup)
+                    popup:close()
                 end),
             })
         })
@@ -221,18 +216,18 @@ function notificationHandlers:updaterUpdateAvailable(latestVersion, currentVersi
                 uiElements.row({
                     uiElements.button(tostring(language.ui.notifications.updaterUpdateYes), function()
                         updater.update(latestVersion)
-                        closePopup(popup)
+                        popup:close()
                     end),
                     uiElements.button(tostring(language.ui.notifications.updaterUpdateNo), function()
-                        closePopup(popup)
+                        popup:close()
                     end),
                     uiElements.button(tostring(language.ui.notifications.updaterRemindMeLater), function()
                         updater.remindMeLater(latestVersion)
-                        closePopup(popup)
+                        popup:close()
                     end),
                     uiElements.button(tostring(language.ui.notifications.updaterDontRemindMeAgain), function()
                         updater.dontAskAgain(latestVersion)
-                        closePopup(popup)
+                        popup:close()
                     end),
                 })
             })

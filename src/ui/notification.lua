@@ -85,6 +85,12 @@ local popupStates = {
     "stopping"
 }
 
+local function closePopup(popup)
+    if popup.stateIndex == 2 then
+        popup.durations[popup.stateIndex] = 0
+    end
+end
+
 function notificationPopup.notify(widget, duration)
     local popup = {
         widget = widget,
@@ -96,7 +102,8 @@ function notificationPopup.notify(widget, duration)
         timeAcc = 0,
         lerpPercent = 0,
         state = "starting",
-        stateIndex = 1
+        stateIndex = 1,
+        close = closePopup
     }
 
     return createPopupWindow(popup)
