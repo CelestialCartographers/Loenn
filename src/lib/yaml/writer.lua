@@ -85,12 +85,18 @@ function writer.serialize(data, options, depth, firstDepth)
             end
 
             for _, v in ipairs(sortedTables) do
-                table.insert(lines, string.format("%s:\n%s", v[1], writer.serialize(v[2], options, depth + 1)))
+                if not utils.isEmpty(v[2]) then
+                    table.insert(lines, string.format("%s:\n%s", v[1], writer.serialize(v[2], options, depth + 1)))
+                end
             end
 
         else
             for k, v in pairs(data) do
-                table.insert(lines, string.format("%s:%s%s", k, type(v) == "table" and "\n" or " ", writer.serialize(v, options, depth + 1)))
+                if type(v) ~= "table" then
+                    table.insert(lines, string.format("%s: %s", k, writer.serialize(v, options, depth + 1)))
+                elseif not utils.isEmpty(v) then
+                    table.insert(lines, string.format("%s:\n%s", k, writer.serialize(v, options, depth + 1)))
+                end
             end
         end
 
@@ -110,7 +116,11 @@ end
 -- Since our writer is not completely up to spec make sure we can read the data back
 function writer.validateSerializiation(data)
     local serialized = writer.serialize(data)
-    local unserialized = reader.eval(serialized)
+    local unserializeSuccess, unserialized = pcall(reader.eval, serialized)
+
+    if not unserializeSuccess then
+        return false
+    end
 
     return utils.serialize(data) == utils.serialize(unserialized), serialized, unserialized
 end

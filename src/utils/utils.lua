@@ -613,6 +613,11 @@ end
 
 utils.countKeys = serialize.countKeys
 
+-- Safe check whether a table is empty
+function utils.isEmpty(t)
+    return next(t) == nil
+end
+
 -- Return the 1 index based tile indices for the coordinates
 function utils.pixelsToTiles(x, y)
     return math.floor(x / 8) + 1, math.floor(y / 8) + 1
