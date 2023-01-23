@@ -54,11 +54,15 @@ local function prepareMetadataForSaving(metadata, newDependencies)
     return newMetadata
 end
 
-local function updateMetadataFile(modName, metadata, newDependencies)
+local function updateMetadataFile(metadata, newDependencies)
     local path = metadata._path
     local mountPoint = metadata._mountPoint
     local folderName = metadata._folderName
-    local mountedFilename, filename = mods.findEverestYaml(mountPoint)
+    local filename
+
+    if not filename then
+        filename = mods.findEverestYamlOrDefault(mountPoint)
+    end
 
     if filename then
         local realFilename = utils.joinpath(love.filesystem.getRealDirectory(mountPoint), filename)
@@ -114,7 +118,7 @@ local function addDependencyCallback(modName, interactionData)
             Version = modVersion
         })
 
-        updateMetadataFile(modName, currentModMetadata, dependencies)
+        updateMetadataFile(currentModMetadata, dependencies)
         updateSections(interactionData)
     end
 end
@@ -131,7 +135,7 @@ local function removeDependencyCallback(modName, interactionData)
             end
         end
 
-        updateMetadataFile(modName, currentModMetadata, dependencies)
+        updateMetadataFile(currentModMetadata, dependencies)
         updateSections(interactionData)
     end
 end
@@ -239,7 +243,7 @@ local function getModSections(groupName, mods, addPadding, interactionData)
 end
 
 function dependencyWindow.getWindowContent(modPath, side, interactionData)
-    local currentModMetadata = mods.getModMetadataFromPath(modPath) or {}
+    local currentModMetadata = mods.getModMetadataFromPath(modPath)
     local currentModNames = mods.getModNamesFromMetadata(currentModMetadata)
     local currentModNamesLookup = table.flip(currentModNames)
     local dependedOnModNames = mods.getDependencyModNames(currentModMetadata)
@@ -333,6 +337,46 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     return scrollableColumn, column
 end
 
+local function createStartingEverestYaml(filename, side, metadata)
+    local modName = metadata._folderName or side.map.package
+    local everestVersion = mods.getEverestVersion()
+
+    local newMetadata = utils.deepcopy(metadata)
+    local dependencies = {}
+
+    if everestVersion then
+        table.insert(dependencies, {
+            Name = "Everest",
+            Version = everestVersion
+        })
+    end
+
+    newMetadata[1] = {
+        Name = modName,
+        Version = "0.0.1"
+    }
+
+    updateMetadataFile(newMetadata, dependencies)
+end
+
+local function showMissingEverestYamlNotification(language, filename, side, metadata)
+    notifications.notify(function(popup)
+        return uiElements.column({
+            uiElements.label(tostring(language.ui.dependency_window.no_everest_yaml)),
+            uiElements.row({
+                uiElements.button(tostring(language.ui.button.yes), function()
+                    createStartingEverestYaml(filename, side, metadata)
+                    dependencyWindow.editDependencies(filename, side)
+                    popup:close()
+                end),
+                uiElements.button(tostring(language.ui.button.cancel), function()
+                    popup:close()
+                end),
+            })
+        })
+    end, -1)
+end
+
 function dependencyWindow.editDependencies(filename, side)
     local language = languageRegistry.getLanguage()
     local modPath = mods.getFilenameModPath(filename)
@@ -345,6 +389,15 @@ function dependencyWindow.editDependencies(filename, side)
 
     if not modPath then
         notifications.notify(tostring(language.ui.dependency_window.requires_packaged_mod))
+
+        return
+    end
+
+    local currentModMetadata = mods.getModMetadataFromPath(modPath)
+
+    -- Naive check if the metadata contains Everest.yaml data
+    if not currentModMetadata or not currentModMetadata[1] then
+        showMissingEverestYamlNotification(language, filename, side, currentModMetadata)
 
         return
     end

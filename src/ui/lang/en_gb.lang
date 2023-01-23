@@ -74,6 +74,7 @@ ui.dependency_window.add_dependency=Add dependency
 ui.dependency_window.remove_dependency=Remove dependency
 ui.dependency_window.no_map_loaded=No map loaded.
 ui.dependency_window.requires_packaged_mod=Cannot edit dependencies of an unpackaged mod.
+ui.dependency_window.no_everest_yaml=No everest.yaml found.\nWould you like to create it?
 
 
 # Room Window
