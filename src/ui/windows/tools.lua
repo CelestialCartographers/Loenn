@@ -41,7 +41,7 @@ local function getLanguageOrDefault(languagePath, default)
     return default
 end
 
-local function updateListItemFavoriteVisuals(listItem)
+local function updateListItemFavorite(listItem)
     local favorite = listItem.itemFavorited
     local text = listItem.originalText
     local children = listItem.children
@@ -67,6 +67,14 @@ local function updateListItemFavoriteVisuals(listItem)
         end
     end
 
+    local favoriteCheckbox = listItem._favoriteCheckbox
+
+    if favoriteCheckbox and favoriteCheckbox:getValue() ~= favorite then
+        -- Prevent callback
+        favoriteCheckbox._value = favorite
+        favoriteCheckbox:updateIcon()
+    end
+
     table.insert(children, label)
     listItem:reflow()
 end
@@ -79,27 +87,53 @@ local function materialSortFunction(lhs, rhs)
     return lhs.originalText < rhs.originalText
 end
 
-local function addMaterialContextMenu(tool, layer, listItem)
+local function updateFavorite(listItem, tool, layer, material, favorite)
+    local materialList = listItem.parent
+    local materialListItems = materialList.children
+
+    if favorite then
+        toolUtils.removePersistenceFavorites(tool, layer, material)
+
+    else
+        toolUtils.addPersistenceFavorites(tool, layer, material)
+    end
+
+    listItem.itemFavorited = favorite
+
+    updateListItemFavorite(listItem)
+    table.sort(materialListItems, materialSortFunction)
+    materialList:layout()
+end
+
+local function materialFavoriteOnPressHandler(tool, layer)
+    return function(orig, self, x, y, button, isDrag, presses)
+        -- Favorite on every double click
+        if presses % 2 == 0 then
+            local material = self.data
+            local favorited = self.itemFavorited
+
+            updateFavorite(self, tool, layer, material, not favorited)
+
+        else
+            orig(self, x, y, button, isDrag, presses)
+        end
+    end
+end
+
+local function addMaterialContextMenu(language, tool, layer, listItem)
     local material = listItem.data
     local favorite = listItem.itemFavorited
 
-    local content = uiElements.checkbox("FAVORITE", favorite, function(checkbox, newFavorite)
-        local materialList = listItem.parent
-        local materialListItems = materialList.children
-
-        if newFavorite then
-            toolUtils.removePersistenceFavorites(tool, layer, material)
-
-        else
-            toolUtils.addPersistenceFavorites(tool, layer, material)
-        end
-
-        listItem.itemFavorited = newFavorite
-
-        updateListItemFavoriteVisuals(listItem)
-        table.sort(materialListItems, materialSortFunction)
-        materialList:layout()
+    local favoriteText = tostring(language.ui.tools_window.favorite)
+    local favoriteCheckbox = uiElements.checkbox(favoriteText, favorite, function(checkbox, newFavorite)
+        updateFavorite(listItem, tool, layer, material, newFavorite)
     end)
+
+    listItem._favoriteCheckbox = favoriteCheckbox
+
+    local content = uiElements.row({
+        favoriteCheckbox
+    })
 
     return contextMenu.addContextMenu(listItem, content)
 end
@@ -111,6 +145,7 @@ local function getMaterialItems(layer, sortItems)
     local materialItems = {}
     local favorites = toolUtils.getPersistenceFavorites(currentTool, currentLayer) or {}
     local favoritesLookup = table.flip(favorites)
+    local language = languageRegistry.getLanguage()
 
     for i, material in ipairs(materials or {}) do
         local materialTooltip
@@ -128,13 +163,15 @@ local function getMaterialItems(layer, sortItems)
         local listItem = uiElements.listItem({
             text = materialText,
             data = materialData,
+        }):hook({
+            onPress = materialFavoriteOnPressHandler(currentTool, currentLayer)
         })
 
         listItem.itemFavorited = itemFavorited
         listItem.tooltipText = materialTooltip
         listItem.originalText = materialText
 
-        table.insert(materialItems, addMaterialContextMenu(currentTool, currentLayer, listItem))
+        table.insert(materialItems, addMaterialContextMenu(language, currentTool, currentLayer, listItem))
     end
 
     if sortItems ~= false then
@@ -143,7 +180,7 @@ local function getMaterialItems(layer, sortItems)
 
     ui.runLate(function()
         for _, listItem in ipairs(materialItems) do
-            updateListItemFavoriteVisuals(listItem)
+            updateListItemFavorite(listItem)
         end
     end)
 

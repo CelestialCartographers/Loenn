@@ -77,6 +77,10 @@ ui.dependency_window.requires_packaged_mod=Cannot edit dependencies of an unpack
 ui.dependency_window.no_everest_yaml=No everest.yaml found.\nWould you like to create it?
 
 
+# Tools Window
+ui.tools_window.favorite=Favorite
+
+
 # Room Window
 ui.room_window.editing_room=Editing room - %s
 ui.room_window.creating_room=Creating room
