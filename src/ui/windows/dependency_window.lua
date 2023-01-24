@@ -32,6 +32,8 @@ local dependencyWindowGroup = uiElements.group({}):with({
 
 })
 
+local everestModName = "everest"
+
 local function prepareMetadataForSaving(metadata, newDependencies)
     local newMetadata = utils.deepcopy(metadata)
 
@@ -112,6 +114,11 @@ local function addDependencyCallback(modName, interactionData)
         local dependencies, currentModMetadata = getDependenciesList(interactionData.modPath)
         local modInfo, modMetadata = mods.findLoadedMod(modName)
         local modVersion = modInfo and modInfo.Version
+
+        -- Special case for Everest
+        if modName == everestModName then
+            modVersion = mods.getEverestVersion()
+        end
 
         table.insert(dependencies, {
             Name = modName,
@@ -265,6 +272,13 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
                 dependedOnMods[modName] = reasons
             end
         end
+    end
+
+    -- Add Everest as target if missing
+    local hasEverest = dependedOnModsLookup[everestModName]
+
+    if not hasEverest then
+        missingMods[everestModName] = false
     end
 
     -- Anything depended on but with no known usage
