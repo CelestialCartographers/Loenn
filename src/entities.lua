@@ -517,13 +517,15 @@ end
 -- This is absolute worst case way to update the selection, movement for example can easily offset the rectangle
 local function updateSelectionNaive(room, entity, node, selection)
     local rectangle, nodeRectangles = entities.getSelection(room, entity)
-    local newSelectionRectangle = node == 0 and rectangle or nodeRectangles[node]
+    local newSelectionRectangle = node == 0 and rectangle or nodeRectangles and nodeRectangles[node]
 
-    selection.x = newSelectionRectangle.x
-    selection.y = newSelectionRectangle.y
+    if newSelectionRectangle then
+        selection.x = newSelectionRectangle.x
+        selection.y = newSelectionRectangle.y
 
-    selection.width = newSelectionRectangle.width
-    selection.height = newSelectionRectangle.height
+        selection.width = newSelectionRectangle.width
+        selection.height = newSelectionRectangle.height
+    end
 end
 
 function entities.flipSelection(room, layer, selection, horizontal, vertical)
