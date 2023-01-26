@@ -23,9 +23,15 @@ function backups.getBackupMapName(side)
     if side then
         local map = side.map
         local mapName = map.package
+        local hasPackageName = mapName and #mapName > 0
 
-        if not mapName and loadedState.filename then
-            mapName = utils.filename(utils.stripExtension(loadedState.filename))
+        if not hasPackageName then
+            if loadedState.filename then
+                mapName = utils.filename(utils.stripExtension(loadedState.filename))
+
+            else
+                mapName = "Unsaved"
+            end
         end
 
         return mapName
