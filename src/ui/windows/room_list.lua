@@ -87,6 +87,14 @@ end
 local function updateList(list, target)
     local roomItems = getRoomItems()
 
+    if not target then
+        local currentRoom = state.getSelectedRoom()
+
+        if currentRoom then
+            target = cleanRoomName(currentRoom.name)
+        end
+    end
+
     listWidgets.updateItems(list, roomItems, target)
 end
 
