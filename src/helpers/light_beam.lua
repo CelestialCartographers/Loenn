@@ -78,4 +78,10 @@ function lightBeamHelper.getSelection(room, entity)
     return baseSprite:getRectangle()
 end
 
+function lightBeamHelper.rotate(room, entity, direction)
+    entity.rotation = ((entity.rotation or 0) + direction * 90) % 360
+
+    return true
+end
+
 return lightBeamHelper
