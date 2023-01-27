@@ -14,6 +14,17 @@ springUp.placements = {
     }
 }
 
+function springUp.rotate(room, entity, direction)
+    if direction > 0 then
+        entity._name = "wallSpringLeft"
+
+    else
+        entity._name = "wallSpringRight"
+    end
+
+    return true
+end
+
 local springRight = {}
 
 springRight.name = "wallSpringLeft"
@@ -36,6 +47,14 @@ function springRight.flip(room, entity, horizontal, vertical)
     return horizontal
 end
 
+function springRight.rotate(room, entity, direction)
+    if direction < 0 then
+        entity._name = "spring"
+    end
+
+    return direction < 0
+end
+
 local springLeft = {}
 
 springLeft.name = "wallSpringRight"
@@ -56,6 +75,14 @@ function springLeft.flip(room, entity, horizontal, vertical)
     end
 
     return horizontal
+end
+
+function springLeft.rotate(room, entity, direction)
+    if direction > 0 then
+        entity._name = "spring"
+    end
+
+    return direction > 0
 end
 
 return {

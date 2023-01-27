@@ -76,20 +76,16 @@ function kevin.sprite(room, entity)
 end
 
 function kevin.rotate(room, entity, direction)
-    local shouldRotate = math.abs(direction) % 2 == 1
+    local axes = (entity.axes or ""):lower()
 
-    if shouldRotate then
-        local axes = (entity.axes or ""):lower()
+    if axes == "horizontal" then
+        entity.axes = "vertical"
 
-        if axes == "horizontal" then
-            entity.axes = "vertical"
-
-        elseif axes == "vertical" then
-            entity.axes = "horizontal"
-        end
+    elseif axes == "vertical" then
+        entity.axes = "horizontal"
     end
 
-    return shouldRotate
+    return true
 end
 
 return kevin
