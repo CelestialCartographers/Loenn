@@ -34,6 +34,17 @@ local dependencyWindowGroup = uiElements.group({}):with({
 
 local everestModName = "everest"
 
+local function localizeModName(modName, language)
+    local language = language or languageRegistry.getLanguage()
+    local modNameLanguage = language.mods[modName].name
+
+    if modNameLanguage._exists then
+        return tostring(modNameLanguage)
+    end
+
+    return modName
+end
+
 local function prepareMetadataForSaving(metadata, newDependencies)
     local newMetadata = utils.deepcopy(metadata)
 
@@ -117,6 +128,7 @@ local function addDependencyCallback(modName, interactionData)
 
         -- Special case for Everest
         if modName == everestModName then
+            modName = localizeModName(everestModName)
             modVersion = mods.getEverestVersion()
         end
 
@@ -204,17 +216,6 @@ local function getModSection(modName, localizedModName, reasons, groupName, inte
     return column
 end
 
-local function localizeModName(modName, language)
-    local language = language or languageRegistry.getLanguage()
-    local modNameLanguage = language.mods[modName].name
-
-    if modNameLanguage._exists then
-        return tostring(modNameLanguage)
-    end
-
-    return modName
-end
-
 local function getModSections(groupName, mods, addPadding, interactionData)
     local language = languageRegistry.getLanguage()
     local labelText = tostring(language.ui.dependency_window.group[groupName])
@@ -275,7 +276,8 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     end
 
     -- Add Everest as target if missing
-    local hasEverest = dependedOnModsLookup[everestModName]
+    local localizedEverestName = localizeModName(everestModName)
+    local hasEverest = dependedOnModsLookup[everestModName] or dependedOnModsLookup[localizedEverestName]
 
     if not hasEverest then
         missingMods[everestModName] = false
