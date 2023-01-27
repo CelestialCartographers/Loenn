@@ -84,7 +84,10 @@ local function materialSortFunction(lhs, rhs)
         return lhs.itemFavorited
     end
 
-    return lhs.originalText < rhs.originalText
+    local lhsText = lhs.originalText or lhs.text
+    local rhsText = rhs.originalText or rhs.text
+
+    return lhsText < rhsText
 end
 
 local function updateFavorite(listItem, tool, layer, material, favorite)
@@ -424,6 +427,18 @@ local function materialSearchFieldChanged(element, new, old)
     local layer = toolHandler.getLayer()
 
     toolUtils.setPersistenceSearch(tool, layer, new)
+
+    if toolWindow.materialList then
+        ui.runLate(function()
+            local materialListItems = toolWindow.materialList.children
+
+            for _, listItem in ipairs(materialListItems) do
+                updateListItemFavorite(listItem)
+            end
+
+            table.sort(materialListItems, materialSortFunction)
+        end)
+    end
 end
 
 function toolWindow.getWindow()
