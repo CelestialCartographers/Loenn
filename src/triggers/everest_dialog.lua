@@ -1,6 +1,7 @@
 local everestDialog = {}
 
 everestDialog.name = "everest/dialogTrigger"
+everestDialog.associatedMods = {"Everest"}
 everestDialog.fieldInformation = {
     deathCount = {
         fieldType = "integer",

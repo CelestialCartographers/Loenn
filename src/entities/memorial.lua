@@ -13,6 +13,7 @@ memorial.justification = {0.5, 1.0}
 local everestMemorial = {}
 
 everestMemorial.name = "everest/memorial"
+everestMemorial.associatedMods = {"Everest"}
 everestMemorial.depth = 100
 everestMemorial.justification = {0.5, 1.0}
 everestMemorial.placements = {

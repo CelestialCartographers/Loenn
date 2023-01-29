@@ -10,6 +10,7 @@ starClimbController.placements = {
 local everestStarClimbGraphicsController = {}
 
 everestStarClimbGraphicsController.name = "everest/starClimbGraphicsController"
+everestStarClimbGraphicsController.associatedMods = {"Everest"}
 everestStarClimbGraphicsController.depth = 0
 everestStarClimbGraphicsController.texture = "@Internal@/northern_lights"
 everestStarClimbGraphicsController.placements = {
