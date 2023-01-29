@@ -41,7 +41,7 @@ local function getLanguageOrDefault(languagePath, default)
     return default
 end
 
-local function updateListItemFavorite(listItem)
+local function updateListItemFavoriteVisuals(listItem)
     local favorite = listItem.itemFavorited
     local text = listItem.originalText
     local children = listItem.children
@@ -95,23 +95,43 @@ local function updateFavorite(listItem, tool, layer, material, favorite)
     local materialListItems = materialList.children
 
     if favorite then
-        toolUtils.removePersistenceFavorites(tool, layer, material)
+        toolUtils.addPersistenceFavorites(tool, layer, material)
 
     else
-        toolUtils.addPersistenceFavorites(tool, layer, material)
+        toolUtils.removePersistenceFavorites(tool, layer, material)
     end
 
     listItem.itemFavorited = favorite
 
-    updateListItemFavorite(listItem)
+    updateListItemFavoriteVisuals(listItem)
     table.sort(materialListItems, materialSortFunction)
     materialList:layout()
 end
 
+local function updateMaterialListFavorites(listItems)
+    if not listItems then
+        return
+    end
+
+    ui.runLate(function()
+        for _, listItem in ipairs(listItems) do
+            updateListItemFavoriteVisuals(listItem)
+        end
+
+        table.sort(listItems, materialSortFunction)
+    end)
+end
+
 local function materialFavoriteOnPressHandler(tool, layer)
     return function(orig, self, x, y, button, isDrag, presses)
-        -- Favorite on every double click
-        if presses % 2 == 0 then
+        -- sameTarget is a workaround for a OlympUI bug where presses is not reset when target changes
+        -- Causes some incorrect pressing behavor, but better than random favorites
+        -- TODO - Remove this workaround when its fixed in OlympUI
+
+        local sameTarget = self == ui.focusing
+        local leftDoubleClick = button == 1 and presses % 2 == 0
+
+        if sameTarget and leftDoubleClick then
             local material = self.data
             local favorited = self.itemFavorited
 
@@ -181,11 +201,7 @@ local function getMaterialItems(layer, sortItems)
         table.sort(materialItems, materialSortFunction)
     end
 
-    ui.runLate(function()
-        for _, listItem in ipairs(materialItems) do
-            updateListItemFavorite(listItem)
-        end
-    end)
+    updateMaterialListFavorites(materialItems)
 
     return materialItems
 end
@@ -427,18 +443,7 @@ local function materialSearchFieldChanged(element, new, old)
     local layer = toolHandler.getLayer()
 
     toolUtils.setPersistenceSearch(tool, layer, new)
-
-    if toolWindow.materialList then
-        ui.runLate(function()
-            local materialListItems = toolWindow.materialList.children
-
-            for _, listItem in ipairs(materialListItems) do
-                updateListItemFavorite(listItem)
-            end
-
-            table.sort(materialListItems, materialSortFunction)
-        end)
-    end
+    updateMaterialListFavorites(toolWindow.materialList.children)
 end
 
 function toolWindow.getWindow()

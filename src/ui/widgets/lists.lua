@@ -362,12 +362,12 @@ end
 
 local function getSearchFieldChanged(onChange)
     return function(element, new, old)
+        filterList(element.list, new)
+        addDraggableHooks(element.list)
+
         if onChange then
             onChange(element, new, old)
         end
-
-        filterList(element.list, new)
-        addDraggableHooks(element.list)
     end
 end
 
