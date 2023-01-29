@@ -151,6 +151,8 @@ entities.jumpThru.attributes.description.surfaceIndex=Footstep sound when walkin
 
 # Player
 entities.player.placements.name.player=Player (Spawn Point)
+entities.player.attributes.name.isDefaultSpawn=Default Spawn
+entities.player.attributes.description.isDefaultSpawn=Whether this should be the spawn point that the player appears at when first starting the map. Only works if the room is the starting room.
 
 # Wire
 entities.wire.placements.name.wire=Wire
