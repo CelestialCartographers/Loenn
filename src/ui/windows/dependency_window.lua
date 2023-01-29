@@ -42,7 +42,7 @@ local function localizeModName(modName, language)
         return tostring(modNameLanguage)
     end
 
-    return modName
+    return tostring(modName)
 end
 
 local function prepareMetadataForSaving(metadata, newDependencies)
