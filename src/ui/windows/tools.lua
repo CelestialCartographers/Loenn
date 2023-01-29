@@ -194,7 +194,10 @@ local function getMaterialItems(layer, sortItems)
         listItem.tooltipText = materialTooltip
         listItem.originalText = materialText
 
-        table.insert(materialItems, addMaterialContextMenu(language, currentTool, currentLayer, listItem))
+        -- TODO - Add this back in when we get the VRAM/caching situation under control
+        --addMaterialContextMenu(language, currentTool, currentLayer, listItem)
+
+        table.insert(materialItems, listItem)
     end
 
     if sortItems ~= false then
