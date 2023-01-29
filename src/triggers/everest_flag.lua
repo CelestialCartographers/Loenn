@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 local everestFlag = {}
 
 everestFlag.name = "everest/flagTrigger"
+everestFlag.associatedMods = {"Everest"}
 everestFlag.fieldInformation = {
     death_count = {
         fieldType = "integer",

@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 local birdTutorial = {}
 
 birdTutorial.name = "everest/customBirdTutorial"
+birdTutorial.associatedMods = {"Everest"}
 birdTutorial.depth = -1000000
 birdTutorial.nodeLineRenderType = "line"
 birdTutorial.justification = {0.5, 1.0}

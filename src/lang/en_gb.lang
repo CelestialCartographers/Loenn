@@ -1162,7 +1162,7 @@ triggers.windTrigger.attributes.description.pattern=Changes the abilities of the
 
 # -- Mod Information --
 # mods.modName.*
-mods.everest.name=Everest
+mods.Everest.name=Everest
 
 
 # -- Room --

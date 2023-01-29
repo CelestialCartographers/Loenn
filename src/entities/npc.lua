@@ -26,6 +26,7 @@ end
 local everestNpc = {}
 
 everestNpc.name = "everest/npc"
+everestNpc.associatedMods = {"Everest"}
 everestNpc.depth = 100
 everestNpc.justification = {0.5, 1.0}
 everestNpc.fieldInformation = {

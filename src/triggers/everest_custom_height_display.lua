@@ -1,6 +1,7 @@
 local customHeightDisplay = {}
 
 customHeightDisplay.name = "everest/CustomHeightDisplayTrigger"
+customHeightDisplay.associatedMods = {"Everest"}
 customHeightDisplay.fieldInformation = {
     target = {
         fieldType = "integer",

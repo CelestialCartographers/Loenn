@@ -10,6 +10,7 @@ coreMessage.texture = "@Internal@/core_message"
 local everestCoreMessage = {}
 
 everestCoreMessage.name = "everest/coreMessage"
+everestCoreMessage.associatedMods = {"Everest"}
 everestCoreMessage.depth = 0
 everestCoreMessage.texture = "@Internal@/core_message"
 everestCoreMessage.fieldInformation = {
