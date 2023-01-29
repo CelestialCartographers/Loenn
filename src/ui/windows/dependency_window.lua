@@ -32,7 +32,7 @@ local dependencyWindowGroup = uiElements.group({}):with({
 
 })
 
-local everestModName = "everest"
+local everestModName = "Everest"
 
 local function localizeModName(modName, language)
     local language = language or languageRegistry.getLanguage()
@@ -125,12 +125,6 @@ local function addDependencyCallback(modName, interactionData)
         local dependencies, currentModMetadata = getDependenciesList(interactionData.modPath)
         local modInfo, modMetadata = mods.findLoadedMod(modName)
         local modVersion = modInfo and modInfo.Version
-
-        -- Special case for Everest
-        if modName == everestModName then
-            modName = localizeModName(everestModName)
-            modVersion = mods.getEverestVersion()
-        end
 
         table.insert(dependencies, {
             Name = modName,
@@ -279,7 +273,7 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     local localizedEverestName = localizeModName(everestModName)
     local hasEverest = dependedOnModsLookup[everestModName] or dependedOnModsLookup[localizedEverestName]
 
-    if not hasEverest then
+    if not hasEverest and not missingMods[everestModName] then
         missingMods[everestModName] = false
     end
 
@@ -362,7 +356,7 @@ local function createStartingEverestYaml(filename, side, metadata)
 
     if everestVersion then
         table.insert(dependencies, {
-            Name = "Everest",
+            Name = everestModName,
             Version = everestVersion
         })
     end
