@@ -33,6 +33,15 @@ function notificationHandlers:saveSanitizerDependenciesMissing(missingMods, used
                 uiElements.button(tostring(language.ui.button.no), function()
                     popup:close()
                 end),
+                uiElements.button(tostring(language.ui.notifications.saveSanitizerDependenciesRemindMeLater), function()
+                    -- Might be reloaded, get latest
+                    -- Use / instead of . since this is loaded based on filesystem paths
+                    local dependencySaveSanitizer = require("save_sanitizers/check_dependencies")
+
+                    dependencySaveSanitizer.disableEventFor[loadedState.filename] = true
+
+                    popup:close()
+                end),
             })
         })
     end, -1)
