@@ -6,8 +6,15 @@ local mods = require("mods")
 
 local sanitizer = {}
 
+-- Disable for specific filenames, should not be persisted
+sanitizer.disableEventFor = {}
+
 function sanitizer.beforeSave(filename, state)
     if configs.editor.checkDependenciesOnSave then
+        if sanitizer.disableEventFor[filename] then
+            return
+        end
+
         local modPath = mods.getFilenameModPath(filename)
 
         -- Make sure mod is packaged
