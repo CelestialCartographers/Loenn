@@ -456,7 +456,7 @@ function modHandler.mountMods(directory, force)
     end
 end
 
-local function getModMetadataByKeyCached(value, key)
+local function getModMetadataByKeyCached(value, key, hasTriedMount)
     local modFolder = modHandler.loadedNameLookup[value]
 
     if not modFolder then
@@ -473,6 +473,13 @@ local function getModMetadataByKeyCached(value, key)
                 return metadata
             end
         end
+    end
+
+    if not hasTriedMount then
+        -- Try mounting the mod folder, might be a new folder since startup
+        modHandler.mountMod(value)
+
+        return getModMetadataByKeyCached(value, key, true)
     end
 
     return modHandler.modMetadata[modFolder]

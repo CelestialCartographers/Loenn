@@ -139,7 +139,7 @@ function backups.createBackup(side, lastChange)
 
         backups.lastBackup = os.time()
 
-        loadedState.saveFile(filename, saveCallback)
+        loadedState.saveFile(filename, saveCallback, false)
         backups.cleanupBackups(side)
     end
 end
