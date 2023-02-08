@@ -113,6 +113,10 @@ local function updateMaterialListFavorites(listItems)
         return
     end
 
+    for _, listItem in ipairs(listItems) do
+        listItem:layout()
+    end
+
     ui.runLate(function()
         for _, listItem in ipairs(listItems) do
             updateListItemFavoriteVisuals(listItem)
