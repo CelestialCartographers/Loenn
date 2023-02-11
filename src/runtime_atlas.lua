@@ -15,7 +15,7 @@ textureAtlas.canvasArray = nil
 -- Love2d on windows doesn't report how many layers are actually supported due to a bug
 -- Test a few, worst case default to 0
 function textureAtlas.init()
-    local layerCounts = {16, 8, 4}
+    local layerCounts = {8, 4}
 
     for _, count in ipairs(layerCounts) do
         local success, canvas = pcall(love.graphics.newCanvas, 4096, 4096, count, {type="array"})
