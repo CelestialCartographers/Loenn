@@ -150,7 +150,7 @@ A player is able to move from one room to another if the rooms are directly adja
 
 **So, I made a map. What now? How do I load it?**
 
-While you can load maps without, it is _highly_ recommended to install [Everest](https://github.com/EverestAPI/Everest). Once Everest is installed, place your map binary in `Mods/<yourmodname>/Maps` in your Celeste installtion directory. It should now be accessible from inside the game.
+While you can load maps without, it is _highly_ recommended to install [Everest](https://github.com/EverestAPI/Everest). Once Everest is installed, place your map binary in `Mods/<yourmodname>/Maps` in your Celeste installation directory. It should now be accessible from inside the game.
 
 **Something is broken!**
 
