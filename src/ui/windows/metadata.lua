@@ -37,9 +37,9 @@ local defaultFieldGroups = {
             "IntroType", "ColorGrade", "Wipe",
             "DarknessAlpha", "BloomBase", "BloomStrength",
             "Jumpthru", "CoreMode", "mode.Inventory",
-            "mode.StartLevel", "mode.HeartIsEnd",
-            "mode.SeekerSlowdown", "mode.TheoInBubble",
-            "Dreaming", "OverrideASideMeta", "Interlude"
+            "mode.StartLevel", "PostcardSoundID",
+            "mode.HeartIsEnd", "mode.SeekerSlowdown", "mode.TheoInBubble", "Dreaming",
+            "OverrideASideMeta", "Interlude"
         }
     },
     {
