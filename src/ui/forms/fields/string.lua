@@ -4,6 +4,8 @@ local uiUtils = require("ui.utils")
 
 local fieldDropdown = require("ui.widgets.field_dropdown")
 
+local utils = require("utils")
+
 local stringField = {}
 
 stringField.fieldType = "string"
@@ -90,6 +92,10 @@ end
 local function prepareDropdownOptions(value, options, displayTransformer, insertMissing)
     local flattenedOptions = {}
     local seenValueName
+
+    if utils.isCallable(options) then
+        options = options()
+    end
 
     -- Assume this is a unordered table, manually flatten
     if #options == 0 then
