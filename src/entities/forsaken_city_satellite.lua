@@ -54,9 +54,9 @@ local function getBirdSprites(node)
     for code, color in pairs(codeColors) do
         local sprite = drawableSprite.fromTexture(birdTexture, node)
 
-        local direcitonX = string.contains(code, "L") and -1 or string.contains(code, "R") and 1 or 0
-        local directionY = string.contains(code, "U") and -1 or string.contains(code, "D") and 1 or 0
-        local offsetX = direcitonX * birdFlightDistance
+        local directionX = string.find(code, "L") and -1 or string.find(code, "R") and 1 or 0
+        local directionY = string.find(code, "U") and -1 or string.find(code, "D") and 1 or 0
+        local offsetX = directionX * birdFlightDistance
         local offsetY = directionY * birdFlightDistance
         local magnitude = math.sqrt(offsetX^2 + offsetY^2)
 
