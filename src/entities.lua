@@ -213,11 +213,9 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
         end
 
         -- Add depth to sprite(s)
-        if drawableSprites then
-            if utils.typeof(drawableSprites) == "table" then
-                for _, sprite in ipairs(drawableSprites) do
-                    sprite.depth = defaultDepth
-                end
+        if utils.typeof(drawableSprites) == "table" then
+            for _, sprite in ipairs(drawableSprites) do
+                sprite.depth = defaultDepth
             end
 
         else
