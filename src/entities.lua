@@ -772,7 +772,8 @@ function entities.deleteSelection(room, layer, selection)
         end
     end
 
-    return false
+    -- Entity doesn't exist in the list anymore, selection should be removed
+    return true
 end
 
 function entities.addNodeToSelection(room, layer, selection)
