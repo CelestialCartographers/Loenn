@@ -297,6 +297,8 @@ local function findStyleInStylegrounds(interactionData)
             end
         end
     end
+
+    return styles, styles, 1
 end
 
 local function findCurrentListItem(interactionData)
@@ -408,114 +410,6 @@ local function getDefaultListTarget()
     }
 end
 
-local function addNewStyle(interactionData, formFields)
-    local listTarget = interactionData.listTarget
-
-    local newStyle
-    local currentStyle = listTarget.style
-    local parentStyle = listTarget.parentStyle
-
-    local listElement = interactionData.stylegroundListElement
-    local foreground = listTarget.foreground
-    local map = interactionData.map
-    local method = interactionData.addNewMethod.method
-    local listItems = {}
-
-    if method == "basedOnCurrent" then
-        if currentStyle then
-            newStyle = table.shallowcopy(currentStyle)
-
-            applyFormChanges(newStyle, form.getFormData(formFields))
-        end
-
-    elseif method == "parallax" then
-        newStyle = createParallax()
-
-    elseif method == "effect" then
-        local effectName = interactionData.addNewMethod.name
-
-        newStyle = createEffect(effectName)
-    end
-
-    if newStyle then
-        local styles, parentTable, index = findStyleInStylegrounds(interactionData)
-        local _, listIndex = findCurrentListItem(interactionData)
-        local listItems = getStylegroundItems({newStyle}, foreground, {}, nil)
-
-        -- Fallback if we don't have any items in the list yet
-        if #listElement.children == 0 then
-            parentTable = foreground and map.stylesFg or map.stylesBg
-            listIndex = 0
-            index = 0
-        end
-
-        for i, item in ipairs(listItems) do
-            local listItem = uiElements.listItem(item.text, item.data)
-
-            listItem.owner = listElement
-
-            table.insert(listElement.children, listIndex + i, listItem)
-        end
-
-        table.insert(parentTable, index + 1, newStyle)
-
-        if #listItems > 0 then
-            local lastItem = listElement.children[listIndex + #listItems]
-
-            listElement:reflow()
-            lastItem:onClick(0, 0, 1)
-        end
-    end
-
-    return not not newStyle
-end
-
-local function removeStyle(interactionData)
-    local styles, parent, index = findStyleInStylegrounds(interactionData)
-
-    if parent and index then
-        local listElement = interactionData.stylegroundListElement
-        local listItem, listIndex = findCurrentListItem(interactionData)
-
-        table.remove(parent, index)
-        listItem:removeSelf()
-
-        if #listElement.children > 0 then
-            setSelectionWithCallback(listElement, listIndex)
-
-        else
-            interactionData.listTarget = getDefaultListTarget()
-
-            stylegroundWindow.updateStylegroundForm(interactionData)
-            stylegroundWindow.updateStylegroundPreview(interactionData)
-        end
-    end
-end
-
-local function updateListItemText(listItem, style)
-    if not listItem then
-        return
-    end
-
-    local styleType = utils.typeof(style)
-    local language = languageRegistry.getLanguage()
-
-    if styleType == "parallax" then
-        listItem.text = parallax.displayName(language, style)
-
-    elseif styleType == "effect" then
-        listItem.text = effects.displayName(language, style)
-    end
-end
-
-local function updateStyle(interactionData, style, newData)
-    local listElement = interactionData.stylegroundListElement
-    local listItem = listElement and listElement.selected
-
-    applyFormChanges(style, newData)
-    updateListItemText(listItem, style)
-end
-
 local function changeStyleForeground(interactionData, moveUpButton, moveDownButton)
     local listTarget = interactionData.listTarget
     local listElement = interactionData.stylegroundListElement
@@ -578,6 +472,119 @@ local function changeStyleForeground(interactionData, moveUpButton, moveDownButt
     listItem:onClick(0, 0, 1)
 end
 
+local function addNewStyle(interactionData, formFields, moveUpButton, moveDownButton)
+    local listTarget = interactionData.listTarget
+
+    local newStyle
+    local currentStyle = listTarget.style
+    local parentStyle = listTarget.parentStyle
+
+    local listElement = interactionData.stylegroundListElement
+    local foreground = listTarget.foreground
+    local map = interactionData.map
+    local method = interactionData.addNewMethod.method
+    local correctForegroundValue = interactionData.addNewMethod.correctForegroundValue
+    local listItems = {}
+
+    if method == "basedOnCurrent" then
+        if currentStyle then
+            newStyle = table.shallowcopy(currentStyle)
+
+            applyFormChanges(newStyle, form.getFormData(formFields))
+        end
+
+    elseif method == "parallax" then
+        newStyle = createParallax()
+
+    elseif method == "effect" then
+        local effectName = interactionData.addNewMethod.name
+
+        newStyle = createEffect(effectName)
+    end
+
+    if newStyle then
+        local styles, parentTable, index = findStyleInStylegrounds(interactionData, foreground)
+        local _, listIndex = findCurrentListItem(interactionData)
+        local listItems = getStylegroundItems({newStyle}, foreground, {}, nil)
+
+        -- Fallback if we don't have any items in the list yet
+        if #listElement.children == 0 then
+            parentTable = foreground and map.stylesFg or map.stylesBg
+            listIndex = 0
+            index = 0
+        end
+
+        for i, item in ipairs(listItems) do
+            local listItem = uiElements.listItem(item.text, item.data)
+
+            listItem.owner = listElement
+
+            table.insert(listElement.children, listIndex + i, listItem)
+        end
+
+        table.insert(parentTable, index + 1, newStyle)
+
+        if #listItems > 0 then
+            local lastItem = listElement.children[listIndex + #listItems]
+
+            listElement:reflow()
+            lastItem:onClick(0, 0, 1)
+
+            if correctForegroundValue == false then
+                changeStyleForeground(interactionData, moveUpButton, moveDownButton)
+            end
+        end
+    end
+
+    return not not newStyle
+end
+
+local function removeStyle(interactionData)
+    local styles, parent, index = findStyleInStylegrounds(interactionData)
+
+    if parent and index then
+        local listElement = interactionData.stylegroundListElement
+        local listItem, listIndex = findCurrentListItem(interactionData)
+
+        table.remove(parent, index)
+        listItem:removeSelf()
+
+        if #listElement.children > 0 then
+            setSelectionWithCallback(listElement, listIndex)
+
+        else
+            interactionData.listTarget = getDefaultListTarget()
+
+            stylegroundWindow.updateStylegroundForm(interactionData)
+            stylegroundWindow.updateStylegroundPreview(interactionData)
+        end
+    end
+end
+
+local function updateListItemText(listItem, style)
+    if not listItem then
+        return
+    end
+
+    local styleType = utils.typeof(style)
+    local language = languageRegistry.getLanguage()
+
+    if styleType == "parallax" then
+        listItem.text = parallax.displayName(language, style)
+
+    elseif styleType == "effect" then
+        listItem.text = effects.displayName(language, style)
+    end
+end
+
+local function updateStyle(interactionData, style, newData)
+    local listElement = interactionData.stylegroundListElement
+    local listItem = listElement and listElement.selected
+
+    applyFormChanges(style, newData)
+    updateListItemText(listItem, style)
+end
+
 local function getNewDropdownOptions(style, foreground, usingDefault)
     local language = languageRegistry.getLanguage()
     local knownEffects = effects.registeredEffects
@@ -608,15 +615,14 @@ local function getNewDropdownOptions(style, foreground, usingDefault)
         local canForeground = effects.canForeground(fakeEffect)
         local canBackground = effects.canBackground(fakeEffect)
 
-        if foreground and canForeground or not foreground and canBackground then
-            table.insert(effectOptions, {
-                text = displayName,
-                data = {
-                    method = "effect",
-                    name = name
-                }
-            })
-        end
+        table.insert(effectOptions, {
+            text = displayName,
+            data = {
+                method = "effect",
+                name = name,
+                correctForegroundValue = foreground and canForeground or not foreground and canBackground
+            }
+        })
     end
 
     effectOptions = table.sortby(effectOptions, function(option)
@@ -663,7 +669,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
         {
             text = tostring(language.ui.styleground_window.form.new),
             callback = function(formFields)
-                addNewStyle(interactionData, formFields)
+                addNewStyle(interactionData, formFields, movementButtonElements.up, movementButtonElements.down)
             end
         },
         {
