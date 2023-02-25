@@ -157,7 +157,7 @@ function drawableSpriteMt.__index:drawRectangle(mode, color)
     end
 end
 
-function drawableSpriteMt.__index:draw()
+function drawableSpriteMt.__index:draw(alpha)
     local offsetX = self.offsetX or math.floor((self.justificationX or 0.0) * self.meta.realWidth + self.meta.offsetX)
     local offsetY = self.offsetY or math.floor((self.justificationY or 0.0) * self.meta.realHeight + self.meta.offsetY)
 
@@ -165,7 +165,14 @@ function drawableSpriteMt.__index:draw()
 
     if self.color and type(self.color) == "table" then
         drawing.callKeepOriginalColor(function()
-            love.graphics.setColor(self.color)
+            if alpha then
+                local r, g, b, a = unpack(self.color)
+
+                love.graphics.setColor(r, g, b, (a or 1) * alpha)
+
+            else
+                love.graphics.setColor(self.color)
+            end
 
             if layer then
                 love.graphics.drawLayer(self.meta.image, layer, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
