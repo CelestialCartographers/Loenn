@@ -11,6 +11,8 @@ local modHandler = require("mods")
 local tasks = require("utils.tasks")
 local utils = require("utils")
 local logging = require("logging")
+local atlases = require("atlases")
+local runtimeAtlas = require("runtime_atlas")
 
 local hasProfile, profile = utils.tryrequire("profile.profile", false)
 local origYield = coroutine.yield
@@ -114,6 +116,13 @@ function debugUtils.reloadUI()
     -- UI branch can choose to change this function
 end
 
+function debugUtils.clearRuntimeAtlases()
+    logging.info("Clearing atlas cache")
+
+    runtimeAtlas.clear()
+    atlases.loadCelesteAtlases()
+end
+
 function debugUtils.redrawMap()
     logging.info("Redrawing map")
 
@@ -125,6 +134,7 @@ end
 function debugUtils.reloadEverything()
     logging.info("Reloading everything")
 
+    debugUtils.clearRuntimeAtlases()
     debugUtils.reloadLanguageFiles()
     debugUtils.reloadLibraries()
     debugUtils.reloadSaveSanitizers()

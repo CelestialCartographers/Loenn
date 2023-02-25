@@ -18,7 +18,7 @@ function textureAtlas.init()
     local layerCounts = {8, 4}
 
     for _, count in ipairs(layerCounts) do
-        local success, canvas = pcall(love.graphics.newCanvas, 4096, 4096, count, {type="array"})
+        local success, canvas = pcall(love.graphics.newCanvas, textureAtlas.width, textureAtlas.height, count, {type="array"})
 
         if success then
             textureAtlas.canvases = count
@@ -31,14 +31,36 @@ function textureAtlas.init()
     textureAtlas.canvases = 0
 end
 
+function textureAtlas.clearCanvasArea(canvas, layer, x, y, width, height)
+    local previousCanvas = love.graphics.getCanvas()
+    local scissorX, scissorY, scissorWidth, scissorHeight = love.graphics.getScissor()
+
+    love.graphics.setCanvas(canvas, layer)
+    love.graphics.push()
+    love.graphics.origin()
+    love.graphics.setScissor(x, y, width, height)
+    love.graphics.clear(0.0, 0.0, 0.0, 0.0)
+    love.graphics.pop()
+    love.graphics.setCanvas(previousCanvas)
+    love.graphics.setScissor(scissorX, scissorY, scissorWidth, scissorHeight)
+end
+
 function textureAtlas.clear()
     for i, atlas in ipairs(textureAtlas.atlases) do
-        if atlas.image then
-            atlas.image:release()
-        end
+        -- Clear canvas arrays, release normal canvases
+        if i <= textureAtlas.canvases then
+            local canvas = textureAtlas.canvasArray
 
-        textureAtlas.atlases[i] = nil
+            textureAtlas.clearCanvasArea(canvas, i, 0, 0, textureAtlas.width, textureAtlas.height)
+
+        else
+            if atlas.image then
+                atlas.image:release()
+            end
+        end
     end
+
+    textureAtlas.atlases = {}
 end
 
 -- Set up as layer in canvasArray if possible, otherwise use a new normal canvas
@@ -48,7 +70,7 @@ function textureAtlas.addAtlas(layer)
     local canvas = textureAtlas.canvasArray
 
     if atlasNumber > textureAtlas.canvases then
-        canvas = love.graphics.newCanvas(4096, 4096)
+        canvas = love.graphics.newCanvas(textureAtlas.width, textureAtlas.height)
         layer = nil
     end
 
@@ -126,20 +148,9 @@ function textureAtlas.removeImage(image, quad, layer)
     local atlas = textureAtlas.atlases[layer]
 
     if atlas then
-        local previousCanvas = love.graphics.getCanvas()
-        local scissorX, scissorY, scissorWidth, scissorHeight = love.graphics.getScissor()
-
-        love.graphics.setCanvas(image, layer)
-        love.graphics.push()
-        love.graphics.origin()
-        love.graphics.setScissor(x, y, width, height)
-        love.graphics.clear(0.0, 0.0, 0.0, 0.0)
-        love.graphics.pop()
-        love.graphics.setCanvas(previousCanvas)
-        love.graphics.setScissor(scissorX, scissorY, scissorWidth, scissorHeight)
+        textureAtlas.clearCanvasArea(image, layer, x, y, wdith, height)
 
         table.insert(atlas.rectangles, utils.rectangle(x, y, width, height))
-
         sortAtlasRectangles(atlas)
 
     else
