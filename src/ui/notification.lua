@@ -62,7 +62,6 @@ local function createPopupWindow(popup)
         removePopupWindow(panel)
     end):with({
         y = 0,
-
     }):with(uiUtils.rightbound)
 
     closeButton.style = {
@@ -91,20 +90,45 @@ local function closePopup(popup)
     end
 end
 
-function notificationPopup.notify(widget, duration)
+function notificationPopup.clearNotifications(tag)
+    for i = #notificationWindows, 1, -1 do
+        local target = notificationWindows[i]
+        local popup = target.popup
+
+        if not tag or popup.settings and popup.settings.tag == tag then
+            table.remove(notificationWindows, i)
+
+            if activeNotification == target then
+                activeNotification = false
+            end
+        end
+    end
+
+    notificationGroup:reflow()
+    ui.root:recollect()
+end
+
+notificationPopup.defaultDuration = 3
+
+function notificationPopup.notify(widget, duration, settings)
     local popup = {
         widget = widget,
         durations = {
             popupStartDuration,
-            duration or 3,
+            duration or notificationPopup.defaultDuration,
             popupStopDuration
         },
+        settings = settings,
         timeAcc = 0,
         lerpPercent = 0,
         state = "starting",
         stateIndex = 1,
         close = closePopup
     }
+
+    if settings and settings.clearSameTag and settings.tag then
+        notificationPopup.clearNotifications(settings.tag)
+    end
 
     return createPopupWindow(popup)
 end

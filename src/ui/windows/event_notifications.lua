@@ -20,31 +20,35 @@ local notificationHandlers = {}
 function notificationHandlers:saveSanitizerDependenciesMissing(missingMods, usedMods, dependedOnMods)
     local language = languageRegistry.getLanguage()
 
-    notifications.notify(function(popup)
-        return uiElements.column({
-            uiElements.label(tostring(language.ui.notifications.saveSanitizerDependenciesMissing)),
-            uiElements.row({
-                uiElements.button(tostring(language.ui.button.yes), function()
-                    loadedState.saveCurrentMap(function(filename)
-                        dependencyEditor.editDependencies()
+    notifications.notify(
+        function(popup)
+            return uiElements.column({
+                uiElements.label(tostring(language.ui.notifications.saveSanitizerDependenciesMissing)),
+                uiElements.row({
+                    uiElements.button(tostring(language.ui.button.yes), function()
+                        loadedState.saveCurrentMap(function(filename)
+                            dependencyEditor.editDependencies()
+                            popup:close()
+                        end)
+                    end),
+                    uiElements.button(tostring(language.ui.button.no), function()
                         popup:close()
-                    end)
-                end),
-                uiElements.button(tostring(language.ui.button.no), function()
-                    popup:close()
-                end),
-                uiElements.button(tostring(language.ui.notifications.saveSanitizerDependenciesRemindMeLater), function()
-                    -- Might be reloaded, get latest
-                    -- Use / instead of . since this is loaded based on filesystem paths
-                    local dependencySaveSanitizer = require("save_sanitizers/check_dependencies")
+                    end),
+                    uiElements.button(tostring(language.ui.notifications.saveSanitizerDependenciesRemindMeLater), function()
+                        -- Might be reloaded, get latest
+                        -- Use / instead of . since this is loaded based on filesystem paths
+                        local dependencySaveSanitizer = require("save_sanitizers/check_dependencies")
 
-                    dependencySaveSanitizer.disableEventFor[loadedState.filename] = true
+                        dependencySaveSanitizer.disableEventFor[loadedState.filename] = true
 
-                    popup:close()
-                end),
+                        popup:close()
+                    end),
+                })
             })
-        })
-    end, -1)
+        end,
+        -1,
+        {clearSameTag = true, tag = "saveSanitizerDependenciesMissing"}
+    )
 end
 
 function notificationHandlers:editorMapSaved(filename)
@@ -53,7 +57,11 @@ function notificationHandlers:editorMapSaved(filename)
 
     -- Only display the notification if the user manually saved
     if not fromBackup then
-        notifications.notify(string.format(tostring(language.ui.notifications.editorMapSaved), filename))
+        notifications.notify(
+            string.format(tostring(language.ui.notifications.editorMapSaved), filename),
+            nil,
+            {clearSameTag = true, tag = "editorMapSaved"}
+        )
     end
 end
 
@@ -90,13 +98,21 @@ end
 function notificationHandlers:editorHistoryUndoEmpty()
     local language = languageRegistry.getLanguage()
 
-    notifications.notify(tostring(language.ui.notifications.editorHistoryUndoEmpty))
+    notifications.notify(
+        tostring(language.ui.notifications.editorHistoryUndoEmpty),
+        nil,
+        {clearSameTag = true, tag = "editorHistoryUndoEmpty"}
+    )
 end
 
 function notificationHandlers:editorHistoryRedoEmpty()
     local language = languageRegistry.getLanguage()
 
-    notifications.notify(tostring(language.ui.notifications.editorHistoryRedoEmpty))
+    notifications.notify(
+        tostring(language.ui.notifications.editorHistoryRedoEmpty),
+        nil,
+        {clearSameTag = true, tag = "editorHistoryRedoEmpty"}
+    )
 end
 
 -- TODO - Move over to modal when those are implemented
