@@ -533,6 +533,8 @@ function modHandler.getModNamesFromMetadata(metadata)
                     table.insert(names, info.Name)
                 end
             end
+
+            return names
         end
     end
 end
