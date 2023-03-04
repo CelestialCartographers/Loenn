@@ -1,9 +1,11 @@
 local state = require("loaded_state")
+local drawing = require("utils.drawing")
 local placementUtils = require("placement_utils")
 local layerHandlers = require("layer_handlers")
 local viewportHandler = require("viewport_handler")
 local keyboardHelper = require("utils.keyboard")
 local configs = require("configs")
+local colors = require("consts.colors")
 local utils = require("utils")
 local toolUtils = require("tool_utils")
 local history = require("history")
@@ -377,18 +379,24 @@ local function selectPlacement(name, index)
 end
 
 local function drawPlacementDrawable(room)
-    if utils.typeof(placementTemplate.drawable) == "table" then
-        for _, drawable in ipairs(placementTemplate.drawable) do
-            if drawable.draw then
-                drawable:draw()
+    drawing.callKeepOriginalColor(function()
+        local alpha = colors.placementPreviewAlpha
+
+        love.graphics.setColor(1.0, 1.0, 1.0, alpha)
+
+        if utils.typeof(placementTemplate.drawable) == "table" then
+            for _, drawable in ipairs(placementTemplate.drawable) do
+                if drawable.draw then
+                    drawable:draw(alpha)
+                end
+            end
+
+        else
+            if placementTemplate.drawable.draw then
+                placementTemplate.drawable:draw(alpha)
             end
         end
-
-    else
-        if placementTemplate.drawable.draw then
-            placementTemplate.drawable:draw()
-        end
-    end
+    end)
 end
 
 local function drawPlacement(room)

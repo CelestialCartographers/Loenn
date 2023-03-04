@@ -220,11 +220,13 @@ function unorderedDrawingBatchMt.__index:remove(id, meta)
     local batch = self._lookup[image]
     local removedIndices = self._lookupRemovedIndices[image]
 
-    if layer then
-        batch:setLayer(id, layer, 0, 0, 0, 0, 0)
+    if batch then
+        if layer then
+            batch:setLayer(id, layer, 0, 0, 0, 0, 0)
 
-    else
-        batch:set(id, 0, 0, 0, 0, 0)
+        else
+            batch:set(id, 0, 0, 0, 0, 0)
+        end
     end
 
     table.insert(removedIndices, id)
@@ -238,14 +240,18 @@ function unorderedDrawingBatchMt.__index:setColor(meta, r, g, b, a)
     local image = meta.image
     local batch = self._lookup[image]
 
-    batch:setColor(r, g, b, a)
+    if batch then
+        batch:setColor(r, g, b, a)
+    end
 end
 
 function unorderedDrawingBatchMt.__index:getColor(meta)
     local image = meta.image
     local batch = self._lookup[image]
 
-    return batch:getColor()
+    if batch then
+        return batch:getColor()
+    end
 end
 
 function unorderedDrawingBatchMt.__index:addFromDrawable(drawable)

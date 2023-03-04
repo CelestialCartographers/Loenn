@@ -59,6 +59,9 @@ colors.selectionCompleteNodeLineColor = {255 / 255, 0 / 255, 255 / 255, 102 / 25
 colors.selectionAxisBoundMovementLines = {255 / 255, 255 / 255, 0 / 255, 153 / 255}
 colors.selectionAxisBoundSelectionBackground = {255 / 255, 0 / 255, 255 / 255, 102 / 255}
 
+-- Placement
+colors.placementPreviewAlpha = 0.65
+
 -- Resize arrows device
 colors.resizeTriangleColor = {196 / 255, 196 / 255, 196 / 255}
 
