@@ -39,6 +39,7 @@ local function filterItems(items, search, caseSensitive)
 
     return filtered
 end
+
 function listWidgets.setSelection(list, target, preventCallback, callbackRequiresChange)
     -- Select first item as default, callback if it exists
     -- If target is defined attempt to select this instead of the first item
@@ -47,13 +48,18 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
     local selectedIndex = 1
     local previousSelection = list.selected and list.selected.data
     local newSelection
+    local magicList = list._magicList
 
     if target and target ~= false then
-        for i, item in ipairs(list.children) do
-            if item == target or item.data == target or item.text == target or i == target then
+        local dataList = magicList and list.data or list.children
+
+        for i, item in ipairs(dataList) do
+            local index = magicList and item._magicIndex or i
+
+            if item == target or item.data == target or item.text == target or index == target then
                 newSelection = item
                 selectedTarget = true
-                selectedIndex = i
+                selectedIndex = index
 
                 break
             end
@@ -63,14 +69,25 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
     if newSelection then
         list.selected = newSelection
 
+        if list.selectedIndex ~= selectedIndex then
+            list.selectedIndex = selectedIndex
+        end
+
         if not preventCallback then
             local dataChanged = newSelection.data ~= previousSelection
 
             if callbackRequiresChange and dataChanged or not callbackRequiresChange then
-                -- Set owner manually here for now
-                -- TODO - Test whether this is actually needed later
-                list.selected.owner = list
-                list.selected:onClick(nil, nil, 1)
+                local listCallback = list.cb
+
+                if listCallback then
+                    local data = list.selected
+
+                    if not magicList then
+                        data = data and data.data
+                    end
+
+                    listCallback(list, data)
+                end
             end
         end
     end
@@ -89,7 +106,7 @@ end
 local function findListParent(element)
     local target = element
 
-    while target and target.__type ~= "list" do
+    while target and (target.__type ~= "magicList" or target.__type ~= "list") do
         target = target.parent
     end
 
@@ -315,16 +332,34 @@ local function addDraggableHooks(list)
     end
 end
 
-function listWidgets.updateItems(list, items, target, fromFilter, preventCallback, callbackRequiresChange)
+local function defaultItemSort(lhs, rhs)
+    return lhs.text < rhs.text
+end
+
+local function sortItems(list, items)
+    local options = list.options or list
+    local sortedItems = table.shallowcopy(items)
+
+    table.sort(sortedItems, options.sortingFunction or defaultItemSort)
+
+    return sortedItems
+end
+
+function listWidgets.updateItems(list, items, target, fromFilter, preventCallback, callbackRequiresChange, forceSort)
+    local options = list.options
     local previousSelection = list.selected and list.selected.data
     local newSelection
 
     local processedItems = items
 
+    if options.sort or forceSort then
+        processedItems = sortItems(list, processedItems)
+    end
+
     if not fromFilter and list.searchField then
         local search = list.searchField:getText() or ""
 
-        processedItems = filterItems(items, search)
+        processedItems = filterItems(processedItems, search)
     end
 
     for _, item in ipairs(processedItems) do
@@ -332,12 +367,19 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
             newSelection = item
         end
 
-        if fromFilter then
+        if fromFilter and not list._magicList then
             item:reflow()
         end
     end
 
-    list.children = processedItems
+    if list._magicList then
+        list:invalidate()
+
+        list.data = processedItems
+
+    else
+        list.children = processedItems
+    end
 
     ui.runLate(function()
         listWidgets.setSelection(list, target or newSelection, preventCallback, callbackRequiresChange)
@@ -351,6 +393,17 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
     end
 
     addDraggableHooks(list)
+end
+
+function listWidgets.sortList(list)
+    local dataList = list._magicList and list.data or list.children
+    local target = list:getSelectedData()
+
+    if list._magicList then
+        target = target.data or target
+    end
+
+    listWidgets.updateItems(list, dataList, target, false, true, true, true)
 end
 
 local function filterList(list, search)
@@ -405,19 +458,43 @@ local function getColumnForList(searchField, scrolledList, mode)
     return uiElements.column(columnItems):with(uiUtils.fillHeight(false))
 end
 
-function listWidgets.getList(callback, items, options)
+-- Magic lists return the item rather than item.data by default
+-- Wrap it such that it is consistent with normal lists, but provide the item as 3rd argument
+local function magicListCallbackWrapper(callback)
+    return function(self, item)
+        callback(self, item and item.data, item)
+    end
+end
+
+local function getListCommon(magicList, callback, items, options)
     options = options or {}
     items = items or {}
+
+    if options.sort then
+        sortItems(options, items)
+    end
 
     local initialSearch = options.initialSearch or ""
     local filteredItems = filterItems(items, initialSearch)
 
-    local list = uiElements.list(filteredItems, callback):with({
+    local list
+    local listData = {
         unfilteredItems = items,
         minWidth = options.minimumWidth or 128,
         draggable = options.draggable or false,
         draggableTag = options.draggableTag or false
-    })
+    }
+
+    if magicList then
+        list = uiElements.magicList(
+            filteredItems,
+            options.dataToElement,
+            magicListCallbackWrapper(callback)
+        ):with(listData)
+
+    else
+        list = uiElements.list(filteredItems, callback):with(listData)
+    end
 
     addDraggableHooks(list)
 
@@ -436,10 +513,25 @@ function listWidgets.getList(callback, items, options)
 
     list.options = options
     list.searchField = searchField
+    list._magicList = magicList
+
+    -- Add utility functions, can't use a metatable
+    list.sort = listWidgets.sortList
+    list.updateItems = listWidgets.updateItems
+    list.setFilterText = listWidgets.setFilterText
+    list.setSelection = listWidgets.setSelection
 
     local column = getColumnForList(searchField, scrolledList, options.searchBarLocation)
 
     return column, list, searchField
+end
+
+function listWidgets.getList(callback, items, options)
+    return getListCommon(false, callback, items, options)
+end
+
+function listWidgets.getMagicList(callback, items, options)
+    return getListCommon(true, callback, items, options)
 end
 
 return listWidgets
