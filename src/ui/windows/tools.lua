@@ -5,7 +5,7 @@ local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
 local widgetUtils = require("ui.widgets.utils")
-local listWidgets = require("ui.widgets.lists")
+local lists = require("ui.widgets.lists")
 local simpleDocks = require("ui.widgets.simple_docks")
 local contextMenu = require("ui.context_menu")
 local iconUtils = require("ui.utils.icons")
@@ -42,9 +42,15 @@ local function getLanguageOrDefault(languagePath, default)
 end
 
 local function updateListItemFavoriteVisuals(listItem)
+    local children = listItem.children
+
+    -- Padding elements does not have children, skip
+    if not children then
+        return
+    end
+
     local favorite = listItem.itemFavorited
     local text = listItem.originalText
-    local children = listItem.children
     local label = uiElements.label(text)
 
     listItem.label = label
@@ -76,7 +82,7 @@ local function updateListItemFavoriteVisuals(listItem)
     end
 
     table.insert(children, label)
-    listItem:reflow()
+    listItem:layout()
 end
 
 local function materialSortFunction(lhs, rhs)
@@ -90,10 +96,7 @@ local function materialSortFunction(lhs, rhs)
     return lhsText < rhsText
 end
 
-local function updateFavorite(listItem, tool, layer, material, favorite)
-    local materialList = listItem.parent
-    local materialListItems = materialList.children
-
+local function updateFavorite(materialList, itemData, tool, layer, material, favorite)
     if favorite then
         toolUtils.addPersistenceFavorites(tool, layer, material)
 
@@ -101,29 +104,9 @@ local function updateFavorite(listItem, tool, layer, material, favorite)
         toolUtils.removePersistenceFavorites(tool, layer, material)
     end
 
-    listItem.itemFavorited = favorite
+    itemData.itemFavorited = favorite
 
-    updateListItemFavoriteVisuals(listItem)
-    table.sort(materialListItems, materialSortFunction)
-    materialList:layout()
-end
-
-local function updateMaterialListFavorites(listItems)
-    if not listItems then
-        return
-    end
-
-    for _, listItem in ipairs(listItems) do
-        listItem:layout()
-    end
-
-    ui.runLate(function()
-        for _, listItem in ipairs(listItems) do
-            updateListItemFavoriteVisuals(listItem)
-        end
-
-        table.sort(listItems, materialSortFunction)
-    end)
+    materialList:sort()
 end
 
 local function materialFavoriteOnPressHandler(tool, layer)
@@ -139,7 +122,7 @@ local function materialFavoriteOnPressHandler(tool, layer)
             local material = self.data
             local favorited = self.itemFavorited
 
-            updateFavorite(self, tool, layer, material, not favorited)
+            updateFavorite(self.parent, self.itemData, tool, layer, material, not favorited)
 
         else
             orig(self, x, y, button, isDrag, presses)
@@ -149,11 +132,12 @@ end
 
 local function addMaterialContextMenu(language, tool, layer, listItem)
     local material = listItem.data
-    local favorite = listItem.itemFavorited
+    local itemData = listItem.itemData
+    local favorite = itemData.itemFavorited
 
     local favoriteText = tostring(language.ui.tools_window.favorite)
     local favoriteCheckbox = uiElements.checkbox(favoriteText, favorite, function(checkbox, newFavorite)
-        updateFavorite(listItem, tool, layer, material, newFavorite)
+        updateFavorite(listItem.parent, itemData, tool, layer, material, newFavorite)
     end)
 
     listItem._favoriteCheckbox = favoriteCheckbox
@@ -165,7 +149,35 @@ local function addMaterialContextMenu(language, tool, layer, listItem)
     return contextMenu.addContextMenu(listItem, content)
 end
 
-local function getMaterialItems(layer, sortItems)
+local function materialDataToElement(list, data, element)
+    if not element then
+        element = uiElements.listItem()
+    end
+
+    if data then
+        local language = languageRegistry.getLanguage()
+
+        element.text = data.text
+        element.data = data.data
+        element.tooltip = data.tooltip
+        element.itemFavorited = data.itemFavorited
+        element.originalText = data.text
+        element.itemData = data
+
+        updateListItemFavoriteVisuals(element)
+
+        -- TODO - Reimplement this, syncing checkbox state is more effort now
+        --addMaterialContextMenu(language, data.currentToolName, data.currentLayer, element)
+
+        element:hook({
+            onPress = materialFavoriteOnPressHandler(data.currentToolName, data.currentLayer)
+        })
+    end
+
+    return element
+end
+
+local function getMaterialItems(layer)
     local currentTool = toolHandler.currentTool
     local currentLayer = layer or toolHandler.getLayer(currentTool)
     local materials = toolHandler.getMaterials(nil, layer or currentLayer)
@@ -187,28 +199,17 @@ local function getMaterialItems(layer, sortItems)
         end
 
         local itemFavorited = not not favoritesLookup[materialData]
-        local listItem = uiElements.listItem({
+        local item = {
             text = materialText,
             data = materialData,
-        }):hook({
-            onPress = materialFavoriteOnPressHandler(currentTool, currentLayer)
-        })
+            tooltip = materialTooltip,
+            itemFavorited = itemFavorited,
+            currentToolName = currentTool,
+            currentLayer = currentLayer
+        }
 
-        listItem.itemFavorited = itemFavorited
-        listItem.tooltipText = materialTooltip
-        listItem.originalText = materialText
-
-        -- TODO - Add this back in when we get the VRAM/caching situation under control
-        --addMaterialContextMenu(language, currentTool, currentLayer, listItem)
-
-        table.insert(materialItems, listItem)
+        table.insert(materialItems, item)
     end
-
-    if sortItems ~= false then
-        table.sort(materialItems, materialSortFunction)
-    end
-
-    updateMaterialListFavorites(materialItems)
 
     return materialItems
 end
@@ -227,8 +228,8 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     toolWindow.eventStates.layer = layer
     toolWindow.eventStates.material = material
 
-    listWidgets.setSelection(toolWindow.layerList, layer, true)
-    listWidgets.setSelection(toolWindow.materialList, material, true)
+    toolWindow.layerList:setSelection(layer, true)
+    toolWindow.materialList:setSelection(material, true)
 end
 
 local function getLayerItems(toolName)
@@ -269,7 +270,7 @@ local function layerCallback(list, layer)
         toolWindow.eventStates.material = nil
 
         toolHandler.setLayer(layer)
-        listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer), nil, nil, true)
+        toolWindow.materialList:updateItems(getMaterialItems(layer), nil, nil, true)
     end
 end
 
@@ -287,15 +288,15 @@ local function toolLayerChangedCallback(self, tool, layer)
         searchField:setText(searchText)
         searchField.index = #searchField
 
-        listWidgets.setSelection(toolWindow.layerList, layer, true)
-        listWidgets.updateItems(toolWindow.materialList, getMaterialItems(layer), nil, nil, true)
+        toolWindow.layerList:setSelection(layer, true)
+        toolWindow.materialList:updateItems(getMaterialItems(layer), nil, nil, true)
     end
 end
 
 local function updateLayerList(name)
     local items = getLayerItems(name)
 
-    listWidgets.updateItems(toolWindow.layerList, items)
+    toolWindow.layerList:updateItems(items)
 
     local newVisible = #items > 0
 
@@ -355,13 +356,13 @@ end
 local function toolModeChangedCallback(self, tool, mode)
     toolWindow.eventStates.mode = mode
 
-    listWidgets.setSelection(toolWindow.modeList, mode, true)
+    toolWindow.modeList:setSelection(mode, true)
 end
 
 local function updateToolModeList(name)
     local items = getModeItems(name)
 
-    listWidgets.updateItems(toolWindow.modeList, items)
+    toolWindow.modeList:updateItems(items)
 
     local newVisible = #items > 0
 
@@ -424,14 +425,14 @@ local function toolCallback(list, toolName)
         toolWindow.eventStates.material = nil
 
         toolHandler.selectTool(toolName)
-        listWidgets.updateItems(toolWindow.layerList, getLayerItems(toolName))
+        toolWindow.layerList:updateItems(getLayerItems(toolName))
     end
 end
 
 local function toolChangedCallback(self, tool)
     toolWindow.eventStates.tool = tool.name
 
-    listWidgets.setSelection(toolWindow.toolList, tool.name, true)
+    toolWindow.toolList:setSelection(tool.name, true)
     updateLayerList(tool.name)
     updateToolModeList(tool.name)
 end
@@ -440,8 +441,8 @@ local function updateLayerAndPlacementsCallback(list, filename)
     -- We get the event before the main editor
     -- Placements for example will be out of date if we update now
     ui.runLate(function()
-        listWidgets.updateItems(toolWindow.layerList, getLayerItems())
-        listWidgets.updateItems(toolWindow.materialList, getMaterialItems())
+        toolWindow.layerList:updateItems(getLayerItems())
+        toolWindow.materialList:updateItems(getMaterialItems())
     end)
 end
 
@@ -450,7 +451,6 @@ local function materialSearchFieldChanged(element, new, old)
     local layer = toolHandler.getLayer()
 
     toolUtils.setPersistenceSearch(tool, layer, new)
-    updateMaterialListFavorites(toolWindow.materialList.children)
 end
 
 function toolWindow.getWindow()
@@ -470,20 +470,23 @@ function toolWindow.getWindow()
         searchBarLocation = "below",
         searchBarCallback = materialSearchFieldChanged,
         initialSearch = toolUtils.getPersistenceSearch(toolHandler.currentTool, toolHandler.getLayer()),
-        initialItem = toolHandler.getMaterial()
+        initialItem = toolHandler.getMaterial(),
+        dataToElement = materialDataToElement,
+        sortingFunction = materialSortFunction,
+        sort = true
     }
 
     local toolItems = getToolItems()
-    local scrolledToolList, toolList = listWidgets.getList(toolCallback, toolItems, toolListOptions)
+    local scrolledToolList, toolList = lists.getList(toolCallback, toolItems, toolListOptions)
 
     local modeItems = getModeItems()
-    local scrolledModeList, modeList = listWidgets.getList(modeCallback, modeItems, modeListOptions)
+    local scrolledModeList, modeList = lists.getList(modeCallback, modeItems, modeListOptions)
 
     local layerItems = getLayerItems()
-    local scrolledLayerList, layerList = listWidgets.getList(layerCallback, layerItems, layerListOptions)
+    local scrolledLayerList, layerList = lists.getList(layerCallback, layerItems, layerListOptions)
 
     local materialItems = getMaterialItems()
-    local scrolledMaterialList, materialList = listWidgets.getList(materialCallback, materialItems, materialListOptions)
+    local scrolledMaterialList, materialList = lists.getMagicList(materialCallback, materialItems, materialListOptions)
 
     -- Make sure lists are visually updated
     -- This does some extra logic to hide the lists if they are empty
