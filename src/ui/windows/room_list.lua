@@ -3,7 +3,7 @@ local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
 local widgetUtils = require("ui.widgets.utils")
-local listWidgets = require("ui.widgets.lists")
+local lists = require("ui.widgets.lists")
 local simpleDocks = require("ui.widgets.simple_docks")
 local contextMenu = require("ui.context_menu")
 local roomEditor = require("ui.room_editor")
@@ -38,8 +38,10 @@ local roomContextActions = {
     delete = roomContextDeleteAction
 }
 
-local function handleContextListClickHandler(room)
+local function handleContextListClickHandler(roomName)
     return function(element, action)
+        local room = state.getRoomByName(roomName)
+
         if roomContextActions[action] then
             roomContextActions[action](room)
         end
@@ -48,7 +50,7 @@ local function handleContextListClickHandler(room)
     end
 end
 
-local function roomListItemContexthandler(room, language)
+local function roomListItemContexthandler(roomName, language)
     return function()
         return uiElements.list({
             uiElements.listItem({
@@ -59,26 +61,42 @@ local function roomListItemContexthandler(room, language)
                 text = tostring(language.ui.room_list.action.delete),
                 data = "delete"
             })
-        }, handleContextListClickHandler(room))
+        }, handleContextListClickHandler(roomName))
     end
 end
 
+local function roomDataToElement(list, data, element)
+    if not element then
+        element = uiElements.listItem()
+    end
+
+    if data then
+        local language = languageRegistry.getLanguage()
+
+        element.text = data.text
+        element.data = data.data
+
+        contextMenu.addContextMenu(
+            element,
+            roomListItemContexthandler(data.data, language)
+        )
+    end
+
+    return element
+end
+
 local function getRoomItems()
-    local language = languageRegistry.getLanguage()
     local rooms = state.map and state.map.rooms or {}
     local roomItems = {}
 
     for _, room in ipairs(rooms) do
         local name = cleanRoomName(room.name)
-        local roomItem = uiElements.listItem({
+        local roomItem = {
             text = name,
             data = room.name
-        })
+        }
 
-        table.insert(roomItems, contextMenu.addContextMenu(
-            roomItem,
-            roomListItemContexthandler(room, language))
-        )
+        table.insert(roomItems, roomItem)
     end
 
     return roomItems
@@ -95,14 +113,14 @@ local function updateList(list, target)
         end
     end
 
-    listWidgets.updateItems(list, roomItems, target)
+    list:updateItems(roomItems, target)
 end
 
-function roomList.roomSelectedCallback(element, item)
+function roomList.roomSelectedCallback(element, roomName)
     local currentRoom = state.getSelectedRoom()
 
-    if not currentRoom or cleanRoomName(currentRoom.name) ~= item then
-        local newRoom = state.getRoomByName(item)
+    if not currentRoom or cleanRoomName(currentRoom.name) ~= roomName then
+        local newRoom = state.getRoomByName(roomName)
 
         if newRoom then
             -- TODO - Allow user to specify zoom after room selection in config
@@ -116,11 +134,11 @@ function roomList:editorMapTargetChanged()
     return function(element, target, targetType)
         if targetType == "room" then
             local roomNameCleaned = cleanRoomName(target.name)
-            local selected = listWidgets.setSelection(self, roomNameCleaned, true, true)
+            local selected = self:setSelection(roomNameCleaned, true, true)
 
             if not selected then
-                listWidgets.setFilterText(self, "", true)
-                listWidgets.setSelection(self, roomNameCleaned, true, true)
+                self:setFilterText("", true)
+                self:setSelection(roomNameCleaned, true, true)
             end
         end
     end
@@ -168,9 +186,10 @@ function roomList.getWindow()
     local roomItems = getRoomItems()
     local listOptions = {
         initialSearch = search,
-        searchBarLocation = "below"
+        searchBarLocation = "below",
+        dataToElement = roomDataToElement
     }
-    local column, list = listWidgets.getList(roomList.roomSelectedCallback, roomItems, listOptions)
+    local column, list = lists.getMagicList(roomList.roomSelectedCallback, roomItems, listOptions)
     local window = uiElements.window("Room List", column:with(uiUtils.fillHeight(true))):with(uiUtils.fillHeight(false))
 
     window:with({
