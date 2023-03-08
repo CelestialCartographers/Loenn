@@ -111,8 +111,6 @@ function argumentParserMt.__index:parse(args)
     -- Check if previous argument got everything it expects
     self:_errorIfMissingArguments()
 
-    print(require("utils").serialize(self._result))
-
     return self._result
 end
 

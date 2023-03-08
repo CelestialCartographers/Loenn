@@ -1,5 +1,10 @@
 require("lua_setup")
 
+local launchArguments = require("launch_arguments")
+
+-- Set up launch argument parsing
+launchArguments.updateArguments(arg)
+
 local meta = require("meta")
 local configs = require("configs")
 local persistence = require("persistence")

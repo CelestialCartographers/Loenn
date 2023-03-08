@@ -259,6 +259,10 @@ function filesystem.mtime(path)
     return attrs and attrs.modification or -1
 end
 
+function filesystem.currentDirectory()
+    return lfs.currentdir()
+end
+
 -- TODO - Test
 function filesystem.copy(from, to)
     local fromFh = io.open(from, "rb")

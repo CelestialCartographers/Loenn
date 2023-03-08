@@ -1,5 +1,10 @@
 -- love.load() is not called again, put stuff here.
 
+local launchArguments = require("launch_arguments")
+
+-- Set up launch argument parsing
+launchArguments.updateArguments(arg)
+
 local meta = require("meta")
 local utils = require("utils")
 local logging = require("logging")
