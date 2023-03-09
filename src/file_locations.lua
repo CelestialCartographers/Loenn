@@ -1,6 +1,7 @@
 local filesystem = require("utils.filesystem")
 local config = require("utils.config")
 local utils = require("utils")
+local launchArguments = require("launch_arguments")
 
 local fileLocations = {}
 
@@ -10,10 +11,13 @@ fileLocations.loennSimpleFolderName = "Loenn"
 fileLocations.loennLinuxFolderName = "Lönn"
 
 function fileLocations.getStorageDir()
+    if launchArguments.parsed.storageDirectory then
+        return launchArguments.parsed.storageDirectory
+    end
+
     local userOS = utils.getOS()
 
     local simpleFolderName = fileLocations.loennSimpleFolderName
-    local windowsFolderName = fileLocations.loennWindowsFolderName
     local linuxFolderName = fileLocations.loennLinuxFolderName
 
     if userOS == "Windows" then

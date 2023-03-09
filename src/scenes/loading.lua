@@ -49,6 +49,8 @@ function loadingScene:firstEnter()
     local configs = require("configs")
     local mods = require("mods")
 
+    local launchArguments = require("launch_arguments")
+
     local fileLocations = require("file_locations")
     local viewerState = require("loaded_state")
 
@@ -104,10 +106,12 @@ function loadingScene:firstEnter()
     )
 
     local defaultMapFilename = utils.joinpath(fileLocations.getCelesteDir(), "Content", "Maps", "7-Summit.bin")
+    local initialFilename = launchArguments.parsed.initialFilename
     local lastMapFilename = persistence.lastLoadedFilename
     local lastRoomName = persistence.lastSelectedRoomName
+    local targetFilename = initialFilename or lastMapFilename or defaultMapFilename
 
-    viewerState.loadFile(lastMapFilename or defaultMapFilename, lastRoomName)
+    viewerState.loadFile(targetFilename, lastRoomName)
     viewportHandler.cameraFromPersistence()
     viewerState.initFromPersistence()
 end
