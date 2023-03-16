@@ -110,6 +110,7 @@ ui.colorPicker.fieldTypes.name.h=H
 ui.colorPicker.fieldTypes.name.s=S
 ui.colorPicker.fieldTypes.name.v=V
 ui.colorPicker.fieldTypes.name.hexColor=Hex
+ui.colorPicker.fieldTypes.name.alpha=Alpha
 ui.colorPicker.fieldTypes.description.r=Red component of the colour, between 0 and 255.
 ui.colorPicker.fieldTypes.description.g=Green component of the colour, between 0 and 255.
 ui.colorPicker.fieldTypes.description.b=Blue component of the colour, between 0 and 255.
@@ -117,6 +118,7 @@ ui.colorPicker.fieldTypes.description.h=Hue of the colour, between 0 and 360.
 ui.colorPicker.fieldTypes.description.s=Saturation of the colour, between 0 and 100.
 ui.colorPicker.fieldTypes.description.v=Value of the colour, between 0 and 100.
 ui.colorPicker.fieldTypes.description.hexColor=Hexadecimal representation of the colour.
+ui.colorPicker.fieldTypes.description.alpha=Alpha value of the colour, between 0 and 255.
 
 
 # Forms

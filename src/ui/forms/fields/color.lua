@@ -183,7 +183,11 @@ function colorField.getElement(name, value, options)
                 callback = function(data)
                     field:setText(data.hexColor)
                     field.index = #data.hexColor
-                end
+                end,
+                showAlpha = options.showAlpha or options.useAlpha,
+                showHex = options.showHex,
+                showHSV = options.showHSV,
+                showRGB = options.showRGB,
             }
 
             local fieldText = getXNAColorHex(field, field:getText() or "")

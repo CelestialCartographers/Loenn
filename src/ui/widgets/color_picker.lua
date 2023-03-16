@@ -17,7 +17,8 @@ local valueRanges = {
     b = {0, 255},
     h = {0, 360},
     s = {0, 100},
-    v = {0, 100}
+    v = {0, 100},
+    alpha = {0, 255}
 }
 
 local fieldTypes = {
@@ -28,6 +29,7 @@ local fieldTypes = {
     s = "number",
     v = "number",
     hexColor = "hex_color",
+    alpha = "integer",
 }
 
 local areaHSVPixelCode = [===[
@@ -122,14 +124,18 @@ local function getFormFieldOrder(options)
         table.insert(fieldOrder, "b")
     end
 
+    if options.showHex ~= false then
+        table.insert(fieldOrder, "hexColor")
+    end
+
     if options.showHSV ~= false then
         table.insert(fieldOrder, "h")
         table.insert(fieldOrder, "s")
         table.insert(fieldOrder, "v")
     end
 
-    if options.showHex ~= false then
-        table.insert(fieldOrder, "hexColor")
+    if options.showAlpha then
+        table.insert(fieldOrder, "alpha")
     end
 
     return fieldOrder
@@ -144,6 +150,9 @@ local function findChangedColorGroup(current, previous)
 
     elseif current.hexColor ~= previous.hexColor then
         return "hex"
+
+    elseif current.alpha ~= previous.alpha then
+        return "alpha"
     end
 end
 
@@ -165,9 +174,16 @@ local function updateRgbFields(data, h, s, v)
     data.b = utils.round(b * 255)
 end
 
--- RGB normalized
-local function updateHexField(data, r, g, b)
-    data.hexColor = utils.rgbToHex(r, g, b)
+-- RGB(A) normalized
+local function updateHexField(data, r, g, b, a)
+    -- Make sure we have alpha from data rather than argument
+    -- Argument has fallback
+    if data.alpha then
+        data.hexColor = utils.rgbaToHex(r, g, b, a)
+
+    else
+        data.hexColor = utils.rgbToHex(r, g, b)
+    end
 end
 
 local function updateFields(data, changedGroup, interactionData)
@@ -183,17 +199,25 @@ local function updateFields(data, changedGroup, interactionData)
     end
 
     if changedGroup == "rgb" then
-        local r, g, b = (data.r or 0) / 255, (data.g or 0) / 255, (data.b or 0)/ 255
+        local r, g, b = (data.r or 0) / 255, (data.g or 0) / 255, (data.b or 0) / 255
+        local alpha = (data.alpha or 0) / 255
 
         updateHsvFields(data, r, g, b)
-        updateHexField(data, r, g, b)
+        updateHexField(data, r, g, b, alpha)
 
     elseif changedGroup == "hsv" then
         local h, s, v = (data.h or 0) / 360, (data.s or 0) / 100, (data.v or 0) / 100
         updateRgbFields(data, h, s, v)
 
         local r, g, b = data.r / 255, data.g / 255, data.b / 255
-        updateHexField(data, r, g, b)
+        local alpha = (data.alpha or 0) / 255
+        updateHexField(data, r, g, b, alpha)
+
+    elseif changedGroup == "alpha" then
+        local r, g, b = (data.r or 0) / 255, (data.g or 0) / 255, (data.b or 0) / 255
+        local alpha = (data.alpha or 0) / 255
+
+        updateHexField(data, r, g, b, alpha)
     end
 
     updateAreaColors((data.h or 0) / 360)
@@ -287,7 +311,7 @@ function colorPicker.getColorPicker(hexColor, options)
     local language = languageRegistry.getLanguage()
     local callback = options.callback or function() end
 
-    local parsed, r, g, b = utils.parseHexColor(hexColor)
+    local parsed, r, g, b, a = utils.parseHexColor(hexColor)
     local h, s, v = utils.rgbToHsv(r or 0, g or 0, b or 0)
 
     local fieldOrder = getFormFieldOrder(options)
@@ -300,6 +324,10 @@ function colorPicker.getColorPicker(hexColor, options)
         v = utils.round(v * 100, hsvFieldDecimals),
         hexColor = hexColor
     }
+
+    if options.showAlpha then
+        formData.alpha = (a or 1) * 255
+    end
 
     local formOptions = {
         columns = 2,
