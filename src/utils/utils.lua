@@ -398,10 +398,10 @@ function utils.getColor(color)
             return xnaColor
 
         else
-            local success, r, g, b = utils.parseHexColor(color)
+            local success, r, g, b, a = utils.parseHexColor(color)
 
             if success then
-                return {r, g, b}
+                return {r, g, b, a}
             end
 
             return success
