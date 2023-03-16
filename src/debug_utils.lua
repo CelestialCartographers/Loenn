@@ -128,6 +128,8 @@ function debugUtils.redrawMap()
 
     celesteRender.invalidateRoomCache()
     celesteRender.clearBatchingTasks()
+    celesteRender.clearTileSpriteQuadCache()
+    celesteRender.clearScenerySpriteQuadCache()
 end
 
 -- TODO - Add as more hotswapping becomes available
