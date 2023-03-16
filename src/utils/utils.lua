@@ -303,6 +303,16 @@ function utils.rgbToHex(r, g, b)
     return string.format("%06x", number)
 end
 
+function utils.rgbaToHex(r, g, b, a)
+    local r8 = math.floor(r * 255 + 0.5)
+    local g8 = math.floor(g * 255 + 0.5)
+    local b8 = math.floor(b * 255 + 0.5)
+    local a8 = math.floor(a * 255 + 0.5)
+    local number = r8 * 256^3 + g8 * 256^2 + b8 * 256 + a8
+
+    return string.format("%08x", number)
+end
+
 -- Based on implementation from Love2d wiki
 function utils.hsvToRgb(h, s, v)
     if s <= 0 then
@@ -398,10 +408,10 @@ function utils.getColor(color)
             return xnaColor
 
         else
-            local success, r, g, b = utils.parseHexColor(color)
+            local success, r, g, b, a = utils.parseHexColor(color)
 
             if success then
-                return {r, g, b}
+                return {r, g, b, a}
             end
 
             return success
