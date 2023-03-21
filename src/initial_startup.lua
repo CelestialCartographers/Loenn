@@ -24,7 +24,7 @@ function startup.cleanupPath(path)
         local pathResources = filesystem.joinpath(path, "Contents", "Resources")
         local pathMacOS = filesystem.joinpath(path, "Contents", "MacOS")
 
-        if path.isDirectory(pathResources) then
+        if filesystem.isDirectory(pathResources) then
             path = pathResources
 
         else
