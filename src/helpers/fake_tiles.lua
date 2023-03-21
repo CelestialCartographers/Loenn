@@ -192,7 +192,7 @@ function fakeTilesHelper.getEntitySpriteFunction(materialKey, blendKey, layer, c
     end
 end
 
-local function getMaterialCorners(entities)
+local function getMaterialCorners(entities, alignToGrid)
     local tlx, tly = math.huge, math.huge
     local brx, bry = -math.huge, -math.huge
 
@@ -201,6 +201,13 @@ local function getMaterialCorners(entities)
         tly = math.min(tly, entity.y)
         brx = math.max(brx, entity.x + entity.width)
         bry = math.max(bry, entity.y + entity.height)
+    end
+
+    if alignToGrid ~= false then
+        tlx = math.floor(tlx / 8) * 8
+        tly = math.floor(tly / 8) * 8
+        brx = math.floor(brx / 8) * 8
+        bry = math.floor(bry / 8) * 8
     end
 
     return tlx, tly, brx, bry

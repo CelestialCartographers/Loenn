@@ -1,5 +1,4 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
-local connectedEntities = require("helpers.connected_entities")
 local utils = require("utils")
 local matrixLib = require("utils.matrix")
 
@@ -28,15 +27,12 @@ end
 
 function floatySpaceBlock.sprite(room, entity)
     local relevantBlocks = utils.filter(getSearchPredicate(entity), room.entities)
-
-    connectedEntities.appendIfMissing(relevantBlocks, entity)
-
     local firstEntity = relevantBlocks[1] == entity
 
     if firstEntity then
         -- Can use simple render, nothing to merge together
         if #relevantBlocks == 1 then
-            return fakeTilesHelper.getEntitySpriteFunction("tiletype")(room, entity)
+            return fakeTilesHelper.getEntitySpriteFunction("tiletype", false)(room, entity)
         end
 
         return fakeTilesHelper.getCombinedEntitySpriteFunction(relevantBlocks, "tiletype")(room)
@@ -46,7 +42,7 @@ function floatySpaceBlock.sprite(room, entity)
 
     -- Entity is from a placement preview
     if not entityInRoom then
-        return fakeTilesHelper.getEntitySpriteFunction("tiletype")(room, entity)
+        return fakeTilesHelper.getEntitySpriteFunction("tiletype", false)(room, entity)
     end
 end
 
