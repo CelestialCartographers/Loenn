@@ -48,7 +48,7 @@ local function getWindowTitle(language, selections, targetItem, targetLayer)
             local selectionId = selection.item._id
             local selectionLayer = selection.layer
 
-            if selectionLayer == "entities" or selectionLayer == "trigers" then
+            if selectionLayer == "entities" or selectionLayer == "triggers" then
                 if selectionId then
                     table.insert(ids, tostring(selectionId))
                 end
