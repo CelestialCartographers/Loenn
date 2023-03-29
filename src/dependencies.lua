@@ -11,6 +11,11 @@ local languageRegistry = require("language_registry")
 
 local dependencyFinder = {}
 
+-- Bundled with Everest
+local ignoredFilePaths = {
+    ["graphics/atlases/gameplay/tilesets/subfolder/bettertemplate.png"] = true
+}
+
 local analyzeLayers = {
     "decalsFg",
     "decalsBg",
@@ -96,6 +101,10 @@ end
 
 local function addAssociatedModsFromFilename(path, filename, modNames)
     if filename then
+        if ignoredFilePaths[string.lower(filename)] then
+            return
+        end
+
         local associated = modsForFilename(filename)
         local localizedReason = localizeFilenameReason(filename)
 
