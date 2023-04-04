@@ -345,6 +345,12 @@ function moveIndex(t, before, after)
 end
 
 local function canMoveStyle(interactionData, offset)
+    local listTarget = interactionData.listTarget
+
+    if not listTarget or listTarget.defaultTarget then
+        return false
+    end
+
     local styles, parent, index = findStyleInStylegrounds(interactionData)
 
     if parent and index then
