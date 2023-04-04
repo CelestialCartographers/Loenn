@@ -30,6 +30,10 @@ function triggers.initDefaultRegistry(t)
 end
 
 local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
+    if type(handler) ~= "table" then
+        return
+    end
+
     local name = handler.name or filenameNoExt
     local modMetadata = modHandler.getModMetadataFromPath(filename)
 
