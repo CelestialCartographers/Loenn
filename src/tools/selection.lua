@@ -1,4 +1,5 @@
 -- TODO - Add history to mouse based resize and movement
+-- TODO - Look into selections targets after redo/undo
 
 local state = require("loaded_state")
 local utils = require("utils")
@@ -37,7 +38,8 @@ local coverStartX, coverStartY, coverStartWidth, coverStartyHeight = nil, nil, n
 local dragMovementTotalX, dragMovementTotalY = 0, 0
 
 local selectionRectangle = nil
-local selectionCompleted = false
+local selectionCompleted = true
+local selectionTargets = {}
 local selectionPreviews = {}
 local selectionCycleTargets = {}
 local selectionCycleIndex = 1
@@ -53,7 +55,7 @@ local movementLastOffsetY = nil
 
 local previousCursor = nil
 
-local copyPreviews = nil
+local copyTargets = nil
 
 local selectionMovementKeys = {
     {"itemMoveLeft", -1, 0},
@@ -84,7 +86,8 @@ local selectionRotationKeys = {
 }
 
 function tool.unselect()
-    selectionPreviews = nil
+    selectionPreviews = {}
+    selectionTargets = {}
 end
 
 local function selectionChanged(x, y, width, height, fromClick)
@@ -118,11 +121,11 @@ local function selectionChanged(x, y, width, height, fromClick)
 end
 
 local function movementAttemptToActivate(cursorX, cursorY)
-    if selectionPreviews and #selectionPreviews > 0 and not movementActive then
+    if selectionTargets and #selectionTargets > 0 and not movementActive then
         local cursorRectangle = utils.rectangle(cursorX - 1, cursorY - 1, 3, 3)
 
         -- Can only start moving with cursor if we are currently over a existing selection
-        for _, preview in ipairs(selectionPreviews) do
+        for _, preview in ipairs(selectionTargets) do
             if utils.aabbCheck(cursorRectangle, preview) then
                 movementActive = true
 
@@ -159,61 +162,84 @@ local function drawSelectionArea(room)
     end
 end
 
-local function drawItemSelections(room)
-    if selectionPreviews then
-        local drawnItems = {}
-        local color = selectionCompleted and colors.selectionCompleteNodeLineColor or colors.selectionPreviewNodeLineColor
+local function drawItemSelections(room )
+    local drawnItems = {}
+    local completeColor = colors.selectionCompleteNodeLineColor
+    local previewColor = colors.selectionPreviewNodeLineColor
 
-        viewportHandler.drawRelativeTo(room.x, room.y, function()
+    viewportHandler.drawRelativeTo(room.x, room.y, function()
             for _, preview in ipairs(selectionPreviews) do
                 local item = preview.item
 
                 if not drawnItems[item] then
                     drawnItems[item] = true
 
-                    selectionItemUtils.drawSelected(room, preview.layer, item, color)
+                    selectionItemUtils.drawSelected(room, preview.layer, item, previewColor)
                 end
             end
-        end)
-    end
+
+        for _, target in ipairs(selectionTargets) do
+            local item = target.item
+
+            if not drawnItems[item] then
+                drawnItems[item] = true
+
+                selectionItemUtils.drawSelected(room, target.layer, item, completeColor)
+            end
+        end
+    end)
 end
 
-local function drawSelectionRectangles(room)
-    if selectionPreviews then
-        local preview = not selectionCompleted
+local function drawSelectionRectanglesCommon(room, targets, borderColor, fillColor, lineWidth, alreadyDrawn)
+    alreadyDrawn = alreadyDrawn or {}
 
-        local borderColor = preview and colors.selectionPreviewBorderColor or colors.selectionCompleteBorderColor
-        local fillColor = preview and colors.selectionPreviewFillColor or colors.selectionCompleteFillColor
-
-        local lineWidth = love.graphics.getLineWidth()
-
+    if targets then
         -- Draw all fills then borders
         -- Greatly reduces amount of setColor calls
-        -- Potentially find a better solution?
+        -- TODO - See if we can use sprite batches here
         viewportHandler.drawRelativeTo(room.x, room.y, function()
             drawing.callKeepOriginalColor(function()
                 love.graphics.setColor(fillColor)
 
-                for _, rectangle in ipairs(selectionPreviews) do
-                    local x, y = rectangle.x, rectangle.y
-                    local width, height = rectangle.width, rectangle.height
+                for _, target in ipairs(targets) do
+                    local x, y = target.x, target.y
+                    local width, height = target.width, target.height
 
-                    love.graphics.rectangle("fill", x, y, width, height)
+                    if not alreadyDrawn[target.item] then
+                        love.graphics.rectangle("fill", x, y, width, height)
+                    end
                 end
             end)
 
             drawing.callKeepOriginalColor(function()
                 love.graphics.setColor(borderColor)
 
-                for _, rectangle in ipairs(selectionPreviews) do
-                    local x, y = rectangle.x, rectangle.y
-                    local width, height = rectangle.width, rectangle.height
+                for _, target in ipairs(targets) do
+                    local x, y = target.x, target.y
+                    local width, height = target.width, target.height
 
-                    love.graphics.rectangle("line", x - lineWidth / 2, y - lineWidth / 2, width + lineWidth, height + lineWidth)
+                    if not alreadyDrawn[target.item] then
+                        love.graphics.rectangle("line", x - lineWidth / 2, y - lineWidth / 2, width + lineWidth, height + lineWidth)
+
+                        alreadyDrawn[target.item] = true
+                    end
                 end
             end)
         end)
     end
+end
+
+local function drawSelectionRectangles(room)
+    local previewBorderColor = colors.selectionPreviewBorderColor
+    local previewFillColor = colors.selectionPreviewFillColor
+    local completeBorderColor = colors.selectionCompleteBorderColor
+    local completeFillColor = colors.selectionCompleteFillColor
+
+    local lineWidth = love.graphics.getLineWidth()
+    local drawnSelections = {}
+
+    drawSelectionRectanglesCommon(room, selectionPreviews, previewBorderColor, previewFillColor, lineWidth, drawnSelections)
+    drawSelectionRectanglesCommon(room, selectionTargets, completeBorderColor, completeFillColor, lineWidth, drawnSelections)
 end
 
 local function drawAxisBoundMovementLines(room)
@@ -384,7 +410,7 @@ end
 local function deleteItems(room, layer, previews)
     local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
         local redraw = false
-        local selectionsBefore = utils.deepcopy(selectionPreviews)
+        local selectionsBefore = utils.deepcopy(selectionTargets)
 
         for i = #previews, 1, -1 do
             local item = previews[i]
@@ -393,7 +419,7 @@ local function deleteItems(room, layer, previews)
             if deleted then
                 redraw = true
 
-                table.remove(selectionPreviews, i)
+                table.remove(selectionTargets, i)
             end
         end
 
@@ -406,7 +432,7 @@ end
 local function addNode(room, layer, previews)
     local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
         local redraw = false
-        local selectionsBefore = utils.deepcopy(selectionPreviews)
+        local selectionsBefore = utils.deepcopy(selectionTargets)
         local newPreviews = {}
 
         for _, selection in ipairs(previews) do
@@ -446,11 +472,11 @@ local function addNode(room, layer, previews)
     return snapshot, redraw
 end
 
-local function getPreviewsCorners(previews)
+local function getSelectionTargetCorners(targets)
     local tlx, tly = math.huge, math.huge
     local brx, bry = -math.huge, -math.huge
 
-    for _, preview in ipairs(previews or selectionPreviews) do
+    for _, preview in ipairs(targets or selectionTargets) do
         tlx = math.min(tlx, preview.x)
         tly = math.min(tly, preview.y)
 
@@ -462,15 +488,15 @@ local function getPreviewsCorners(previews)
 end
 
 -- TODO - Improve decal logic, currently can't copy paste between bg <-> fg
-local function pasteItems(room, layer, previews)
+local function pasteItems(room, layer, targets)
     local pasteCentered = configs.editor.pasteCentered
     local snapshot, usedLayers = snapshotUtils.roomLayerSnapshot(function()
         local layerItems = {}
-        local newPreviews = {}
+        local newTargets = {}
 
         local cursorX, cursorY = toolUtils.getCursorPositionInRoom(viewportHandler.getMousePosition())
 
-        local tlx, tly, brx, bry = getPreviewsCorners(previews)
+        local tlx, tly, brx, bry = getSelectionTargetCorners(targets)
         local width, height = brx - tlx, bry - tly
         local widthOffset = pasteCentered and math.floor(width / 2) or 0
         local heightOffset = pasteCentered and math.floor(height / 2) or 0
@@ -479,16 +505,16 @@ local function pasteItems(room, layer, previews)
         local offsetX, offsetY = cursorX - tlx - widthOffset, cursorY - tly - heightOffset
         local offsetGridX, offsetGridY = placementUtils.getGridPosition(offsetX, offsetY, false)
 
-        for _, preview in ipairs(previews) do
-            local item = preview.item
-            local targetLayer = preview.layer
+        for _, target in ipairs(targets) do
+            local item = target.item
+            local targetLayer = target.layer
 
             placementUtils.finalizePlacement(room, layer, item)
 
             item.x += offsetGridX
             item.y += offsetGridY
-            preview.x += offsetGridX
-            preview.y += offsetGridY
+            target.x += offsetGridX
+            target.y += offsetGridY
 
             if type(item.nodes) == "table" then
                 for _, node in ipairs(item.nodes) do
@@ -514,10 +540,10 @@ local function pasteItems(room, layer, previews)
 
             -- Add preview for all main and node parts of the item
             -- Makes more sense for visuals after a paste
-            selectionUtils.getSelectionsForItem(room, targetLayer, item, newPreviews)
+            selectionUtils.getSelectionsForItem(room, targetLayer, item, newTargets)
         end
 
-        selectionPreviews = newPreviews
+        selectionTargets = newTargets
 
         return table.keys(layerItems)
     end, room, layer, "Selection Pasted")
@@ -526,7 +552,7 @@ local function pasteItems(room, layer, previews)
 end
 
 local function handleItemMovementKeys(room, key, scancode, isrepeat)
-    if not selectionPreviews or not room then
+    if not selectionTargets or not room then
         return
     end
 
@@ -540,7 +566,7 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
         end
 
         if targetKey == key then
-            local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, offsetX, offsetY)
+            local snapshot, redraw = moveItems(room, tool.layer, selectionTargets, offsetX, offsetY)
 
             if redraw then
                 history.addSnapshot(snapshot)
@@ -555,7 +581,7 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemResizeKeys(room, key, scancode, isrepeat)
-    if not selectionPreviews or not room then
+    if not selectionTargets or not room then
         return
     end
 
@@ -569,7 +595,7 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
         end
 
         if targetKey == key then
-            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, directionX, directionY)
+            local snapshot, redraw = resizeItems(room, tool.layer, selectionTargets, offsetX, offsetY, directionX, directionY)
 
             if redraw then
                 history.addSnapshot(snapshot)
@@ -584,7 +610,7 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemRotateKeys(room, key, scancode, isrepeat)
-    if not selectionPreviews or not room then
+    if not selectionTargets or not room then
         return
     end
 
@@ -593,7 +619,7 @@ local function handleItemRotateKeys(room, key, scancode, isrepeat)
         local targetKey = configs.editor[configKey]
 
         if targetKey == key then
-            local snapshot, redraw = rotateItems(room, tool.layer, selectionPreviews, direction)
+            local snapshot, redraw = rotateItems(room, tool.layer, selectionTargets, direction)
 
             if redraw then
                 history.addSnapshot(snapshot)
@@ -608,7 +634,7 @@ local function handleItemRotateKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemFlipKeys(room, key, scancode, isrepeat)
-    if not selectionPreviews or not room then
+    if not selectionTargets or not room then
         return
     end
 
@@ -617,7 +643,7 @@ local function handleItemFlipKeys(room, key, scancode, isrepeat)
         local targetKey = configs.editor[configKey]
 
         if targetKey == key then
-            local snapshot, redraw = flipItems(room, tool.layer, selectionPreviews, horizontal, vertical)
+            local snapshot, redraw = flipItems(room, tool.layer, selectionTargets, horizontal, vertical)
 
             if redraw then
                 history.addSnapshot(snapshot)
@@ -632,14 +658,14 @@ local function handleItemFlipKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemDeletionKey(room, key, scancode, isrepeat)
-    if not selectionPreviews or not room then
+    if not selectionTargets or not room then
         return
     end
 
     local targetKey = configs.editor.itemDelete
 
     if targetKey == key then
-        local snapshot, redraw = deleteItems(room, tool.layer, selectionPreviews)
+        local snapshot, redraw = deleteItems(room, tool.layer, selectionTargets)
 
         if redraw then
             history.addSnapshot(snapshot)
@@ -653,14 +679,14 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
 end
 
 local function handleNodeAddKey(room, key, scancode, isrepeat)
-    if not selectionPreviews or not room then
+    if not selectionTargets or not room then
         return
     end
 
     local targetKey = configs.editor.itemAddNode
 
     if targetKey == key and not isrepeat then
-        local snapshot, redraw = addNode(room, tool.layer, selectionPreviews)
+        local snapshot, redraw = addNode(room, tool.layer, selectionTargets)
 
         if redraw then
             history.addSnapshot(snapshot)
@@ -677,30 +703,30 @@ local function copyCommon(cut)
     local room = state.getSelectedRoom()
     local useClipboard = configs.editor.copyUsesClipboard
 
-    if not room or not selectionPreviews or #selectionPreviews == 0 then
+    if not room or not selectionTargets or #selectionTargets == 0 then
         return false
     end
 
-    copyPreviews = {}
+    copyTargets = {}
 
     -- We should only handle an item once
     local handledItems = {}
 
-    for _, preview in ipairs(selectionPreviews) do
-        local item = preview.item
+    for _, target in ipairs(selectionTargets) do
+        local item = target.item
 
         if not handledItems[item] then
-            local previewCopy = utils.deepcopy(preview)
+            local targetCopy = utils.deepcopy(target)
 
-            previewCopy.node = 0
+            targetCopy.node = 0
             handledItems[item] = true
 
-            table.insert(copyPreviews, previewCopy)
+            table.insert(copyTargets, targetCopy)
         end
     end
 
     if cut then
-        local snapshot, redraw = deleteItems(room, tool.layer, selectionPreviews)
+        local snapshot, redraw = deleteItems(room, tool.layer, selectionTargets)
 
         if redraw then
             history.addSnapshot(snapshot)
@@ -709,7 +735,7 @@ local function copyCommon(cut)
     end
 
     if useClipboard then
-        local success, text = utils.serialize(copyPreviews)
+        local success, text = utils.serialize(copyTargets)
 
         if success then
             love.system.setClipboardText(text)
@@ -738,7 +764,7 @@ end
 
 local function pasteItemsHotkey()
     local useClipboard = configs.editor.copyUsesClipboard
-    local newPreviews = utils.deepcopy(copyPreviews)
+    local newTargets = utils.deepcopy(copyTargets)
 
     if useClipboard then
         local clipboard = love.system.getClipboardText()
@@ -747,14 +773,14 @@ local function pasteItemsHotkey()
             local success, fromClipboard = utils.unserialize(clipboard, true, 3)
 
             if success then
-                newPreviews = fromClipboard
+                newTargets = fromClipboard
             end
         end
     end
 
-    if newPreviews and #newPreviews > 0 then
+    if newTargets and #newTargets > 0 then
         local room = state.getSelectedRoom()
-        local snapshot, usedLayers = pasteItems(room, tool.layer, newPreviews)
+        local snapshot, usedLayers = pasteItems(room, tool.layer, newTargets)
 
         history.addSnapshot(snapshot)
         toolUtils.redrawTargetLayer(room, tool.layer)
@@ -781,9 +807,9 @@ local function updateCursor()
     previousCursor = cursorUtils.setCursor(cursor, previousCursor)
 end
 
-local function updateSelectionPreviews(x, y)
-    if selectionPreviews then
-        local couldResize = #selectionPreviews > 0
+local function updateSelectionTargets(x, y)
+    if selectionTargets then
+        local couldResize = #selectionTargets > 0
 
         if couldResize then
              -- TODO - Put sensitivity in config?
@@ -798,7 +824,7 @@ local function updateSelectionPreviews(x, y)
             local point = utils.point(x, y)
 
             -- Find first selection where we are on the border
-            for _, preview in ipairs(selectionPreviews) do
+            for _, preview in ipairs(selectionTargets) do
                 local mainTarget = preview.node == 0
 
                 if mainTarget then
@@ -824,9 +850,29 @@ local function updateSelectionPreviews(x, y)
     end
 end
 
+local function updateSelectionTargetsFromPreviews(keepExisting)
+    if keepExisting then
+        -- Make sure we have no duplicates
+        local existingTargets = {}
+
+        for _, target in ipairs(selectionTargets) do
+            existingTargets[target.item] = true
+        end
+
+        for _, preview in ipairs(selectionPreviews) do
+            if not existingTargets[preview.item] then
+                table.insert(selectionTargets, preview)
+            end
+        end
+
+    else
+        selectionTargets = selectionPreviews
+    end
+end
+
 local function selectionStarted(x, y)
     selectionRectangle = utils.rectangle(x, y, 0, 0)
-    selectionPreviews = nil
+    selectionPreviews = {}
     selectionCompleted = false
     resizeDirection = nil
     resizeDirectionPreview = nil
@@ -835,9 +881,18 @@ local function selectionStarted(x, y)
     dragStartY = y
 end
 
-local function selectionFinished(x, y)
+local function selectionFinished(x, y, fromClick)
+    local addModifier = keyboardHelper.modifierHeld(configs.editor.selectionAddModifier)
+
     selectionRectangle = false
     selectionCompleted = true
+
+    updateSelectionTargetsFromPreviews(addModifier)
+
+    -- Special case, otherwise we lose some selections
+    if not fromClick then
+        selectionPreviews = {}
+    end
 end
 
 local function resizeStarted(x, y)
@@ -848,14 +903,14 @@ end
 local function resizeFinished(x, y)
     local hasResizeDelta = resizeLastOffsetX and resizeLastOffsetY and (resizeLastOffsetX ~= 0 or resizeLastOffsetY ~= 0)
 
-    if selectionPreviews and #selectionPreviews > 0 and resizeDirection and hasResizeDelta then
+    if selectionTargets and #selectionTargets > 0 and resizeDirection and hasResizeDelta then
         local room = state.getSelectedRoom()
         local directionX, directionY = unpack(resizeDirection)
         local deltaX, deltaY = resizeLastOffsetX, resizeLastOffsetY
         local offsetX, offsetY = deltaX * directionX, deltaY * directionY
 
         -- Don't call forward function, we have already resized the items
-        local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, offsetX, offsetY, directionX, directionY, false)
+        local snapshot, redraw = resizeItems(room, tool.layer, selectionTargets, offsetX, offsetY, directionX, directionY, false)
 
         if snapshot then
             history.addSnapshot(snapshot)
@@ -871,24 +926,24 @@ local function resizeFinished(x, y)
     resizeLastOffsetX = nil
     resizeLastOffsetY = nil
 
-    updateSelectionPreviews(x, y)
+    updateSelectionTargets(x, y)
 end
 
 local function movementStarted(x, y)
     dragStartX = x
     dragStartY = y
 
-    coverStartX, coverStartY, coverStartWidth, coverStartyHeight = utils.coverRectangles(selectionPreviews)
+    coverStartX, coverStartY, coverStartWidth, coverStartyHeight = utils.coverRectangles(selectionTargets)
     dragMovementTotalX, dragMovementTotalY = 0, 0
 end
 
 local function movementFinished(x, y)
     local hasMovementDelta = dragMovementTotalX and dragMovementTotalY and (dragMovementTotalX ~= 0 or dragMovementTotalY ~= 0)
 
-    if selectionPreviews and #selectionPreviews > 0 and hasMovementDelta then
+    if selectionTargets and #selectionTargets > 0 and hasMovementDelta then
         -- Don't call forward function, we have already moved the items
         local room = state.getSelectedRoom()
-        local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, dragMovementTotalX, dragMovementTotalY, false)
+        local snapshot, redraw = moveItems(room, tool.layer, selectionTargets, dragMovementTotalX, dragMovementTotalY, false)
 
         if snapshot then
             history.addSnapshot(snapshot)
@@ -984,7 +1039,7 @@ local function mouseMovedResize(cursorX, cursorY)
             resizeLastOffsetX = width
             resizeLastOffsetY = height
 
-            local snapshot, redraw = resizeItems(room, tool.layer, selectionPreviews, deltaX * directionX, deltaY * directionY, directionX, directionY)
+            local snapshot, redraw = resizeItems(room, tool.layer, selectionTargets, deltaX * directionX, deltaY * directionY, directionX, directionY)
 
             if redraw then
                 toolUtils.redrawTargetLayer(room, tool.layer)
@@ -1036,7 +1091,7 @@ local function mouseMovedMovement(cursorX, cursorY)
         dragMovementTotalY += deltaY
 
         if deltaX ~= 0 or deltaY ~= 0 then
-            local snapshot, redraw = moveItems(room, tool.layer, selectionPreviews, deltaX, deltaY)
+            local snapshot, redraw = moveItems(room, tool.layer, selectionTargets, deltaX, deltaY)
 
             if redraw then
                 toolUtils.redrawTargetLayer(room, tool.layer)
@@ -1088,7 +1143,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
             end
 
         else
-            updateSelectionPreviews(cursorX, cursorY)
+            updateSelectionTargets(cursorX, cursorY)
         end
     end
 
@@ -1105,7 +1160,6 @@ function tool.mousereleased(x, y, button, istouch, presses)
             selectionFinished(cursorX, cursorY)
             resizeFinished(cursorX, cursorY)
             movementFinished(cursorX, cursorY)
-
         end
     end
 
@@ -1123,7 +1177,7 @@ function tool.mouseclicked(x, y, button, istouch, presses)
         if cursorX and cursorY then
             selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
 
-            selectionFinished(cursorX, cursorX)
+            selectionFinished(cursorX, cursorX, true)
             resizeFinished(cursorX, cursorX)
             movementFinished(cursorX, cursorX)
         end
@@ -1133,9 +1187,9 @@ function tool.mouseclicked(x, y, button, istouch, presses)
 
         if cursorX and cursorY then
             local room = state.getSelectedRoom()
-            local previewTargets = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY, selectionPreviews)
+            local selectionTargets = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY, selectionTargets)
 
-            selectionUtils.sendContextMenuEvent(previewTargets)
+            selectionUtils.sendContextMenuEvent(selectionTargets)
         end
     end
 end
@@ -1166,10 +1220,12 @@ end
 
 function tool.editorMapLoaded(item, itemType)
     selectionPreviews = {}
+    selectionTargets = {}
 end
 
 function tool.editorMapTargetChanged(item, itemType)
     selectionPreviews = {}
+    selectionTargets = {}
 end
 
 function tool.draw()
