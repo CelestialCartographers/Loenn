@@ -310,11 +310,11 @@ local function drawAxisBoundMovement(room)
     end
 end
 
-local function getMoveCallback(room, layer, previews, offsetX, offsetY)
+local function getMoveCallback(room, layer, targets, offsetX, offsetY)
     return function()
         local redraw = false
 
-        for _, item in ipairs(previews) do
+        for _, item in ipairs(targets) do
             local moved = selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
 
             if moved then
@@ -326,11 +326,11 @@ local function getMoveCallback(room, layer, previews, offsetX, offsetY)
     end
 end
 
-local function getResizeCallback(room, layer, previews, offsetX, offsetY, directionX, directionY)
+local function getResizeCallback(room, layer, targets, offsetX, offsetY, directionX, directionY)
     return function()
         local redraw = false
 
-        for _, item in ipairs(previews) do
+        for _, item in ipairs(targets) do
             local resized = selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, directionX, directionY)
 
             if resized then
@@ -342,11 +342,11 @@ local function getResizeCallback(room, layer, previews, offsetX, offsetY, direct
     end
 end
 
-local function getRotationCallback(room, layer, previews, direction)
+local function getRotationCallback(room, layer, targets, direction)
     return function()
         local redraw = false
 
-        for _, item in ipairs(previews) do
+        for _, item in ipairs(targets) do
             local rotated = selectionItemUtils.rotateSelection(room, layer, item, direction)
 
             if rotated then
@@ -358,11 +358,11 @@ local function getRotationCallback(room, layer, previews, direction)
     end
 end
 
-local function getFlipCallback(room, layer, previews, horizontal, vertical)
+local function getFlipCallback(room, layer, targets, horizontal, vertical)
     return function()
         local redraw = false
 
-        for _, item in ipairs(previews) do
+        for _, item in ipairs(targets) do
             local flipped = selectionItemUtils.flipSelection(room, layer, item, horizontal, vertical)
 
             if flipped then
@@ -374,47 +374,48 @@ local function getFlipCallback(room, layer, previews, horizontal, vertical)
     end
 end
 
-local function moveItems(room, layer, previews, offsetX, offsetY, callForward)
-    local forward = getMoveCallback(room, layer, previews, offsetX, offsetY)
-    local backward = getMoveCallback(room, layer, previews, -offsetX, -offsetY)
+local function moveItems(room, layer, targets, offsetX, offsetY, callForward)
+    local forward = getMoveCallback(room, layer, targets, offsetX, offsetY)
+    local backward = getMoveCallback(room, layer, targets, -offsetX, -offsetY)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved", callForward)
 
     return snapshot, redraw
 end
 
-local function resizeItems(room, layer, previews, offsetX, offsetY, directionX, directionY, callForward)
-    local forward = getResizeCallback(room, layer, previews, offsetX, offsetY, directionX, directionY)
-    local backward = getResizeCallback(room, layer, previews, -offsetX, -offsetY, directionX, directionY)
+local function resizeItems(room, layer, targets, offsetX, offsetY, directionX, directionY, callForward)
+    local forward = getResizeCallback(room, layer, targets, offsetX, offsetY, directionX, directionY)
+    local backward = getResizeCallback(room, layer, targets, -offsetX, -offsetY, directionX, directionY)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
 
 
-local function rotateItems(room, layer, previews, direction, callForward)
-    local forward = getRotationCallback(room, layer, previews, direction)
-    local backward = getRotationCallback(room, layer, previews, -direction)
+local function rotateItems(room, layer, targets, direction, callForward)
+    local forward = getRotationCallback(room, layer, targets, direction)
+    local backward = getRotationCallback(room, layer, targets, -direction)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
 
-local function flipItems(room, layer, previews, horizontal, vertical, callForward)
-    local forward = getFlipCallback(room, layer, previews, horizontal, vertical)
-    local backward = getFlipCallback(room, layer, previews, horizontal, vertical)
+local function flipItems(room, layer, targets, horizontal, vertical, callForward)
+    local forward = getFlipCallback(room, layer, targets, horizontal, vertical)
+    local backward = getFlipCallback(room, layer, targets, horizontal, vertical)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
 
-local function deleteItems(room, layer, previews)
-    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
+local function deleteItems(room, layer, targets)
+    local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
+    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayersSnapshot(function()
         local redraw = false
         local selectionsBefore = utils.deepcopy(selectionTargets)
 
-        for i = #previews, 1, -1 do
-            local item = previews[i]
-            local deleted = selectionItemUtils.deleteSelection(room, layer, item)
+        for i = #targets, 1, -1 do
+            local item = targets[i]
+            local deleted = selectionItemUtils.deleteSelection(room, item.layer, item)
 
             if deleted then
                 redraw = true
@@ -424,26 +425,27 @@ local function deleteItems(room, layer, previews)
         end
 
         return redraw, selectionsBefore
-    end, room, layer, "Selection Deleted")
+    end, room, relevantLayers, "Selection Deleted")
 
     return snapshot, redraw
 end
 
-local function addNode(room, layer, previews)
-    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayerSnapshot(function()
+local function addNode(room, layer, targets)
+    local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
+    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayersSnapshot(function()
         local redraw = false
         local selectionsBefore = utils.deepcopy(selectionTargets)
-        local newPreviews = {}
+        local newTargets = {}
 
-        for _, selection in ipairs(previews) do
-            local added = selectionItemUtils.addNodeToSelection(room, layer, selection)
+        for _, selection in ipairs(targets) do
+            local added = selectionItemUtils.addNodeToSelection(room, selection.layer, selection)
 
             if added then
                 local item = selection.item
                 local node = selection.node
 
                 -- Make sure selection nodes for the target is correct
-                for _, target in ipairs(previews) do
+                for _, target in ipairs(targets) do
                     if target.item == item then
                         if target.node >= node then
                             target.node += 1
@@ -456,18 +458,18 @@ local function addNode(room, layer, previews)
 
                 -- Nodes are off by one here since the main entity would be the first rectangle
                 -- We also insert after the target node, meaning the total offset is two
-                table.insert(newPreviews, rectangles[node + 2])
+                table.insert(newTargets, rectangles[node + 2])
 
                 redraw = true
             end
         end
 
-        for _, newPreview in ipairs(newPreviews) do
-            table.insert(previews, newPreview)
+        for _, newTarget in ipairs(newTargets) do
+            table.insert(targets, newTarget)
         end
 
         return redraw, selectionsBefore
-    end, room, layer, "Node Added")
+    end, room, relevantLayers, "Node Added")
 
     return snapshot, redraw
 end
@@ -476,12 +478,12 @@ local function getSelectionTargetCorners(targets)
     local tlx, tly = math.huge, math.huge
     local brx, bry = -math.huge, -math.huge
 
-    for _, preview in ipairs(targets or selectionTargets) do
-        tlx = math.min(tlx, preview.x)
-        tly = math.min(tly, preview.y)
+    for _, target in ipairs(targets or selectionTargets) do
+        tlx = math.min(tlx, target.x)
+        tly = math.min(tly, target.y)
 
-        brx = math.max(brx, preview.x + preview.width)
-        bry = math.max(bry, preview.y + preview.height)
+        brx = math.max(brx, target.x + target.width)
+        bry = math.max(bry, target.y + target.height)
     end
 
     return tlx, tly, brx, bry
@@ -490,7 +492,8 @@ end
 -- TODO - Improve decal logic, currently can't copy paste between bg <-> fg
 local function pasteItems(room, layer, targets)
     local pasteCentered = configs.editor.pasteCentered
-    local snapshot, usedLayers = snapshotUtils.roomLayerSnapshot(function()
+    local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
+    local snapshot, usedLayers = snapshotUtils.roomLayersSnapshot(function()
         local layerItems = {}
         local newTargets = {}
 
@@ -546,7 +549,7 @@ local function pasteItems(room, layer, targets)
         selectionTargets = newTargets
 
         return table.keys(layerItems)
-    end, room, layer, "Selection Pasted")
+    end, room, relevantLayers, "Selection Pasted")
 
     return snapshot, usedLayers
 end
@@ -570,7 +573,7 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
 
             if redraw then
                 history.addSnapshot(snapshot)
-                toolUtils.redrawTargetLayer(room, tool.layer)
+                selectionUtils.redrawTargetLayers(room, selectionTargets)
             end
 
             return true
@@ -599,7 +602,7 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
 
             if redraw then
                 history.addSnapshot(snapshot)
-                toolUtils.redrawTargetLayer(room, tool.layer)
+                selectionUtils.redrawTargetLayers(room, selectionTargets)
             end
 
             return true
@@ -623,7 +626,7 @@ local function handleItemRotateKeys(room, key, scancode, isrepeat)
 
             if redraw then
                 history.addSnapshot(snapshot)
-                toolUtils.redrawTargetLayer(room, tool.layer)
+                selectionUtils.redrawTargetLayers(room, selectionTargets)
             end
 
             return true
@@ -647,7 +650,7 @@ local function handleItemFlipKeys(room, key, scancode, isrepeat)
 
             if redraw then
                 history.addSnapshot(snapshot)
-                toolUtils.redrawTargetLayer(room, tool.layer)
+                selectionUtils.redrawTargetLayers(room, selectionTargets)
             end
 
             return true
@@ -665,11 +668,12 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
     local targetKey = configs.editor.itemDelete
 
     if targetKey == key then
+        local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
         local snapshot, redraw = deleteItems(room, tool.layer, selectionTargets)
 
         if redraw then
             history.addSnapshot(snapshot)
-            toolUtils.redrawTargetLayer(room, tool.layer)
+            toolUtils.redrawTargetLayer(room, relevantLayers)
         end
 
         return true
@@ -690,7 +694,7 @@ local function handleNodeAddKey(room, key, scancode, isrepeat)
 
         if redraw then
             history.addSnapshot(snapshot)
-            toolUtils.redrawTargetLayer(room, tool.layer)
+            selectionUtils.redrawTargetLayers(room, selectionTargets)
         end
 
         return true

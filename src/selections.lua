@@ -1,8 +1,25 @@
 local layerHandlers = require("layer_handlers")
 local utils = require("utils")
 local sceneHandler = require("scene_handler")
+local toolUtils = require("tool_utils")
 
 local selectionUtils = {}
+
+function selectionUtils.selectionTargetLayers(selectionTargets)
+    local layers = {}
+
+    for _, target in ipairs(selectionTargets) do
+        layers[target.layer] = true
+    end
+
+    return table.keys(layers)
+end
+
+function selectionUtils.redrawTargetLayers(room, selectionTargets)
+    local targetLayers = selectionUtils.selectionTargetLayers(selectionTargets)
+
+    toolUtils.redrawTargetLayer(room, targetLayers)
+end
 
 function selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
     rectangles = rectangles or {}
@@ -31,8 +48,9 @@ function selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
     return rectangles
 end
 
-function selectionUtils.getSelectionsForRoom(room, layer)
-    local rectangles = {}
+function selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
+    rectanles = rectangles or {}
+
     local handler = layerHandlers.getHandler(layer)
 
     if room and handler and handler.getSelection then
@@ -43,6 +61,21 @@ function selectionUtils.getSelectionsForRoom(room, layer)
                 selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
             end
         end
+    end
+
+    return rectangles
+end
+
+function selectionUtils.getSelectionsForRoom(room, layer)
+    local rectangles = {}
+
+    if type(layer) == "table" then
+        for _, l in ipairs(layer) do
+            selectionUtils.getLayerSelectionsForRoom(room, l, rectangles)
+        end
+
+    else
+        selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
     end
 
     return rectangles
