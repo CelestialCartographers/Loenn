@@ -95,7 +95,7 @@ local function selectionChanged(x, y, width, height, fromClick)
     local room = state.getSelectedRoom()
 
     -- Only update if needed
-    if fromClick or x ~= selectionRectangle.x or y ~= selectionRectangle.y or math.abs(width) ~= selectionRectangle.width or math.abs(height) ~= selectionRectangle.height then
+    if fromClick or not selectionRectangle or x ~= selectionRectangle.x or y ~= selectionRectangle.y or math.abs(width) ~= selectionRectangle.width or math.abs(height) ~= selectionRectangle.height then
         selectionRectangle = utils.rectangle(x, y, width, height)
 
         local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
@@ -1031,10 +1031,23 @@ local function movementFinished(x, y)
     dragMovementTotalX, dragMovementTotalY = 0, 0
 end
 
+local function selectAllHotkey()
+    -- Fake a infinitely large selection
+    local x, y = -math.huge, -math.huge
+    local width, height = math.huge, math.huge
+
+    selectionChanged(x, y, width, height)
+
+    selectionFinished(x, y)
+    resizeFinished(x, y)
+    movementFinished(x, y)
+end
+
 local toolHotkeys = {
     hotkeyStruct.createHotkey(configs.hotkeys.itemsCopy, copyItemsHotkey),
     hotkeyStruct.createHotkey(configs.hotkeys.itemsPaste, pasteItemsHotkey),
-    hotkeyStruct.createHotkey(configs.hotkeys.itemsCut, cutItemsHotkey)
+    hotkeyStruct.createHotkey(configs.hotkeys.itemsCut, cutItemsHotkey),
+    hotkeyStruct.createHotkey(configs.hotkeys.itemsSelectAll, selectAllHotkey),
 }
 
 -- Modifier keys that update behavior/visuals
@@ -1247,9 +1260,9 @@ function tool.mouseclicked(x, y, button, istouch, presses)
         if cursorX and cursorY then
             selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
 
-            selectionFinished(cursorX, cursorX, true)
-            resizeFinished(cursorX, cursorX)
-            movementFinished(cursorX, cursorX)
+            selectionFinished(cursorX, cursorY, true)
+            resizeFinished(cursorX, cursorY)
+            movementFinished(cursorX, cursorY)
         end
 
     elseif button == contextMenuButton then
