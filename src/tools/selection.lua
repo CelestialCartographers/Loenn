@@ -17,6 +17,7 @@ local hotkeyStruct = require("structs.hotkey")
 local layerHandlers = require("layer_handlers")
 local placementUtils = require("placement_utils")
 local cursorUtils = require("utils.cursor")
+local nodeStruct = require("structs.node")
 
 local tool = {}
 
@@ -703,6 +704,70 @@ local function handleNodeAddKey(room, key, scancode, isrepeat)
     return false
 end
 
+-- Clean up some redundant data for the clipboard
+-- Remove type data and simplify nodes
+local function prepareCopyForClipboard(targets)
+    local items = {}
+
+    for _, target in ipairs(targets) do
+        local nodes = target.item.nodes
+
+        if nodes then
+            nodes._type = nil
+
+            for _, node in ipairs(nodes) do
+                node._type = nil
+            end
+        end
+
+        target.item._fromLayer = target.layer
+
+        table.insert(items, target.item)
+    end
+
+    return items
+end
+
+local function rebuildSelectionFromItem(room, item)
+    -- We only need the first rectangle, pasting sets up the rest
+    local layer = item._fromLayer
+    local rectangles = selectionUtils.getSelectionsForItem(room, layer, item)
+    local rectangle = rectangles[1]
+
+    item._fromLayer = nil
+    rectangle.item = item
+
+    local nodes = item.nodes
+
+    if nodes then
+        nodes._type = nodeStruct.nodesType
+
+        for _, node in ipairs(nodes) do
+            node._type = nodeStruct.nodeType
+        end
+    end
+
+    return rectangle
+end
+
+-- Add back some of the data we need for pasting that can be infered
+local function preparePasteFromClipboard(room, items)
+    local targets = {}
+
+    for _, item in ipairs(items) do
+        if utils.typeof(item) == "rectangle" then
+            table.insert(targets, item)
+
+        else
+            local target = rebuildSelectionFromItem(room, item)
+
+            table.insert(targets, target)
+        end
+    end
+
+    return targets
+end
+
 local function copyCommon(cut)
     local room = state.getSelectedRoom()
     local useClipboard = configs.editor.copyUsesClipboard
@@ -739,7 +804,7 @@ local function copyCommon(cut)
     end
 
     if useClipboard then
-        local success, text = utils.serialize(copyTargets)
+        local success, text = utils.serialize(prepareCopyForClipboard(copyTargets))
 
         if success then
             love.system.setClipboardText(text)
@@ -770,6 +835,8 @@ local function pasteItemsHotkey()
     local useClipboard = configs.editor.copyUsesClipboard
     local newTargets = utils.deepcopy(copyTargets)
 
+    local room = state.getSelectedRoom()
+
     if useClipboard then
         local clipboard = love.system.getClipboardText()
 
@@ -777,13 +844,12 @@ local function pasteItemsHotkey()
             local success, fromClipboard = utils.unserialize(clipboard, true, 3)
 
             if success then
-                newTargets = fromClipboard
+                newTargets = preparePasteFromClipboard(room, fromClipboard)
             end
         end
     end
 
     if newTargets and #newTargets > 0 then
-        local room = state.getSelectedRoom()
         local snapshot, usedLayers = pasteItems(room, tool.layer, newTargets)
 
         history.addSnapshot(snapshot)
