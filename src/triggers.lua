@@ -596,6 +596,18 @@ function triggers.ignoredFields(layer, trigger)
     end
 end
 
+function triggers.ignoredFieldsMultiple(layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.ignoredFieldsMultiple then
+        return utils.callIfFunction(handler.ignoredFieldsMultiple, trigger)
+
+    else
+        return {"x", "y"}
+    end
+end
+
 function triggers.fieldOrder(layer, trigger)
     local name = trigger._name
     local handler = triggers.registeredTriggers[name]

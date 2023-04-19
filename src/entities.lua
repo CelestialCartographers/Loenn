@@ -1107,6 +1107,18 @@ function entities.ignoredFields(layer, entity)
     end
 end
 
+function entities.ignoredFieldsMultiple(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.ignoredFieldsMultiple then
+        return utils.callIfFunction(handler.ignoredFieldsMultiple, entity)
+
+    else
+        return {"x", "y"}
+    end
+end
+
 function entities.fieldOrder(layer, entity)
     local name = entity._name
     local handler = entities.registeredEntities[name]
