@@ -107,10 +107,11 @@ function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
 end
 
 function selectionUtils.getContextSelections(room, layer, x, y, selections)
-    local previewTargets
+    local selectionTargets
 
     local rectangle = utils.rectangle(x - 1, y - 1, 3, 3)
     local hoveredSelections = selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
+    local bestSelection
 
     selectionUtils.orderSelectionsByScore(hoveredSelections)
 
@@ -123,6 +124,7 @@ function selectionUtils.getContextSelections(room, layer, x, y, selections)
                 for _, selection in ipairs(selections) do
                     if hovered.item == selection.item then
                         hoveringFromSelections = true
+                        bestSelection = hovered
 
                         break
                     end
@@ -134,22 +136,23 @@ function selectionUtils.getContextSelections(room, layer, x, y, selections)
             end
 
             if hoveringFromSelections then
-                previewTargets = table.shallowcopy(selections)
+                selectionTargets = table.shallowcopy(selections)
             end
 
         else
             if #hoveredSelections > 0 then
-                previewTargets = {hoveredSelections[1]}
+                selectionTargets = {hoveredSelections[1]}
+                bestSelection = hoveredSelections[1]
             end
         end
     end
 
-    return previewTargets
+    return selectionTargets, bestSelection
 end
 
-function selectionUtils.sendContextMenuEvent(selections)
+function selectionUtils.sendContextMenuEvent(selections, bestSelection)
     if selections and #selections > 0 then
-        sceneHandler.sendEvent("editorSelectionContextMenu", selections)
+        sceneHandler.sendEvent("editorSelectionContextMenu", selections, bestSelection)
     end
 end
 
