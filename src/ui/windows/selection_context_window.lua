@@ -22,8 +22,8 @@ local activeWindows = {}
 local windowPreviousX = 0
 local windowPreviousY = 0
 
-local function editorSelectionContextMenuCallback(group, selections)
-    contextWindow.createContextMenu(selections)
+local function editorSelectionContextMenuCallback(group, selections, bestSelection)
+    contextWindow.createContextMenu(selections, bestSelection)
 end
 
 local function contextWindowUpdate(orig, self, dt)
@@ -96,7 +96,10 @@ function contextWindow.saveChangesCallback(selections, dummyData)
     end
 end
 
-local function prepareFormData(layer, item, language)
+local function prepareFormData(selections, targetSelection, language)
+    local item = targetSelection.item
+    local layer = targetSelection.layer
+
     local handler = layerHandlers.getHandler(layer)
     local options = {}
 
@@ -106,32 +109,51 @@ local function prepareFormData(layer, item, language)
         options.tooltipPath = {"description"}
     end
 
+    options.multiple = #selections > 1
+
     return formUtils.prepareFormData(handler, item, options, {layer, item})
 end
 
-function contextWindow.createContextMenu(selections)
-    local targetSelection = selections[1]
-    local targetItem = targetSelection.item
-    local targetLayer = targetSelection.layer
+-- Filter out selections that don't match the best selection
+-- For example decals shouldn't be changed when the first item is a refill
+-- Triggers and entities should only work on ones with the same name
+local function findCompatibleSelections(selections, targetSelection)
+    local compatible = {}
 
+    local item = targetSelection.item
+    local layer = targetSelection.layer
+
+    for _, target in ipairs(selections) do
+        if target.layer == layer then
+            if layer == "entities" or layer == "triggers" then
+                if item._name == target.item._name then
+                    table.insert(compatible, target)
+                end
+
+            else
+                table.insert(compatible, target)
+            end
+        end
+    end
+
+    return compatible
+end
+
+function contextWindow.createContextMenu(selections, bestSelection)
     local window
     local windowX = windowPreviousX
     local windowY = windowPreviousY
     local language = languageRegistry.getLanguage()
-
-    -- TODO - Remove this once we support multiple selection editing
-    if #selections > 1 then
-        notifications.notify(tostring(language.ui.selection_context_window.multiple_selections))
-
-        return
-    end
 
     -- Don't stack windows on top of each other
     if #activeWindows > 0 then
         windowX, windowY = 0, 0
     end
 
-    local dummyData, fieldInformation, fieldOrder = prepareFormData(targetLayer, targetItem, language)
+    -- Filter out selections that would end up making a mess
+    selections = findCompatibleSelections(selections, bestSelection)
+
+    local dummyData, fieldInformation, fieldOrder = prepareFormData(selections, bestSelection, language)
     local buttons = {
         {
             text = tostring(language.ui.selection_context_window.save_changes),

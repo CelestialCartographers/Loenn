@@ -39,12 +39,23 @@ local function getItemLanguage(handler, language, ...)
     return language, language
 end
 
-local function getItemIgnoredFields(handler, layer, item)
-    local ignored = utils.callIfFunction(handler and handler.ignoredFields, layer, item) or {}
+local function getItemIgnoredFields(handler, multiple, layer, item)
     local ignoredSet = {}
 
-    for _, name in ipairs(ignored) do
-        ignoredSet[name] = true
+    if handler then
+        local ignored = utils.callIfFunction(handler.ignoredFields, layer, item) or {}
+
+        for _, name in ipairs(ignored) do
+            ignoredSet[name] = true
+        end
+
+        if multiple then
+            local ignoredMultiple = utils.callIfFunction(handler.ignoredFieldsMultiple, layer, item) or {}
+
+            for _, name in ipairs(ignoredMultiple) do
+                ignoredSet[name] = true
+            end
+        end
     end
 
     return ignoredSet
@@ -63,8 +74,8 @@ function formUtils.prepareFormData(handler, data, options, handlerArguments)
 
     local fieldsAdded = {}
     local fieldInformation = getItemFieldInformation(handler, unpack(handlerArguments))
-    local fieldOrder = getItemFieldOrder(handler, unpack(handlerArguments))
-    local fieldIgnored = getItemIgnoredFields(handler, unpack(handlerArguments))
+    local fieldOrderOriginal = getItemFieldOrder(handler, unpack(handlerArguments))
+    local fieldIgnored = getItemIgnoredFields(handler, options.multiple, unpack(handlerArguments))
 
     local fieldLanguage, fallbackLanguage = getItemLanguage(handler, language, unpack(handlerArguments))
     local languageTooltips = utils.getPath(fieldLanguage, tooltipPath)
@@ -72,11 +83,14 @@ function formUtils.prepareFormData(handler, data, options, handlerArguments)
     local fallbackTooltips = utils.getPath(fallbackLanguage, tooltipPath)
     local fallbackNames = utils.getPath(fallbackLanguage, namePath)
 
-    for _, field in ipairs(fieldOrder) do
+    local fieldOrder = {}
+
+    for _, field in ipairs(fieldOrderOriginal) do
         local fieldInfo = fieldInformation[field]
         local value = data[field]
+        local filtered = globallyFilteredKeys[field] or fieldIgnored[field]
 
-        if value ~= nil or fieldInfo then
+        if not filtered and (value ~= nil or fieldInfo) then
             local humanizedName = utils.humanizeVariableName(field)
             local displayName = getLanguageKey(field, languageNames, getLanguageKey(field, fallbackNames, humanizedName))
             local tooltip = getLanguageKey(field, languageTooltips, getLanguageKey(field, fallbackTooltips))
@@ -89,6 +103,8 @@ function formUtils.prepareFormData(handler, data, options, handlerArguments)
             dummyData[field] = utils.deepcopy(value)
             fieldInformation[field].displayName = displayName
             fieldInformation[field].tooltipText = tooltip
+
+            table.insert(fieldOrder, field)
         end
     end
 
