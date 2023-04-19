@@ -55,6 +55,10 @@ function entities.initDefaultRegistry(t)
 end
 
 local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
+    if type(handler) ~= "table" then
+        return
+    end
+
     local name = handler.name or filenameNoExt
     local modMetadata = modHandler.getModMetadataFromPath(filename)
 
@@ -1100,6 +1104,18 @@ function entities.ignoredFields(layer, entity)
 
     else
         return {"_name", "_id", "originX", "originY"}
+    end
+end
+
+function entities.ignoredFieldsMultiple(layer, entity)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.ignoredFieldsMultiple then
+        return utils.callIfFunction(handler.ignoredFieldsMultiple, entity)
+
+    else
+        return {"x", "y"}
     end
 end
 

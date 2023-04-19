@@ -30,6 +30,10 @@ function triggers.initDefaultRegistry(t)
 end
 
 local function addHandler(handler, registerAt, filenameNoExt, filename, verbose)
+    if type(handler) ~= "table" then
+        return
+    end
+
     local name = handler.name or filenameNoExt
     local modMetadata = modHandler.getModMetadataFromPath(filename)
 
@@ -589,6 +593,18 @@ function triggers.ignoredFields(layer, trigger)
 
     else
         return {"_name", "_id", "originX", "originY"}
+    end
+end
+
+function triggers.ignoredFieldsMultiple(layer, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler and handler.ignoredFieldsMultiple then
+        return utils.callIfFunction(handler.ignoredFieldsMultiple, trigger)
+
+    else
+        return {"x", "y"}
     end
 end
 

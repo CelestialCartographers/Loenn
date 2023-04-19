@@ -370,6 +370,10 @@ function decals.ignoredFields(layer, decal)
     return {}
 end
 
+function decals.ignoredFieldsMultiple(layer, decal)
+    return {"x", "y"}
+end
+
 function decals.fieldOrder(layer, decal)
     return {"x", "y", "scaleX", "scaleY", "texture", "rotation"}
 end

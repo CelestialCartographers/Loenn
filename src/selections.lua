@@ -1,8 +1,25 @@
 local layerHandlers = require("layer_handlers")
 local utils = require("utils")
 local sceneHandler = require("scene_handler")
+local toolUtils = require("tool_utils")
 
 local selectionUtils = {}
+
+function selectionUtils.selectionTargetLayers(selectionTargets)
+    local layers = {}
+
+    for _, target in ipairs(selectionTargets) do
+        layers[target.layer] = true
+    end
+
+    return table.keys(layers)
+end
+
+function selectionUtils.redrawTargetLayers(room, selectionTargets)
+    local targetLayers = selectionUtils.selectionTargetLayers(selectionTargets)
+
+    toolUtils.redrawTargetLayer(room, targetLayers)
+end
 
 function selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
     rectangles = rectangles or {}
@@ -31,8 +48,9 @@ function selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
     return rectangles
 end
 
-function selectionUtils.getSelectionsForRoom(room, layer)
-    local rectangles = {}
+function selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
+    rectanles = rectangles or {}
+
     local handler = layerHandlers.getHandler(layer)
 
     if room and handler and handler.getSelection then
@@ -43,6 +61,21 @@ function selectionUtils.getSelectionsForRoom(room, layer)
                 selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
             end
         end
+    end
+
+    return rectangles
+end
+
+function selectionUtils.getSelectionsForRoom(room, layer)
+    local rectangles = {}
+
+    if type(layer) == "table" then
+        for _, l in ipairs(layer) do
+            selectionUtils.getLayerSelectionsForRoom(room, l, rectangles)
+        end
+
+    else
+        selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
     end
 
     return rectangles
@@ -74,10 +107,11 @@ function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
 end
 
 function selectionUtils.getContextSelections(room, layer, x, y, selections)
-    local previewTargets
+    local selectionTargets
 
     local rectangle = utils.rectangle(x - 1, y - 1, 3, 3)
     local hoveredSelections = selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
+    local bestSelection
 
     selectionUtils.orderSelectionsByScore(hoveredSelections)
 
@@ -90,6 +124,7 @@ function selectionUtils.getContextSelections(room, layer, x, y, selections)
                 for _, selection in ipairs(selections) do
                     if hovered.item == selection.item then
                         hoveringFromSelections = true
+                        bestSelection = hovered
 
                         break
                     end
@@ -101,22 +136,23 @@ function selectionUtils.getContextSelections(room, layer, x, y, selections)
             end
 
             if hoveringFromSelections then
-                previewTargets = table.shallowcopy(selections)
+                selectionTargets = table.shallowcopy(selections)
             end
 
         else
             if #hoveredSelections > 0 then
-                previewTargets = {hoveredSelections[1]}
+                selectionTargets = {hoveredSelections[1]}
+                bestSelection = hoveredSelections[1]
             end
         end
     end
 
-    return previewTargets
+    return selectionTargets, bestSelection
 end
 
-function selectionUtils.sendContextMenuEvent(selections)
+function selectionUtils.sendContextMenuEvent(selections, bestSelection)
     if selections and #selections > 0 then
-        sceneHandler.sendEvent("editorSelectionContextMenu", selections)
+        sceneHandler.sendEvent("editorSelectionContextMenu", selections, bestSelection)
     end
 end
 

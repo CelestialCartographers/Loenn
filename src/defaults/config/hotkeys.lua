@@ -27,6 +27,9 @@ local defaultHotkeys = {
     itemsCut = "ctrl + x",
     itemsPaste = "ctrl + v",
 
+    -- Selection
+    itemsSelectAll = "ctrl + a",
+
     -- Room Resizing
     roomResizeLeftGrow = false,
     roomResizeRightGrow = false,

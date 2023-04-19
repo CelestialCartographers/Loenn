@@ -584,9 +584,9 @@ function tool.mouseclicked(x, y, button, istouch, presses)
     if cursorX and cursorY then
         if button == contextMenuButton then
             local room = state.getSelectedRoom()
-            local contextTargets = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY)
+            local contextTargets, bestTarget = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY)
 
-            selectionUtils.sendContextMenuEvent(contextTargets)
+            selectionUtils.sendContextMenuEvent(contextTargets, bestTarget)
 
         elseif button == objectCloneButton then
             local room = state.getSelectedRoom()

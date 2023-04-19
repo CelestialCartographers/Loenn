@@ -60,6 +60,34 @@ function snapshotUtils.roomLayerSnapshot(callback, room, layer, description)
     return getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter), unpack(res)
 end
 
+function snapshotUtils.roomLayersSnapshot(callback, room, layers, description)
+    local targets = {}
+    local befores = {}
+    local snapshots = {}
+
+    for _, layer in ipairs(layers) do
+        local handler = layerHandlers.getHandler(layer)
+        local targetItems = handler.getRoomItems(room, layer)
+        local targetsBefore = utils.deepcopy(targetItems)
+
+        targets[layer] = targetItems
+        befores[layer] = targetsBefore
+    end
+
+    local res = {callback()}
+
+    for _, layer in ipairs(layers) do
+        local targetItems = targets[layer]
+        local targetsBefore = befores[layer]
+        local targetsAfter = utils.deepcopy(targetItems)
+        local snapshot = getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter)
+
+        table.insert(snapshots, snapshot)
+    end
+
+    return snapshotUtils.multiSnapshot(description, snapshots), unpack(res)
+end
+
 function snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, description, callForward)
     local function snapshotForward(data)
         local targetRoom = state.getRoomByName(data.room)

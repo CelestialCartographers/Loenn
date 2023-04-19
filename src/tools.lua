@@ -52,6 +52,11 @@ function toolHandler.loadTool(filename)
     local filenameNoExt = utils.filename(pathNoExt, "/")
 
     local handler = utils.rerequire(pathNoExt)
+
+    if type(handler) ~= "table" then
+        return
+    end
+
     local name = handler.name or filenameNoExt
 
     -- Make sure tools always have a name

@@ -6,13 +6,15 @@ booster.placements = {
     {
         name = "green",
         data = {
-            red = false
+            red = false,
+            ch9_hub_booster = false
         }
     },
     {
         name = "red",
         data = {
-            red = true
+            red = true,
+            ch9_hub_booster = false
         }
     }
 }
