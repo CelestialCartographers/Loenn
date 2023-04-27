@@ -302,7 +302,7 @@ function state.selectItem(item, add)
         persistence.lastSelectedRoomName = item.name
     end
 
-    if add then
+    if add and state.selectedItem then
         if state.selectedItemType ~= "table" then
             state.selectedItem = {
                 [state.selectedItem] = state.selectedItemType
