@@ -119,7 +119,7 @@ end
 function roomList.roomSelectedCallback(element, roomName)
     local currentRoom = state.getSelectedRoom()
 
-    if not currentRoom or cleanRoomName(currentRoom.name) ~= roomName then
+    if currentRoom and cleanRoomName(currentRoom.name) ~= roomName and currentRoom.name ~= roomName then
         local newRoom = state.getRoomByName(roomName)
 
         if newRoom then
