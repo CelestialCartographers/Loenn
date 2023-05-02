@@ -957,10 +957,10 @@ local function selectionFinished(x, y, fromClick)
     selectionRectangle = false
     selectionCompleted = true
 
-    updateSelectionTargetsFromPreviews(addModifier)
-
     -- Special case, otherwise we lose some selections
-    if not fromClick then
+    if not fromClick and not movementActive and not resizeDirection then
+        updateSelectionTargetsFromPreviews(addModifier)
+
         selectionPreviews = {}
     end
 end
