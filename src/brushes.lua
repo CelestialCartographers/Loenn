@@ -264,10 +264,4 @@ function brushHelper.getMaterialLookup(layer)
     return lookup
 end
 
-function brushHelper.getRoomSnapshotValue(room, layer)
-    if room then
-        return utils.deepcopy(room[layer].matrix)
-    end
-end
-
 return brushHelper

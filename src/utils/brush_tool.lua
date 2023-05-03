@@ -97,7 +97,7 @@ end
 function brushToolUtils.getTileSnapshotValue(tool)
     local room = state.getSelectedRoom()
 
-    return brushHelper.getRoomSnapshotValue(room, tool.layer)
+    return snapshotUtils.getRoomTileSnapshotValue(room, tool.layer)
 end
 
 function brushToolUtils.startTileSnapshot(tool)

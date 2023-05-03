@@ -6,6 +6,7 @@ local snapshot = require("structs.snapshot")
 local matrix = require("utils.matrix")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
+local tilesStruct = require("structs.tiles")
 
 local snapshotUtils = {}
 
@@ -17,6 +18,20 @@ local function redrawLayer(room, layer)
 
     else
         celesteRender.forceRedrawRoom(room, state, false)
+    end
+end
+
+-- Use minimized string
+-- This might still use too much memory, but it is a start
+function snapshotUtils.getRoomTileSnapshotValue(room, layer)
+    if room and room[layer] then
+        return tilesStruct.matrixToTileStringMinimized(room[layer].matrix)
+    end
+end
+
+function snapshotUtils.restoreRoomSnapshotValue(snapshotValue)
+    if snapshotValue then
+        return tilesStruct.tileStringToMatrix(snapshotValue)
     end
 end
 
@@ -127,7 +142,7 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         local targetRoom = state.getRoomByName(data.room)
 
         if targetRoom then
-            targetRoom[layer].matrix = matrix.fromTable(tilesAfter, data.width, data.height)
+            targetRoom[layer].matrix = snapshotUtils.restoreRoomSnapshotValue(tilesAfter)
 
             redrawLayer(targetRoom, layer)
         end
@@ -137,7 +152,7 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         local targetRoom = state.getRoomByName(data.room)
 
         if targetRoom then
-            targetRoom[layer].matrix = matrix.fromTable(tilesBefore, data.width, data.height)
+            targetRoom[layer].matrix = snapshotUtils.restoreRoomSnapshotValue(tilesBefore)
 
             redrawLayer(targetRoom, layer)
         end
