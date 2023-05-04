@@ -16,7 +16,7 @@ function startup.cleanupPath(path)
     local macOS = love.system.getOS() == "OS X"
 
     -- Get the base path for Celeste dir
-    if filename == "Celeste.exe" then
+    if filesystem.isFile(path) then
         path = filesystem.dirname(path)
     end
 
@@ -42,7 +42,11 @@ function startup.verifyCelesteDir(path)
         return false
     end
 
-    if filesystem.isFile(filesystem.joinpath(path, "Celeste.exe")) and filesystem.isDirectory(filesystem.joinpath(path, "Content")) then
+    local hasCelesteExe = filesystem.isFile(filesystem.joinpath(path, "Celeste.exe"))
+    local hasCelesteDll = filesystem.isFile(filesystem.joinpath(path, "Celeste.dll"))
+    local hasGameplayMeta = filesystem.isFile(filesystem.joinpath(path, "Content/Graphics/Atlases/Gameplay.meta"))
+
+    if (hasCelesteExe or hasCelesteDll) and hasGameplayMeta then
         return true
     end
 
