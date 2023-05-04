@@ -174,9 +174,9 @@ function modHandler.findPluginLoennFolder(mountPoint)
     end
 end
 
-function modHandler.getEverestBuildNumber()
-    local celesteExe = utils.joinpath(fileLocations.getCelesteDir(), "Celeste.exe")
-    local fh = io.open(celesteExe, "rb")
+local function getbuildNumber(filename)
+    local fullFilename = utils.joinpath(fileLocations.getCelesteDir(), filename)
+    local fh = io.open(fullFilename, "rb")
 
     if fh then
         local data = fh:read("*a")
@@ -186,6 +186,11 @@ function modHandler.getEverestBuildNumber()
 
         return buildNumber
     end
+end
+
+function modHandler.getEverestBuildNumber()
+    -- Check both, .NET core builds of Everest has it in the .dll
+    return getbuildNumber("Celeste.exe") or getbuildNumber("Celeste.dll")
 end
 
 function modHandler.getEverestVersion()
