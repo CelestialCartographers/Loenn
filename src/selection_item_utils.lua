@@ -35,7 +35,7 @@ function selectionItemUtils.canResize(room, layer, target)
 end
 
 function selectionItemUtils.canResizeItem(room, layer, item)
-    return callHandlerFunction(room, layer, "canResize", item.item)
+    return selectionItemUtils.canResize(room, layer, item)
 end
 
 function selectionItemUtils.drawSelected(room, layer, item, color)
