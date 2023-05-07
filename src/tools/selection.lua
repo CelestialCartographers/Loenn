@@ -18,6 +18,7 @@ local layerHandlers = require("layer_handlers")
 local placementUtils = require("placement_utils")
 local cursorUtils = require("utils.cursor")
 local nodeStruct = require("structs.node")
+local tiles = require("tiles")
 
 local tool = {}
 
@@ -28,6 +29,8 @@ tool.image = nil
 
 tool.layer = "entities"
 tool.validLayers = {
+    "tilesFg",
+    "tilesBg",
     "entities",
     "triggers",
     "decalsFg",
@@ -90,6 +93,11 @@ function tool.unselect()
     selectionPreviews = {}
     selectionTargets = {}
 end
+
+local tileLayers = {
+    tilesFg = true,
+    tilesBg = true
+}
 
 local function selectionChanged(x, y, width, height, fromClick)
     local room = state.getSelectedRoom()
@@ -710,7 +718,8 @@ local function prepareCopyForClipboard(targets)
     local items = {}
 
     for _, target in ipairs(targets) do
-        local nodes = target.item.nodes
+        local item = target.item
+        local nodes = item.nodes
 
         if nodes then
             nodes._type = nil
@@ -718,6 +727,10 @@ local function prepareCopyForClipboard(targets)
             for _, node in ipairs(nodes) do
                 node._type = nil
             end
+        end
+
+        if tileLayers[target.layer] then
+            tiles.clipboardPrepareCopy(target)
         end
 
         target.item._fromLayer = target.layer
@@ -733,6 +746,10 @@ local function rebuildSelectionFromItem(room, item)
     local layer = item._fromLayer
     local rectangles = selectionUtils.getSelectionsForItem(room, layer, item)
     local rectangle = rectangles[1]
+
+    if tileLayers[layer] then
+        rectange, item = tiles.rebuildSelection(room, item)
+    end
 
     item._fromLayer = nil
     rectangle.item = item
