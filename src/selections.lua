@@ -105,6 +105,16 @@ function selectionUtils.orderSelectionsByScore(selections)
     return selections
 end
 
+local function addTilesSelections(layer, room, rectangle, selected)
+    if tileLayers[layer] then
+        local selection = tiles.getSelectionFromRectangle(room, layer, rectangle)
+
+        if selection then
+            table.insert(selected, selection)
+        end
+    end
+end
+
 function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
     local selected = {}
 
@@ -112,18 +122,15 @@ function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
         return selected
     end
 
-    if tileLayers[layer] then
-        local selection = tiles.getSelectionFromRectangle(room, layer, rectangle)
+    -- Handle tile selections
+    utils.callIterateFirstIfTable(addTilesSelections, layer, room, rectangle, selected)
 
-        table.insert(selected, selection)
+    -- All other selections
+    local rectangles = selectionUtils.getSelectionsForRoom(room, layer)
 
-    else
-        local rectangles = selectionUtils.getSelectionsForRoom(room, layer)
-
-        for _, selection in ipairs(rectangles) do
-            if utils.aabbCheck(rectangle, selection) then
-                table.insert(selected, selection)
-            end
+    for _, selection in ipairs(rectangles) do
+        if utils.aabbCheck(rectangle, selection) then
+            table.insert(selected, selection)
         end
     end
 
