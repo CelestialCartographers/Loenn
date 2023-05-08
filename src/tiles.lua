@@ -2,8 +2,13 @@ local utils = require("utils")
 local brushHelper = require("brushes")
 local matrixLib = require("utils.matrix")
 local tilesStruct = require("structs.tiles")
+local loadedState = require("loaded_state")
 
 local tiles = {}
+
+-- Keeps a copy of the tile matrix with the selections "popped off"
+-- Used to create the illusion of tiles being moved actually being selected
+local backingMatrices = {}
 
 local function getRectanglePoints(room, rectangle)
     local widthTiles = math.floor(room.width / 8)
@@ -31,7 +36,7 @@ local function getSelectionRectangle(tileStartX, tileStartY, tileStopX, tileStop
     end
 end
 
-local function clearArea(room, layer, startX, startY, stopX, stopY)
+local function deleteArea(room, layer, startX, startY, stopX, stopY)
     local width, height = getTileSize(startX, startY, stopX, stopY)
     local material = matrixLib.filled("0", width, height)
 
@@ -54,7 +59,9 @@ function tiles.moveSelection(room, layer, selection, offsetX, offsetY)
     local needsChanges = deltaX ~= 0 or deltaY ~= 0
 
     if needsChanges then
-        clearArea(room, layer, tileStartX, tileStartY, tileStopX, tileStopY)
+        local backingSlice = backingMatrices[layer]:getSlice(tileStartX, tileStartY, tileStopX, tileStopY)
+
+        brushHelper.placeTile(room, tileStartX, tileStartY, backingSlice, layer)
         brushHelper.placeTile(room, tileStartX + deltaX, tileStartY + deltaY, selection.item, layer)
     end
 
@@ -68,7 +75,7 @@ end
 function tiles.deleteSelection(room, layer, selection)
     local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, selection)
 
-    clearArea(room, layer, tileStartX, tileStartY, tileStopX, tileStopY)
+    deleteArea(room, layer, tileStartX, tileStartY, tileStopX, tileStopY)
 
     return true
 end
@@ -112,6 +119,29 @@ function tiles.rebuildSelection(room, item)
         item.y = rectangle.y
 
         return rectangle, item
+    end
+end
+
+local function updateBackingMatrix(room, layer, selections)
+    local matrix = utils.deepcopy(room[layer].matrix)
+
+    for _, selection in ipairs(selections) do
+        if selection.layer == layer then
+            local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, selection)
+
+            matrix:setSlice(tileStartX, tileStartY, tileStopX, tileStopY, "0")
+        end
+    end
+
+    backingMatrices[layer] = matrix
+end
+
+function tiles.selectionsChanged(selections)
+    local room = loadedState.getSelectedRoom()
+
+    if room then
+        updateBackingMatrix(room, "tilesFg", selections)
+        updateBackingMatrix(room, "tilesBg", selections)
     end
 end
 

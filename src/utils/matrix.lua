@@ -81,6 +81,36 @@ function matrixMt.__index:getSlice(x1, y1, x2, y2, default)
     return res
 end
 
+function matrixMt.__index:setSlice(x1, y1, x2, y2, slice)
+    local sliceIsMatrix = slice._type == "matrix"
+
+    local sliceWidth = math.abs(x2 - x1) + 1
+    local sliceHeight = math.abs(y2 - y1) + 1
+
+    local startX, endX = math.min(x1, x2), math.max(x1, x2)
+    local startY, endY = math.min(y1, y2), math.max(y1, y2)
+
+    -- Make sure sizes match
+    if sliceIsMatrix and (sliceWidth ~= slice._width or sliceHeight ~= slice._height) then
+        return false
+    end
+
+    for y = math.max(1, startY), math.min(self._height, endY) do
+        for x = math.max(1, startX), math.min(self._width, endX) do
+            if sliceIsMatrix then
+                local resultX = x - startX
+                local resultY = y - startY
+
+                self:set(x, y, slice[resultX + resultY * sliceWidth + 1])
+
+            else
+                self:set(x, y, slice)
+            end
+        end
+    end
+end
+
+
 function matrix.filled(default, width, height)
     local m = {
         _type = "matrix"

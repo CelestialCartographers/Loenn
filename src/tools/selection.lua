@@ -980,6 +980,8 @@ local function selectionFinished(x, y, fromClick)
 
         selectionPreviews = {}
     end
+
+    tiles.selectionsChanged(selectionTargets)
 end
 
 local function resizeStarted(x, y)
