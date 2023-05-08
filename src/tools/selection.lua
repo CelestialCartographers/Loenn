@@ -521,12 +521,12 @@ local function pasteItems(room, layer, targets)
             local item = target.item
             local targetLayer = target.layer
 
-            placementUtils.finalizePlacement(room, layer, item)
-
             item.x += offsetGridX
             item.y += offsetGridY
             target.x += offsetGridX
             target.y += offsetGridY
+
+            placementUtils.finalizePlacement(room, layer, item)
 
             if type(item.nodes) == "table" then
                 for _, node in ipairs(item.nodes) do
@@ -550,12 +550,20 @@ local function pasteItems(room, layer, targets)
                 table.insert(targetItems, item)
             end
 
-            -- Add preview for all main and node parts of the item
-            -- Makes more sense for visuals after a paste
-            selectionUtils.getSelectionsForItem(room, targetLayer, item, newTargets)
+            -- Special case tile layer selections
+            if tileLayers[targetLayer] then
+                table.insert(newTargets, target)
+
+            else
+                -- Add preview for all main and node parts of the item
+                -- Makes more sense for visuals after a paste
+                selectionUtils.getSelectionsForItem(room, targetLayer, item, newTargets)
+            end
         end
 
         selectionTargets = newTargets
+
+        tiles.selectionsChanged(newTargets)
 
         return table.keys(layerItems)
     end, room, relevantLayers, "Selection Pasted")
@@ -748,9 +756,10 @@ local function rebuildSelectionFromItem(room, item)
     local rectangle = rectangles[1]
 
     if tileLayers[layer] then
-        rectange, item = tiles.rebuildSelection(room, item)
+        rectangle, item = tiles.rebuildSelection(room, item)
     end
 
+    rectangle.layer = layer
     item._fromLayer = nil
     rectangle.item = item
 
