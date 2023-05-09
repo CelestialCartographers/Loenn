@@ -6,18 +6,13 @@ local tiles = require("tiles")
 
 local selectionUtils = {}
 
-local tileLayers = {
-    tilesFg = true,
-    tilesBg = true
-}
-
 function selectionUtils.selectionTargetLayers(selectionTargets, includeTiles)
     local layers = {}
 
     includeTiles = includeTiles == nil or includeTiles
 
     for _, target in ipairs(selectionTargets) do
-        if includeTiles or not tileLayers[target.layer] then
+        if includeTiles or not tiles.tileLayers[target.layer] then
             layers[target.layer] = true
         end
     end
@@ -105,8 +100,8 @@ function selectionUtils.orderSelectionsByScore(selections)
     return selections
 end
 
-local function addTilesSelections(layer, room, rectangle, selected)
-    if tileLayers[layer] then
+local function addTileSelection(layer, room, rectangle, selected)
+    if tiles.tileLayers[layer] then
         local selection = tiles.getSelectionFromRectangle(room, layer, rectangle)
 
         if selection then
@@ -123,7 +118,7 @@ function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
     end
 
     -- Handle tile selections
-    utils.callIterateFirstIfTable(addTilesSelections, layer, room, rectangle, selected)
+    utils.callIterateFirstIfTable(addTileSelection, layer, room, rectangle, selected)
 
     -- All other selections
     local rectangles = selectionUtils.getSelectionsForRoom(room, layer)

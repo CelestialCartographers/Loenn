@@ -94,11 +94,6 @@ function tool.unselect()
     selectionTargets = {}
 end
 
-local tileLayers = {
-    tilesFg = true,
-    tilesBg = true
-}
-
 local function selectionChanged(x, y, width, height, fromClick)
     local room = state.getSelectedRoom()
 
@@ -536,23 +531,27 @@ local function pasteItems(room, layer, targets)
                 end
             end
 
-            local targetItems = layerItems[targetLayer]
+            -- Add the new item to the correct layer
+            -- Tiles handle this in the finalizePlacement call
+            if not tiles.tileLayers[targetLayer] then
+                local targetItems = layerItems[targetLayer]
 
-            if not targetItems then
-                local handler = layerHandlers.getHandler(targetLayer)
+                if not targetItems then
+                    local handler = layerHandlers.getHandler(targetLayer)
 
-                if handler and handler.getRoomItems then
-                    targetItems = handler.getRoomItems(room, targetLayer)
-                    layerItems[targetLayer] = targetItems
+                    if handler and handler.getRoomItems then
+                        targetItems = handler.getRoomItems(room, targetLayer)
+                        layerItems[targetLayer] = targetItems
+                    end
+                end
+
+                if targetItems then
+                    table.insert(targetItems, item)
                 end
             end
 
-            if targetItems then
-                table.insert(targetItems, item)
-            end
-
             -- Special case tile layer selections
-            if tileLayers[targetLayer] then
+            if tiles.tileLayers[targetLayer] then
                 table.insert(newTargets, target)
 
             else
@@ -566,7 +565,7 @@ local function pasteItems(room, layer, targets)
 
         tiles.selectionsChanged(newTargets)
 
-        return table.keys(layerItems)
+        return relevantLayers
     end, room, relevantLayers, "Selection Pasted")
 
     return snapshot, relevantLayers
@@ -738,7 +737,7 @@ local function prepareCopyForClipboard(targets)
             end
         end
 
-        if tileLayers[target.layer] then
+        if tiles.tileLayers[target.layer] then
             tiles.clipboardPrepareCopy(target)
         end
 
@@ -756,7 +755,7 @@ local function rebuildSelectionFromItem(room, item)
     local rectangles = selectionUtils.getSelectionsForItem(room, layer, item)
     local rectangle = rectangles[1]
 
-    if tileLayers[layer] then
+    if tiles.tileLayers[layer] then
         rectangle, item = tiles.rebuildSelection(room, item)
     end
 

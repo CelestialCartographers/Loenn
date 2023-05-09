@@ -6,6 +6,14 @@ local loadedState = require("loaded_state")
 
 local tiles = {}
 
+tiles.tileLayers = {
+    "tilesFg",
+    "tilesBg",
+
+    tilesFg = true,
+    tilesBg = true
+}
+
 -- Keeps a copy of the tile matrix with the selections "popped off"
 -- Used to create the illusion of tiles being moved actually being selected
 local backingMatrices = {}
@@ -54,9 +62,23 @@ local function deleteArea(room, layer, startX, startY, stopX, stopY)
     brushHelper.placeTile(room, startX, startY, material, layer)
 end
 
--- TODO - Improve, this is a temporary history workaround
+-- Use minimized string
+-- This might still use too much memory, but it is a start
+function tiles.getRoomTileSnapshotValue(room, layer)
+    if room and room[layer] then
+        return tilesStruct.matrixToTileStringMinimized(room[layer].matrix)
+    end
+end
+
+function tiles.restoreRoomSnapshotValue(snapshotValue)
+    if snapshotValue then
+        return tilesStruct.tileStringToMatrix(snapshotValue)
+    end
+end
+
+-- Used for room layer snapshots
 function tiles.getRoomItems(room, layer)
-    return room[layer]
+    return tiles.getRoomTileSnapshotValue(room, layer)
 end
 
 function tiles.moveSelection(room, layer, selection, offsetX, offsetY)

@@ -6,7 +6,7 @@ local snapshot = require("structs.snapshot")
 local matrix = require("utils.matrix")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
-local tilesStruct = require("structs.tiles")
+local tiles = require("tiles")
 
 local snapshotUtils = {}
 
@@ -18,20 +18,6 @@ local function redrawLayer(room, layer)
 
     else
         celesteRender.forceRedrawRoom(room, state, false)
-    end
-end
-
--- Use minimized string
--- This might still use too much memory, but it is a start
-function snapshotUtils.getRoomTileSnapshotValue(room, layer)
-    if room and room[layer] then
-        return tilesStruct.matrixToTileStringMinimized(room[layer].matrix)
-    end
-end
-
-function snapshotUtils.restoreRoomSnapshotValue(snapshotValue)
-    if snapshotValue then
-        return tilesStruct.tileStringToMatrix(snapshotValue)
     end
 end
 
@@ -71,8 +57,9 @@ function snapshotUtils.roomLayerSnapshot(callback, room, layer, description)
     local res = {callback()}
 
     local targetsAfter = utils.deepcopy(targetItems)
+    local snapshotFunction = tiles.tileLayers[layer] and snapshotUtils.roomTilesSnapshot or getRoomLayerSnapshot
 
-    return getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter), unpack(res)
+    return snapshotFunction(room, layer, description, targetsBefore, targetsAfter), unpack(res)
 end
 
 function snapshotUtils.roomLayersSnapshot(callback, room, layers, description)
@@ -95,7 +82,8 @@ function snapshotUtils.roomLayersSnapshot(callback, room, layers, description)
         local targetItems = targets[layer]
         local targetsBefore = befores[layer]
         local targetsAfter = utils.deepcopy(targetItems)
-        local snapshot = getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter)
+        local snapshotFunction = tiles.tileLayers[layer] and snapshotUtils.roomTilesSnapshot or getRoomLayerSnapshot
+        local snapshot = snapshotFunction(room, layer, description, targetsBefore, targetsAfter)
 
         table.insert(snapshots, snapshot)
     end
@@ -142,7 +130,7 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         local targetRoom = state.getRoomByName(data.room)
 
         if targetRoom then
-            targetRoom[layer].matrix = snapshotUtils.restoreRoomSnapshotValue(tilesAfter)
+            targetRoom[layer].matrix = tiles.restoreRoomSnapshotValue(tilesAfter)
 
             redrawLayer(targetRoom, layer)
         end
@@ -152,7 +140,7 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         local targetRoom = state.getRoomByName(data.room)
 
         if targetRoom then
-            targetRoom[layer].matrix = snapshotUtils.restoreRoomSnapshotValue(tilesBefore)
+            targetRoom[layer].matrix = tiles.restoreRoomSnapshotValue(tilesBefore)
 
             redrawLayer(targetRoom, layer)
         end

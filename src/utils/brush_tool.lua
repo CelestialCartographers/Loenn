@@ -7,6 +7,7 @@ local brushHelper = require("brushes")
 local history = require("history")
 local snapshotUtils = require("snapshot_utils")
 local matrixLib = require("utils.matrix")
+local tiles = require("tiles")
 
 local brushToolUtils = {}
 
@@ -97,7 +98,7 @@ end
 function brushToolUtils.getTileSnapshotValue(tool)
     local room = state.getSelectedRoom()
 
-    return snapshotUtils.getRoomTileSnapshotValue(room, tool.layer)
+    return tiles.getRoomTileSnapshotValue(room, tool.layer)
 end
 
 function brushToolUtils.startTileSnapshot(tool)
