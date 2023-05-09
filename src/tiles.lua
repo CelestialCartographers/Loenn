@@ -11,14 +11,25 @@ local tiles = {}
 local backingMatrices = {}
 
 local function getRectanglePoints(room, rectangle)
+    local rectangleX, rectangleY = rectangle.x, rectangle.y
+    local rectangleWidth, rectangleHeight = rectangle.width, rectangle.height
+
+    if rectangle.fromClick then
+        rectangleX += math.floor(rectangle.width / 2)
+        rectangleY += math.floor(rectangle.height / 2)
+
+        rectangleWidth = 1
+        rectangleHeight = 1
+    end
+
     local widthTiles = math.floor(room.width / 8)
     local heightTiles = math.floor(room.height / 8)
 
-    local tileStartX = math.max(math.floor(rectangle.x / 8) + 1, 1)
-    local tileStartY = math.max(math.floor(rectangle.y / 8) + 1, 1)
+    local tileStartX = math.max(math.floor(rectangleX / 8) + 1, 1)
+    local tileStartY = math.max(math.floor(rectangleY / 8) + 1, 1)
 
-    local tileStopX = math.min(math.ceil((rectangle.x + rectangle.width) / 8), widthTiles)
-    local tileStopY = math.min(math.ceil((rectangle.y + rectangle.height) / 8), heightTiles)
+    local tileStopX = math.min(math.ceil((rectangleX + rectangleWidth) / 8), widthTiles)
+    local tileStopY = math.min(math.ceil((rectangleY + rectangleHeight) / 8), heightTiles)
 
     return tileStartX, tileStartY, tileStopX, tileStopY
 end

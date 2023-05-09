@@ -105,6 +105,7 @@ local function selectionChanged(x, y, width, height, fromClick)
     -- Only update if needed
     if fromClick or not selectionRectangle or x ~= selectionRectangle.x or y ~= selectionRectangle.y or math.abs(width) ~= selectionRectangle.width or math.abs(height) ~= selectionRectangle.height then
         selectionRectangle = utils.rectangle(x, y, width, height)
+        selectionRectangle.fromClick = fromClick
 
         local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
 
