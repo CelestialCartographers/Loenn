@@ -123,8 +123,15 @@ end
 
 function tiles.rebuildSelection(room, item)
     if item.tiles then
+        -- The slice we get from restoring the matrix will have whitespace trimmed off
+        -- We need to add that back to get "0" instead of " "
+
         local rectangle = utils.rectangle(item.x * 8 - 8, item.y * 8 - 8, item.width * 8, item.height * 8)
-        local item = tilesStruct.tileStringToMatrix(item.tiles)
+        local matrixSlice = tilesStruct.tileStringToMatrix(item.tiles)
+        local sliceWidth, sliceHeight = matrixSlice:size()
+        local item = matrixLib.filled("0", item.width, item.height)
+
+        item:setSlice(1, 1, sliceWidth, sliceHeight, matrixSlice)
 
         item.x = rectangle.x
         item.y = rectangle.y
