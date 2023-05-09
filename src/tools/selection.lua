@@ -503,7 +503,7 @@ end
 local function pasteItems(room, layer, targets)
     local pasteCentered = configs.editor.pasteCentered
     local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
-    local snapshot, usedLayers = snapshotUtils.roomLayersSnapshot(function()
+    local snapshot = snapshotUtils.roomLayersSnapshot(function()
         local layerItems = {}
         local newTargets = {}
 
@@ -527,7 +527,7 @@ local function pasteItems(room, layer, targets)
             target.x += offsetGridX
             target.y += offsetGridY
 
-            placementUtils.finalizePlacement(room, layer, item)
+            placementUtils.finalizePlacement(room, targetLayer, item)
 
             if type(item.nodes) == "table" then
                 for _, node in ipairs(item.nodes) do
@@ -569,7 +569,7 @@ local function pasteItems(room, layer, targets)
         return table.keys(layerItems)
     end, room, relevantLayers, "Selection Pasted")
 
-    return snapshot, usedLayers
+    return snapshot, relevantLayers
 end
 
 local function handleItemMovementKeys(room, key, scancode, isrepeat)
