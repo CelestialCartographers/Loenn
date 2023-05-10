@@ -159,13 +159,13 @@ function toolHandler.setLayer(layer, name)
 
     if handler then
         local validLayers = toolHandler.getLayers(name)
+        local oldLayer = toolHandler.getLayer(name) or validLayers[1]
+        local result = true
 
         if not utils.contains(layer, validLayers) then
-            return false
+            layer = oldLayer
+            result = false
         end
-
-        local oldLayer = toolHandler.getLayer(name)
-        local result = true
 
         if handler.setLayer then
             result = handler.setLayer(layer, oldLayer)
