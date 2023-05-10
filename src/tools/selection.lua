@@ -29,6 +29,18 @@ tool.image = nil
 
 tool.layer = "entities"
 tool.validLayers = {
+    "all_layers",
+    "tilesFg",
+    "tilesBg",
+    "entities",
+    "triggers",
+    "decalsFg",
+    "decalsBg"
+}
+
+local allLayers = {
+    _persistenceName = "AllLayers",
+
     "tilesFg",
     "tilesBg",
     "entities",
@@ -92,6 +104,15 @@ local selectionRotationKeys = {
 function tool.unselect()
     selectionPreviews = {}
     selectionTargets = {}
+end
+
+function tool.setLayer(layer)
+    if layer == "all_layers" then
+        tool.layer = allLayers
+
+    else
+        tool.layer = layer
+    end
 end
 
 local function selectionChanged(x, y, width, height, fromClick)
