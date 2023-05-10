@@ -6,6 +6,7 @@ local snapshot = require("structs.snapshot")
 local matrix = require("utils.matrix")
 local celesteRender = require("celeste_render")
 local viewportHandler = require("viewport_handler")
+local tiles = require("tiles")
 
 local snapshotUtils = {}
 
@@ -56,8 +57,9 @@ function snapshotUtils.roomLayerSnapshot(callback, room, layer, description)
     local res = {callback()}
 
     local targetsAfter = utils.deepcopy(targetItems)
+    local snapshotFunction = tiles.tileLayers[layer] and snapshotUtils.roomTilesSnapshot or getRoomLayerSnapshot
 
-    return getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter), unpack(res)
+    return snapshotFunction(room, layer, description, targetsBefore, targetsAfter), unpack(res)
 end
 
 function snapshotUtils.roomLayersSnapshot(callback, room, layers, description)
@@ -80,7 +82,8 @@ function snapshotUtils.roomLayersSnapshot(callback, room, layers, description)
         local targetItems = targets[layer]
         local targetsBefore = befores[layer]
         local targetsAfter = utils.deepcopy(targetItems)
-        local snapshot = getRoomLayerSnapshot(room, layer, description, targetsBefore, targetsAfter)
+        local snapshotFunction = tiles.tileLayers[layer] and snapshotUtils.roomTilesSnapshot or getRoomLayerSnapshot
+        local snapshot = snapshotFunction(room, layer, description, targetsBefore, targetsAfter)
 
         table.insert(snapshots, snapshot)
     end
@@ -127,7 +130,7 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         local targetRoom = state.getRoomByName(data.room)
 
         if targetRoom then
-            targetRoom[layer].matrix = matrix.fromTable(tilesAfter, data.width, data.height)
+            targetRoom[layer].matrix = tiles.restoreRoomSnapshotValue(tilesAfter)
 
             redrawLayer(targetRoom, layer)
         end
@@ -137,7 +140,7 @@ function snapshotUtils.roomTilesSnapshot(room, layer, description, tilesBefore, 
         local targetRoom = state.getRoomByName(data.room)
 
         if targetRoom then
-            targetRoom[layer].matrix = matrix.fromTable(tilesBefore, data.width, data.height)
+            targetRoom[layer].matrix = tiles.restoreRoomSnapshotValue(tilesBefore)
 
             redrawLayer(targetRoom, layer)
         end

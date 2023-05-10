@@ -2,21 +2,26 @@ local layerHandlers = require("layer_handlers")
 local utils = require("utils")
 local sceneHandler = require("scene_handler")
 local toolUtils = require("tool_utils")
+local tiles = require("tiles")
 
 local selectionUtils = {}
 
-function selectionUtils.selectionTargetLayers(selectionTargets)
+function selectionUtils.selectionTargetLayers(selectionTargets, includeTiles)
     local layers = {}
 
+    includeTiles = includeTiles == nil or includeTiles
+
     for _, target in ipairs(selectionTargets) do
-        layers[target.layer] = true
+        if includeTiles or not tiles.tileLayers[target.layer] then
+            layers[target.layer] = true
+        end
     end
 
     return table.keys(layers)
 end
 
 function selectionUtils.redrawTargetLayers(room, selectionTargets)
-    local targetLayers = selectionUtils.selectionTargetLayers(selectionTargets)
+    local targetLayers = selectionUtils.selectionTargetLayers(selectionTargets, false)
 
     toolUtils.redrawTargetLayer(room, targetLayers)
 end
@@ -25,6 +30,11 @@ function selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
     rectangles = rectangles or {}
 
     local handler = layerHandlers.getHandler(layer)
+
+    if not handler or not handler.getSelection then
+        return rectangles
+    end
+
     local main, nodes = handler.getSelection(room, item)
 
     if main then
@@ -49,7 +59,7 @@ function selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
 end
 
 function selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
-    rectanles = rectangles or {}
+    rectangles = rectangles or {}
 
     local handler = layerHandlers.getHandler(layer)
 
@@ -90,16 +100,32 @@ function selectionUtils.orderSelectionsByScore(selections)
     return selections
 end
 
+local function addTileSelection(layer, room, rectangle, selected)
+    if tiles.tileLayers[layer] then
+        local selection = tiles.getSelectionFromRectangle(room, layer, rectangle)
+
+        if selection then
+            table.insert(selected, selection)
+        end
+    end
+end
+
 function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
     local selected = {}
 
-    if room and rectangle then
-        local rectangles = selectionUtils.getSelectionsForRoom(room, layer)
+    if not room or not rectangle then
+        return selected
+    end
 
-        for _, selection in ipairs(rectangles) do
-            if utils.aabbCheck(rectangle, selection) then
-                table.insert(selected, selection)
-            end
+    -- Handle tile selections
+    utils.callIterateFirstIfTable(addTileSelection, layer, room, rectangle, selected)
+
+    -- All other selections
+    local rectangles = selectionUtils.getSelectionsForRoom(room, layer)
+
+    for _, selection in ipairs(rectangles) do
+        if utils.aabbCheck(rectangle, selection) then
+            table.insert(selected, selection)
         end
     end
 

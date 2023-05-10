@@ -7,13 +7,15 @@ scenes.loading.loading=Loading
 
 scenes.editor.no_map_loaded=No map loaded
 
-scenes.startup.threads_supported=Please select Celeste.exe in the dialog or drag the file into the window.\nIf you drag Celeste.exe in you will have to manually close the dialog window.
-scenes.startup.threads_not_supported=Please select Celeste.exe or Celeste.app in the dialog.
+scenes.startup.windows=Please select Celeste.exe in the dialog or drag the file into the window.\nIf you drag Celeste.exe in, you will have to manually close the dialog window.
+scenes.startup.linux=Please select the Celeste executable in the dialog or drag the file into the window.\nIf you drag the executable in, you will have to manually close the dialog window.
+scenes.startup.os_x=Please select Celeste.exe or Celeste.app in the dialog.
 
 
 # -- Layers --
 # layers.name.layerName
 # layers.description.layerName
+layers.name.all_layers=All
 layers.name.tilesFg=Foreground Tiles
 layers.name.tilesBg=Background Tiles
 layers.name.decalsFg=Foreground Decals

@@ -5,6 +5,7 @@ local configs = require("configs")
 local state = require("loaded_state")
 local mods = require("mods")
 local dependencies = require("dependencies")
+local brushHelper = require("brushes")
 
 local placementUtils = {}
 
@@ -78,6 +79,12 @@ function placementUtils.finalizePlacement(room, layer, item)
                 return
             end
         end
+
+    elseif layer == "tilesFg" or layer == "tilesBg" then
+        local tileX = math.floor(item.x / 8) + 1
+        local tileY = math.floor(item.y / 8) + 1
+
+        brushHelper.placeTile(room, tileX, tileY, item, layer)
     end
 end
 

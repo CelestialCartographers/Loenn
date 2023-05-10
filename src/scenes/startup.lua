@@ -5,6 +5,7 @@ local threadHandler = require("utils.threads")
 local drawing = require("utils.drawing")
 local languageRegistry = require("language_registry")
 local configs = require("configs")
+local utils = require("utils")
 
 local startupScene = {}
 
@@ -18,7 +19,7 @@ startupScene._performedGameScan = false
 startupScene._dialogChannel = nil
 startupScene._dialogThread = nil
 startupScene._nextScene = "Loading"
-startupScene._messageKey = filesystem.supportWindowsInThreads and "threads_supported" or "threads_not_supported"
+startupScene._messageKey = string.lower(utils.getOS())
 
 -- Save the path to config and then change to the loading scene
 local function saveGotoLoading(path)
@@ -69,7 +70,12 @@ function startupScene:firstEnter()
 
     local language = languageRegistry.getLanguage()
 
-    self._message = tostring(language.scenes.startup[self._messageKey])
+    if language.scenes.startup[self._messageKey]._exists then
+        self._message = tostring(language.scenes.startup[self._messageKey])
+
+    else
+        self._message = tostring(language.scenes.startup.linux)
+    end
 end
 
 function startupScene:filedropped(file)

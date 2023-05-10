@@ -35,7 +35,18 @@ function toolUtils.redrawTargetLayer(room, layer)
 end
 
 function toolUtils.getPersistenceKey(...)
-    return "tool" .. table.concat(utils.titleCase@({...}))
+    local parts = {}
+
+    for _, part in ipairs({...}) do
+        if type(part) == "table" then
+            table.insert(parts, part._persistenceName or table.concat(utils.titleCase@(parts)))
+
+        else
+            table.insert(parts, part)
+        end
+    end
+
+    return "tool" .. table.concat(utils.titleCase@(parts))
 end
 
 function toolUtils.getPersistenceValue(...)

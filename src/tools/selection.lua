@@ -18,6 +18,7 @@ local layerHandlers = require("layer_handlers")
 local placementUtils = require("placement_utils")
 local cursorUtils = require("utils.cursor")
 local nodeStruct = require("structs.node")
+local tiles = require("tiles")
 
 local tool = {}
 
@@ -28,6 +29,20 @@ tool.image = nil
 
 tool.layer = "entities"
 tool.validLayers = {
+    "all_layers",
+    "tilesFg",
+    "tilesBg",
+    "entities",
+    "triggers",
+    "decalsFg",
+    "decalsBg"
+}
+
+local allLayers = {
+    _persistenceName = "AllLayers",
+
+    "tilesFg",
+    "tilesBg",
     "entities",
     "triggers",
     "decalsFg",
@@ -91,12 +106,22 @@ function tool.unselect()
     selectionTargets = {}
 end
 
+function tool.setLayer(layer)
+    if layer == "all_layers" then
+        tool.layer = allLayers
+
+    else
+        tool.layer = layer
+    end
+end
+
 local function selectionChanged(x, y, width, height, fromClick)
     local room = state.getSelectedRoom()
 
     -- Only update if needed
     if fromClick or not selectionRectangle or x ~= selectionRectangle.x or y ~= selectionRectangle.y or math.abs(width) ~= selectionRectangle.width or math.abs(height) ~= selectionRectangle.height then
         selectionRectangle = utils.rectangle(x, y, width, height)
+        selectionRectangle.fromClick = fromClick
 
         local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
 
@@ -494,7 +519,7 @@ end
 local function pasteItems(room, layer, targets)
     local pasteCentered = configs.editor.pasteCentered
     local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
-    local snapshot, usedLayers = snapshotUtils.roomLayersSnapshot(function()
+    local snapshot = snapshotUtils.roomLayersSnapshot(function()
         local layerItems = {}
         local newTargets = {}
 
@@ -513,12 +538,12 @@ local function pasteItems(room, layer, targets)
             local item = target.item
             local targetLayer = target.layer
 
-            placementUtils.finalizePlacement(room, layer, item)
-
             item.x += offsetGridX
             item.y += offsetGridY
             target.x += offsetGridX
             target.y += offsetGridY
+
+            placementUtils.finalizePlacement(room, targetLayer, item)
 
             if type(item.nodes) == "table" then
                 for _, node in ipairs(item.nodes) do
@@ -527,32 +552,44 @@ local function pasteItems(room, layer, targets)
                 end
             end
 
-            local targetItems = layerItems[targetLayer]
+            -- Add the new item to the correct layer
+            -- Tiles handle this in the finalizePlacement call
+            if not tiles.tileLayers[targetLayer] then
+                local targetItems = layerItems[targetLayer]
 
-            if not targetItems then
-                local handler = layerHandlers.getHandler(targetLayer)
+                if not targetItems then
+                    local handler = layerHandlers.getHandler(targetLayer)
 
-                if handler and handler.getRoomItems then
-                    targetItems = handler.getRoomItems(room, targetLayer)
-                    layerItems[targetLayer] = targetItems
+                    if handler and handler.getRoomItems then
+                        targetItems = handler.getRoomItems(room, targetLayer)
+                        layerItems[targetLayer] = targetItems
+                    end
+                end
+
+                if targetItems then
+                    table.insert(targetItems, item)
                 end
             end
 
-            if targetItems then
-                table.insert(targetItems, item)
-            end
+            -- Special case tile layer selections
+            if tiles.tileLayers[targetLayer] then
+                table.insert(newTargets, target)
 
-            -- Add preview for all main and node parts of the item
-            -- Makes more sense for visuals after a paste
-            selectionUtils.getSelectionsForItem(room, targetLayer, item, newTargets)
+            else
+                -- Add preview for all main and node parts of the item
+                -- Makes more sense for visuals after a paste
+                selectionUtils.getSelectionsForItem(room, targetLayer, item, newTargets)
+            end
         end
 
         selectionTargets = newTargets
 
-        return table.keys(layerItems)
+        tiles.selectionsChanged(newTargets)
+
+        return relevantLayers
     end, room, relevantLayers, "Selection Pasted")
 
-    return snapshot, usedLayers
+    return snapshot, relevantLayers
 end
 
 local function handleItemMovementKeys(room, key, scancode, isrepeat)
@@ -710,7 +747,8 @@ local function prepareCopyForClipboard(targets)
     local items = {}
 
     for _, target in ipairs(targets) do
-        local nodes = target.item.nodes
+        local item = target.item
+        local nodes = item.nodes
 
         if nodes then
             nodes._type = nil
@@ -718,6 +756,10 @@ local function prepareCopyForClipboard(targets)
             for _, node in ipairs(nodes) do
                 node._type = nil
             end
+        end
+
+        if tiles.tileLayers[target.layer] then
+            tiles.clipboardPrepareCopy(target)
         end
 
         target.item._fromLayer = target.layer
@@ -734,6 +776,11 @@ local function rebuildSelectionFromItem(room, item)
     local rectangles = selectionUtils.getSelectionsForItem(room, layer, item)
     local rectangle = rectangles[1]
 
+    if tiles.tileLayers[layer] then
+        rectangle, item = tiles.rebuildSelection(room, item)
+    end
+
+    rectangle.layer = layer
     item._fromLayer = nil
     rectangle.item = item
 
@@ -957,12 +1004,14 @@ local function selectionFinished(x, y, fromClick)
     selectionRectangle = false
     selectionCompleted = true
 
-    updateSelectionTargetsFromPreviews(addModifier)
-
     -- Special case, otherwise we lose some selections
-    if not fromClick then
+    if not fromClick and not movementActive and not resizeDirection then
+        updateSelectionTargetsFromPreviews(addModifier)
+
         selectionPreviews = {}
     end
+
+    tiles.selectionsChanged(selectionTargets)
 end
 
 local function resizeStarted(x, y)

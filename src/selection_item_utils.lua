@@ -3,21 +3,22 @@ local utils = require("utils")
 
 local selectionItemUtils = {}
 
-local function callHandlerFunction(room, layer, func, ...)
+local function callHandlerFunction(func, room, layer, item, ...)
     if type(layer) == "table" then
         local result = false
 
         for _, l in ipairs(layer) do
-            result = result or callHandlerFunction(room, l, func, ...)
+            result = result or callHandlerFunction(func, room, l, item, ...)
         end
 
         return result
 
     else
-        local handler = layerHandlers.getHandler(layer)
+        local correctLayer = item.layer or layer
+        local handler = layerHandlers.getHandler(correctLayer)
 
         if room and handler and handler[func] then
-            return handler[func](room, layer, ...)
+            return handler[func](room, correctLayer, item, ...)
         end
     end
 
@@ -35,35 +36,35 @@ function selectionItemUtils.canResize(room, layer, target)
 end
 
 function selectionItemUtils.canResizeItem(room, layer, item)
-    return callHandlerFunction(room, layer, "canResize", item.item)
+    return selectionItemUtils.canResize(room, layer, item)
 end
 
 function selectionItemUtils.drawSelected(room, layer, item, color)
-    return callHandlerFunction(room, layer, "drawSelected", item, color)
+    return callHandlerFunction("drawSelected", room, layer, item, color)
 end
 
 function selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
-    return callHandlerFunction(room, layer, "moveSelection", item, offsetX, offsetY)
+    return callHandlerFunction("moveSelection", room, layer, item, offsetX, offsetY)
 end
 
 function selectionItemUtils.resizeSelection(room, layer, item, offsetX, offsetY, directionX, directionY)
-    return callHandlerFunction(room, layer, "resizeSelection", item, offsetX, offsetY, directionX, directionY)
+    return callHandlerFunction("resizeSelection", room, layer, item, offsetX, offsetY, directionX, directionY)
 end
 
 function selectionItemUtils.rotateSelection(room, layer, item, direction)
-    return callHandlerFunction(room, layer, "rotateSelection", item, direction)
+    return callHandlerFunction("rotateSelection", room, layer, item, direction)
 end
 
 function selectionItemUtils.flipSelection(room, layer, item, horizontal, vertical)
-    return callHandlerFunction(room, layer, "flipSelection", item, horizontal, vertical)
+    return callHandlerFunction("flipSelection", room, layer, item, horizontal, vertical)
 end
 
 function selectionItemUtils.deleteSelection(room, layer, item)
-    return callHandlerFunction(room, layer, "deleteSelection", item)
+    return callHandlerFunction("deleteSelection", room, layer, item)
 end
 
 function selectionItemUtils.addNodeToSelection(room, layer, item)
-    return callHandlerFunction(room, layer, "addNodeToSelection", item)
+    return callHandlerFunction("addNodeToSelection", room, layer, item)
 end
 
 return selectionItemUtils
