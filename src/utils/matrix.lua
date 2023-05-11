@@ -111,6 +111,47 @@ function matrixMt.__index:setSlice(x1, y1, x2, y2, slice)
 end
 
 
+function matrixMt.__index:flipHorizontal()
+    local width, height = self:size()
+
+    for x = 1, math.floor(width / 2) do
+        for y = 1, height do
+            local rightX = width - x + 1
+            local left = self:getInbounds(x, y)
+            local right = self:getInbounds(rightX, y)
+
+            self:setInbounds(x, y, right)
+            self:setInbounds(rightX, y, left)
+        end
+    end
+end
+
+function matrixMt.__index:flipVertical()
+    local width, height = self:size()
+
+    for y = 1, math.floor(height / 2) do
+        for x = 1, width do
+            local bottomY = height - y + 1
+            local top = self:getInbounds(x, y)
+            local bottom = self:getInbounds(x, bottomY)
+
+            self:setInbounds(x, y, bottom)
+            self:setInbounds(x, bottomY, top)
+        end
+    end
+end
+
+function matrixMt.__index:flip(horizontal, vertical)
+    if horizontal then
+        self:flipHorizontal()
+    end
+
+    if vertical then
+        self:flipVertical()
+    end
+end
+
+
 function matrix.filled(default, width, height)
     local m = {
         _type = "matrix"

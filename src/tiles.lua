@@ -119,7 +119,11 @@ function tiles.deleteSelection(room, layer, selection)
 end
 
 function tiles.flipSelection(room, layer, selection, horizontal, vertical)
-    -- TODO - Implement
+    local matrix = selection.item
+    local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, selection)
+
+    matrix:flip(horizontal, vertical)
+    brushHelper.placeTile(room, tileStartX, tileStartY, matrix, layer)
 end
 
 function tiles.getSelectionFromRectangle(room, layer, rectangle)
