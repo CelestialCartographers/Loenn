@@ -14,6 +14,7 @@ local layerHandlers = require("layer_handlers")
 local toolUtils = require("tool_utils")
 local notifications = require("ui.notification")
 local formUtils = require("ui.utils.forms")
+local tiles = require("tiles")
 
 local contextWindow = {}
 
@@ -124,7 +125,7 @@ local function findCompatibleSelections(selections, targetSelection)
     local layer = targetSelection.layer
 
     for _, target in ipairs(selections) do
-        if target.layer == layer then
+        if target.layer == layer and not tiles.tileLayer[target.layer] then
             if layer == "entities" or layer == "triggers" then
                 if item._name == target.item._name then
                     table.insert(compatible, target)
