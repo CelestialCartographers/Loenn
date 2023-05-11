@@ -18,7 +18,7 @@ tiles.tileLayers = {
 -- Used to create the illusion of tiles being moved actually being selected
 local backingMatrices = {}
 
-local function getRectanglePoints(room, rectangle)
+local function getRectanglePoints(room, rectangle, clampInbounds)
     local rectangleX, rectangleY = rectangle.x, rectangle.y
     local rectangleWidth, rectangleHeight = rectangle.width, rectangle.height
 
@@ -33,11 +33,16 @@ local function getRectanglePoints(room, rectangle)
     local widthTiles = math.floor(room.width / 8)
     local heightTiles = math.floor(room.height / 8)
 
-    local tileStartX = math.max(math.floor(rectangleX / 8) + 1, 1)
-    local tileStartY = math.max(math.floor(rectangleY / 8) + 1, 1)
+    local tileStartX = math.floor(rectangleX / 8) + 1
+    local tileStartY = math.floor(rectangleY / 8) + 1
 
-    local tileStopX = math.min(math.ceil((rectangleX + rectangleWidth) / 8), widthTiles)
-    local tileStopY = math.min(math.ceil((rectangleY + rectangleHeight) / 8), heightTiles)
+    local tileStopX = math.ceil((rectangleX + rectangleWidth) / 8)
+    local tileStopY = math.ceil((rectangleY + rectangleHeight) / 8)
+
+    if clampInbounds then
+        tileStartX, tileStartY = math.max(tileStartX, 1), math.max(tileStartY, 1)
+        tileStopX, tileStopY = math.min(tileStopX, widthTiles), math.min(tileStopY, heightTiles)
+    end
 
     return tileStartX, tileStartY, tileStopX, tileStopY
 end
@@ -118,7 +123,7 @@ function tiles.flipSelection(room, layer, selection, horizontal, vertical)
 end
 
 function tiles.getSelectionFromRectangle(room, layer, rectangle)
-    local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, rectangle)
+    local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, rectangle, true)
     local selection = getSelectionRectangle(tileStartX, tileStartY, tileStopX, tileStopY)
     local matrix = room[layer].matrix
 
