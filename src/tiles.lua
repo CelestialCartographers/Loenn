@@ -107,7 +107,17 @@ function tiles.moveSelection(room, layer, selection, offsetX, offsetY)
 end
 
 function tiles.rotateSelection(room, layer, selection, direction)
-    -- TODO - Implement
+    local matrix = selection.item
+    local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, selection)
+    local backingSlice = backingMatrices[layer]:getSlice(tileStartX, tileStartY, tileStopX, tileStopY)
+
+    local rotated = matrix:rotate(direction)
+    local width, height = rotated:size()
+
+    brushHelper.placeTile(room, tileStartX, tileStartY, backingSlice, layer)
+    brushHelper.placeTile(room, tileStartX, tileStartY, rotated, layer)
+
+    selection.width, selection.height = width * 8, height * 8
 end
 
 function tiles.deleteSelection(room, layer, selection)
