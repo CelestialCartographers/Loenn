@@ -111,6 +111,115 @@ function matrixMt.__index:setSlice(x1, y1, x2, y2, slice)
 end
 
 
+function matrixMt.__index:flipHorizontal()
+    local width, height = self:size()
+
+    for x = 1, math.floor(width / 2) do
+        for y = 1, height do
+            local rightX = width - x + 1
+            local left = self:getInbounds(x, y)
+            local right = self:getInbounds(rightX, y)
+
+            self:setInbounds(x, y, right)
+            self:setInbounds(rightX, y, left)
+        end
+    end
+
+    return self
+end
+
+function matrixMt.__index:flipVertical()
+    local width, height = self:size()
+
+    for y = 1, math.floor(height / 2) do
+        for x = 1, width do
+            local bottomY = height - y + 1
+            local top = self:getInbounds(x, y)
+            local bottom = self:getInbounds(x, bottomY)
+
+            self:setInbounds(x, y, bottom)
+            self:setInbounds(x, bottomY, top)
+        end
+    end
+
+    return self
+end
+
+function matrixMt.__index:flip(horizontal, vertical)
+    if horizontal then
+        self:flipHorizontal()
+    end
+
+    if vertical then
+        self:flipVertical()
+    end
+
+    return self
+end
+
+
+-- 90 degrees clockwise rotation
+function matrixMt.__index:rotateLeft()
+    local width, height = self:size()
+    local rotated = matrix.fromTable(self, height, width)
+
+    for x = 1, width do
+        for y = 1, height do
+            local rotatedX = y
+            local rotatedY = width - x + 1
+
+            rotated:setInbounds(rotatedX, rotatedY, self:getInbounds(x, y))
+        end
+    end
+
+    return self:updateData(rotated, height, width)
+end
+
+-- 90 degrees counter clockwise rotation
+function matrixMt.__index:rotateRight()
+    local width, height = self:size()
+    local rotated = matrix.fromTable(self, height, width)
+
+    for x = 1, width do
+        for y = 1, height do
+            local rotatedX = height - y + 1
+            local rotatedY = x
+
+            rotated:setInbounds(rotatedX, rotatedY, self:getInbounds(x, y))
+        end
+    end
+
+    return self:updateData(rotated, height, width)
+end
+
+function matrixMt.__index:rotate(steps)
+    local rotationFunction = steps > 0 and self.rotateRight or self.rotateLeft
+
+    for i = 1, math.abs(steps) do
+        rotationFunction(self)
+    end
+
+    return self
+end
+
+
+function matrixMt.__index:updateData(data, width, height)
+    for i = 1, #data do
+        self[i] = data[i]
+    end
+
+    -- Blank out any excess values after updating
+    for i = #data + 1, self._width * self._height do
+        self[i] = nil
+    end
+
+    self._width = width
+    self._height = height
+
+    return self
+end
+
+
 function matrix.filled(default, width, height)
     local m = {
         _type = "matrix"
