@@ -125,7 +125,7 @@ local function findCompatibleSelections(selections, targetSelection)
     local layer = targetSelection.layer
 
     for _, target in ipairs(selections) do
-        if target.layer == layer and not tiles.tileLayer[target.layer] then
+        if target.layer == layer and not tiles.tileLayers[target.layer] then
             if layer == "entities" or layer == "triggers" then
                 if item._name == target.item._name then
                     table.insert(compatible, target)
@@ -153,6 +153,10 @@ function contextWindow.createContextMenu(selections, bestSelection)
 
     -- Filter out selections that would end up making a mess
     selections = findCompatibleSelections(selections, bestSelection)
+
+    if #selections == 0 then
+        return
+    end
 
     local dummyData, fieldInformation, fieldOrder = prepareFormData(selections, bestSelection, language)
     local buttons = {
