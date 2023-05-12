@@ -67,17 +67,40 @@ local function deleteArea(room, layer, startX, startY, stopX, stopY)
     brushHelper.placeTile(room, startX, startY, material, layer)
 end
 
+local function restoreMinimizedMatrix(tiles, width, height)
+    local restoredMatrix = tilesStruct.tileStringToMatrix(tiles)
+    local restoredWidth, restoredHeight = restoredMatrix:size()
+    local matrix = matrixLib.filled("0", width, height)
+
+    matrix:setSlice(1, 1, restoredWidth, restoredHeight, restoredMatrix)
+
+    return matrix
+end
+
 -- Use minimized string
 -- This might still use too much memory, but it is a start
 function tiles.getRoomTileSnapshotValue(room, layer)
     if room and room[layer] then
-        return tilesStruct.matrixToTileStringMinimized(room[layer].matrix)
+        local matrix = room[layer].matrix
+        local tiles = tilesStruct.matrixToTileStringMinimized(matrix)
+        local width, height = matrix:size()
+
+        return {
+            tiles = tiles,
+            width = width,
+            height = height
+        }
     end
 end
 
+-- The slice we get from restoring the matrix will have whitespace trimmed off
+-- We need to add that back to get "0" instead of " "
 function tiles.restoreRoomSnapshotValue(snapshotValue)
     if snapshotValue then
-        return tilesStruct.tileStringToMatrix(snapshotValue)
+        local tiles = snapshotValue.tiles
+        local width, height = snapshotValue.width, snapshotValue.height
+
+        return restoreMinimizedMatrix(tiles, width, height)
     end
 end
 
@@ -164,15 +187,8 @@ end
 
 function tiles.rebuildSelection(room, item)
     if item.tiles then
-        -- The slice we get from restoring the matrix will have whitespace trimmed off
-        -- We need to add that back to get "0" instead of " "
-
         local rectangle = utils.rectangle(item.x * 8 - 8, item.y * 8 - 8, item.width * 8, item.height * 8)
-        local matrixSlice = tilesStruct.tileStringToMatrix(item.tiles)
-        local sliceWidth, sliceHeight = matrixSlice:size()
-        local item = matrixLib.filled("0", item.width, item.height)
-
-        item:setSlice(1, 1, sliceWidth, sliceHeight, matrixSlice)
+        local item = restoreMinimizedMatrix(item.tiles, item.width, item.height)
 
         item.x = rectangle.x
         item.y = rectangle.y

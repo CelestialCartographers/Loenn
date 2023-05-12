@@ -518,7 +518,7 @@ end
 -- TODO - Improve decal logic, currently can't copy paste between bg <-> fg
 local function pasteItems(room, layer, targets)
     local pasteCentered = configs.editor.pasteCentered
-    local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
+    local relevantLayers = selectionUtils.selectionTargetLayers(targets)
     local snapshot = snapshotUtils.roomLayersSnapshot(function()
         local layerItems = {}
         local newTargets = {}
