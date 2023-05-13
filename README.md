@@ -86,6 +86,8 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
  - Left click: Select object
  - Left click existing selection: Cycle through objects under cursor (smallest to largest)
  - Left click & drag: Select multiple objects
+ - Shift + Left click & drag: Add to current selection
+ - Ctrl + A: Select all objects
  - Right click selection: Open properties of selected object(s)
  - Holding Left mouse button over selection: Drag selected objects
  - Shift + Holding Left mouse button over selection: Axis-bound object dragging

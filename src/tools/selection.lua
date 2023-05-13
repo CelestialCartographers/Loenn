@@ -1004,14 +1004,15 @@ local function selectionFinished(x, y, fromClick)
     selectionRectangle = false
     selectionCompleted = true
 
+    local doingMouseActions = movementActive or resizeDirection
+
     -- Special case, otherwise we lose some selections
-    if not fromClick and not movementActive and not resizeDirection then
+    if not fromClick and not doingMouseActions then
         updateSelectionTargetsFromPreviews(addModifier)
+        tiles.selectionsChanged(selectionTargets)
 
         selectionPreviews = {}
     end
-
-    tiles.selectionsChanged(selectionTargets)
 end
 
 local function resizeStarted(x, y)
