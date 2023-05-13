@@ -1115,7 +1115,7 @@ function entities.ignoredFieldsMultiple(layer, entity)
         return utils.callIfFunction(handler.ignoredFieldsMultiple, entity)
 
     else
-        return {"x", "y", "nodes"}
+        return {"x", "y", "width", "height", "nodes"}
     end
 end
 
