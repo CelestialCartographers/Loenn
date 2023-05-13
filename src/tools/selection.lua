@@ -479,7 +479,7 @@ local function addNode(room, layer, targets)
                 -- Make sure selection nodes for the target is correct
                 for _, target in ipairs(targets) do
                     if target.item == item then
-                        if target.node >= node then
+                        if target.node > node then
                             target.node += 1
                         end
                     end
@@ -490,7 +490,12 @@ local function addNode(room, layer, targets)
 
                 -- Nodes are off by one here since the main entity would be the first rectangle
                 -- We also insert after the target node, meaning the total offset is two
-                table.insert(newTargets, rectangles[node + 2])
+                local nodeRectangle = rectangles[node + 2]
+
+                nodeRectangle.item = item
+                nodeRectangle.node = node + 1
+
+                table.insert(newTargets, nodeRectangle)
 
                 redraw = true
             end
