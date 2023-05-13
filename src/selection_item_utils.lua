@@ -29,7 +29,7 @@ function selectionItemUtils.canResize(room, layer, target)
     local handler = layerHandlers.getHandler(layer)
 
     if room and handler and handler.canResize then
-        return handler.canResize(room, layer, target)
+        return handler.canResize(room, layer, target.item or target)
     end
 
     return false, false
