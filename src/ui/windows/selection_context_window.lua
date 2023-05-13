@@ -34,31 +34,32 @@ local function contextWindowUpdate(orig, self, dt)
     windowPreviousY = self.y
 end
 
-local function getWindowTitle(language, selections, targetItem, targetLayer)
+local function getWindowTitle(language, selections, bestSelection)
     local baseTitle = tostring(language.ui.selection_context_window.title)
     local titleParts = {baseTitle}
+    local targetLayer = bestSelection.layer
 
     if targetLayer == "entities" or targetLayer == "triggers" then
         -- Add entity/trigger name
-        table.insert(titleParts, targetItem._name)
+        table.insert(titleParts, bestSelection.item._name)
+    end
 
-        -- Add id for selected items
-        local ids = {}
+    -- Add id for selected items
+    local ids = {}
 
-        for _, selection in ipairs(selections) do
-            local selectionId = selection.item._id
-            local selectionLayer = selection.layer
+    for _, selection in ipairs(selections) do
+        local selectionId = selection.item._id
+        local selectionLayer = selection.layer
 
-            if selectionLayer == "entities" or selectionLayer == "triggers" then
-                if selectionId then
-                    table.insert(ids, tostring(selectionId))
-                end
+        if selectionLayer == "entities" or selectionLayer == "triggers" then
+            if selectionId then
+                table.insert(ids, tostring(selectionId))
             end
         end
+    end
 
-        if #ids > 0 then
-            table.insert(titleParts, string.format("ID: %s", table.concat(ids, ", ")))
-        end
+    if #ids > 0 then
+        table.insert(titleParts, string.format("ID: %s", table.concat(ids, ", ")))
     end
 
     return table.concat(titleParts, " - ")
@@ -167,7 +168,7 @@ function contextWindow.createContextMenu(selections, bestSelection)
         }
     }
 
-    local windowTitle = getWindowTitle(language, selections, targetItem, targetLayer)
+    local windowTitle = getWindowTitle(language, selections, bestSelection)
     local selectionForm = form.getForm(buttons, dummyData, {
         fields = fieldInformation,
         fieldOrder = fieldOrder
