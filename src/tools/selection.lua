@@ -340,6 +340,8 @@ local function getMoveCallback(room, layer, targets, offsetX, offsetY)
     return function()
         local redraw = false
 
+        tiles.beforeSelectionChanges(room, targets)
+
         for _, item in ipairs(targets) do
             local moved = selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
 
@@ -372,6 +374,8 @@ local function getRotationCallback(room, layer, targets, direction)
     return function()
         local redraw = false
 
+        tiles.beforeSelectionChanges(room, targets)
+
         for _, item in ipairs(targets) do
             local rotated = selectionItemUtils.rotateSelection(room, layer, item, direction)
 
@@ -387,6 +391,8 @@ end
 local function getFlipCallback(room, layer, targets, horizontal, vertical)
     return function()
         local redraw = false
+
+        tiles.beforeSelectionChanges(room, targets)
 
         for _, item in ipairs(targets) do
             local flipped = selectionItemUtils.flipSelection(room, layer, item, horizontal, vertical)
