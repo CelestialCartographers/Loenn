@@ -223,8 +223,8 @@ function tiles.selectionsChanged(selections)
     end
 end
 
-local function restoreBackingAreas(room, layer, targets)
-    local backingMatrix = backingMatrices[layer]
+local function restoreBackingAreas(room, layer, targets, matrices)
+    local backingMatrix = matrices and matrices[layer] or backingMatrices[layer]
 
     for _, target in ipairs(targets) do
         if target.layer == layer then
@@ -237,12 +237,16 @@ local function restoreBackingAreas(room, layer, targets)
 end
 
 -- Prepare for tile based changes in needed
-function tiles.beforeSelectionChanges(room, targets)
+function tiles.beforeSelectionChanges(room, targets, matrices)
     for _, layer in ipairs(tiles.tileLayers) do
         if room and backingMatrices[layer] then
-            restoreBackingAreas(room, layer, targets)
+            restoreBackingAreas(room, layer, targets, matrices)
         end
     end
+end
+
+function tiles.getBackingMatrices(targets)
+    return table.shallowcopy(backingMatrices)
 end
 
 return tiles

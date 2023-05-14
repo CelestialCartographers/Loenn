@@ -337,10 +337,12 @@ local function drawAxisBoundMovement(room)
 end
 
 local function getMoveCallback(room, layer, targets, offsetX, offsetY)
+    local backingMatrices = tiles.getBackingMatrices(targets)
+
     return function()
         local redraw = false
 
-        tiles.beforeSelectionChanges(room, targets)
+        tiles.beforeSelectionChanges(room, targets, backingMatrices)
 
         for _, item in ipairs(targets) do
             local moved = selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
@@ -371,10 +373,12 @@ local function getResizeCallback(room, layer, targets, offsetX, offsetY, directi
 end
 
 local function getRotationCallback(room, layer, targets, direction)
+    local backingMatrices = tiles.getBackingMatrices(targets)
+
     return function()
         local redraw = false
 
-        tiles.beforeSelectionChanges(room, targets)
+        tiles.beforeSelectionChanges(room, targets, backingMatrices)
 
         for _, item in ipairs(targets) do
             local rotated = selectionItemUtils.rotateSelection(room, layer, item, direction)
@@ -389,10 +393,12 @@ local function getRotationCallback(room, layer, targets, direction)
 end
 
 local function getFlipCallback(room, layer, targets, horizontal, vertical)
+    local backingMatrices = tiles.getBackingMatrices(targets)
+
     return function()
         local redraw = false
 
-        tiles.beforeSelectionChanges(room, targets)
+        tiles.beforeSelectionChanges(room, targets, backingMatrices)
 
         for _, item in ipairs(targets) do
             local flipped = selectionItemUtils.flipSelection(room, layer, item, horizontal, vertical)
