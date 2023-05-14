@@ -337,8 +337,12 @@ local function drawAxisBoundMovement(room)
 end
 
 local function getMoveCallback(room, layer, targets, offsetX, offsetY)
+    local backingMatrices = tiles.getBackingMatrices(targets)
+
     return function()
         local redraw = false
+
+        tiles.beforeSelectionChanges(room, targets, backingMatrices)
 
         for _, item in ipairs(targets) do
             local moved = selectionItemUtils.moveSelection(room, layer, item, offsetX, offsetY)
@@ -369,8 +373,12 @@ local function getResizeCallback(room, layer, targets, offsetX, offsetY, directi
 end
 
 local function getRotationCallback(room, layer, targets, direction)
+    local backingMatrices = tiles.getBackingMatrices(targets)
+
     return function()
         local redraw = false
+
+        tiles.beforeSelectionChanges(room, targets, backingMatrices)
 
         for _, item in ipairs(targets) do
             local rotated = selectionItemUtils.rotateSelection(room, layer, item, direction)
@@ -385,8 +393,12 @@ local function getRotationCallback(room, layer, targets, direction)
 end
 
 local function getFlipCallback(room, layer, targets, horizontal, vertical)
+    local backingMatrices = tiles.getBackingMatrices(targets)
+
     return function()
         local redraw = false
+
+        tiles.beforeSelectionChanges(room, targets, backingMatrices)
 
         for _, item in ipairs(targets) do
             local flipped = selectionItemUtils.flipSelection(room, layer, item, horizontal, vertical)
@@ -473,7 +485,7 @@ local function addNode(room, layer, targets)
                 -- Make sure selection nodes for the target is correct
                 for _, target in ipairs(targets) do
                     if target.item == item then
-                        if target.node >= node then
+                        if target.node > node then
                             target.node += 1
                         end
                     end
@@ -484,7 +496,12 @@ local function addNode(room, layer, targets)
 
                 -- Nodes are off by one here since the main entity would be the first rectangle
                 -- We also insert after the target node, meaning the total offset is two
-                table.insert(newTargets, rectangles[node + 2])
+                local nodeRectangle = rectangles[node + 2]
+
+                nodeRectangle.item = item
+                nodeRectangle.node = node + 1
+
+                table.insert(newTargets, nodeRectangle)
 
                 redraw = true
             end

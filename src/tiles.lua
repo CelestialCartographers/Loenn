@@ -120,9 +120,6 @@ function tiles.moveSelection(room, layer, selection, offsetX, offsetY)
     local needsChanges = deltaX ~= 0 or deltaY ~= 0
 
     if needsChanges then
-        local backingSlice = backingMatrices[layer]:getSlice(tileStartX, tileStartY, tileStopX, tileStopY)
-
-        brushHelper.placeTile(room, tileStartX, tileStartY, backingSlice, layer)
         brushHelper.placeTile(room, tileStartX + deltaX, tileStartY + deltaY, selection.item, layer)
     end
 
@@ -132,15 +129,15 @@ end
 function tiles.rotateSelection(room, layer, selection, direction)
     local matrix = selection.item
     local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, selection)
-    local backingSlice = backingMatrices[layer]:getSlice(tileStartX, tileStartY, tileStopX, tileStopY)
 
     local rotated = matrix:rotate(direction)
     local width, height = rotated:size()
 
-    brushHelper.placeTile(room, tileStartX, tileStartY, backingSlice, layer)
     brushHelper.placeTile(room, tileStartX, tileStartY, rotated, layer)
 
     selection.width, selection.height = width * 8, height * 8
+
+    return true
 end
 
 function tiles.deleteSelection(room, layer, selection)
@@ -157,6 +154,8 @@ function tiles.flipSelection(room, layer, selection, horizontal, vertical)
 
     matrix:flip(horizontal, vertical)
     brushHelper.placeTile(room, tileStartX, tileStartY, matrix, layer)
+
+    return true
 end
 
 function tiles.getSelectionFromRectangle(room, layer, rectangle)
@@ -168,6 +167,9 @@ function tiles.getSelectionFromRectangle(room, layer, rectangle)
         selection.item = matrix:getSlice(tileStartX, tileStartY, tileStopX, tileStopY, "0")
         selection.layer = layer
         selection.node = 0
+
+        selection.item.x = selection.x
+        selection.item.y = selection.y
     end
 
     return selection
@@ -215,9 +217,36 @@ function tiles.selectionsChanged(selections)
     local room = loadedState.getSelectedRoom()
 
     if room then
-        updateBackingMatrix(room, "tilesFg", selections)
-        updateBackingMatrix(room, "tilesBg", selections)
+        for _, layer in ipairs(tiles.tileLayers) do
+            updateBackingMatrix(room, layer, selections)
+        end
     end
+end
+
+local function restoreBackingAreas(room, layer, targets, matrices)
+    local backingMatrix = matrices and matrices[layer] or backingMatrices[layer]
+
+    for _, target in ipairs(targets) do
+        if target.layer == layer then
+            local startX, startY, stopX, stopY = getRectanglePoints(room, target)
+            local slice = backingMatrix:getSlice(startX, startY, stopX, stopY)
+
+            brushHelper.placeTile(room, startX, startY, slice, layer)
+        end
+    end
+end
+
+-- Prepare for tile based changes in needed
+function tiles.beforeSelectionChanges(room, targets, matrices)
+    for _, layer in ipairs(tiles.tileLayers) do
+        if room and backingMatrices[layer] then
+            restoreBackingAreas(room, layer, targets, matrices)
+        end
+    end
+end
+
+function tiles.getBackingMatrices(targets)
+    return table.shallowcopy(backingMatrices)
 end
 
 return tiles

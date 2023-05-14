@@ -604,7 +604,7 @@ function triggers.ignoredFieldsMultiple(layer, trigger)
         return utils.callIfFunction(handler.ignoredFieldsMultiple, trigger)
 
     else
-        return {"x", "y"}
+        return {"x", "y", "width", "height", "nodes"}
     end
 end
 
