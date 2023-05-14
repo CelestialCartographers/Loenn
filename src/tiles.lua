@@ -167,6 +167,9 @@ function tiles.getSelectionFromRectangle(room, layer, rectangle)
         selection.item = matrix:getSlice(tileStartX, tileStartY, tileStopX, tileStopY, "0")
         selection.layer = layer
         selection.node = 0
+
+        selection.item.x = selection.x
+        selection.item.y = selection.y
     end
 
     return selection
