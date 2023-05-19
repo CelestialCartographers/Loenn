@@ -121,6 +121,11 @@ ui.colorPicker.fieldTypes.description.hexColor=Hexadecimal representation of the
 ui.colorPicker.fieldTypes.description.alpha=Alpha value of the colour, between 0 and 255.
 
 
+# User Input Capturing
+ui.userInput.capturing=Capturing...
+ui.userInput.noValue=Not configured
+
+
 # Forms
 forms.fieldTypes.unknown_type.label=Unknown field for type '%s' in field '%s'
 
