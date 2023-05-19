@@ -58,6 +58,32 @@ function selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
     return rectangles
 end
 
+function selectionUtils.updateSelectionRectangles(room, selections)
+    local seenItemsSelections = {}
+
+    for _, selection in ipairs(selections) do
+        local layer = selection.layer
+        local item = selection.item
+        local node = selection.node
+
+        if not seenItemsSelections[item] then
+            seenItemsSelections[item] = selectionUtils.getSelectionsForItem(room, layer, item)
+        end
+
+        -- Main selection is node 0, offset by 1
+        local itemSelections = seenItemsSelections[item]
+        local targetSelection = itemSelections[node + 1]
+
+        if targetSelection then
+            selection.x = targetSelection.x
+            selection.y = targetSelection.y
+
+            selection.width = targetSelection.width
+            selection.height = targetSelection.height
+        end
+    end
+end
+
 function selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
     rectangles = rectangles or {}
 
