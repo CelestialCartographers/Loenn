@@ -66,6 +66,7 @@ local function openFileDialog(textField, options)
         end
 
         textField:setText(filename)
+        textField.index = #filename
     end
 
     if useFolderDialog then
