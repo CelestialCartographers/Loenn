@@ -42,4 +42,33 @@ function keyboard.modifierHeld(modifier)
     return false
 end
 
+function keyboard.activatorModifierString(key)
+    local parts = {}
+
+    if keyboard.modifierGUI() then
+        if love.system.getOS() == "OS X" then
+            table.insert(parts, "cmd")
+
+        else
+            table.insert(parts, "winkey")
+        end
+    end
+
+    if keyboard.modifierControl() then
+        table.insert(parts, "ctrl")
+    end
+
+    if keyboard.modifierAlt() then
+        table.insert(parts, "alt")
+    end
+
+    if keyboard.modifierShift() then
+        table.insert(parts, "shift")
+    end
+
+    table.insert(parts, key)
+
+    return table.concat(parts, " + ")
+end
+
 return keyboard
