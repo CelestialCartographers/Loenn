@@ -15,6 +15,7 @@ local toolUtils = require("tool_utils")
 local notifications = require("ui.notification")
 local formUtils = require("ui.utils.forms")
 local tiles = require("tiles")
+local selectionUtils = require("selections")
 
 local contextWindow = {}
 
@@ -86,14 +87,11 @@ function contextWindow.saveChangesCallback(selections, dummyData)
             for k, v in pairs(newData) do
                 item[k] = v
             end
-
-            redraw[layer] = true
         end
 
         if room then
-            for layer, _ in pairs(redraw) do
-                toolUtils.redrawTargetLayer(room, layer)
-            end
+            selectionUtils.updateSelectionRectangles(room, selections)
+            selectionUtils.redrawTargetLayers(room, selections)
         end
     end
 end
