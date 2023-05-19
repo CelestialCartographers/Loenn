@@ -160,6 +160,13 @@ function contextWindow.createContextMenu(selections, bestSelection)
     end
 
     local dummyData, fieldInformation, fieldOrder = prepareFormData(selections, bestSelection, language)
+    local keyCount = utils.countKeys
+
+    -- Window would be empty, nothing to show
+    if utils.countKeys(dummyData) == 0 then
+        return
+    end
+
     local buttons = {
         {
             text = tostring(language.ui.selection_context_window.save_changes),
