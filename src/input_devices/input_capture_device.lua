@@ -2,7 +2,7 @@ local keyboardHelper = require("utils.keyboard")
 
 local inputCaptureDevice = {}
 
-local DEFAULT_TIMEOUT = 10
+local DEFAULT_TIMEOUT = 5
 
 inputCaptureDevice._capturing = false
 inputCaptureDevice._captureTime = 0
@@ -10,7 +10,14 @@ inputCaptureDevice._captureMode = nil
 inputCaptureDevice._captureCallback = nil
 
 function inputCaptureDevice.update(dt)
-    inputCaptureDevice._captureTime = math.max(0, inputCaptureDevice._captureTime - dt)
+    if inputCaptureDevice._capturing then
+        inputCaptureDevice._captureTime = math.max(0, inputCaptureDevice._captureTime - dt)
+
+        if inputCaptureDevice._captureTime == 0 then
+            inputCaptureDevice._captureCallback(false)
+        end
+    end
+
     inputCaptureDevice._capturing = inputCaptureDevice._captureTime > 0
 end
 
