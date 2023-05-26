@@ -502,12 +502,13 @@ function entities.drawSelected(room, layer, entity, color)
             local previousX, previousY = entityRenderX, entityRenderY
 
             for i, node in ipairs(nodes) do
+                local lineOffsetX, lineOffsetY = entities.nodeLineRenderOffset(layer, entity, node, i)
                 local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i)
 
                 if nodeDrawable then
                     if nodeLineRenderType then
                         local nodeX, nodeY = node.x or 0, node.y or 0
-                        local nodeRenderX, nodeRenderY = nodeX + halfWidth, nodeY + halfHeight
+                        local nodeRenderX, nodeRenderY = nodeX + lineOffsetX, nodeY + lineOffsetY
 
                         drawing.callKeepOriginalColor(function()
                             love.graphics.setColor(color)
@@ -1114,6 +1115,23 @@ function entities.nodeLineRenderType(layer, entity)
 
     else
         return false
+    end
+end
+
+function entities.nodeLineRenderOffset(layer, entity, node, nodeIndex)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.nodeLineRenderOffset then
+        if utils.isCallable(handler.nodeLineRenderOffset) then
+            return handler.nodeLineRenderOffset(entity, node, nodeIndex)
+
+        else
+            return unpack(handler.nodeLimits)
+        end
+
+    else
+        return (entity.width or 0) / 2, (entity.height or 0) / 2
     end
 end
 
