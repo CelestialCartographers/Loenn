@@ -10,6 +10,7 @@ local configs = require("configs")
 local colors = require("consts.colors")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
+local keyboardHelper = require("utils.keyboard")
 
 local roomStruct = require("structs.room")
 local fillerStruct = require("structs.filler")
@@ -25,6 +26,7 @@ local targetType
 local previousCursor
 
 local triangleColor = colors.resizeTriangleColor
+local triangleWarningColor = colors.resizeBelowRecommendedTriangleColor
 local triangleHeight = 16
 local triangleOffset = 20
 
@@ -139,6 +141,24 @@ local function getItemStruct(itemType)
     end
 end
 
+local function getTriangleColor(itemType, width, height)
+    local precisionModifierHeld = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+    local color = triangleColor
+
+    -- Use warning color if below recommended minimum size for rooms or to indicate precision resize
+    if itemType == "room" then
+        if width < roomStruct.recommendedMinimumWidth or height < roomStruct.recommendedMinimumHeight then
+            color = triangleWarningColor
+        end
+
+        if precisionModifierHeld and (dragging or draggingPreview) then
+            color = triangleWarningColor
+        end
+    end
+
+    return color
+end
+
 function roomResizer.draw()
     local item, itemType = loadedState.getSelectedItem()
 
@@ -149,12 +169,14 @@ function roomResizer.draw()
         local x, y = itemStruct.getPosition(item)
         local width, height = itemStruct.getSize(item)
 
+        local color = getTriangleColor(itemType, width, height)
+
         love.graphics.push()
 
         love.graphics.translate(math.floor(x * viewport.scale - viewport.x), math.floor(y * viewport.scale - viewport.y))
 
         drawing.callKeepOriginalColor(function()
-            love.graphics.setColor(triangleColor)
+            love.graphics.setColor(color)
 
             for i, point in ipairs(getTrianglePoints(x, y, width, height, viewport.scale)) do
                 local dx, dy, theta = point[1], point[2], point[3]
@@ -205,6 +227,8 @@ function roomResizer.mousereleased(x, y, button, istouch, presses)
         madeChanges = false
     end
 
+    updateCursor()
+
     return consume
 end
 
@@ -224,6 +248,7 @@ function roomResizer.mousemoved(x, y, dx, dy, istouch)
             local deltaX, deltaY = tileX - startX, tileY - startY
 
             if deltaX ~= 0 or deltaY ~= 0 then
+                local precisionModifierHeld = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
                 local resizeHorizontal, resizeVertical = getResizeDirections(dragging)
 
                 deltaX, deltaY = fixDeltas(resizeHorizontal, resizeVertical, deltaX, deltaY)
@@ -231,13 +256,22 @@ function roomResizer.mousemoved(x, y, dx, dy, istouch)
                 local newWidth = width + deltaX * 8
                 local newHeight = height + deltaY * 8
 
-                if resizeHorizontal and deltaX ~= 0 and (newWidth >= itemStruct.recommendedMinimumWidth or deltaX > 0) then
+                local newWidthAllowed = newWidth >= itemStruct.recommendedMinimumWidth
+                local newHeightAllowed = newHeight >= itemStruct.recommendedMinimumHeight
+
+                -- Allow any sensible size if precision modifier is held
+                if precisionModifierHeld then
+                    newWidthAllowed = newWidth >= 8
+                    newHeightAllowed = newHeight >= 8
+                end
+
+                if resizeHorizontal and deltaX ~= 0 and (newWidthAllowed or deltaX > 0) then
                     madeChanges = true
 
                     itemStruct.directionalResize(item, resizeHorizontal, deltaX)
                 end
 
-                if resizeVertical and deltaY ~= 0 and (newHeight >= itemStruct.recommendedMinimumHeight or deltaY > 0) then
+                if resizeVertical and deltaY ~= 0 and (newHeightAllowed or deltaY > 0) then
                     madeChanges = true
 
                     itemStruct.directionalResize(item, resizeVertical, deltaY)

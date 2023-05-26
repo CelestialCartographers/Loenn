@@ -64,6 +64,7 @@ colors.placementPreviewAlpha = 0.65
 
 -- Resize arrows device
 colors.resizeTriangleColor = {196 / 255, 196 / 255, 196 / 255}
+colors.resizeBelowRecommendedTriangleColor = {224 / 255, 96 / 255, 96 / 255}
 
 -- Default color
 colors.default = {255 / 255, 255 / 255, 255 / 255}
