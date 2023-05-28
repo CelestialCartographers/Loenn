@@ -14,6 +14,8 @@ local languageRegistry = require("language_registry")
 local toolHandler = require("tools")
 local toolUtils = require("tool_utils")
 local persistence = require("persistence")
+local textSearching = require("utils.text_search")
+local utils = require("utils")
 
 local toolWindow = {}
 
@@ -90,10 +92,98 @@ local function materialSortFunction(lhs, rhs)
         return lhs.itemFavorited
     end
 
+    if lhs.sortingScore ~= rhs.sortingScore then
+        return lhs.sortingScore > rhs.sortingScore
+    end
+
     local lhsText = lhs.originalText or lhs.text
     local rhsText = rhs.originalText or rhs.text
 
     return lhsText < rhsText
+end
+
+-- TODO - Config for text vs textNoMods?
+-- TODO - Config for disabling scoring, plain filtering
+local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
+    local totalScore = 0
+
+    for _, part in ipairs(searchParts) do
+        local mode = part.mode
+        local search = part.text
+
+        if mode == "name" then
+            local text = item.textNoMods
+            local score = textSearching.searchScore(text, search, caseSensitive, fuzzy)
+
+            if score then
+                totalScore += score
+            end
+
+        elseif mode == "modName" then
+            local associatedMods = item.associatedMods
+
+            if associatedMods then
+                for _, modName in ipairs(associatedMods) do
+                    local score = textSearching.searchScore(modName, search, caseSensitive, fuzzy)
+
+                    if score then
+                        totalScore += score
+                    end
+                end
+            end
+        end
+    end
+
+    return totalScore
+end
+
+-- TODO - Config for case sensitivity (always, never, contextual)
+-- TODO - Config for fuzzy
+local function prepareMaterialSearch(search)
+    local parts = {}
+    local searchStringParts = search:split("|")()
+
+    -- Consider the search case sensitive if it contains any uppercase characters
+    local caseSensitive = search ~= search:lower()
+
+    for _, searchPart in ipairs(searchStringParts) do
+        if utils.startsWith(searchPart, "@") then
+            table.insert(parts, {
+                mode = "modName",
+                text = string.sub(searchPart, 2)
+            })
+
+        else
+            table.insert(parts, {
+                mode = "name",
+                text = searchPart
+            })
+        end
+    end
+
+    -- Remove empty entries, just causes issues
+    for i = #parts, 1, -1 do
+        if #parts[i].text == 0 then
+            table.remove(parts, i)
+        end
+    end
+
+    return parts, caseSensitive, false
+end
+
+local function materialFilterItems(items, search)
+    local filtered = {}
+    local searchParts, caseSensitive, fuzzy = prepareMaterialSearch(search)
+
+    for _, item in ipairs(items) do
+        item.sortingScore = getMaterialScore(item, searchParts, caseSensitive, fuzzy)
+
+        if item.sortingScore then
+            table.insert(filtered, item)
+        end
+    end
+
+    return filtered
 end
 
 local function updateFavorite(materialList, itemData, tool, layer, material, favorite)
@@ -189,11 +279,13 @@ local function getMaterialItems(layer)
     for i, material in ipairs(materials or {}) do
         local materialTooltip
         local materialText = material
+        local materialTextNoMods = material
         local materialData = material
         local materialType = type(material)
 
         if materialType == "table" then
             materialText = material.displayName or material.name
+            materialTextNoMods = material.displayNameNoMods or materialText
             materialData = material.name
             materialTooltip = material.tooltipText
         end
@@ -201,11 +293,13 @@ local function getMaterialItems(layer)
         local itemFavorited = not not favoritesLookup[materialData]
         local item = {
             text = materialText,
+            textNoMods = materialTextNoMods,
             data = materialData,
             tooltip = materialTooltip,
             itemFavorited = itemFavorited,
-            currentToolName = currentTool,
-            currentLayer = currentLayer
+            currentToolName = currentTool.name,
+            currentLayer = currentLayer,
+            associatedMods = material.associatedMods
         }
 
         table.insert(materialItems, item)
@@ -473,6 +567,7 @@ function toolWindow.getWindow()
         initialItem = toolHandler.getMaterial(),
         dataToElement = materialDataToElement,
         sortingFunction = materialSortFunction,
+        filterItems = materialFilterItems,
         sort = true
     }
 
