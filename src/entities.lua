@@ -940,6 +940,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
 
     local associatedMods = placementInfo.associatedMods or entities.associatedMods(itemTemplate)
     local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
+    local displayNameNoMods = displayName
 
     if modsString then
         displayName = string.format("%s %s", displayName, modsString)
@@ -948,6 +949,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
     local placement = {
         name = simpleName,
         displayName = displayName,
+        displayNameNoMods = displayNameNoMods,
         tooltipText = tooltipText,
         layer = "entities",
         placementType = placementType,
