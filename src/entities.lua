@@ -259,6 +259,40 @@ function entities.getNodeDrawableUnsafe(name, handler, room, entity, node, nodeI
     elseif handler.nodeDraw then
         return drawableFunction.fromFunction(handler.nodeDraw, room, entity, node, nodeIndex, viewport)
 
+    elseif handler.nodeRectangle then
+        local rectangle = handler.nodeRectangle(room, entity, node, nodeIndex, viewport)
+        local drawableSprites
+
+        local bothNodeColors = handler.nodeFillColor and handler.nodeBorderColor
+        local fillColorFunction = bothNodeColors and handler.nodeFillColor or handler.fillColor
+        local borderColorFunction = bothNodeColors and handler.nodeBorderColor or handler.borderColor
+
+        -- If both fillColor and borderColor is specified then make a rectangle with these
+        if fillColorFunction and borderColorFunction then
+            local fillColor = utils.callIfFunction(fillColorFunction, room, entity, node, nodeIndex)
+            local borderColor = utils.callIfFunction(borderColorFunction, room, entity, node, nodeIndex)
+
+            drawableSprites = drawableRectangle.fromRectangle("bordered", rectangle, fillColor, borderColor):getDrawableSprite()
+
+        else
+            local colorFunction = handler.nodeColor or handler.color
+            local color = utils.callIfFunction(colorFunction, room, entity, node, nodeIndex)
+
+            drawableSprites = drawableRectangle.fromRectangle(handler.nodeMode or handler.mode or "fill", rectangle, color or colors.default)
+        end
+
+        -- Add depth to sprite(s)
+        if utils.typeof(drawableSprites) == "table" then
+            for _, sprite in ipairs(drawableSprites) do
+                sprite.depth = defaultDepth
+            end
+
+        else
+            drawableSprites.defaultDepth = defaultDepth
+        end
+
+        return drawableSprites
+
     else
         -- Make a copy of entity and change the position to the node
         -- This makes it correctly render and select at the node rather than main entity
@@ -468,12 +502,13 @@ function entities.drawSelected(room, layer, entity, color)
             local previousX, previousY = entityRenderX, entityRenderY
 
             for i, node in ipairs(nodes) do
+                local lineOffsetX, lineOffsetY = entities.nodeLineRenderOffset(layer, entity, node, i)
                 local nodeDrawable = entities.getNodeDrawable(name, handler, room, entity, node, i)
 
                 if nodeDrawable then
                     if nodeLineRenderType then
                         local nodeX, nodeY = node.x or 0, node.y or 0
-                        local nodeRenderX, nodeRenderY = nodeX + halfWidth, nodeY + halfHeight
+                        local nodeRenderX, nodeRenderY = nodeX + lineOffsetX, nodeY + lineOffsetY
 
                         drawing.callKeepOriginalColor(function()
                             love.graphics.setColor(color)
@@ -1080,6 +1115,23 @@ function entities.nodeLineRenderType(layer, entity)
 
     else
         return false
+    end
+end
+
+function entities.nodeLineRenderOffset(layer, entity, node, nodeIndex)
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler and handler.nodeLineRenderOffset then
+        if utils.isCallable(handler.nodeLineRenderOffset) then
+            return handler.nodeLineRenderOffset(entity, node, nodeIndex)
+
+        else
+            return unpack(handler.nodeLimits)
+        end
+
+    else
+        return (entity.width or 0) / 2, (entity.height or 0) / 2
     end
 end
 

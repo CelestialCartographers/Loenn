@@ -132,6 +132,15 @@ local function dragFinished()
             placeItemWithHistory(room)
             toolUtils.redrawTargetLayer(room, tool.layer)
         end
+
+        if placementType == "rectangle" then
+            -- Reset rectangle template to minimum size
+            local item = placementTemplate.item
+            local minimumWidth, minimumHeight = placementUtils.minimumSize(room, tool.layer, item)
+
+            item.width = item.width and minimumWidth
+            item.height = item.height and minimumHeight
+        end
     end
 
     placementDragCompleted = true
@@ -205,10 +214,14 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
 
     local resizeWidth, resizeHeight = placementUtils.canResize(room, layer, item)
     local minimumWidth, minimumHeight = placementUtils.minimumSize(room, layer, item)
+    local maximumWidth, maximumHeight = placementUtils.maximumSize(room, layer, item)
 
     local gridSize = placementUtils.getGridSize()
-    local itemWidth = math.max(dragging and placementRectangle.width or gridSize, minimumWidth or gridSize)
-    local itemHeight = math.max(dragging and placementRectangle.height or gridSize, minimumHeight or gridSize)
+    local itemWidthRaw = dragging and placementRectangle.width or gridSize
+    local itemHeightRaw = dragging and placementRectangle.height or gridSize
+
+    local itemWidth = utils.clamp(itemWidthRaw, minimumWidth or gridSize, maximumWidth)
+    local itemHeight = utils.clamp(itemHeightRaw, minimumHeight or gridSize, maximumHeight)
 
     -- Always update when not dragging
     if not dragging then
@@ -222,9 +235,11 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
 
     -- When dragging only update the x position if we have width
     if resizeWidth and item.width then
-        if dragging and itemX ~= item.x or itemWidth ~= item.width then
-            item.x = itemX
-            item.width = itemWidth
+        if dragging and (itemX ~= item.x or itemWidth ~= item.width) then
+            if itemWidthRaw <= maximumWidth then
+                item.x = itemX
+                item.width = itemWidth
+            end
 
             needsUpdate = true
         end
@@ -232,9 +247,11 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
 
     -- When dragging only update the y position if we have height
     if resizeHeight and item.height then
-        if not dragging and itemY ~= item.y or itemHeight ~= item.height then
-            item.y = itemY
-            item.height = itemHeight
+        if dragging and (itemY ~= item.y or itemHeight ~= item.height) then
+            if itemHeightRaw <= maximumHeight then
+                item.y = itemY
+                item.height = itemHeight
+            end
 
             needsUpdate = true
         end
