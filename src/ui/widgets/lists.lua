@@ -4,29 +4,23 @@ local uiUtils = require("ui.utils")
 
 local widgetUtils = require("ui.widgets.utils")
 
+local textSearching = require("utils.text_search")
+
 local listWidgets = {}
 
 local function calculateWidth(orig, element)
     return element.inner.width
 end
 
-local function filterItems(items, search, caseSensitive)
+local function defaultFilterItems(items, search, caseSensitive, fuzzy)
     local filtered = {}
-
-    if caseSensitive ~= false then
-        search = search:lower()
-    end
 
     for _, item in ipairs(items) do
         local text = item.text
         local textType = type(text)
 
         if textType == "string" then
-            if caseSensitive ~= false then
-                text = text:lower()
-            end
-
-            if text:contains(search) then
+            if textSearching.contains(text, search, caseSensitive, fuzzy) then
                 table.insert(filtered, item)
             end
 
@@ -347,6 +341,7 @@ end
 
 function listWidgets.updateItems(list, items, target, fromFilter, preventCallback, callbackRequiresChange, forceSort)
     local options = list.options
+    local filterItems = options.filterItems or defaultFilterItems
     local previousSelection = list.selected and list.selected.data
     local newSelection
 
@@ -408,7 +403,7 @@ end
 
 local function filterList(list, search)
     local unfilteredItems = list.unfilteredItems
-    local filteredItems = filterItems(unfilteredItems, search)
+    local filteredItems = list.filterItems(unfilteredItems, search)
 
     listWidgets.updateItems(list, filteredItems, nil, true, false, true)
 end
@@ -470,6 +465,8 @@ local function getListCommon(magicList, callback, items, options)
     options = options or {}
     items = items or {}
 
+    local filterItems = options.filterItems or defaultFilterItems
+
     if options.sort then
         sortItems(options, items)
     end
@@ -480,6 +477,7 @@ local function getListCommon(magicList, callback, items, options)
     local list
     local listData = {
         unfilteredItems = items,
+        filterItems = filterItems,
         minWidth = options.minimumWidth or 128,
         draggable = options.draggable or false,
         draggableTag = options.draggableTag or false
