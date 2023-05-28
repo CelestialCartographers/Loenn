@@ -308,6 +308,7 @@ function decals.getPlacements(layer, specificMods)
         local displayName = nameNoDecalsPrefix
         local associatedMods = fromMods[i]
         local modsString = mods.formatAssociatedMods(language, associatedMods)
+        local displayNameNoMods = displayName
 
         if modsString then
             displayName = string.format("%s %s", displayName, modsString)
@@ -328,6 +329,7 @@ function decals.getPlacements(layer, specificMods)
         placements[i] = {
             name = name,
             displayName = displayName,
+            displayNameNoMods = displayNameNoMods,
             layer = layer,
             placementType = "point",
             itemTemplate = itemTemplate,
