@@ -73,6 +73,11 @@ end
 
 local function callWithSnapshot(functionName, itemType, item, ...)
     local itemStruct = itemStructs[itemType]
+
+    if not item or not itemStruct then
+        return
+    end
+
     local func = itemStruct[functionName]
     local snapshotFunction = snapshotFunctions[itemType]
 
