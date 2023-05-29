@@ -18,7 +18,7 @@ function widgetUtils.setWindowTitle(window, title)
     end
 end
 
-function widgetUtils.addWindowCloseButton(window)
+function widgetUtils.addWindowCloseButton(window, callback)
     if window and window.titlebar then
         local titlebar = window.titlebar
         local labelFontHeight = window.titlebar.label.style.font:getHeight(" ")
@@ -36,7 +36,12 @@ function widgetUtils.addWindowCloseButton(window)
         -- Adjust padding to match titlebar height
         closeButton.style.padding += math.floor(deltaHeight / 2)
         closeButton.cb = function()
-            window:removeSelf()
+            if callback then
+                callback(window)
+
+            else
+                window:removeSelf()
+            end
         end
 
         table.insert(titlebar.children, closeButton)
@@ -177,6 +182,15 @@ function widgetUtils.cursorDeltaFromElementCenter(element, x, y)
     local elementWidth, elementHeight = element.width, element.height
 
     return x - elementX - elementWidth / 2, y - elementY - elementHeight / 2
+end
+
+function widgetUtils.centerWindow(window, parent)
+    parent = parent or ui.root
+
+    local x = math.floor((parent.width - window.width) / 2)
+    local y = math.floor((parent.height - window.height) / 2)
+
+    widgetUtils.moveWindow(window, x, y, 0, 0, 0)
 end
 
 return widgetUtils

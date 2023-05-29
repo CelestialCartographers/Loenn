@@ -22,11 +22,10 @@ local configs = require("configs")
 local enums = require("consts.celeste_enums")
 local colors = require("consts.colors")
 
-local roomWindow = {}
+local windowPersister = require("ui.window_postition_persister")
+local windowPersisterName = "room_window"
 
-local activeWindows = {}
-local windowPreviousX = 0
-local windowPreviousY = 0
+local roomWindow = {}
 
 local songs = table.keys(enums.songs)
 local ambientSounds = table.keys(enums.ambient_sounds)
@@ -118,14 +117,6 @@ local roomWindowGroup = uiElements.group({}):with({
     editorRoomAdd = roomWindow.editorRoomAdd,
     editorRoomConfigure = roomWindow.editorRoomConfigure,
 })
-
-
-local function roomWindowUpdate(orig, self, dt)
-    orig(self, dt)
-
-    windowPreviousX = self.x
-    windowPreviousY = self.y
-end
 
 local saveRoomManualAttributesEditing = {
     width = true,
@@ -349,14 +340,6 @@ function roomWindow.createRoomWindow(room, editing)
     local language = languageRegistry.getLanguage()
     local windowTitle = getWindowTitle(language, room, editing)
 
-    local windowX = windowPreviousX
-    local windowY = windowPreviousY
-
-    -- Don't stack windows on top of each other
-    if #activeWindows > 0 then
-        windowX, windowY = 0, 0
-    end
-
     local fieldInformation = utils.deepcopy(defaultFieldInformation)
 
     local roomAttributes = language.room.attribute
@@ -393,18 +376,13 @@ function roomWindow.createRoomWindow(room, editing)
         ignoreUnordered = true
     })
 
-    window = uiElements.window(windowTitle, roomForm):with({
-        x = windowX,
-        y = windowY,
+    window = uiElements.window(windowTitle, roomForm)
 
-        updateHidden = true
-    }):hook({
-        update = roomWindowUpdate
-    })
+    local windowCloseCallback = windowPersister.getWindowCloseCallback(windowPersisterName)
 
-    table.insert(activeWindows, window)
+    windowPersister.trackWindow(windowPersisterName, window)
     roomWindowGroup.parent:addChild(window)
-    widgetUtils.addWindowCloseButton(window)
+    widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     form.prepareScrollableWindow(window)
 
     return window

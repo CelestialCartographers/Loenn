@@ -22,20 +22,18 @@ local collapsableWidget = require("ui.widgets.collapsable")
 local widgetUtils = require("ui.widgets.utils")
 local gridElement = require("ui.widgets.grid")
 
+local windowPersister = require("ui.window_postition_persister")
+local windowPersisterName = "dependency_window"
+
 local dependencyWindow = {}
 
-local activeWindows = {}
-local windowPreviousX = 0
-local windowPreviousY = 0
-
-local dependencyWindowGroup = uiElements.group({}):with({
-
-})
+local dependencyWindowGroup = uiElements.group({})
 
 local everestModName = "Everest"
 
 local function localizeModName(modName, language)
-    local language = language or languageRegistry.getLanguage()
+    language = language or languageRegistry.getLanguage()
+
     local modNameLanguage = language.mods[modName].name
 
     if modNameLanguage._exists then
@@ -419,28 +417,16 @@ function dependencyWindow.editDependencies(filename, side)
     }
 
     local layout = dependencyWindow.getWindowContent(modPath, side, interactionData)
-
-    local language = languageRegistry.getLanguage()
     local windowTitle = tostring(language.ui.dependency_window.window_title)
 
-    local windowX = windowPreviousX
-    local windowY = windowPreviousY
-
-    -- Don't stack windows on top of each other
-    if #activeWindows > 0 then
-        windowX, windowY = 0, 0
-    end
-
-    window = uiElements.window(windowTitle, layout):with({
-        x = windowX,
-        y = windowY
-    })
-
+    window = uiElements.window(windowTitle, layout)
     interactionData.window = window
 
-    table.insert(activeWindows, window)
+    local windowCloseCallback = windowPersister.getWindowCloseCallback(windowPersisterName)
+
+    windowPersister.trackWindow(windowPersisterName, window)
     dependencyWindowGroup.parent:addChild(window)
-    widgetUtils.addWindowCloseButton(window)
+    widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     window:with(widgetUtils.fillHeightIfNeeded())
 
     return window

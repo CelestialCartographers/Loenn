@@ -17,22 +17,15 @@ local formUtils = require("ui.utils.forms")
 local tiles = require("tiles")
 local selectionUtils = require("selections")
 
+local windowPersister = require("ui.window_postition_persister")
+local windowPersisterName = "selection_context_window"
+
 local contextWindow = {}
 
 local contextGroup
-local activeWindows = {}
-local windowPreviousX = 0
-local windowPreviousY = 0
 
 local function editorSelectionContextMenuCallback(group, selections, bestSelection)
     contextWindow.createContextMenu(selections, bestSelection)
-end
-
-local function contextWindowUpdate(orig, self, dt)
-    orig(self, dt)
-
-    windowPreviousX = self.x
-    windowPreviousY = self.y
 end
 
 local function getWindowTitle(language, selections, bestSelection)
@@ -141,14 +134,7 @@ end
 
 function contextWindow.createContextMenu(selections, bestSelection)
     local window
-    local windowX = windowPreviousX
-    local windowY = windowPreviousY
     local language = languageRegistry.getLanguage()
-
-    -- Don't stack windows on top of each other
-    if #activeWindows > 0 then
-        windowX, windowY = 0, 0
-    end
 
     -- Filter out selections that would end up making a mess
     selections = findCompatibleSelections(selections, bestSelection)
@@ -179,18 +165,13 @@ function contextWindow.createContextMenu(selections, bestSelection)
         fieldOrder = fieldOrder
     })
 
-    window = uiElements.window(windowTitle, selectionForm):with({
-        x = windowX,
-        y = windowY,
+    window = uiElements.window(windowTitle, selectionForm)
 
-        updateHidden = true
-    }):hook({
-        update = contextWindowUpdate
-    })
+    local windowCloseCallback = windowPersister.getWindowCloseCallback(windowPersisterName)
 
-    table.insert(activeWindows, window)
+    windowPersister.trackWindow(windowPersisterName, window)
     contextGroup.parent:addChild(window)
-    widgetUtils.addWindowCloseButton(window)
+    widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     form.prepareScrollableWindow(window)
 
     return window

@@ -22,17 +22,14 @@ local effectStruct = require("structs.effect")
 local formUtils = require("ui.utils.forms")
 local atlases = require("atlases")
 
+local windowPersister = require("ui.window_postition_persister")
+local windowPersisterName = "stylegrounds_window"
+
 local stylegroundWindow = {}
 
 local parallaxTextureOptions
 
-local activeWindows = {}
-local windowPreviousX = 0
-local windowPreviousY = 0
-
-local stylegroundWindowGroup = uiElements.group({}):with({
-
-})
+local stylegroundWindowGroup = uiElements.group({})
 
 -- TODO - Layouting variables that should be more dyanmic
 local PREVIEW_MAX_WIDTH = 320 * 3
@@ -882,9 +879,11 @@ function stylegroundWindow.editStylegrounds(map)
         height = WINDOW_STATIC_HEIGHT
     })
 
-    table.insert(activeWindows, window)
+    local windowCloseCallback = windowPersister.getWindowCloseCallback(windowPersisterName)
+
+    windowPersister.trackWindow(windowPersisterName, window)
     stylegroundWindowGroup.parent:addChild(window)
-    widgetUtils.addWindowCloseButton(window)
+    widgetUtils.addWindowCloseButton(window, windowCloseCallback)
 
     return window
 end
