@@ -100,7 +100,7 @@ end
 local function findListParent(element)
     local target = element
 
-    while target and (target.__type ~= "magicList" or target.__type ~= "list") do
+    while target and (target.__type ~= "magicList" and target.__type ~= "list") do
         target = target.parent
     end
 
@@ -110,7 +110,7 @@ end
 local function getListDropTarget(element, x, y)
     local elementList = findListParent(element)
 
-    if not elementList.draggable then
+    if not elementList or not elementList.draggable then
         return false, false, false
     end
 
@@ -149,6 +149,20 @@ local function moveListItem(fromList, fromListItem, toList, toListItem, fromInde
 
     local toChildren = toList.children or {}
     local fromChildren = fromList.children or {}
+
+    local shouldMove = true
+
+    if fromList.listItemDragged then
+        shouldMove = shouldMove and fromList.listItemDragged(fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
+    end
+
+    if not sameList and toList.listItemDragged then
+        shouldMove = shouldMove and toList.listItemDragged(fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
+    end
+
+    if shouldMove == false then
+        return false
+    end
 
     -- Make sure we don't shift around the indices when moving in same list
     if fromIndex < toIndex then
@@ -480,7 +494,8 @@ local function getListCommon(magicList, callback, items, options)
         filterItems = filterItems,
         minWidth = options.minimumWidth or 128,
         draggable = options.draggable or false,
-        draggableTag = options.draggableTag or false
+        draggableTag = options.draggableTag or false,
+        listItemDragged = options.listItemDragged
     }
 
     if magicList then

@@ -362,7 +362,17 @@ local function canMoveStyle(interactionData, offset)
     return false
 end
 
-local function moveStyle(interactionData, offset, moveUpButton, moveDownButton)
+local function updateMovementButtons(interactionData)
+    local moveUpButton = interactionData.movementButtonElements.up
+    local moveDownButton = interactionData.movementButtonElements.down
+
+    if moveUpButton and moveDownButton then
+        moveUpButton:formSetEnabled(canMoveStyle(interactionData, -1))
+        moveDownButton:formSetEnabled(canMoveStyle(interactionData, 1))
+    end
+end
+
+local function moveStyle(interactionData, offset)
     local styles, parent, index = findStyleInStylegrounds(interactionData)
 
     if parent and index then
@@ -377,10 +387,7 @@ local function moveStyle(interactionData, offset, moveUpButton, moveDownButton)
 
             listElement:reflow()
 
-            if moveUpButton and moveDownButton then
-                moveUpButton:formSetEnabled(canMoveStyle(interactionData, -1))
-                moveDownButton:formSetEnabled(canMoveStyle(interactionData, 1))
-            end
+            updateMovementButtons(interactionData)
         end
     end
 end
@@ -416,10 +423,13 @@ local function getDefaultListTarget()
     }
 end
 
-local function changeStyleForeground(interactionData, moveUpButton, moveDownButton)
+local function changeStyleForeground(interactionData)
     local listTarget = interactionData.listTarget
     local listElement = interactionData.stylegroundListElement
     local listItem, listIndex = findCurrentListItem(interactionData)
+
+    local moveUpButton = interactionData.movementButtonElements.up
+    local moveDownButton = interactionData.movementButtonElements.down
 
     local foreground = listTarget.foreground
     local foregroundCount = foregroundListItemCount(interactionData)
@@ -478,12 +488,15 @@ local function changeStyleForeground(interactionData, moveUpButton, moveDownButt
     listItem:onClick(0, 0, 1)
 end
 
-local function addNewStyle(interactionData, formFields, moveUpButton, moveDownButton)
+local function addNewStyle(interactionData, formFields)
     local listTarget = interactionData.listTarget
 
     local newStyle
     local currentStyle = listTarget.style
     local parentStyle = listTarget.parentStyle
+
+    local moveUpButton = interactionData.movementButtonElements.up
+    local moveDownButton = interactionData.movementButtonElements.down
 
     local listElement = interactionData.stylegroundListElement
     local foreground = listTarget.foreground
@@ -668,14 +681,17 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     local changeForegroundButton = {
         text = foreground and moveToBackgroundText or moveToForegroundText,
         callback = function(formFields)
-            changeStyleForeground(interactionData, movementButtonElements.up, movementButtonElements.down)
+            changeStyleForeground(interactionData)
         end
     }
+
+    interactionData.movementButtonElements = movementButtonElements
+
     local buttons = {
         {
             text = tostring(language.ui.styleground_window.form.new),
             callback = function(formFields)
-                addNewStyle(interactionData, formFields, movementButtonElements.up, movementButtonElements.down)
+                addNewStyle(interactionData, formFields)
             end
         },
         {
@@ -697,14 +713,14 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
             text = tostring(language.ui.styleground_window.form.move_up),
             enabled = canMoveStyle(interactionData, -1),
             callback = function(formFields)
-                moveStyle(interactionData, -1, movementButtonElements.up, movementButtonElements.down)
+                moveStyle(interactionData, -1)
             end
         },
         {
             text = tostring(language.ui.styleground_window.form.move_down),
             enabled = canMoveStyle(interactionData, 1),
             callback = function(formFields)
-                moveStyle(interactionData, 1, movementButtonElements.up, movementButtonElements.down)
+                moveStyle(interactionData, 1)
             end
         }
     }
@@ -761,11 +777,45 @@ function stylegroundWindow.updateStylegroundForm(interactionData)
     formContainer:addChild(newForm)
 end
 
+local function listItemDraggedHandler(interactionData)
+    return function(fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
+        local offset = toIndex - fromIndex
+
+        if toIndex > fromIndex then
+            offset -= 1
+        end
+
+        if offset ~= 0 then
+            local fakeInteractionData = table.shallowcopy(interactionData)
+
+            fakeInteractionData.listTarget = fromListItem.data
+            fakeInteractionData.stylegroundListElement = fromList
+
+            if canMoveStyle(fakeInteractionData, offset) then
+                moveStyle(fakeInteractionData, offset)
+            end
+
+            -- Force update movement buttons with the real data
+            -- We might have moved in a way that should disable/enable some buttons
+            updateMovementButtons(interactionData)
+        end
+
+        -- Manually update the list
+        return false
+    end
+end
+
 function stylegroundWindow.getStylegroundList(map, interactionData)
     local items = {}
 
     getStylegroundItems(map.stylesFg or {}, true, items)
     getStylegroundItems(map.stylesBg or {}, false, items)
+
+    local listOptions = {
+        initialItem = 1,
+        draggable = true,
+        listItemDragged = listItemDraggedHandler(interactionData)
+    }
 
     local column, list = listWidgets.getList(function(element, listItem)
         interactionData.listTarget = listItem
@@ -773,7 +823,7 @@ function stylegroundWindow.getStylegroundList(map, interactionData)
 
         stylegroundWindow.updateStylegroundForm(interactionData)
         stylegroundWindow.updateStylegroundPreview(interactionData)
-    end, items, {initialItem = 1})
+    end, items, listOptions)
 
     return column, list
 end
