@@ -13,21 +13,57 @@ local function calculateWidth(orig, element)
     return element.inner.width
 end
 
-local function defaultFilterItems(items, search, caseSensitive, fuzzy)
+local function getCaseSensitive(search)
+    local caseSensitive = configs.ui.searching.searchCaseSensitive
+
+    if caseSensitive == "contextual" then
+        caseSensitive = search ~= search:lower()
+
+    elseif type(caseSensitive) == "string" then
+        caseSensitive = caseSensitive == "always"
+    end
+
+    return caseSensitive
+end
+
+local function defaultFilterItems(items, search, options)
     local filtered = {}
 
-    for _, item in ipairs(items) do
-        local text = item.text
-        local textType = type(text)
+    local scoreFunction = options.searchScore or textSearching.searchScore
+    local searchPreprocessor = options.searchPreprocessor
 
-        if textType == "string" then
-            if textSearching.contains(text, search, caseSensitive, fuzzy) then
-                table.insert(filtered, item)
-            end
+    local fuzzy = configs.ui.searching.searchFuzzy
+    local caseSensitive = getCaseSensitive(search)
+
+    if searchPreprocessor then
+        search = searchPreprocessor(search, caseSensitive, fuzzy)
+    end
+
+    for _, item in ipairs(items) do
+        local score = nil
+
+        if options.searchRawItem then
+            score = scoreFunction(item, search, caseSensitive, fuzzy)
 
         else
-            -- Improve this for non string in the future
+            local text = item.text
+            local textType = type(text)
 
+            if textType == "string" then
+                score = scoreFunction(text, search, caseSensitive, fuzzy)
+
+                item._filterScore = score
+
+            else
+                -- Improve this for non string in the future
+
+                score = math.huge
+            end
+        end
+
+        item._filterScore = score
+
+        if score then
             table.insert(filtered, item)
         end
     end
@@ -342,6 +378,12 @@ local function addDraggableHooks(list)
 end
 
 local function defaultItemSort(lhs, rhs)
+    if configs.ui.searching.sortByScore then
+        if lhs._filterScore ~= rhs._filterScore then
+            return lhs._filterScore > rhs._filterScore
+        end
+    end
+
     return lhs.text < rhs.text
 end
 
@@ -369,7 +411,7 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
     if not fromFilter and list.searchField then
         local search = list.searchField:getText() or ""
 
-        processedItems = filterItems(processedItems, search)
+        processedItems = filterItems(processedItems, search, list.options)
     end
 
     for _, item in ipairs(processedItems) do
@@ -418,7 +460,7 @@ end
 
 local function filterList(list, search)
     local unfilteredItems = list.unfilteredItems
-    local filteredItems = list.filterItems(unfilteredItems, search)
+    local filteredItems = list.filterItems(unfilteredItems, search, list.options)
 
     listWidgets.updateItems(list, filteredItems, nil, true, false, true)
 end
@@ -511,7 +553,7 @@ local function getListCommon(magicList, callback, items, options)
     end
 
     local initialSearch = options.initialSearch or ""
-    local filteredItems = filterItems(items, initialSearch)
+    local filteredItems = filterItems(items, initialSearch, options)
 
     local list
     local listData = {

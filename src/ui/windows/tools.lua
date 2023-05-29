@@ -10,6 +10,7 @@ local simpleDocks = require("ui.widgets.simple_docks")
 local contextMenu = require("ui.context_menu")
 local iconUtils = require("ui.utils.icons")
 
+local configs = require("configs")
 local languageRegistry = require("language_registry")
 local toolHandler = require("tools")
 local toolUtils = require("tool_utils")
@@ -92,8 +93,10 @@ local function materialSortFunction(lhs, rhs)
         return lhs.itemFavorited
     end
 
-    if lhs.sortingScore ~= rhs.sortingScore then
-        return lhs.sortingScore > rhs.sortingScore
+    if configs.ui.searching.sortByScore then
+        if lhs._filterScore ~= rhs._filterScore then
+            return lhs._filterScore > rhs._filterScore
+        end
     end
 
     local lhsText = lhs.originalText or lhs.text
@@ -103,10 +106,14 @@ local function materialSortFunction(lhs, rhs)
 end
 
 -- TODO - Config for text vs textNoMods?
--- TODO - Config for disabling scoring, plain filtering
 local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
     local totalScore = 0
     local hasMatch = false
+
+    -- Always match with empty search
+    if #searchParts == 0 then
+        return math.huge
+    end
 
     for _, part in ipairs(searchParts) do
         local mode = part.mode
@@ -137,17 +144,14 @@ local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
         end
     end
 
-    return totalScore, hasMatch
+    if hasMatch then
+        return totalScore
+    end
 end
 
--- TODO - Config for case sensitivity (always, never, contextual)
--- TODO - Config for fuzzy
 local function prepareMaterialSearch(search)
     local parts = {}
     local searchStringParts = search:split("|")()
-
-    -- Consider the search case sensitive if it contains any uppercase characters
-    local caseSensitive = search ~= search:lower()
 
     for _, searchPart in ipairs(searchStringParts) do
         if utils.startsWith(searchPart, "@") then
@@ -171,24 +175,7 @@ local function prepareMaterialSearch(search)
         end
     end
 
-    return parts, caseSensitive, false
-end
-
-local function materialFilterItems(items, search)
-    local filtered = {}
-    local searchParts, caseSensitive, fuzzy = prepareMaterialSearch(search)
-
-    for _, item in ipairs(items) do
-        local score, hasMatch = getMaterialScore(item, searchParts, caseSensitive, fuzzy)
-
-        item.sortingScore = score
-
-        if hasMatch then
-            table.insert(filtered, item)
-        end
-    end
-
-    return filtered
+    return parts
 end
 
 local function updateFavorite(materialList, itemData, tool, layer, material, favorite)
@@ -572,7 +559,9 @@ function toolWindow.getWindow()
         initialItem = toolHandler.getMaterial(),
         dataToElement = materialDataToElement,
         sortingFunction = materialSortFunction,
-        filterItems = materialFilterItems,
+        searchScore = getMaterialScore,
+        searchRawItem = true,
+        searchPreprocessor = prepareMaterialSearch,
         sort = true
     }
 
