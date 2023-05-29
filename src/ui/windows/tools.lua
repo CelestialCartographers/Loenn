@@ -106,6 +106,7 @@ end
 -- TODO - Config for disabling scoring, plain filtering
 local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
     local totalScore = 0
+    local hasMatch = false
 
     for _, part in ipairs(searchParts) do
         local mode = part.mode
@@ -117,6 +118,7 @@ local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
 
             if score then
                 totalScore += score
+                hasMatch = true
             end
 
         elseif mode == "modName" then
@@ -128,13 +130,14 @@ local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
 
                     if score then
                         totalScore += score
+                        hasMatch = true
                     end
                 end
             end
         end
     end
 
-    return totalScore
+    return totalScore, hasMatch
 end
 
 -- TODO - Config for case sensitivity (always, never, contextual)
@@ -176,9 +179,11 @@ local function materialFilterItems(items, search)
     local searchParts, caseSensitive, fuzzy = prepareMaterialSearch(search)
 
     for _, item in ipairs(items) do
-        item.sortingScore = getMaterialScore(item, searchParts, caseSensitive, fuzzy)
+        local score, hasMatch = getMaterialScore(item, searchParts, caseSensitive, fuzzy)
 
-        if item.sortingScore then
+        item.sortingScore = score
+
+        if hasMatch then
             table.insert(filtered, item)
         end
     end
