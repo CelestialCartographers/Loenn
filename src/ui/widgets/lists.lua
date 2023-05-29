@@ -5,6 +5,7 @@ local uiUtils = require("ui.utils")
 local widgetUtils = require("ui.widgets.utils")
 
 local textSearching = require("utils.text_search")
+local configs = require("configs")
 
 local listWidgets = {}
 
@@ -445,6 +446,30 @@ function listWidgets.setFilterText(list, text, updateList)
     end
 end
 
+local function searchFieldKeyRelease(list)
+    return function(orig, self, key, ...)
+        local exitKey = configs.ui.searching.searchExitKey
+        local exitClearKey = configs.ui.searching.searchExitAndClearKey
+
+        if key == exitClearKey then
+            self:setText("")
+            widgetUtils.focusMainEditor()
+
+        elseif key == exitKey then
+            widgetUtils.focusMainEditor()
+
+        else
+            orig(self, key, ...)
+        end
+    end
+end
+
+local function addSearchFieldHooks(list, searchField)
+    searchField:hook({
+        onKeyRelease = searchFieldKeyRelease(list)
+    })
+end
+
 local function getColumnForList(searchField, scrolledList, mode)
     local columnItems
 
@@ -523,6 +548,8 @@ local function getListCommon(magicList, callback, items, options)
     local searchField = uiElements.field(initialSearch, searchFieldCallback):with({
         list = list
     }):with(uiUtils.fillWidth)
+
+    addSearchFieldHooks(list, searchField)
 
     list.options = options
     list.searchField = searchField
