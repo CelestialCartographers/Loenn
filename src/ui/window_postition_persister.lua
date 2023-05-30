@@ -36,7 +36,7 @@ end
 function windowPersister.addActiveWindow(name, window)
     activeWindows[name] = activeWindows[name] or {}
 
-    table.insert(activeWindows, window)
+    table.insert(activeWindows[name], window)
 end
 
 function windowPersister.trackWindow(name, window)
@@ -51,18 +51,19 @@ end
 
 function windowPersister.restorePosition(name, window)
     local windows = activeWindows[name]
-    local x, y = 0, 0
     local previous = previousPositions[name]
-
-    -- Don't stack windows
-    if #windows > 0 then
-        x = 0
-        y = 0
-    end
 
     -- Set window to center of screen if no previous position
     if previous then
-        window.x, window.y = previous[1], previous[2]
+        local newX, newY = previous[1], previous[2]
+
+        -- Don't stack windows
+        if #windows > 0 then
+            newX += 24
+            newY += 24
+        end
+
+        widgetUtils.moveWindow(window, newX, newY)
 
     else
         window.x, window.y = -4096, -4096
@@ -73,8 +74,6 @@ function windowPersister.restorePosition(name, window)
             end)
         end)
     end
-
-    previousPositions[name] = {x, y}
 end
 
 local function windowUpdate(name, window)

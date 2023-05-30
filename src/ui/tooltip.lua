@@ -53,7 +53,7 @@ function tooltipHandler.tooltipWindowUpdate(orig, self, dt)
     if tooltipExists and waitedEnough then
         widgetUtils.moveWindow(tooltipWindow, cursorX, cursorY - tooltipWindow.height)
 
-    else
+    elseif tooltipWindow.x ~= -1024 or tooltipWindow.y ~= -1024 then
         widgetUtils.moveWindow(tooltipWindow, -1024, -1024, 0, false)
     end
 end
