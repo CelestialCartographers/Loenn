@@ -12,6 +12,33 @@ local contextMenuRoot
 local contextMenuHandler = {}
 local contextStack = {}
 
+local function keyReleaseHook(orig, self, key, ...)
+    if key == "escape" then
+        -- Remove this item and all stack items after it
+
+        local found = false
+
+        for i, contextMenu in ipairs(contextStack) do
+            if not found then
+                local spawnedFrom = contextMenu.spawnedFrom
+
+                if targetElement == spawnedFrom then
+                    found = true
+                end
+            end
+
+            if found then
+                contextMenu:removeSelf()
+
+                contextStack[i] = nil
+            end
+        end
+
+    else
+        orig(self, key, ...)
+    end
+end
+
 local function createContextMenu(spawnedFrom, widget, options)
     local x, y = love.mouse.getPosition()
 
@@ -22,7 +49,8 @@ local function createContextMenu(spawnedFrom, widget, options)
         x = -1024,
         y = -1024
     }):hook({
-        update = contextMenuHandler.contextWindowUpdate
+        update = contextMenuHandler.contextWindowUpdate,
+        onKeyRelease = keyReleaseHook
     })
 
     window.spawnedFrom = spawnedFrom
@@ -95,7 +123,9 @@ function contextMenuHandler.showContextMenu(widget, options)
         end
     end
 
-    createContextMenu(targetElement, widgetUtils.getSimpleOverlayWidget(widget), options)
+    local window = createContextMenu(targetElement, widgetUtils.getSimpleOverlayWidget(widget), options)
+
+    ui.focusing = window
 end
 
 function contextMenuHandler.getContextMenu()

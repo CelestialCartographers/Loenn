@@ -195,7 +195,8 @@ function colorField.getElement(name, value, options)
             return colorPicker.getColorPicker(fieldText, pickerOptions)
         end,
         {
-            shouldShowMenu = shouldShowMenu
+            shouldShowMenu = shouldShowMenu,
+            mode = "focused"
         }
     )
 
