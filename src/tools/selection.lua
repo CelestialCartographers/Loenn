@@ -990,11 +990,14 @@ local function updateSelectionTargetsFromPreviews(keepExisting)
         local existingTargets = {}
 
         for _, target in ipairs(selectionTargets) do
-            existingTargets[target.item] = true
+            existingTargets[target.item] = existingTargets[target.item] or {}
+            existingTargets[target.item][target.node] = true
         end
 
         for _, preview in ipairs(selectionPreviews) do
-            if not existingTargets[preview.item] then
+            local existing = existingTargets[preview.item]
+
+            if not existing or not existing[preview.node] then
                 table.insert(selectionTargets, preview)
             end
         end
