@@ -18,9 +18,10 @@ local history = require("history")
 local configs = require("configs")
 local enums = require("consts.celeste_enums")
 
-local metadataWindow = {}
+local windowPersister = require("ui.window_postition_persister")
+local windowPersisterName = "metadata_window"
 
-local activeWindows = {}
+local metadataWindow = {}
 
 local songs = enums.songs
 local cassetteSongs = enums.cassette_songs
@@ -349,16 +350,12 @@ function metadataWindow.editMetadata(side)
         ignoreUnordered = true
     })
 
-    local window = uiElements.window(windowTitle, metadataForm):with({
-        x = windowX,
-        y = windowY,
+    local window = uiElements.window(windowTitle, metadataForm)
+    local windowCloseCallback = windowPersister.getWindowCloseCallback(windowPersisterName)
 
-        updateHidden = true
-    })
-
-    table.insert(activeWindows, window)
+    windowPersister.trackWindow(windowPersisterName, window)
     metadataWindowGroup.parent:addChild(window)
-    widgetUtils.addWindowCloseButton(window)
+    widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     form.prepareScrollableWindow(window)
 
     return window
