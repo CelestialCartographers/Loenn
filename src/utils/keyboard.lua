@@ -32,6 +32,12 @@ keyboard.nameToModifierFunction = {
     winkey = keyboard.modifierGUI
 }
 
+-- Some names cause confusions/issues for hotkeys
+local keyToNameLookup = {
+    ["+"] = "plus",
+    ["-"] = "minus"
+}
+
 function keyboard.modifierHeld(modifier)
     local modifierFunction = keyboard.nameToModifierFunction[modifier]
 
@@ -64,6 +70,10 @@ function keyboard.activatorModifierString(key)
 
     if keyboard.modifierShift() then
         table.insert(parts, "shift")
+    end
+
+    if keyToNameLookup[key] then
+        key = keyToNameLookup[key]
     end
 
     table.insert(parts, key)
