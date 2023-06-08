@@ -3,15 +3,15 @@ local configs = require("configs")
 local graphicsDevice = {}
 
 function graphicsDevice.focused()
-    DRAW_INTERVAL = configs.graphics.focused_draw_rate
-    UPDATE_INTERVAL = configs.graphics.focused_update_rate
-    MAIN_LOOP_SLEEP = configs.graphics.focused_main_loop_sleep
+    DRAW_INTERVAL = configs.graphics.focusedDrawRate
+    UPDATE_INTERVAL = configs.graphics.focusedUpdateRate
+    MAIN_LOOP_SLEEP = configs.graphics.focusedMainLoopSleep
 end
 
 function graphicsDevice.unfocused()
-    DRAW_INTERVAL = configs.graphics.unfocused_draw_rate
-    UPDATE_INTERVAL = configs.graphics.unfocused_update_rate
-    MAIN_LOOP_SLEEP = configs.graphics.unfocused_main_loop_sleep
+    DRAW_INTERVAL = configs.graphics.unfocusedDrawRate
+    UPDATE_INTERVAL = configs.graphics.unfocusedUpdateRate
+    MAIN_LOOP_SLEEP = configs.graphics.unfocusedMainLoopSleep
 end
 
 function graphicsDevice.focus(focused)
