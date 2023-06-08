@@ -1,0 +1,100 @@
+local loadedState = require("loaded_state")
+local utils = require("utils")
+local celesteRender = require("celeste_render")
+local viewportHandler = require("viewport_handler")
+
+local mapImageGenerator = {}
+
+function mapImageGenerator.getMapBounds(map)
+    local rectangles = {}
+
+    for _, room in ipairs(map.rooms) do
+        local rectangle = utils.rectangle(room.x, room.y, room.width, room.height)
+
+        table.insert(rectangles, rectangle)
+    end
+
+    return utils.rectangleBounds(rectangles)
+end
+
+local function getImageState(map)
+    local imageState = utils.deepcopy(loadedState)
+
+    local tlx, tly, brx, bry = mapImageGenerator.getMapBounds(map)
+    local width, height = brx - tlx, bry - tly
+
+    imageState.map = map
+    imageState.viewport = {
+        visible = true,
+        scale = 1,
+        x = tlx,
+        y = tly,
+        width = width,
+        height = height
+    }
+    imageState.selectedItemType = "table"
+    imageState.selectedItem = {}
+    imageState.showRoomBackground = false
+    imageState.showRoomBorders = false
+
+    -- TODO - Improve, this is a bit of a hack
+    function imageState.getLayerVisible(layer)
+        if layer == "triggers" then
+            return false
+        end
+
+        return true
+    end
+
+    return imageState
+end
+
+function mapImageGenerator.getMapImage(map)
+    map = map or loadedState.map
+
+    if not map then
+        return
+    end
+
+    local imageState = getImageState(map)
+    local width, height = imageState.viewport.width, imageState.viewport.height
+    local success, canvas = pcall(love.graphics.newCanvas, width, height)
+
+    if success then
+        -- Redraw all rooms with new state info
+        for _, room in ipairs(map.rooms) do
+            celesteRender.forceRedrawRoom(room, imageState, true)
+        end
+
+        canvas:renderTo(function()
+            celesteRender.drawMap(imageState)
+        end)
+
+        return canvas
+    end
+
+    return false
+end
+
+function mapImageGenerator.saveMapImage(filename, map)
+    local canvas = mapImageGenerator.getMapImage(map)
+
+    if canvas then
+        local imageData = canvas:newImageData()
+
+        local temporaryFilename = "saved_map_image.png"
+        local temporaryPath = utils.joinpath(love.filesystem.getSaveDirectory(), temporaryFilename)
+
+        imageData:encode("png", temporaryFilename)
+        os.remove(filename)
+        os.rename(temporaryPath, filename)
+
+        -- TODO - Make sure image can be loaded, can produce invalid pngs
+
+        return true
+    end
+
+    return false
+end
+
+return mapImageGenerator

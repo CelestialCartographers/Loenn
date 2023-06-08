@@ -132,7 +132,9 @@ function viewportHandler.disable()
     viewportHandler.device._enabled = false
 end
 
-function viewportHandler.drawRelativeTo(x, y, func)
+function viewportHandler.drawRelativeTo(x, y, func, customViewport)
+    local viewport = customViewport or viewportHandler.viewport
+
     love.graphics.push()
 
     love.graphics.translate(math.floor(-viewport.x), math.floor(-viewport.y))

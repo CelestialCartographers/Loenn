@@ -242,7 +242,11 @@ function celesteRender.getRoomCache(roomName, key)
     return false
 end
 
-function celesteRender.getRoomBackgroundColor(room, selected)
+function celesteRender.getRoomBackgroundColor(room, selected, state)
+    if not state.showRoomBackground then
+        return nil
+    end
+
     local roomColor = room.color or 0
     local color = colors.roomBackgroundDefault
 
@@ -256,7 +260,11 @@ function celesteRender.getRoomBackgroundColor(room, selected)
     return {r, g, b, a}
 end
 
-function celesteRender.getRoomBorderColor(room, selected)
+function celesteRender.getRoomBorderColor(room, selected, state)
+    if not state.showRoomBorders then
+        return nil
+    end
+
     local roomColor = room.color or 0
     local color = colors.roomBorderDefault
 
@@ -716,6 +724,7 @@ local depthBatchingFunctions = {
 -- Force all non finished room batch tasks to finish
 function celesteRender.forceRoomBatchRender(room, state)
     local viewport = state.viewport
+
     for i, data in ipairs(depthBatchingFunctions) do
         local description, key, func, depth = data[1], data[2], data[3], data[4]
         local layerVisible = state.getLayerVisible(key)
@@ -863,15 +872,14 @@ local function getRoomCanvas(room, state, selected)
         )
     end
 
-    return cache.canvas and cache.canvas.result
+    return cache.canvas and cache.canvas.result, cache.canvas
 end
 
 -- Force the rooms canvas cache to be rendered
 function celesteRender.forceRoomCanvasRender(room, state, selected)
-    local viewport = state.viewport
-    local task, canvas = getRoomCanvas(room, state, selected)
+    local canvas, task = getRoomCanvas(room, state, selected)
 
-    if task and not canvas then
+    if not canvas then
         tasks.processTask(task)
     end
 end
@@ -937,14 +945,16 @@ function celesteRender.drawRoom(room, state, selected, visible)
 
         local roomVisibleWidth, roomVisibleHeight = viewportHandler.getRoomVisibleSize(room, viewport)
 
-        local backgroundColor = celesteRender.getRoomBackgroundColor(room, selected)
-        local borderColor = celesteRender.getRoomBorderColor(room, selected)
+        local backgroundColor = celesteRender.getRoomBackgroundColor(room, selected, state)
+        local borderColor = celesteRender.getRoomBorderColor(room, selected, state)
 
         viewportHandler.drawRelativeTo(roomX, roomY, function()
-            drawing.callKeepOriginalColor(function()
-                love.graphics.setColor(backgroundColor)
-                love.graphics.rectangle("fill", 0, 0, width, height)
-            end)
+            if backgroundColor then
+                drawing.callKeepOriginalColor(function()
+                    love.graphics.setColor(backgroundColor)
+                    love.graphics.rectangle("fill", 0, 0, width, height)
+                end)
+            end
 
             if redrawRoom then
                 drawRoomFromBatches(room, state, selected)
@@ -958,11 +968,13 @@ function celesteRender.drawRoom(room, state, selected, visible)
                 end
             end
 
-            drawing.callKeepOriginalColor(function()
-                love.graphics.setColor(borderColor)
-                love.graphics.rectangle("line", 0, 0, width, height)
-            end)
-        end)
+            if borderColor then
+                drawing.callKeepOriginalColor(function()
+                    love.graphics.setColor(borderColor)
+                    love.graphics.rectangle("line", 0, 0, width, height)
+                end)
+            end
+        end, viewport)
     end
 end
 
@@ -1007,7 +1019,7 @@ function celesteRender.drawFiller(filler, viewport)
 
     viewportHandler.drawRelativeTo(x, y, function()
         love.graphics.rectangle("fill", 0, 0, width, height)
-    end)
+    end, viewport)
 end
 
 function celesteRender.drawMap(state)
