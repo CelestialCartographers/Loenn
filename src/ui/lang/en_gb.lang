@@ -158,6 +158,7 @@ ui.menubar.map=Map
 ui.menubar.stylegrounds=Stylegrounds
 ui.menubar.dependencies=Dependencies
 ui.menubar.metadata=Metadata
+ui.menubar.save_map_image=Save Map Image
 
 ui.menubar.room=Room
 ui.menubar.add=Add

@@ -10,6 +10,8 @@ local sceneHandler = require("scene_handler")
 local updater = require("updater")
 local configs = require("configs")
 local fileLocations = require("file_locations")
+local filesystem = require("utils.filesystem")
+local mapImageGenerator = require("map_image")
 
 local utils = require("utils")
 local languageRegistry = require("language_registry")
@@ -38,6 +40,10 @@ local function openStorageDirectory()
     local fileUrl = string.format("file://%s", fileLocations.getStorageDir())
 
     love.system.openURL(fileUrl)
+end
+
+local function saveMapImage()
+    filesystem.saveDialog(loadedState.filename, "png", mapImageGenerator.saveMapImage)
 end
 
 local function getLayerToggleFunction(layer)
@@ -125,7 +131,8 @@ menubar.menubar = {
     {"map", {
         {"stylegrounds", stylegroundEditor.editStylegrounds},
         {"metadata", metadataEditor.editMetadata},
-        {"dependencies", dependencyEditor.editDependencies}
+        {"dependencies", dependencyEditor.editDependencies},
+        {"save_map_image", saveMapImage},
     }},
     {"room", {
         {"add", roomEditor.createNewRoom},
