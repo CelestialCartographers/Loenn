@@ -457,7 +457,6 @@ state.map = nil
 -- The currently selected item (room or filler)
 state.selectedItem = nil
 state.selectedItemType = nil
-state.selectedRooms = {}
 
 -- The viewport for the map renderer
 state.viewport = viewportHandler.viewport
@@ -467,5 +466,9 @@ state.layerInformation = {}
 
 -- Hide content that is not in Everest.yaml
 state.onlyShowDependedOnMods = false
+
+-- Map rendering
+state.showRoomBorders = true
+state.showRoomBackground = true
 
 return state
