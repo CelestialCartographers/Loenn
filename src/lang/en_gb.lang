@@ -72,12 +72,14 @@ decals.attribute.scaleX=Scale X
 decals.attribute.scaleY=Scale Y
 decals.attribute.texture=Texture
 decals.attribute.rotation=Rotation
+decals.attribute.color=Colour
 decals.description.x=X position of decal.
 decals.description.y=Y position of decal.
 decals.description.scaleX=Horizontal scale of decal.
 decals.description.scaleY=Vertical scale of decal.
 decals.description.texture=Texture path of the decal.
 decals.description.rotation=Rotation of the decal in degrees.
+decals.description.color=Colour of decal.
 
 
 # -- Entities --

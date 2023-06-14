@@ -323,7 +323,8 @@ function decals.getPlacements(layer, specificMods)
             scaleX = 1,
             scaleY = 1,
 
-            rotation = 0
+            rotation = 0,
+            color = "ffffff"
         }
 
         placements[i] = {
@@ -377,7 +378,15 @@ function decals.ignoredFieldsMultiple(layer, decal)
 end
 
 function decals.fieldOrder(layer, decal)
-    return {"x", "y", "scaleX", "scaleY", "texture", "rotation"}
+    return {"x", "y", "scaleX", "scaleY", "texture", "rotation", "color"}
+end
+
+function decals.fieldInformation(layer, decal)
+    return {
+        color = {
+            fieldType = "color"
+        }
+    }
 end
 
 function decals.languageData(language, layer, decal)
