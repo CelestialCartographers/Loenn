@@ -238,7 +238,7 @@ local function handleItemDrag(item, x, y)
         local previousIndex
 
         if previousList then
-            local previousIndex = previousList._dragHoveredIndex
+            previousIndex = previousList._dragHoveredIndex
 
             previousList._dragHoveredIndex = nil
         end
@@ -250,14 +250,14 @@ local function handleItemDrag(item, x, y)
         end
 
         if previousList == hoveredList and previousIndex ~= hoveredIndex then
-            previousList:reflow()
-            previousList:redraw()
+            hoveredList:reflow()
+            hoveredList:redraw()
         end
 
         hoveredList._dragHoveredIndex = hoveredIndex
         item._previousHovered = hoveredList
 
-        return moved
+        return true
     end
 end
 
@@ -269,6 +269,7 @@ local function handleItemDragFinish(item, x, y)
         local ourIndex = findChildIndex(ourList, ourListItem)
         local hoveredIndex = hoveredList._dragHoveredIndex
         local moved = moveListItem(ourList, ourListItem, hoveredList, hoveredListItem, ourIndex, hoveredIndex)
+        local sameList = ourList == hoveredList
 
         hoveredList._previousHovered = nil
         hoveredList._dragHoveredIndex = nil
@@ -300,13 +301,17 @@ local function prepareListDragHook()
                 local drawY = self.screenY
 
                 local width = children[1].width
-                local height = self.style.spacing
+                local height = math.min(self.style.spacing, 1)
 
                 local item = children[hovered]
 
                 if item then
                     drawX = item.screenX
-                    drawY = item.screenY - height
+                    drawY = item.screenY
+
+                    if hovered > 1 then
+                        drawY -= height
+                    end
 
                 else
                     local lastChild = children[#children]
@@ -323,6 +328,12 @@ local function prepareListDragHook()
                 love.graphics.setColor(previousColor)
             end
         end,
+        onPress = function(orig, self, x, y, button, dragging)
+            -- Make sure all children have the hook
+            listWidgets.addDraggableHooks(self)
+
+            orig(self, x, y, button, dragging)
+        end
     }
 end
 
@@ -357,7 +368,7 @@ local function prepareItemDragHook()
     }
 end
 
-local function addDraggableHooks(list)
+function listWidgets.addDraggableHooks(list)
     local draggable = list.draggable
 
     if draggable then
@@ -444,7 +455,7 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
         list.unfilteredItems = items
     end
 
-    addDraggableHooks(list)
+    listWidgets.addDraggableHooks(list)
 end
 
 function listWidgets.sortList(list)
@@ -468,7 +479,7 @@ end
 local function getSearchFieldChanged(onChange)
     return function(element, new, old)
         filterList(element.list, new)
-        addDraggableHooks(element.list)
+        listWidgets.addDraggableHooks(element.list)
 
         if onChange then
             onChange(element, new, old)
@@ -576,7 +587,7 @@ local function getListCommon(magicList, callback, items, options)
         list = uiElements.list(filteredItems, callback):with(listData)
     end
 
-    addDraggableHooks(list)
+    listWidgets.addDraggableHooks(list)
 
     ui.runLate(function()
         listWidgets.setSelection(list, list.options.initialItem)

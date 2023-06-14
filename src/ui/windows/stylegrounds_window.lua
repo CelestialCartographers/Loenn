@@ -335,7 +335,7 @@ local function setSelectionWithCallback(listElement, index)
     return newSelection
 end
 
-function moveIndex(t, before, after)
+local function moveIndex(t, before, after)
     local value = table.remove(t, before)
 
     table.insert(t, after, value)
@@ -351,9 +351,9 @@ local function canMoveStyle(interactionData, offset)
     local styles, parent, index = findStyleInStylegrounds(interactionData)
 
     if parent and index then
-        local newIndex = utils.clamp(index + offset, 1, #parent)
+        local newIndex = index + offset
 
-        return index ~= newIndex
+        return index ~= newIndex and newIndex >= 1 and newIndex <= #parent
     end
 
     return false
@@ -500,7 +500,6 @@ local function addNewStyle(interactionData, formFields)
     local map = interactionData.map
     local method = interactionData.addNewMethod.method
     local correctForegroundValue = interactionData.addNewMethod.correctForegroundValue
-    local listItems = {}
 
     if method == "basedOnCurrent" then
         if currentStyle then
@@ -519,7 +518,7 @@ local function addNewStyle(interactionData, formFields)
     end
 
     if newStyle then
-        local styles, parentTable, index = findStyleInStylegrounds(interactionData, foreground)
+        local styles, parentTable, index = findStyleInStylegrounds(interactionData)
         local _, listIndex = findCurrentListItem(interactionData)
         local listItems = getStylegroundItems({newStyle}, foreground, {}, nil)
 
@@ -547,7 +546,7 @@ local function addNewStyle(interactionData, formFields)
             lastItem:onClick(0, 0, 1)
 
             if correctForegroundValue == false then
-                changeStyleForeground(interactionData, moveUpButton, moveDownButton)
+                changeStyleForeground(interactionData)
             end
         end
     end
