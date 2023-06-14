@@ -81,7 +81,7 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
     local newSelection
     local magicList = list._magicList
 
-    if target and target ~= false then
+    if target ~= false then
         local dataList = magicList and list.data or list.children
 
         for i, item in ipairs(dataList) do
@@ -94,6 +94,10 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
 
                 break
             end
+        end
+
+        if not newSelection then
+            newSelection = dataList[1]
         end
     end
 
