@@ -82,16 +82,16 @@ function hotkeyStruct.hotkeyActive(hotkey)
     return true
 end
 
-function hotkeyStruct.callbackIfActive(hotkey)
+function hotkeyStruct.callbackIfActive(hotkey, ...)
     if hotkey:active() then
-        hotkey()
+        hotkey(...)
     end
 end
 
-function hotkeyStruct.callbackFirstActive(hotkeys)
+function hotkeyStruct.callbackFirstActive(hotkeys, ...)
     for i, hotkey in ipairs(hotkeys) do
         if hotkey:active() then
-            hotkey()
+            hotkey(...)
 
             return true, i
         end
@@ -110,8 +110,8 @@ hotkeyMt.__index = {}
 hotkeyMt.__index.active = hotkeyStruct.hotkeyActive
 hotkeyMt.__index.callbackIfActive = hotkeyStruct.callbackIfActive
 
-function hotkeyMt:__call()
-    self:callback()
+function hotkeyMt:__call(...)
+    self:callback(...)
 end
 
 function hotkeyStruct.createHotkey(activator, callback)
