@@ -773,23 +773,32 @@ function stylegroundWindow.updateStylegroundForm(interactionData)
     formContainer:addChild(newForm)
 end
 
+-- Check if movement is allowed and return prepared offset and interactionData
+local function listItemDragAllowed(interactionData, fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
+    local offset = toIndex - fromIndex
+
+    if toIndex > fromIndex then
+        offset -= 1
+    end
+
+    if offset ~= 0 then
+        local fakeInteractionData = table.shallowcopy(interactionData)
+
+        fakeInteractionData.listTarget = fromListItem.data
+        fakeInteractionData.stylegroundListElement = fromList
+
+        return canMoveStyle(fakeInteractionData, offset), offset, fakeInteractionData
+    end
+
+    return false, offset, nil
+end
+
 local function listItemDraggedHandler(interactionData)
     return function(fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
-        local offset = toIndex - fromIndex
+        local allowed, offset, fakeInteraction = listItemDragAllowed(interactionData, fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
 
-        if toIndex > fromIndex then
-            offset -= 1
-        end
-
-        if offset ~= 0 then
-            local fakeInteractionData = table.shallowcopy(interactionData)
-
-            fakeInteractionData.listTarget = fromListItem.data
-            fakeInteractionData.stylegroundListElement = fromList
-
-            if canMoveStyle(fakeInteractionData, offset) then
-                moveStyle(fakeInteractionData, offset)
-            end
+        if allowed then
+            moveStyle(fakeInteraction, offset)
 
             -- Force update movement buttons with the real data
             -- We might have moved in a way that should disable/enable some buttons
@@ -798,6 +807,12 @@ local function listItemDraggedHandler(interactionData)
 
         -- Manually update the list
         return false
+    end
+end
+
+local function listItemCanInsertHandler(interactionData)
+    return function(fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
+        return listItemDragAllowed(interactionData, fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
     end
 end
 
@@ -810,7 +825,8 @@ function stylegroundWindow.getStylegroundList(map, interactionData)
     local listOptions = {
         initialItem = 1,
         draggable = true,
-        listItemDragged = listItemDraggedHandler(interactionData)
+        listItemDragged = listItemDraggedHandler(interactionData),
+        listItemCanInsert = listItemCanInsertHandler(interactionData)
     }
 
     local column, list = listWidgets.getList(function(element, listItem)

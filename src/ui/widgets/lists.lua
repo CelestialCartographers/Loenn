@@ -254,6 +254,17 @@ local function handleItemDrag(item, x, y)
             hoveredList:redraw()
         end
 
+        if hoveredList._dragHoveredIndex ~= hoveredIndex then
+            if hoveredList.listItemCanInsert then
+                local allowed = hoveredList.listItemCanInsert(ourList, ourListItem, hoveredList, hoveredListItem, ourIndex, hoveredIndex)
+
+                hoveredList._dragInsertionAllowed = allowed
+
+            else
+                hoveredList._dragInsertionAllowed = true
+            end
+        end
+
         hoveredList._dragHoveredIndex = hoveredIndex
         item._previousHovered = hoveredList
 
@@ -290,6 +301,12 @@ local function prepareListDragHook()
     return {
         draw = function(orig, self)
             orig(self)
+
+            local renderInsertLine = self._dragInsertionAllowed
+
+            if not renderInsertLine then
+                return
+            end
 
             -- Index 0 means before any items, index 2 is between item two and three
             local hovered = self._dragHoveredIndex
@@ -573,7 +590,8 @@ local function getListCommon(magicList, callback, items, options)
         minWidth = options.minimumWidth or 128,
         draggable = options.draggable or false,
         draggableTag = options.draggableTag or false,
-        listItemDragged = options.listItemDragged
+        listItemDragged = options.listItemDragged,
+        listItemCanInsert = options.listItemCanInsert,
     }
 
     if magicList then
