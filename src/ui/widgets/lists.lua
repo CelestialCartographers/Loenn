@@ -525,12 +525,28 @@ local function searchFieldKeyRelease(list)
         local exitKey = configs.ui.searching.searchExitKey
         local exitClearKey = configs.ui.searching.searchExitAndClearKey
 
+        local nextResultKey = configs.ui.searching.searchNextResultKey
+        local previousResultKey = configs.ui.searching.searchPreviousResultKey
+
+        local magicList = list._magicList
+        local dataList = magicList and list.data or list.children
+
         if key == exitClearKey then
             self:setText("")
             widgetUtils.focusMainEditor()
 
         elseif key == exitKey then
             widgetUtils.focusMainEditor()
+
+        elseif key == nextResultKey then
+            if list.selectedIndex < #dataList then
+                listWidgets.setSelection(list, list.selectedIndex + 1)
+            end
+
+        elseif key == previousResultKey then
+            if list.selectedIndex > 1 then
+                listWidgets.setSelection(list, list.selectedIndex - 1)
+            end
 
         else
             orig(self, key, ...)

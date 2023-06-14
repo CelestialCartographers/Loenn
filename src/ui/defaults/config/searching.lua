@@ -3,5 +3,7 @@ return {
     searchFuzzy = false,
     sortByScore = true,
     searchExitKey = "escape",
-    searchExitAndClearKey = "return"
+    searchExitAndClearKey = "return",
+    searchNextResultKey = "down",
+    searchPreviousResultKey = "up"
 }
