@@ -106,6 +106,7 @@ local function materialSortFunction(lhs, rhs)
 end
 
 -- TODO - Config for text vs textNoMods?
+-- TODO - Score checks could potentially be cached, for mod names there is a lot of redundant checks
 local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
     local totalScore = 0
     local hasMatch = false
@@ -117,9 +118,9 @@ local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
 
     for _, part in ipairs(searchParts) do
         local mode = part.mode
-        local search = part.text
 
         if mode == "name" then
+            local search = part.text
             local text = item.textNoMods
             local score = textSearching.searchScore(text, search, caseSensitive, fuzzy)
 
@@ -129,14 +130,20 @@ local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
             end
 
         elseif mode == "modName" then
+            -- If we have additional search text it should search for entries within the given mod
             local associatedMods = item.associatedMods
+            local searchModName = part.text
+            local search = part.additional
+            local text = item.textNoMods
 
             if associatedMods then
                 for _, modName in ipairs(associatedMods) do
-                    local score = textSearching.searchScore(modName, search, caseSensitive, fuzzy)
+                    local modScore = textSearching.searchScore(modName, searchModName, caseSensitive, fuzzy)
+                    local score = textSearching.searchScore(text, search, caseSensitive, fuzzy)
 
-                    if score then
-                        totalScore += score
+                    -- Only include the additional search if it matches
+                    if modScore and (score or #search == 0) then
+                        totalScore += modScore + (score or 0)
                         hasMatch = true
                     end
                 end
@@ -155,9 +162,13 @@ local function prepareMaterialSearch(search)
 
     for _, searchPart in ipairs(searchStringParts) do
         if utils.startsWith(searchPart, "@") then
+            -- First space or the end of the string, used to extract additional search terms
+            local spaceIndex = utils.findCharacter(searchPart, " ") or #searchPart + 1
+
             table.insert(parts, {
                 mode = "modName",
-                text = string.sub(searchPart, 2)
+                text = string.sub(searchPart, 2, spaceIndex - 1),
+                additional = string.sub(searchPart, spaceIndex + 1)
             })
 
         else
