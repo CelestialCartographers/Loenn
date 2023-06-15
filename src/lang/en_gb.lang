@@ -250,6 +250,9 @@ entities.resortLantern.placements.name.lantern=Resort Lantern
 # Resort Roof Ending
 entities.resortRoofEnding.placements.name.resort_roof_ending=Resort Roof Ending
 
+# Resort Mirror
+entities.resortmirror.placements.name.mirror=Resort Mirror
+
 # Dream Block
 entities.dreamBlock.placements.name.dream_block=Space Jam
 entities.dreamBlock.attributes.description.fastMoving=Changes the dream block between two speeds.
