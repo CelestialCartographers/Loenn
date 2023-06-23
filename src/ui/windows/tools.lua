@@ -263,7 +263,7 @@ local function materialDataToElement(list, data, element)
         --addMaterialContextMenu(language, data.currentToolName, data.currentLayer, element)
 
         element:hook({
-            onPress = materialFavoriteOnPressHandler(data.currentToolName, data.currentLayer)
+            onPress = materialFavoriteOnPressHandler(data.currentTool, data.currentLayer)
         })
     end
 
@@ -300,6 +300,7 @@ local function getMaterialItems(layer)
             data = materialData,
             tooltip = materialTooltip,
             itemFavorited = itemFavorited,
+            currentTool = currentTool,
             currentToolName = currentTool.name,
             currentLayer = currentLayer,
             associatedMods = material.associatedMods
