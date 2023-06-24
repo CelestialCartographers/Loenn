@@ -43,7 +43,16 @@ local function openStorageDirectory()
 end
 
 local function saveMapImage()
-    filesystem.saveDialog(loadedState.filename, "png", mapImageGenerator.saveMapImage)
+    filesystem.saveDialog(loadedState.filename, "png", function(filename)
+        local saved = mapImageGenerator.saveMapImage(filename)
+
+        if not saved then
+            local language = languageRegistry.getLanguage()
+            local text = tostring(language.ui.notifications.mapImageSaveFailed)
+
+            notifications.notify(text, -1)
+        end
+    end)
 end
 
 local function getLayerToggleFunction(layer)

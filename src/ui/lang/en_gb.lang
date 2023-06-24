@@ -36,6 +36,8 @@ ui.notifications.updaterDontRemindMeAgain=Don't ask me again
 ui.notifications.saveSanitizerDependenciesMissing=Detected missing dependencies.\nDo you want to open the dependency window?
 ui.notifications.saveSanitizerDependenciesRemindMeLater=Remind me later
 
+ui.notifications.mapImageSaveFailed=Failed to save map image
+
 
 # Styleground Window
 ui.styleground_window.window_title=Stylegrounds
