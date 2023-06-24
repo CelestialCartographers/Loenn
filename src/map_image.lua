@@ -86,12 +86,16 @@ function mapImageGenerator.saveMapImage(filename, map)
         local temporaryPath = utils.joinpath(love.filesystem.getSaveDirectory(), temporaryFilename)
 
         imageData:encode("png", temporaryFilename)
-        os.remove(filename)
-        os.rename(temporaryPath, filename)
 
-        -- TODO - Make sure image can be loaded, can produce invalid pngs
+        -- Validate that the png is valid
+        local success, loadedImage = pcall(love.graphics.newImage(temporaryFilename))
 
-        return true
+        if success then
+            os.remove(filename)
+            os.rename(temporaryPath, filename)
+
+            return true
+        end
     end
 
     return false
