@@ -72,12 +72,14 @@ decals.attribute.scaleX=Scale X
 decals.attribute.scaleY=Scale Y
 decals.attribute.texture=Texture
 decals.attribute.rotation=Rotation
+decals.attribute.color=Colour
 decals.description.x=X position of decal.
 decals.description.y=Y position of decal.
 decals.description.scaleX=Horizontal scale of decal.
 decals.description.scaleY=Vertical scale of decal.
 decals.description.texture=Texture path of the decal.
 decals.description.rotation=Rotation of the decal in degrees.
+decals.description.color=Colour of decal.
 
 
 # -- Entities --
@@ -247,6 +249,9 @@ entities.resortLantern.placements.name.lantern=Resort Lantern
 
 # Resort Roof Ending
 entities.resortRoofEnding.placements.name.resort_roof_ending=Resort Roof Ending
+
+# Resort Mirror
+entities.resortmirror.placements.name.mirror=Resort Mirror
 
 # Dream Block
 entities.dreamBlock.placements.name.dream_block=Space Jam

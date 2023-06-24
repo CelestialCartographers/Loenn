@@ -10,6 +10,7 @@ dreamBlock.placements = {
     data = {
         fastMoving = false,
         below = false,
+        oneUse = false,
         width = 8,
         height = 8
     }
