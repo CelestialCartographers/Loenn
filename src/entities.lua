@@ -705,6 +705,8 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, dire
     local entityOffsetY = 0
     local madeChanges = false
 
+    local selectionWidth, selectionHeight = selection.width, selection.height
+
     if handler.resize then
         madeChanges = handler.resize(room, entity, offsetX, offsetY, directionX, directionY)
 
@@ -721,6 +723,7 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, dire
 
             if minimumWidth <= newWidth and newWidth <= maximumWidth then
                 entity.width = newWidth
+                selectionWidth = newWidth
 
                 if directionX < 0 then
                     entityOffsetX = -offsetX
@@ -736,6 +739,7 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, dire
 
             if minimumHeight <= newHeight and newHeight <= maximumHeight then
                 entity.height = newHeight
+                selectionHeight = newHeight
 
                 if directionY < 0 then
                     entityOffsetY = -offsetY
@@ -755,8 +759,8 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, dire
         selection.x += entityOffsetX
         selection.y += entityOffsetY
 
-        selection.width = entity.width or selection.width
-        selection.height = entity.height or selection.height
+        selection.width = selectionWidth
+        selection.height = selectionHeight
     end
 
     return madeChanges

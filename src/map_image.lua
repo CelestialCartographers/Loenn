@@ -70,6 +70,8 @@ function mapImageGenerator.getMapImage(map)
             celesteRender.drawMap(imageState)
         end)
 
+        celesteRender.invalidateRoomCache()
+
         return canvas
     end
 
@@ -88,7 +90,7 @@ function mapImageGenerator.saveMapImage(filename, map)
         imageData:encode("png", temporaryFilename)
 
         -- Validate that the png is valid
-        local success, loadedImage = pcall(love.graphics.newImage(temporaryFilename))
+        local success, loadedImage = pcall(love.graphics.newImage, temporaryFilename)
 
         if success then
             os.remove(filename)
