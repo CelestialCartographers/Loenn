@@ -436,14 +436,14 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
 
     local processedItems = items
 
-    if options.sort or forceSort then
-        processedItems = sortItems(list, processedItems)
-    end
-
     if not fromFilter and list.searchField then
         local search = list.searchField:getText() or ""
 
         processedItems = filterItems(processedItems, search, list.options)
+    end
+
+    if options.sort or forceSort then
+        processedItems = sortItems(list, processedItems)
     end
 
     for _, item in ipairs(processedItems) do
