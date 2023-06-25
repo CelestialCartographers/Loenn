@@ -70,6 +70,8 @@ function mapImageGenerator.getMapImage(map)
             celesteRender.drawMap(imageState)
         end)
 
+        celesteRender.invalidateRoomCache()
+
         return canvas
     end
 
