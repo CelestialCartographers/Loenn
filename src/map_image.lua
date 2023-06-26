@@ -83,20 +83,19 @@ function mapImageGenerator.saveMapImage(filename, map)
 
     if canvas then
         local imageData = canvas:newImageData()
+        local fh = io.open(filename, "wb")
 
-        local temporaryFilename = "saved_map_image.png"
-        local temporaryPath = utils.joinpath(love.filesystem.getSaveDirectory(), temporaryFilename)
+        if fh then
+            local encoded = imageData:encode("png")
+            local data = encoded:getString()
 
-        imageData:encode("png", temporaryFilename)
+            fh:write(data)
+            fh:close()
 
-        -- Validate that the png is valid
-        local success, loadedImage = pcall(love.graphics.newImage, temporaryFilename)
+            -- Validate that the png is valid
+            local success, loadedImage = pcall(love.graphics.newImage, filename)
 
-        if success then
-            os.remove(filename)
-            os.rename(temporaryPath, filename)
-
-            return true
+            return success
         end
     end
 
