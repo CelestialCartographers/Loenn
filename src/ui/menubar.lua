@@ -12,6 +12,8 @@ local configs = require("configs")
 local fileLocations = require("file_locations")
 local filesystem = require("utils.filesystem")
 local mapImageGenerator = require("map_image")
+local persistence = require("persistence")
+local mods = require("mods")
 
 local utils = require("utils")
 local languageRegistry = require("language_registry")
@@ -21,6 +23,8 @@ local stylegroundEditor = require("ui.styleground_editor")
 local metadataEditor = require("ui.metadata_editor")
 local dependencyEditor = require("ui.dependency_editor")
 local aboutWindow = require("ui.about_window_wrapper")
+
+local activeMenubar
 
 local menubar = {}
 
@@ -159,6 +163,18 @@ menubar.menubar = {
     }}
 }
 
+local function findMenuEntry(menu, key)
+    if not menu then
+        return
+    end
+
+    for _, entry in ipairs(menu) do
+        if entry[1] == key or entry._key == key then
+            return entry
+        end
+    end
+end
+
 -- TODO - Tooltip support
 local function addLanguageStrings(menu, language)
     if utils.typeof(menu) == "table" then
@@ -167,6 +183,7 @@ local function addLanguageStrings(menu, language)
 
         if languageKeyType == "string" then
             menu[1] = tostring(language.ui.menubar[languageKey])
+            menu._key = languageKey
         end
 
         for _, sub in pairs(menu) do
@@ -249,16 +266,72 @@ local function removeFalseEntries(menu)
     end
 end
 
+local function addRecentFiles(menu)
+    local recentFiles = persistence.recentFiles or {}
+    local fileEntry = findMenuEntry(menu, "file") or {}
+    local recentEntry = findMenuEntry(fileEntry[2], "recent")
+
+    if recentEntry then
+        local recentChildren = {}
+
+        for _, filename in ipairs(recentFiles) do
+            local cleanedFilename = filename
+            local modPath = mods.getFilenameModPath(filename)
+
+            -- If packaged
+            if modPath then
+                local relativeTo = utils.joinpath(modPath, "Maps")
+
+                cleanedFilename = string.sub(filename, #relativeTo + 2)
+                cleanedFilename = utils.stripExtension(cleanedFilename)
+
+            else
+                cleanedFilename = utils.stripExtension(filesystem.filename(filename))
+            end
+
+            table.insert(recentChildren, {
+                cleanedFilename,
+                function()
+                    loadedState.loadFile(filename)
+                end
+            })
+        end
+
+        recentEntry[2] = recentChildren
+    end
+end
+
+local function hotswapMenubar()
+    local newMenubar = menubar.getMenubar()
+
+    activeMenubar.children = newMenubar.children
+    activeMenubar:reflow()
+    activeMenubar:repaint()
+end
+
 function menubar.getMenubar()
     local preparedMenubar = utils.deepcopy(menubar.menubar)
     local language = languageRegistry.getLanguage()
 
     removeFalseEntries(preparedMenubar)
-    wrapInSubmenuClosers(preparedMenubar)
     addLanguageStrings(preparedMenubar, language)
+    addRecentFiles(preparedMenubar)
+    wrapInSubmenuClosers(preparedMenubar)
     handleElementTypes(preparedMenubar)
 
-    return uiElements.topbar(preparedMenubar)
+    local topbar = uiElements.topbar(preparedMenubar)
+
+    topbar:hook({
+        editorMapLoaded = function()
+            hotswapMenubar()
+        end
+    })
+
+    if not activeMenubar then
+        activeMenubar = topbar
+    end
+
+    return topbar
 end
 
 return menubar
