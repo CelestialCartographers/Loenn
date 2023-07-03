@@ -244,10 +244,12 @@ local function drawSelectionRectanglesCommon(room, targets, borderColor, fillCol
                     local x, y = target.x, target.y
                     local width, height = target.width, target.height
 
-                    if not alreadyDrawn[target.item] then
+                    alreadyDrawn[target.item] = alreadyDrawn[target.item] or {}
+
+                    if not alreadyDrawn[target.item][target.node] then
                         love.graphics.rectangle("line", x - lineWidth / 2, y - lineWidth / 2, width + lineWidth, height + lineWidth)
 
-                        alreadyDrawn[target.item] = true
+                        alreadyDrawn[target.item][target.node] = true
                     end
                 end
             end)
