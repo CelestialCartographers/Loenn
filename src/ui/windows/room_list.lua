@@ -180,6 +180,12 @@ function roomList:uiRoomWindowRoomChanged()
     end
 end
 
+function roomList:editorRoomOrderChanged()
+    return function(list)
+        updateList(self)
+    end
+end
+
 function roomList.getWindow()
     local search = ""
 
@@ -193,6 +199,7 @@ function roomList.getWindow()
     local window = uiElements.window("Room List", column:with(uiUtils.fillHeight(true))):with(uiUtils.fillHeight(false))
 
     window:with({
+        editorRoomOrderChanged = roomList.editorRoomOrderChanged(list),
         editorMapTargetChanged = roomList.editorMapTargetChanged(list),
         editorMapLoaded = roomList.editorMapLoaded(list),
         editorMapNew = roomList.editorMapNew(list),

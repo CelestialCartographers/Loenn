@@ -258,6 +258,18 @@ local function saveRoomCallback(formFields, room, editing, usingPixels)
             mapItemUtils.addItem(map, newRoom)
         end
     end
+
+    if configs.editor.sortRoomsOnSave then
+        local map = loadedState.map
+
+        if map then
+            table.sort(map.rooms, function(lhs, rhs)
+                return lhs.name < rhs.name
+            end)
+
+            sceneHandler.sendEvent("editorRoomOrderChanged", map)
+        end
+    end
 end
 
 local function checkCheckpointEntity(room)

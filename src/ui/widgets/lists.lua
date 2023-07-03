@@ -410,7 +410,7 @@ function listWidgets.addDraggableHooks(list)
 end
 
 local function defaultItemSort(lhs, rhs)
-    if configs.ui.searching.sortByScore then
+    if configs.ui.searching.sortByScore and lhs._filterScore and rhs._filterScore then
         if lhs._filterScore ~= rhs._filterScore then
             return lhs._filterScore > rhs._filterScore
         end
