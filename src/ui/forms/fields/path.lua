@@ -13,35 +13,16 @@ local pathField = {}
 
 pathField.fieldType = "path"
 
-local function openFileDialog(textField, options)
-    local relativeToMod = options.relativeToMod
-    local allowedExtensions = options.filePickerExtensions or options.allowedExtensions
-    local allowFolders = options.allowFolders
-    local allowFiles = options.allowFiles
-    local useUnixSeparator = options.useUnixSeparator
-    local filenameProcessor = options.filenameProcessor
-
-    local useFolderDialog = not allowFiles and allowFolders
-
-    local filter
-    local startingPath = fileLocations.getCelesteDir()
-
-    local userOS = utils.getOS()
-    local usingWindows = userOS == "Windows"
-
-    if allowedExtensions then
-        filter = table.concat(allowedExtensions, ",")
-    end
-
-    if relativeToMod ~= false then
-        local modPath = mods.getFilenameModPath(loadedState.filename)
-
-        -- Use current mod root if posible, otherwise use Celeste root
-        startingPath = modPath or startingPath
-    end
-
-    local function dialogCallback(filename)
+local function getDialogCallback(textField, options)
+    return function(filename)
         local rawFilename = filename
+
+        local useUnixSeparator = options.useUnixSeparator
+        local filenameProcessor = options.filenameProcessor
+        local relativeToMod = options.relativeToMod
+
+        local userOS = utils.getOS()
+        local usingWindows = userOS == "Windows"
 
         if relativeToMod ~= false then
             local modPath = mods.getFilenameModPath(filename)
@@ -68,12 +49,56 @@ local function openFileDialog(textField, options)
         textField:setText(filename)
         textField.index = #filename
     end
+end
+
+local function openFileDialog(textField, options)
+    local relativeToMod = options.relativeToMod
+    local allowedExtensions = options.filePickerExtensions or options.allowedExtensions
+    local allowFolders = options.allowFolders
+    local allowFiles = options.allowFiles
+
+    local useFolderDialog = not allowFiles and allowFolders
+
+    local filter
+    local startingPath = fileLocations.getCelesteDir()
+
+    if allowedExtensions then
+        filter = table.concat(allowedExtensions, ",")
+    end
+
+    if relativeToMod ~= false then
+        local modPath = mods.getFilenameModPath(loadedState.filename)
+
+        -- Use current mod root if posible, otherwise use Celeste root
+        startingPath = modPath or startingPath
+    end
 
     if useFolderDialog then
-        utils.openFolderDialog(startingPath, dialogCallback)
+        utils.openFolderDialog(startingPath, getDialogCallback(textField, options))
 
     else
-        utils.openDialog(startingPath, filter, dialogCallback)
+        utils.openDialog(startingPath, filter, getDialogCallback(textField, options))
+    end
+end
+
+local function fileDropped(orig, self, file)
+    local cursorX, cursorY = love.mouse.getPosition()
+    local hoveredElement = ui.root:getChildAt(cursorX, cursorY)
+    local target = hoveredElement
+    local hovered = false
+
+    while target and not hovered do
+        hovered = target == self
+        target = target.parent
+    end
+
+    if hovered then
+        local fieldElement = self._fieldElement
+        local filename = file:getFilename()
+
+        getDialogCallback(self, fieldElement._options)(filename)
+
+        return true
     end
 end
 
@@ -143,6 +168,9 @@ function pathField.getElement(name, value, options)
     local stringElement = stringField.getElement(name, value, options)
     local textfield = stringElement.field
 
+    stringElement._options = options
+    textfield._fieldElement = stringElement
+
     if textfield.height == -1 then
         textfield:layout()
     end
@@ -166,6 +194,10 @@ function pathField.getElement(name, value, options)
 
         textfield:addChild(folderImage)
     end
+
+    textfield:hook({
+        filedropped = fileDropped
+    })
 
     return stringElement
 end
