@@ -7,8 +7,11 @@ local github = {}
 github._cache = {}
 github._cacheTime = 300
 
-github._baseUrl = "https://api.github.com"
-github._baseReleasesUrl = github._baseUrl .. "/repos/%s/%s/releases"
+github._baseUrl = "https://github.com"
+github._repositoryUrl = github._baseUrl .. "/%s/%s"
+github._repositoryReadmeUrl = github._repositoryUrl .. "#readme"
+github._apiBaseUrl = "https://api.github.com"
+github._baseReleasesUrl = github._apiBaseUrl .. "/repos/%s/%s/releases"
 
 local headers = {
     ["User-Agent"] = "curl/7.78.0",
@@ -46,6 +49,14 @@ local function getUrlJsonData(url, force)
             end
         end
     end
+end
+
+function github.getRepositoryUrl(author, repo)
+    return string.format(github._repositoryUrl, author, repo)
+end
+
+function github.getRepositoryReadmeUrl(author, repo)
+    return string.format(github._repositoryReadmeUrl, author, repo)
 end
 
 function github.getReleases(author, repo)
