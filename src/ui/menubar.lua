@@ -20,6 +20,7 @@ local roomEditor = require("ui.room_editor")
 local stylegroundEditor = require("ui.styleground_editor")
 local metadataEditor = require("ui.metadata_editor")
 local dependencyEditor = require("ui.dependency_editor")
+local aboutWindow = require("ui.about_window_wrapper")
 
 local menubar = {}
 
@@ -154,7 +155,7 @@ menubar.menubar = {
     {"help", {
         {"check_for_updates", checkForUpdates},
         {"open_storage_directory", openStorageDirectory},
-        {"about", notYetImplementedNotification}
+        {"about", aboutWindow.showAboutWindow}
     }}
 }
 

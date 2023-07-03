@@ -92,6 +92,14 @@ ui.room_window.save_changes_update=Update room
 ui.room_window.close_window=Close window
 
 
+# About Window
+ui.about_window.title=About
+ui.about_window.readme_button=Go to README
+ui.about_window.description=Level Editor for the game Celeste\nPowered by LÖVE and Lua.
+ui.about_window.version=Editor version: %s
+ui.about_window.credits=Created by Cruor and Vexatos
+
+
 # Room List
 ui.room_list.action.edit=Edit
 ui.room_list.action.delete=Delete
