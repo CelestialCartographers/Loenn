@@ -27,6 +27,12 @@ function inputCaptureDevice.captureKeyboardHotkey(callback, timeout)
     inputCaptureDevice._captureCallback = callback
 end
 
+function inputCaptureDevice.captureKeyboardModifier(callback, timeout)
+    inputCaptureDevice._captureTime = timeout or DEFAULT_TIMEOUT
+    inputCaptureDevice._captureMode = "keyboardModifier"
+    inputCaptureDevice._captureCallback = callback
+end
+
 function inputCaptureDevice.captureMouseButton(callback, timeout)
     inputCaptureDevice._captureTime = timeout or DEFAULT_TIMEOUT
     inputCaptureDevice._captureMode = "mouse"
@@ -41,6 +47,15 @@ function inputCaptureDevice.captureStop()
 end
 
 function inputCaptureDevice.keypressed(key, scancode, isrepeat)
+    if inputCaptureDevice._captureMode == "keyboardModifier" then
+        if inputCaptureDevice._captureCallback then
+            local activator = keyboardHelper.activatorModifierString()
+
+            inputCaptureDevice._captureCallback(activator)
+            inputCaptureDevice.captureStop()
+        end
+    end
+
     return inputCaptureDevice._capturing
 end
 
@@ -75,6 +90,5 @@ end
 function inputCaptureDevice.mouseclicked(x, y, button, istouch, presses)
     return inputCaptureDevice._capturing
 end
-
 
 return inputCaptureDevice
