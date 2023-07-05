@@ -134,6 +134,7 @@ ui.colorPicker.fieldTypes.description.alpha=Alpha value of the colour, between 0
 # User Input Capturing
 ui.userInput.capturing=Capturing...
 ui.userInput.noValue=Not configured
+ui.userInput.mouseButton=Mouse Button %s
 
 
 # Forms

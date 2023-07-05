@@ -38,9 +38,11 @@ local function captureMouseButton(formField, buttonElement)
 
     return function(button)
         if button then
+            local buttonText = string.format(tostring(language.ui.userInput.mouseButton), button)
+
             formField:setValue(button)
             formField:notifyFieldChanged()
-            buttonElement:setText(tostring(button))
+            buttonElement:setText(buttonText)
 
         else
             buttonElement:setText(previousText)
@@ -52,7 +54,14 @@ function mouseField.getElement(name, value, options)
     local formField = {}
 
     local language = languageRegistry.getLanguage()
-    local buttonText = value and tostring(value) or tostring(language.ui.userInput.noValue)
+    local buttonText
+
+    if value then
+        buttonText = string.format(tostring(language.ui.userInput.mouseButton), value)
+
+    else
+        buttonText = tostring(language.ui.userInput.noValue)
+    end
 
     local label = uiElements.label(options.displayName or name)
     local buttonElement = uiElements.button(buttonText, function(self, x, y, button)
