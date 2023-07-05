@@ -72,11 +72,13 @@ function keyboard.activatorModifierString(key)
         table.insert(parts, "shift")
     end
 
-    if keyToNameLookup[key] then
-        key = keyToNameLookup[key]
-    end
+    if key then
+        if keyToNameLookup[key] then
+            key = keyToNameLookup[key]
+        end
 
-    table.insert(parts, key)
+        table.insert(parts, key)
+    end
 
     return table.concat(parts, " + ")
 end
