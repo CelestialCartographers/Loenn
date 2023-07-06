@@ -52,28 +52,32 @@ end
 function windowPersister.restorePosition(name, window)
     local windows = activeWindows[name]
     local previous = previousPositions[name]
+    local newX, newY = -4096, -4096
+
+    window.x, window.y = -4096, -4096
 
     -- Set window to center of screen if no previous position
     if previous then
-        local newX, newY = previous[1], previous[2]
+        newX, newY = previous[1], previous[2]
 
         -- Don't stack windows
         if #windows > 0 then
             newX += 24
             newY += 24
         end
-
-        widgetUtils.moveWindow(window, newX, newY)
-
-    else
-        window.x, window.y = -4096, -4096
-        -- Needs to run pretty late to get correct size
-        ui.runLate(function()
-            ui.runLate(function()
-                widgetUtils.centerWindow(window)
-            end)
-        end)
     end
+
+    -- Needs to run pretty late to get correct size
+    ui.runLate(function()
+        ui.runLate(function()
+            if previous then
+                widgetUtils.moveWindow(window, newX, newY)
+
+            else
+                widgetUtils.centerWindow(window)
+            end
+        end)
+    end)
 end
 
 local function windowUpdate(name, window)
