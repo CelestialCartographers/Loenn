@@ -470,6 +470,32 @@ local function deleteItems(room, layer, targets)
     return snapshot, redraw
 end
 
+local function getRelevantNodeAddSelections(layer, selections)
+    -- If a entity/trigger has multiple selections
+    -- Then we add the one with the highest node value
+    local targetsBestNode = {}
+
+    for _, selection in ipairs(selections) do
+        local bestNode = targetsBestNode[selection.item] or 0
+
+        if selection.node or bestNode < selection.node then
+            targetsBestNode[selection.item] = selection.node
+        end
+    end
+
+    local relevantSelections = {}
+
+    for _, selection in ipairs(selections) do
+        local bestNode = targetsBestNode[selection.item] or 0
+
+        if selection.node == bestNode then
+            table.insert(relevantSelections, selection)
+        end
+    end
+
+    return relevantSelections
+end
+
 local function addNode(room, layer, targets)
     local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
     local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayersSnapshot(function()
@@ -477,7 +503,9 @@ local function addNode(room, layer, targets)
         local selectionsBefore = utils.deepcopy(selectionTargets)
         local newTargets = {}
 
-        for _, selection in ipairs(targets) do
+        local relevantSelections = getRelevantNodeAddSelections(layer, targets)
+
+        for _, selection in ipairs(relevantSelections) do
             local added = selectionItemUtils.addNodeToSelection(room, selection.layer, selection)
 
             if added then
