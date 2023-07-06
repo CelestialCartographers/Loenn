@@ -640,10 +640,6 @@ local function pasteItems(room, layer, targets)
 end
 
 local function handleItemMovementKeys(room, key, scancode, isrepeat)
-    if not selectionTargets or not room then
-        return
-    end
-
     for _, movementData in ipairs(selectionMovementKeys) do
         local configKey, offsetX, offsetY = movementData[1], movementData[2], movementData[3]
         local targetKey = configs.editor[configKey]
@@ -669,10 +665,6 @@ local function handleItemMovementKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemResizeKeys(room, key, scancode, isrepeat)
-    if not selectionTargets or not room then
-        return
-    end
-
     for _, resizeData in ipairs(selectionResizeKeys) do
         local configKey, offsetX, offsetY, directionX, directionY = resizeData[1], resizeData[2], resizeData[3], resizeData[4], resizeData[5]
         local targetKey = configs.editor[configKey]
@@ -698,10 +690,6 @@ local function handleItemResizeKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemRotateKeys(room, key, scancode, isrepeat)
-    if not selectionTargets or not room then
-        return
-    end
-
     for _, rotationData in ipairs(selectionRotationKeys) do
         local configKey, direction = rotationData[1], rotationData[2]
         local targetKey = configs.editor[configKey]
@@ -722,10 +710,6 @@ local function handleItemRotateKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemFlipKeys(room, key, scancode, isrepeat)
-    if not selectionTargets or not room then
-        return
-    end
-
     for _, flipData in ipairs(selectionFlipKeys) do
         local configKey, horizontal, vertical = flipData[1], flipData[2], flipData[3]
         local targetKey = configs.editor[configKey]
@@ -746,10 +730,6 @@ local function handleItemFlipKeys(room, key, scancode, isrepeat)
 end
 
 local function handleItemDeletionKey(room, key, scancode, isrepeat)
-    if not selectionTargets or not room then
-        return
-    end
-
     local targetKey = configs.editor.itemDelete
 
     if targetKey == key then
@@ -768,10 +748,6 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
 end
 
 local function handleNodeAddKey(room, key, scancode, isrepeat)
-    if not selectionTargets or not room then
-        return
-    end
-
     local targetKey = configs.editor.itemAddNode
 
     if targetKey == key and not isrepeat then
@@ -1391,12 +1367,14 @@ function tool.keypressed(key, scancode, isrepeat)
 
     updateVisualsOnBehaviorChange()
 
-    handled = handled or handleItemMovementKeys(room, key, scancode, isrepeat)
-    handled = handled or handleItemResizeKeys(room, key, scancode, isrepeat)
-    handled = handled or handleItemRotateKeys(room, key, scancode, isrepeat)
-    handled = handled or handleItemFlipKeys(room, key, scancode, isrepeat)
-    handled = handled or handleItemDeletionKey(room, key, scancode, isrepeat)
-    handled = handled or handleNodeAddKey(room, key, scancode, isrepeat)
+    if selectionTargets and room then
+        handled = handled or handleItemMovementKeys(room, key, scancode, isrepeat)
+        handled = handled or handleItemResizeKeys(room, key, scancode, isrepeat)
+        handled = handled or handleItemRotateKeys(room, key, scancode, isrepeat)
+        handled = handled or handleItemFlipKeys(room, key, scancode, isrepeat)
+        handled = handled or handleItemDeletionKey(room, key, scancode, isrepeat)
+        handled = handled or handleNodeAddKey(room, key, scancode, isrepeat)
+    end
 
     return handled
 end
