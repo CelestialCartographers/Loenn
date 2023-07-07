@@ -40,13 +40,16 @@ local function getWindowTitle(language, selections, bestSelection)
 
     -- Add id for selected items
     local ids = {}
+    local seenIds = {}
 
     for _, selection in ipairs(selections) do
         local selectionId = selection.item._id
         local selectionLayer = selection.layer
 
         if selectionLayer == "entities" or selectionLayer == "triggers" then
-            if selectionId then
+            if selectionId and not seenIds[selectionId] then
+                seenIds[selectionId] = true
+
                 table.insert(ids, tostring(selectionId))
             end
         end
