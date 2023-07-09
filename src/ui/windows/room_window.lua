@@ -237,6 +237,8 @@ local function saveRoomCallback(formFields, room, editing, usingPixels)
         local map = loadedState.map
         local newRoom = utils.deepcopy(room)
 
+        room.name = newRoomData.name
+
         local roomTilesWidth = math.ceil(newRoomData.width / 8)
         local roomTilesHeight = math.ceil(newRoomData.height / 8)
 
@@ -375,6 +377,15 @@ function roomWindow.createRoomWindow(room, editing)
         {
             text = saveText,
             formMustBeValid = true,
+            enabled = function(formFields)
+                if not editing and formFields then
+                    local data = form.getFormData(formFields)
+
+                    return data.name ~= room.name
+                end
+
+                return true
+            end,
             callback = function(formFields)
                 saveRoomCallback(formFields, room, editing, usingPixels)
                 widgetUtils.setWindowTitle(window, getWindowTitle(language, room, editing))
