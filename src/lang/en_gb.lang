@@ -255,6 +255,7 @@ entities.resortmirror.placements.name.mirror=Resort Mirror
 
 # Dream Block
 entities.dreamBlock.placements.name.dream_block=Dream Block
+entities.dreamBlock.placements.name.space_jam=Space Jam
 entities.dreamBlock.attributes.description.fastMoving=Changes the dream block between two speeds.
 entities.dreamBlock.attributes.description.oneUse=Determines whether the dream block should disappear after one use.
 entities.dreamBlock.attributes.description.below=Determines whether the dream block should render in the background or foreground.
@@ -1024,6 +1025,7 @@ triggers.eventTrigger.attributes.description.onSpawn=If the event should automat
 
 # Activate Dream Block (Everest)
 triggers.everest/activateDreamBlocksTrigger.placements.name.activate_dream_blocks=Activate Dream Blocks
+triggers.everest/activateDreamBlocksTrigger.placements.name.activate_space_jam=Activate Space Jam
 triggers.everest/activateDreamBlocksTrigger.attributes.description.fullRoutine=Whether the Dream Block should play the whole animation, rather than just instantly looking ready.
 triggers.everest/activateDreamBlocksTrigger.attributes.description.activate=Whether the Dream Block should become usable or not.
 triggers.everest/activateDreamBlocksTrigger.attributes.description.fastAnimation=Whether a faster animation should be used.

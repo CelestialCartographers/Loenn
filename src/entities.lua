@@ -905,22 +905,53 @@ local function getDefaultPlacement(handler, placements)
     end
 end
 
+local function getPlacementLanguage(language, entityName, name, key, default)
+    local result = language.entities[entityName].placements[key][name]
+
+    if result._exists then
+        return tostring(result)
+    end
+
+    return default
+end
+
+local function getAlternativeDisplayNames(placementInfo, name, language)
+    local alternativeName = placementInfo.alternativeName
+    local alternativeNameType = type(alternativeName)
+
+    if alternativeNameType == "string" then
+        local displayName = getPlacementLanguage(language, name, alternativeName, "name")
+
+        if displayName then
+            return {displayName}
+        end
+
+    elseif alternativeNameType == "table" then
+        local result = {}
+
+        for _, altName in ipairs(alternativeName) do
+            local displayName = getPlacementLanguage(language, name, alternativeName, "name")
+
+            if displayName then
+                print(type(displayName), displayName)
+                table.insert(result, displayName)
+            end
+        end
+
+        if #result > 0 then
+            return result
+        end
+    end
+end
+
 local function getPlacement(placementInfo, defaultPlacement, name, handler, language)
     local placementType = placementInfo.placementType or guessPlacementType(name, handler, placementInfo)
     local modPrefix = modHandler.getEntityModPrefix(name)
     local simpleName = string.format("%s#%s", name, placementInfo.name)
-    local displayName = placementInfo.name
-    local tooltipText
-    local displayNameLanguage = language.entities[name].placements.name[placementInfo.name]
-    local tooltipTextLanguage = language.entities[name].placements.description[placementInfo.name]
-
-    if displayNameLanguage._exists then
-        displayName = tostring(displayNameLanguage)
-    end
-
-    if tooltipTextLanguage._exists then
-        tooltipText = tostring(tooltipTextLanguage)
-    end
+    local placementName = placementInfo.name
+    local displayName = getPlacementLanguage(language, name, placementName, "name", placementInfo.name)
+    local tooltipText = getPlacementLanguage(language, name, placementName, "description")
+    local alternativeDisplayNames = getAlternativeDisplayNames(placementInfo, name, language)
 
     local itemTemplate = {
         _name = name,
@@ -954,6 +985,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         name = simpleName,
         displayName = displayName,
         displayNameNoMods = displayNameNoMods,
+        alternativeDisplayNames = alternativeDisplayNames,
         tooltipText = tooltipText,
         layer = "entities",
         placementType = placementType,
