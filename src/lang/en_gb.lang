@@ -381,6 +381,8 @@ entities.trackSpinner.attributes.description.star=Turns the visual appearance of
 
 # Watchtower
 entities.towerviewer.placements.name.watchtower=Watchtower
+entities.towerviewer.placements.name.lookout=Lookout
+entities.towerviewer.placements.name.binoculars=Binoculars
 entities.towerviewer.attributes.description.summit=Whether the watch tower should zoom on the final node or not. Requires nodes to function, otherwise game will crash.
 entities.towerviewer.attributes.description.onlyY=Whether the watch tower can only move vertically. If the watch tower has nodes it will still follow them.
 
@@ -393,7 +395,8 @@ entities.wallBooster.attributes.description.left=Whether the entity attaches to 
 entities.wallBooster.attributes.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Bounce Block
-entities.bounceBlock.placements.name.fire=Bounce Block
+entities.bounceBlock.placements.name.fire=Core Block
+entities.bounceBlock.placements.name.fire_bounce=Bounce Block
 entities.bounceBlock.placements.name.ice=Ice Crumble Block
 entities.bounceBlock.attributes.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 

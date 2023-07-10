@@ -930,10 +930,9 @@ local function getAlternativeDisplayNames(placementInfo, name, language)
         local result = {}
 
         for _, altName in ipairs(alternativeName) do
-            local displayName = getPlacementLanguage(language, name, alternativeName, "name")
+            local displayName = getPlacementLanguage(language, name, altName, "name")
 
             if displayName then
-                print(type(displayName), displayName)
                 table.insert(result, displayName)
             end
         end

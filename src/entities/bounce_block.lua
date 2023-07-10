@@ -9,6 +9,7 @@ bounceBlock.minimumSize = {16, 16}
 bounceBlock.placements = {
     {
         name = "fire",
+        alternativeName = "fire_bounce",
         data = {
             width = 16,
             height = 16,
