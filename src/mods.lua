@@ -584,41 +584,8 @@ function modHandler.getAvailableModNames()
     return availableNames
 end
 
-local entityPrefixShownWarningFor = {}
-
-local function entityPrefixDeprecationWarning(language, modNames, modPrefix)
-    if entityPrefixShownWarningFor[modPrefix] then
-        return
-    end
-
-    -- Check if prefix matches known mods, if it does there is no issue
-    if modNames then
-        for _, modName in ipairs(modNames) do
-            if modName == modPrefix then
-                print("----- exit early", modPrefix)
-                return
-            end
-        end
-    end
-
-    local message = string.format("The mod '%s' is referred to by its mod prefix in the language file. This will be removed in the future, Please switch to using the mod name found in the mod's everest.yaml for the language entry of the mod.", modPrefix)
-
-    logging.warning(message)
-
-    entityPrefixShownWarningFor[modPrefix] = true
-end
-
-function modHandler.formatAssociatedMods(language, modNames, modPrefix)
+function modHandler.formatAssociatedMods(language, modNames)
     local displayNames = {}
-
-    -- TODO - Should this be deprecated later?
-    if modPrefix then
-        local modPrefixLanguage = language.mods[modPrefix].name
-
-        if modPrefixLanguage._exists then
-            displayNames[tostring(modPrefixLanguage)] = true
-        end
-    end
 
     for _, modName in ipairs(modNames or {}) do
         local modNameLanguage = language.mods[modName].name
@@ -634,18 +601,6 @@ function modHandler.formatAssociatedMods(language, modNames, modPrefix)
     displayNames = table.keys(displayNames)
 
     if #displayNames > 0 then
-        -- DEPRECATION - entity prefix for language lookup
-        if modNames then
-            if #displayNames > #modNames then
-                entityPrefixDeprecationWarning(language, modNames, modPrefix)
-            end
-
-        else
-            entityPrefixDeprecationWarning(language, modNames, modPrefix)
-        end
-
-
-
         table.sort(displayNames)
 
         local joinedNames = table.concat(displayNames, modHandler.modNamesSeparator)

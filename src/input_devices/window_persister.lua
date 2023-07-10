@@ -10,11 +10,12 @@ local function persistWindowData()
     local windowWidth, windowHeight = love.graphics.getDimensions()
     local windowMaximized = love.window.isMaximized()
     local windowMinimized = love.window.isMinimized()
+    local fullscreen, fullscreenType = love.window.getFullscreen()
 
     persistence.windowDisplay = windowDisplay
     persistence.windowMaximized = windowMaximized
 
-    if not windowMaximized and not windowMinimized then
+    if not windowMaximized and not windowMinimized and not fullscreen then
         persistence.windowX = windowX
         persistence.windowY = windowY
 

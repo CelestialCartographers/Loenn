@@ -393,22 +393,51 @@ local function getDefaultPlacement(handler, placements)
     end
 end
 
+local function getPlacementLanguage(language, triggerName, name, key, default)
+    local result = language.triggers[triggerName].placements[key][name]
+
+    if result._exists then
+        return tostring(result)
+    end
+
+    return default
+end
+
+local function getAlternativeDisplayNames(placementInfo, name, language)
+    local alternativeName = placementInfo.alternativeName
+    local alternativeNameType = type(alternativeName)
+
+    if alternativeNameType == "string" then
+        local displayName = getPlacementLanguage(language, name, alternativeName, "name")
+
+        if displayName then
+            return {displayName}
+        end
+
+    elseif alternativeNameType == "table" then
+        local result = {}
+
+        for _, altName in ipairs(alternativeName) do
+            local displayName = getPlacementLanguage(language, name, altName, "name")
+
+            if displayName then
+                table.insert(result, displayName)
+            end
+        end
+
+        if #result > 0 then
+            return result
+        end
+    end
+end
+
 local function getPlacement(placementInfo, defaultPlacement, name, handler, language)
     local placementType = "rectangle"
     local modPrefix = modHandler.getEntityModPrefix(name)
-    local simpleName = string.format("%s#%s", name, placementInfo.name)
-    local displayName = placementInfo.name
-    local tooltipText
-    local displayNameLanguage = language.triggers[name].placements.name[placementInfo.name]
-    local tooltipTextLanguage = language.triggers[name].placements.description[placementInfo.name]
-
-    if displayNameLanguage._exists then
-        displayName = tostring(displayNameLanguage)
-    end
-
-    if tooltipTextLanguage._exists then
-        tooltipText = tostring(tooltipTextLanguage)
-    end
+    local placementName = placementInfo.name
+    local displayName = getPlacementLanguage(language, name, placementName, "name", placementInfo.name)
+    local tooltipText = getPlacementLanguage(language, name, placementName, "description")
+    local alternativeDisplayNames = getAlternativeDisplayNames(placementInfo, name, language)
 
     local itemTemplate = {
         _name = name,
@@ -434,7 +463,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
     itemTemplate.height = itemTemplate.height or 16
 
     local associatedMods = placementInfo.associatedMods or triggers.associatedMods(itemTemplate)
-    local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
+    local modsString = modHandler.formatAssociatedMods(language, associatedMods)
     local displayNameNoMods = displayName
 
     if modsString then
@@ -445,6 +474,7 @@ local function getPlacement(placementInfo, defaultPlacement, name, handler, lang
         name = simpleName,
         displayName = displayName,
         displayNameNoMods = displayNameNoMods,
+        alternativeDisplayNames = alternativeDisplayNames,
         tooltipText = tooltipText,
         layer = "triggers",
         placementType = placementType,

@@ -254,7 +254,8 @@ entities.resortRoofEnding.placements.name.resort_roof_ending=Resort Roof Ending
 entities.resortmirror.placements.name.mirror=Resort Mirror
 
 # Dream Block
-entities.dreamBlock.placements.name.dream_block=Space Jam
+entities.dreamBlock.placements.name.dream_block=Dream Block
+entities.dreamBlock.placements.name.space_jam=Space Jam
 entities.dreamBlock.attributes.description.fastMoving=Changes the dream block between two speeds.
 entities.dreamBlock.attributes.description.oneUse=Determines whether the dream block should disappear after one use.
 entities.dreamBlock.attributes.description.below=Determines whether the dream block should render in the background or foreground.
@@ -380,6 +381,8 @@ entities.trackSpinner.attributes.description.star=Turns the visual appearance of
 
 # Watchtower
 entities.towerviewer.placements.name.watchtower=Watchtower
+entities.towerviewer.placements.name.lookout=Lookout
+entities.towerviewer.placements.name.binoculars=Binoculars
 entities.towerviewer.attributes.description.summit=Whether the watch tower should zoom on the final node or not. Requires nodes to function, otherwise game will crash.
 entities.towerviewer.attributes.description.onlyY=Whether the watch tower can only move vertically. If the watch tower has nodes it will still follow them.
 
@@ -392,7 +395,8 @@ entities.wallBooster.attributes.description.left=Whether the entity attaches to 
 entities.wallBooster.attributes.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
 # Bounce Block
-entities.bounceBlock.placements.name.fire=Bounce Block
+entities.bounceBlock.placements.name.fire=Core Block
+entities.bounceBlock.placements.name.fire_bounce=Bounce Block
 entities.bounceBlock.placements.name.ice=Ice Crumble Block
 entities.bounceBlock.attributes.description.notCoreMode=Determines whether the entity should ignore the current core mode and default to ice variant.
 
@@ -1022,10 +1026,11 @@ triggers.eventTrigger.placements.name.event=Event
 triggers.eventTrigger.attributes.description.event=Upon activation, plays the event selected.
 triggers.eventTrigger.attributes.description.onSpawn=If the event should automatically play when the player enters the room.
 
-# Activate Space Jams (Everest)
-triggers.everest/activateDreamBlocksTrigger.placements.name.activate_dream_blocks=Activate Space Jams
-triggers.everest/activateDreamBlocksTrigger.attributes.description.fullRoutine=Whether the Space Jam should play the whole animation, rather than just instantly looking ready.
-triggers.everest/activateDreamBlocksTrigger.attributes.description.activate=Whether the Space Jam should become usable or not.
+# Activate Dream Block (Everest)
+triggers.everest/activateDreamBlocksTrigger.placements.name.activate_dream_blocks=Activate Dream Blocks
+triggers.everest/activateDreamBlocksTrigger.placements.name.activate_space_jam=Activate Space Jam
+triggers.everest/activateDreamBlocksTrigger.attributes.description.fullRoutine=Whether the Dream Block should play the whole animation, rather than just instantly looking ready.
+triggers.everest/activateDreamBlocksTrigger.attributes.description.activate=Whether the Dream Block should become usable or not.
 triggers.everest/activateDreamBlocksTrigger.attributes.description.fastAnimation=Whether a faster animation should be used.
 
 # Change Inventory (Everest)

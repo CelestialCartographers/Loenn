@@ -53,7 +53,7 @@ function roomStruct.decode(data)
 
     room.delayAlternativeMusicFade = data.delayAltMusicFade == true
 
-    room.music = data.music or "music_oldsite_awake"
+    room.music = data.music or ""
     room.musicAlternative = data.alt_music or ""
     room.ambience = data.ambience or ""
 

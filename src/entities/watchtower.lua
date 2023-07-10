@@ -8,6 +8,7 @@ watchtower.texture = "objects/lookout/lookout05"
 watchtower.nodeLimits = {0, -1}
 watchtower.placements = {
     name = "watchtower",
+    alternativeName = {"lookout", "binoculars"},
     data = {
         summit = false,
         onlyY = false
