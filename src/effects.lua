@@ -162,7 +162,7 @@ function effects.displayName(language, style)
     end
 
     local associatedMods = effects.associatedMods(style)
-    local modsString = modHandler.formatAssociatedMods(language, associatedMods, modPrefix)
+    local modsString = modHandler.formatAssociatedMods(language, associatedMods)
 
     if modsString then
         displayName = string.format("%s %s", displayName, modsString)
