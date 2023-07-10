@@ -124,6 +124,16 @@ local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
             local text = item.textNoMods
             local score = textSearching.searchScore(text, search, caseSensitive, fuzzy)
 
+            if item.alternativeNames then
+                for _, altName in ipairs(item.alternativeNames) do
+                    local altScore = textSearching.searchScore(altName, search, caseSensitive, fuzzy)
+
+                    if altScore then
+                        score = math.max(score or altScore, altScore)
+                    end
+                end
+            end
+
             if score then
                 totalScore += score
                 hasMatch = true
@@ -297,6 +307,7 @@ local function getMaterialItems(layer)
         local item = {
             text = materialText,
             textNoMods = materialTextNoMods,
+            alternativeNames = material.alternativeDisplayNames,
             data = materialData,
             tooltip = materialTooltip,
             itemFavorited = itemFavorited,
