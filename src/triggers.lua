@@ -434,6 +434,7 @@ end
 local function getPlacement(placementInfo, defaultPlacement, name, handler, language)
     local placementType = "rectangle"
     local modPrefix = modHandler.getEntityModPrefix(name)
+    local simpleName = string.format("%s#%s", name, placementInfo.name)
     local placementName = placementInfo.name
     local displayName = getPlacementLanguage(language, name, placementName, "name", placementInfo.name)
     local tooltipText = getPlacementLanguage(language, name, placementName, "description")
