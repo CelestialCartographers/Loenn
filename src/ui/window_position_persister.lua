@@ -29,8 +29,6 @@ function windowPersister.removeActiveWindow(name, window)
             break
         end
     end
-
-    table.insert(activeWindows, window)
 end
 
 function windowPersister.addActiveWindow(name, window)
