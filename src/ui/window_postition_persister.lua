@@ -24,7 +24,7 @@ function windowPersister.removeActiveWindow(name, window)
 
     for i, w in ipairs(activeWindows[name]) do
         if w == window then
-            table.remove(activeWindows, i)
+            table.remove(activeWindows[name], i)
 
             break
         end
@@ -40,8 +40,8 @@ function windowPersister.addActiveWindow(name, window)
 end
 
 function windowPersister.trackWindow(name, window)
-    windowPersister.addActiveWindow(name, window)
     windowPersister.restorePosition(name, window)
+    windowPersister.addActiveWindow(name, window)
     windowPersister.addPositionHook(name, window)
 end
 
