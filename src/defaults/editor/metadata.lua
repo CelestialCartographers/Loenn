@@ -60,7 +60,7 @@ defaultMetadata.mode = {
 }
 
 defaultMetadata.audioState = {
-    Ambience = "event:/env/amb/01_main",
+    Ambience = "event:/env/amb/02_awake",
     Music = "event:/music/lvl2/awake"
 }
 
