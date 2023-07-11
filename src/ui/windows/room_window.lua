@@ -22,7 +22,7 @@ local configs = require("configs")
 local enums = require("consts.celeste_enums")
 local colors = require("consts.colors")
 
-local windowPersister = require("ui.window_postition_persister")
+local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "room_window"
 
 local roomWindow = {}

@@ -22,7 +22,7 @@ local effectStruct = require("structs.effect")
 local formUtils = require("ui.utils.forms")
 local atlases = require("atlases")
 
-local windowPersister = require("ui.window_postition_persister")
+local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "stylegrounds_window"
 
 local stylegroundWindow = {}

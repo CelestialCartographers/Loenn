@@ -22,7 +22,7 @@ local collapsableWidget = require("ui.widgets.collapsable")
 local widgetUtils = require("ui.widgets.utils")
 local gridElement = require("ui.widgets.grid")
 
-local windowPersister = require("ui.window_postition_persister")
+local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "dependency_window"
 
 local dependencyWindow = {}

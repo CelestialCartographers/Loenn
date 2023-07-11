@@ -18,7 +18,7 @@ local history = require("history")
 local configs = require("configs")
 local enums = require("consts.celeste_enums")
 
-local windowPersister = require("ui.window_postition_persister")
+local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "metadata_window"
 
 local metadataWindow = {}

@@ -17,7 +17,7 @@ local formUtils = require("ui.utils.forms")
 local tiles = require("tiles")
 local selectionUtils = require("selections")
 
-local windowPersister = require("ui.window_postition_persister")
+local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "selection_context_window"
 
 local contextWindow = {}

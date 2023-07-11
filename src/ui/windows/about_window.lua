@@ -12,7 +12,7 @@ local meta = require("meta")
 
 local aboutWindowWrapper = require("ui.about_window_wrapper")
 
-local windowPersister = require("ui.window_postition_persister")
+local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "about_window"
 
 local aboutWindow = {}
