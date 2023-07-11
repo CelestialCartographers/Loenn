@@ -61,7 +61,7 @@ defaultMetadata.mode = {
 
 defaultMetadata.audioState = {
     Ambience = "event:/env/amb/01_main",
-    Music = "event:/music/lvl1/main"
+    Music = "event:/music/lvl2/awake"
 }
 
 defaultMetadata.cassetteModifiers = {
