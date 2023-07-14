@@ -80,6 +80,14 @@ local function getOnlyShowDependencies()
     return loadedState.onlyShowDependedOnMods
 end
 
+
+local function noRecentFilesNotification()
+    local language = languageRegistry.getLanguage()
+    local text = tostring(language.ui.menubar.no_recent_files)
+
+    notifications.notify(text)
+end
+
 local function notYetImplementedNotification()
     local language = languageRegistry.getLanguage()
     local text = tostring(language.ui.menubar.not_yet_implemented)
@@ -118,7 +126,7 @@ menubar.menubar = {
     {"file", {
         {"new", loadedState.newMap},
         {"open", loadedState.openMap},
-        {"recent", notYetImplementedNotification},
+        {"recent", noRecentFilesNotification},
         {},
         {"save", loadedState.saveCurrentMap},
         {"save_as", loadedState.saveAsCurrentMap},
@@ -297,7 +305,9 @@ local function addRecentFiles(menu)
             })
         end
 
-        recentEntry[2] = recentChildren
+        if #recentChildren > 1 then
+            recentEntry[2] = recentChildren
+        end
     end
 end
 
