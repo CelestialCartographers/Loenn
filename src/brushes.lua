@@ -222,8 +222,14 @@ function brushHelper.getTile(room, x, y, layer)
     return tilesMatrix:get(x, y, "0")
 end
 
-function brushHelper.getValidTiles(layer, addAir)
+function brushHelper.getTilerMeta(layer)
     local tilerMeta = layer == "tilesFg" and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
+
+    return tilerMeta
+end
+
+function brushHelper.getValidTiles(layer, addAir)
+    local tilerMeta = brushHelper.getTilerMeta(layer)
     local paths = {}
 
     for id, tileset in pairs(tilerMeta) do
@@ -237,10 +243,14 @@ function brushHelper.getValidTiles(layer, addAir)
     return paths
 end
 
-function brushHelper.cleanMaterialPath(path, layer)
-    -- Remove tileset/ from front and humanize
+function brushHelper.cleanMaterialPath(path, layer, displayName)
+    if displayName then
+        return displayName
+    end
 
-    path = path:match("^tilesets/(.*)") or path
+    -- Remove path and humanize just the filename
+
+    path = utils.filename(path) or path
 
     if layer == "tilesBg" then
         path = path:match("^bg(.*)") or path
@@ -251,15 +261,13 @@ end
 
 function brushHelper.getMaterialLookup(layer)
     local lookup = {}
-    local paths = brushHelper.getValidTiles(layer)
+    local tilesets = brushHelper.getTilerMeta(layer)
 
-    for id, path in pairs(paths) do
-        local cleanPath = brushHelper.cleanMaterialPath(path, layer)
+    for id, tileset in pairs(tilesets) do
+        local cleanPath = brushHelper.cleanMaterialPath(tileset.path, layer, tileset.displayName)
 
         lookup[cleanPath] = id
     end
-
-    lookup["Air"] = "0"
 
     return lookup
 end

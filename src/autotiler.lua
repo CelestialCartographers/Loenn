@@ -328,9 +328,11 @@ function autotiler.loadTilesetXML(filename)
         local copy = element._attr.copy
         local ignores = element._attr.ignores
         local path = element._attr.path
+        local displayName = element._attr.displayName
         local tileset = getTilesetStructure(id)
 
         tileset.path = "tilesets/" .. path
+        tileset.displayName = displayName
 
         readTilesetInfo(tileset, id, element)
 
