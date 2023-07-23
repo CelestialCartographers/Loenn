@@ -1172,6 +1172,10 @@ triggers.windTrigger.placements.name.wind=Wind Pattern
 triggers.windTrigger.attributes.description.pattern=Changes the abilities of the room's current wind type.
 
 
+# -- Scenery Tiles
+sceneryTiles.names.-1=Air
+
+
 # -- Mod Information --
 # mods.modName.*
 mods.Everest.name=Everest
