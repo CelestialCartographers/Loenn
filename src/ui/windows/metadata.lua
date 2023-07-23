@@ -268,16 +268,11 @@ end
 local function getRoomOptions(side)
     local map = side.map
     local options = {
-        {"", ""}
+        ""
     }
 
     for i, room in ipairs(map.rooms) do
-        local nameNoPrefix = room.name:match("^lvl_(.*)") or room.name
-
-        table.insert(options, {
-            nameNoPrefix,
-            room.name
-        })
+        table.insert(options, room.name)
     end
 
     return options
