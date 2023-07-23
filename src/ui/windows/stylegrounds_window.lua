@@ -133,23 +133,6 @@ local function getOptions(style)
     return options, dummyData
 end
 
-local function getBestScale(width, height, maxWidth, maxHeight)
-    local scaleX = 1
-    local scaleY = 1
-
-    while width >= maxWidth do
-        width /= 2
-        scaleX /= 2
-    end
-
-    while height >= maxHeight do
-        height /= 2
-        scaleY /= 2
-    end
-
-    return math.min(scaleX, scaleY)
-end
-
 function stylegroundWindow.getStylegroundPreview(interactionData)
     local language = languageRegistry.getLanguage()
     local formData = interactionData.formData
@@ -182,7 +165,7 @@ function stylegroundWindow.getStylegroundPreview(interactionData)
             imageElement:layout()
 
             local imageWidth, imageHeight = imageElement.width / imageElement.scaleX, imageElement.height / imageElement.scaleY
-            local bestScale = getBestScale(imageWidth, imageHeight, PREVIEW_MAX_WIDTH, PREVIEW_MAX_HEIGHT)
+            local bestScale = widgetUtils.getBestImageScale(imageWidth, imageHeight, PREVIEW_MAX_WIDTH, PREVIEW_MAX_HEIGHT)
 
             imageElement.scaleX = bestScale
             imageElement.scaleY = bestScale
