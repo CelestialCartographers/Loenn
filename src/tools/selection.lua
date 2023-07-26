@@ -525,7 +525,7 @@ local function addNode(room, layer, targets)
                 end
 
                 -- Add new node to selections
-                local rectangles = selectionUtils.getSelectionsForItem(room, layer, item)
+                local rectangles = selectionUtils.getSelectionsForItem(room, selection.layer, item)
 
                 -- Nodes are off by one here since the main entity would be the first rectangle
                 -- We also insert after the target node, meaning the total offset is two
