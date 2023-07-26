@@ -10,7 +10,7 @@ local sceneryPath = "tilesets/scenery"
 -- Figure out which tiles are used and cache it
 function scenery.getSceneryTiles(force)
     if scenery.usedTilesCache and not force then
-        return usedSceneryTiles
+        return scenery.usedTilesCache
     end
 
     local spriteMeta = atlases.getResource(sceneryPath, "Gameplay")
@@ -63,22 +63,25 @@ function scenery.getMaterialLookup(addBlank)
     local sceneryTiles = scenery.getSceneryTiles()
     local lookup = {}
     local language = languageRegistry.getLanguage()
+    local displayFormat = "%s (%s)"
 
     for i, id in ipairs(sceneryTiles) do
         local displayName = language.sceneryTiles.names[tostring(id)]
 
         if displayName._exists then
-            lookup[tostring(displayName)] = id
+            lookup[string.format(displayFormat, displayName, id)] = id
 
         else
-            lookup[tostring(id)] = id
+            local unknownName = language.sceneryTiles.names.unknown
+
+            lookup[string.format(displayFormat, unknownName, id)] = id
         end
     end
 
     if addBlank ~= false then
         local displayName = tostring(language.sceneryTiles.names["-1"])
 
-        lookup[displayName] = -1
+        lookup[string.format(displayFormat, displayName, id)] = -1
     end
 
     return lookup
