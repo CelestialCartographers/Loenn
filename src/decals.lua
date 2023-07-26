@@ -385,6 +385,9 @@ function decals.fieldInformation(layer, decal)
     return {
         color = {
             fieldType = "color"
+        },
+        texture = {
+            fieldType = "decalTexture"
         }
     }
 end
