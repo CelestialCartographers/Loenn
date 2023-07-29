@@ -29,7 +29,7 @@ tool.image = nil
 
 tool.layer = "entities"
 tool.validLayers = {
-    "all_layers",
+    "allLayers",
     "tilesFg",
     "tilesBg",
     "entities",
@@ -107,7 +107,7 @@ function tool.unselect()
 end
 
 function tool.setLayer(layer)
-    if layer == "all_layers" then
+    if layer == "allLayers" then
         tool.layer = allLayers
 
     else
