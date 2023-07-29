@@ -90,10 +90,27 @@ function triggers.getDrawableDisplayText(trigger)
     return displayName
 end
 
+function triggers.triggerText(room, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+    local fallbackText = triggers.getDrawableDisplayText(trigger)
+
+    if handler.triggerText then
+        if utils.isCallable(handler.triggerText) then
+            return handler.triggerText(room, trigger) or fallbackText
+
+        else
+            return handler.triggerText or fallbackText
+        end
+    end
+
+    return fallbackText
+end
+
 -- Returns drawable, depth
 function triggers.getDrawable(name, handler, room, trigger, viewport)
     local func = function()
-        local displayName = triggers.getDrawableDisplayText(trigger)
+        local displayName = triggers.triggerText(room, trigger)
 
         local x = trigger.x or 0
         local y = trigger.y or 0
@@ -142,7 +159,7 @@ function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
     local textBatch = love.graphics.newText(font)
 
     for i, trigger in ipairs(targets) do
-        local displayName = triggers.getDrawableDisplayText(trigger)
+        local displayName = triggers.triggerText(room, trigger)
 
         local x = trigger.x or 0
         local y = trigger.y or 0
