@@ -262,7 +262,7 @@ local function materialDataToElement(list, data, element)
 
         element.text = data.text
         element.data = data.data
-        element.tooltip = data.tooltip
+        element.tooltipText = data.tooltip
         element.itemFavorited = data.itemFavorited
         element.originalText = data.text
         element.itemData = data
