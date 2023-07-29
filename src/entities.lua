@@ -600,6 +600,69 @@ function entities.flipSelection(room, layer, selection, horizontal, vertical)
     return true
 end
 
+function entities.areaFlipSelection(room, layer, selection, horizontal, vertical, area)
+    local entity, node = selection.item, selection.node
+    local name = entity._name
+    local handler = entities.registeredEntities[name]
+
+    if handler.onAreaFlip then
+        local handled = handler.onAreaFlip(room, entity, horizontal, vertical)
+
+        if handled == false then
+            return false
+        end
+    end
+
+    if handler.areaFlip then
+        local madeChanges = handler.areaFlip(room, entity, horizontal, vertical)
+
+        if madeChanges == false then
+            return false
+        end
+
+    else
+        if handler.flip then
+            handler.flip(room, entity, horizontal, vertical)
+        end
+
+        local target = entity
+        local width = entity.width or 0
+        local height = entity.height or 0
+
+        if selection.node > 0 then
+            local nodes = entity.nodes
+
+            if nodes and node <= #nodes then
+                target = nodes[node]
+
+            else
+                return false
+            end
+        end
+
+        if horizontal then
+            target.x = 2 * area.x + area.width - width - target.x
+        end
+
+        if vertical then
+            target.y = 2 * area.y + area.height - height - target.y
+        end
+    end
+
+    -- Name might have changed
+    name = entity._name
+    handler = entities.registeredEntities[name]
+
+    if handler.updateAreaFlipSelection then
+        handler.updateAreaFlipSelection(room, entity, node, selection, horizontal, vertical)
+
+    else
+        updateSelectionNaive(room, entity, node, selection)
+    end
+
+    return true
+end
+
 function entities.rotateSelection(room, layer, selection, direction)
     local entity, node = selection.item, selection.node
     local name = entity._name

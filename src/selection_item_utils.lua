@@ -55,6 +55,10 @@ function selectionItemUtils.rotateSelection(room, layer, item, direction)
     return callHandlerFunction("rotateSelection", room, layer, item, direction)
 end
 
+function selectionItemUtils.areaFlipSelection(room, layer, item, horizontal, vertical, area)
+    return callHandlerFunction("areaFlipSelection", room, layer, item, horizontal, vertical, area)
+end
+
 function selectionItemUtils.flipSelection(room, layer, item, horizontal, vertical)
     return callHandlerFunction("flipSelection", room, layer, item, horizontal, vertical)
 end

@@ -271,6 +271,26 @@ function decals.flipSelection(room, layer, selection, horizontal, vertical)
     return horizontal or vertical
 end
 
+function decals.areaFlipSelection(room, layer, selection, horizontal, vertical, area)
+    local decal = selection.item
+
+    if horizontal then
+        decal.scaleX *= -1
+        decal.x = 2 * area.x + area.width - decal.x
+    end
+
+    if vertical then
+        decal.scaleY *= -1
+        decal.y = 2 * area.y + area.height - decal.y
+    end
+
+    if horizontal or vertical then
+        updateSelection(selection, room, decal, layer)
+    end
+
+    return horizontal or vertical
+end
+
 function decals.rotateSelection(room, layer, selection, direction)
     local decal = selection.item
 

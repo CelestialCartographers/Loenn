@@ -231,6 +231,52 @@ function triggers.drawSelected(room, layer, trigger, color)
     end
 end
 
+local function updateSelectionNaive(room, trigger, node, selection)
+    local rectangle, nodeRectangles = triggers.getSelection(room, trigger)
+    local newSelectionRectangle = node == 0 and rectangle or nodeRectangles and nodeRectangles[node]
+
+    if newSelectionRectangle then
+        selection.x = newSelectionRectangle.x
+        selection.y = newSelectionRectangle.y
+
+        selection.width = newSelectionRectangle.width
+        selection.height = newSelectionRectangle.height
+    end
+end
+
+function triggers.areaFlipSelection(room, layer, selection, horizontal, vertical, area)
+    local trigger, node = selection.item, selection.node
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    local target = trigger
+    local width = trigger.width or 0
+    local height = trigger.height or 0
+
+    if selection.node > 0 then
+        local nodes = entity.nodes
+
+        if nodes and node <= #nodes then
+            target = nodes[node]
+
+        else
+            return false
+        end
+    end
+
+    if horizontal then
+        target.x = 2 * area.x + area.width - width - target.x
+    end
+
+    if vertical then
+        target.y = 2 * area.y + area.height - height - target.y
+    end
+
+    updateSelectionNaive(room, trigger, node, selection)
+
+    return horizontal or vertical
+end
+
 function triggers.moveSelection(room, layer, selection, offsetX, offsetY)
     local trigger, node = selection.item, selection.node
 
