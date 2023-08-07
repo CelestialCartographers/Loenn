@@ -75,15 +75,6 @@ function forms.getFormFields(data, options)
 
     local elements = {}
 
-    local fieldChangedCallback = function(changedField)
-        elements._lastChange = love.timer.getTime()
-        elements._formValid = forms.formValid(elements)
-
-        if options.formFieldChanged then
-            options.formFieldChanged(elements, changedField)
-        end
-    end
-
     for _, name in ipairs(fieldOrder) do
         local nameParts = forms.getNameParts(name, options)
         local fieldOptions = forms.getFieldOptions(name, options)
@@ -125,14 +116,6 @@ function forms.getFormFields(data, options)
             table.insert(elements, element)
         end
     end
-
-    -- Add extra fields
-    for _, element in ipairs(elements) do
-        element.notifyFieldChanged = fieldChangedCallback
-    end
-
-    -- Initial validation
-    elements._formValid = forms.formValid(elements)
 
     return elements
 end
@@ -224,6 +207,27 @@ function forms.getFormBodyGroups(data, options)
     allFormFields._options = options
 
     return bodyColumn, allFormFields
+end
+
+local fieldChangedCallback = function(formFields, options)
+    return function(changedField)
+        formFields._lastChange = love.timer.getTime()
+        formFields._formValid = forms.formValid(formFields)
+
+        if options.formFieldChanged then
+            options.formFieldChanged(formFields, changedField)
+        end
+    end
+end
+
+local function addChangedCallbacks(formFields, options)
+    -- Add extra fields for validation
+    for _, field in ipairs(formFields) do
+        field.notifyFieldChanged = fieldChangedCallback(formFields, options)
+    end
+
+    -- Initial validation
+    formFields._formValid = forms.formValid(formFields)
 end
 
 function forms.getFormBody(data, options)
@@ -334,7 +338,7 @@ function forms.getFormButtonRow(buttons, formFields, options)
         })
 
         if button.enabled ~= nil then
-            buttonElement.enabled = utils.callIfFunction(button.enabled, formField, button)
+            buttonElement.enabled = utils.callIfFunction(button.enabled, formFields, button)
         end
 
         buttonElements[i] = buttonElement
@@ -355,6 +359,9 @@ function forms.getForm(buttons, data, options)
     options = options or {}
 
     local body, formFields = forms.getFormBody(data, options)
+
+    addChangedCallbacks(formFields, options)
+
     local buttonRow = forms.getFormButtonRow(buttons, formFields, options)
     local scrollableBody = uiElements.scrollbox(body)
 
