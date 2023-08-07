@@ -480,14 +480,14 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
 end
 
 function listWidgets.sortList(list)
-    local dataList = list._magicList and list.data or list.children
+    local unfilteredItems = list.unfilteredItems
     local target = list:getSelectedData()
 
     if list._magicList then
         target = target.data or target
     end
 
-    listWidgets.updateItems(list, dataList, target, false, true, true, true)
+    listWidgets.updateItems(list, unfilteredItems, target, false, true, true, true)
 end
 
 local function filterList(list, search)
