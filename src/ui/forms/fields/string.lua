@@ -227,7 +227,13 @@ function stringField.getElement(name, value, options)
         label, element
     }
 
-    return setmetatable(formField, stringField._MT)
+    formField = setmetatable(formField, stringField._MT)
+
+    if not validator(value) then
+        updateFieldStyle(formField, nil, false)
+    end
+
+    return formField
 end
 
 return stringField
