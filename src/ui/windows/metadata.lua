@@ -78,6 +78,7 @@ local defaultFieldInformation = {
         fieldType = "path",
         filePickerExtensions = {"png"},
         allowMissingPath = false,
+        celesteAtlas = "Gui",
         filenameProcessor = function(filename)
             -- Discard leading "Graphics/Atlases/Gui/" and file extension
             local filename, ext = utils.splitExtension(filename)

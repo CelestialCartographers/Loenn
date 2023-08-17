@@ -5,6 +5,7 @@ local uiUtils = require("ui.utils")
 local utils = require("utils")
 local mods = require("mods")
 local loadedState = require("loaded_state")
+local atlases = require("atlases")
 local stringField = require("ui.forms.fields.string")
 local iconUtils = require("ui.utils.icons")
 local fileLocations = require("file_locations")
@@ -111,6 +112,7 @@ function pathField.getElement(name, value, options)
     local allowFiles = options.allowFiles
     local allowedExtensions = options.allowedExtensions
     local relativeToMod = options.relativeToMod
+    local celesteAtlas = options.celesteAtlas
     local filenameResolver = options.filenameResolver
 
     options.validator = function(filename)
@@ -120,6 +122,14 @@ function pathField.getElement(name, value, options)
 
         if fieldEmpty then
             return allowEmpty ~= false
+        end
+
+        if celesteAtlas then
+            local atlas = atlases[celesteAtlas]
+
+            if atlas and atlas[filename] then
+                return true
+            end
         end
 
         if relativeToMod ~= false then
