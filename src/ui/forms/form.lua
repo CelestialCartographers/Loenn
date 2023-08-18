@@ -232,18 +232,21 @@ end
 
 function forms.getFormBody(data, options)
     local groups = options.groups
+    local grid, formFields
 
     if groups then
-        return forms.getFormBodyGroups(data, options)
+        grid, formFields = forms.getFormBodyGroups(data, options)
 
     else
-        local formFields = forms.getFormFields(data, options)
-        local grid = forms.getFormFieldsGrid(formFields, options)
+        formFields = forms.getFormFields(data, options)
+        grid = forms.getFormFieldsGrid(formFields, options)
 
         formFields._options = options
-
-        return grid, formFields
     end
+
+    addChangedCallbacks(formFields, options)
+
+    return grid, formFields
  end
 
 function forms.formValid(formFields)
@@ -359,8 +362,6 @@ function forms.getForm(buttons, data, options)
     options = options or {}
 
     local body, formFields = forms.getFormBody(data, options)
-
-    addChangedCallbacks(formFields, options)
 
     local buttonRow = forms.getFormButtonRow(buttons, formFields, options)
     local scrollableBody = uiElements.scrollbox(body)
