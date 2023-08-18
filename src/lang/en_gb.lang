@@ -1681,12 +1681,12 @@ style.effects.planets.description.size=The sprite to use for the planets.\nLocat
 style.effects.planets.description.scrollx=Determines the parallax scrolling of the planets along the X axis.
 style.effects.planets.description.scrolly=Determines the parallax scrolling of the planets along the Y axis.
 
-# Windsnow
-style.effects.windsnow.name=Wind Snow
+# Wind Snow
+style.effects.windSnow.name=Wind Snow
 
-style.effects.windsnow.attribute.color=Colour
+style.effects.windSnow.attribute.color=Colour
 
-style.effects.windsnow.description.color=The colour of the snow.
+style.effects.windSnow.description.color=The colour of the snow.
 
 
 # -- Dependencies --
