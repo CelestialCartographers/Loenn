@@ -146,16 +146,19 @@ local function getMaterialScore(item, searchParts, caseSensitive, fuzzy)
             local search = part.additional
             local text = item.textNoMods
 
-            if associatedMods then
-                for _, modName in ipairs(associatedMods) do
-                    local modScore = textSearching.searchScore(modName, searchModName, caseSensitive, fuzzy)
-                    local score = textSearching.searchScore(text, search, caseSensitive, fuzzy)
+            -- Assume that mods with no associatedMods is from Celeste
+            if not associatedMods or #associatedMods == 0 then
+                associatedMods = {"Celeste", "Vanilla"}
+            end
 
-                    -- Only include the additional search if it matches
-                    if modScore and (score or #search == 0) then
-                        totalScore += modScore + (score or 0)
-                        hasMatch = true
-                    end
+            for _, modName in ipairs(associatedMods) do
+                local modScore = textSearching.searchScore(modName, searchModName, caseSensitive, fuzzy)
+                local score = textSearching.searchScore(text, search, caseSensitive, fuzzy)
+
+                -- Only include the additional search if it matches
+                if modScore and (score or #search == 0) then
+                    totalScore += modScore + (score or 0)
+                    hasMatch = true
                 end
             end
         end
