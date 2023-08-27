@@ -6,6 +6,7 @@ local widgetUtils = require("ui.widgets.utils")
 
 local textSearching = require("utils.text_search")
 local configs = require("configs")
+local keyboard = require("utils.keyboard")
 
 local listWidgets = {}
 
@@ -216,6 +217,31 @@ local function moveListItem(fromList, fromListItem, toList, toListItem, fromInde
     end
 
     return true
+end
+
+local function moveListItemInDirection(list, direction)
+    local index = list.selectedIndex
+    local targetIndex = index + direction
+    local listItem = list.children[index]
+    local allowed = true
+
+    -- Needs one extra to move downwards
+    if direction > 0 then
+        targetIndex += 1
+    end
+
+    if list.listItemCanInsert then
+        allowed = list.listItemCanInsert(list, listItem, list, listItem, index, targetIndex)
+    end
+
+    if not allowed then
+        return false
+    end
+
+    moveListItem(list, listItem, list, listItem, index, targetIndex)
+
+    list:reflow()
+    list:redraw()
 end
 
 local function handleItemDrag(item, x, y)
@@ -527,19 +553,33 @@ end
 local function handleListKeyboardNavigation(list, key)
     local nextResultKey = configs.ui.searching.searchNextResultKey
     local previousResultKey = configs.ui.searching.searchPreviousResultKey
+    local rearrangeModifier = configs.ui.searching.searchRearrangeModifier
+
+    local direction = 0
 
     local magicList = list._magicList
     local dataList = magicList and list.data or list.children
 
-    if key == nextResultKey then
-        if list.selectedIndex < #dataList then
-            listWidgets.setSelection(list, list.selectedIndex + 1)
-            listWidgets.scrollSelectionVisible(list)
-        end
+    -- Set direction if move is allowed
+    if key == nextResultKey and list.selectedIndex < #dataList then
+        direction = 1
 
-    elseif key == previousResultKey then
-        if list.selectedIndex > 1 then
-            listWidgets.setSelection(list, list.selectedIndex - 1)
+    elseif key == previousResultKey and list.selectedIndex > 1 then
+        direction = -1
+    end
+
+    if direction ~= 0 then
+        local rearrangeHeld = keyboard.modifierHeld(rearrangeModifier)
+
+        -- Rearrange not supported on magic lists
+        if rearrangeHeld then
+            if list.draggable and not magicList then
+                moveListItemInDirection(list, direction)
+                listWidgets.scrollSelectionVisible(list)
+            end
+
+        else
+            listWidgets.setSelection(list, list.selectedIndex + direction)
             listWidgets.scrollSelectionVisible(list)
         end
     end
@@ -583,6 +623,8 @@ local function addSearchFieldHooks(list, searchField)
 end
 
 local function addListHooks(list)
+    list.interactive = 1
+
     list:hook({
         onKeyPress = listCommonKeyPress(list)
     })

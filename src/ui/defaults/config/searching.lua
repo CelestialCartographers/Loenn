@@ -5,5 +5,6 @@ return {
     searchExitKey = "escape",
     searchExitAndClearKey = "return",
     searchNextResultKey = "down",
-    searchPreviousResultKey = "up"
+    searchPreviousResultKey = "up",
+    searchRearrangeModifier = "alt"
 }
