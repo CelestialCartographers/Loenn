@@ -44,6 +44,7 @@ templeGate.placements = {}
 for _, preset in ipairs(placementPresets) do
     table.insert(templeGate.placements, {
         name = string.format("%s_%s", preset[1], string.lower(preset[2])),
+        placementType = "point",
         data = {
             height = 48,
             sprite = preset[1],
