@@ -102,11 +102,15 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
         end
     end
 
+    -- Magic lists call its callback when changing index, normal lists don't
+
     if newSelection then
         list.selected = newSelection
 
         if list.selectedIndex ~= selectedIndex then
-            list.selectedIndex = selectedIndex
+            if not magicList then
+                list.selectedIndex = selectedIndex
+            end
         end
 
         if not preventCallback then
@@ -122,7 +126,12 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
                         data = data and data.data
                     end
 
-                    listCallback(list, data)
+                    if magicList then
+                        list.selectedIndex = selectedIndex
+
+                    else
+                        listCallback(list, data)
+                    end
                 end
             end
         end

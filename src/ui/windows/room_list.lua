@@ -104,16 +104,18 @@ end
 
 local function updateList(list, target)
     local roomItems = getRoomItems()
+    local preventCallback = false
 
     if not target then
         local currentRoom = state.getSelectedRoom()
 
         if currentRoom then
             target = cleanRoomName(currentRoom.name)
+            preventCallback = true
         end
     end
 
-    list:updateItems(roomItems, target)
+    list:updateItems(roomItems, target, nil, preventCallback)
 end
 
 function roomList.roomSelectedCallback(element, roomName)
