@@ -911,6 +911,7 @@ entities.dreamHeartGem.placements.name.crystal_heart=Crystal Heart (Dream)
 
 # Lightning
 entities.lightning.placements.name.lightning=Lightning
+entities.lightning.placements.name.electricity=Electricity
 entities.lightning.attributes.description.moveTime=The time it takes to move from the base position to the node position.
 entities.lightning.attributes.description.perLevel=Whether the lightning ignores the global disabling flag set by breaker boxes with the flag attribute set.
 
