@@ -520,16 +520,37 @@ function listWidgets.setFilterText(list, text, updateList)
     end
 end
 
+function listWidgets.scrollSelectionVisible(list)
+    -- TODO - Implement
+end
+
+local function handleListKeyboardNavigation(list, key)
+    local nextResultKey = configs.ui.searching.searchNextResultKey
+    local previousResultKey = configs.ui.searching.searchPreviousResultKey
+
+    local magicList = list._magicList
+    local dataList = magicList and list.data or list.children
+
+    if key == nextResultKey then
+        if list.selectedIndex < #dataList then
+            listWidgets.setSelection(list, list.selectedIndex + 1)
+            listWidgets.scrollSelectionVisible(list)
+        end
+
+    elseif key == previousResultKey then
+        if list.selectedIndex > 1 then
+            listWidgets.setSelection(list, list.selectedIndex - 1)
+            listWidgets.scrollSelectionVisible(list)
+        end
+    end
+
+    return key == nextResultKey or key == previousResultKey
+end
+
 local function searchFieldKeyRelease(list)
     return function(orig, self, key, ...)
         local exitKey = configs.ui.searching.searchExitKey
         local exitClearKey = configs.ui.searching.searchExitAndClearKey
-
-        local nextResultKey = configs.ui.searching.searchNextResultKey
-        local previousResultKey = configs.ui.searching.searchPreviousResultKey
-
-        local magicList = list._magicList
-        local dataList = magicList and list.data or list.children
 
         if key == exitClearKey then
             self:setText("")
@@ -538,17 +559,17 @@ local function searchFieldKeyRelease(list)
         elseif key == exitKey then
             widgetUtils.focusMainEditor()
 
-        elseif key == nextResultKey then
-            if list.selectedIndex < #dataList then
-                listWidgets.setSelection(list, list.selectedIndex + 1)
-            end
-
-        elseif key == previousResultKey then
-            if list.selectedIndex > 1 then
-                listWidgets.setSelection(list, list.selectedIndex - 1)
-            end
-
         else
+            orig(self, key, ...)
+        end
+    end
+end
+
+local function listCommonKeyPress(list)
+    return function(orig, self, key, ...)
+        local handled = handleListKeyboardNavigation(list, key)
+
+        if not handled then
             orig(self, key, ...)
         end
     end
@@ -556,7 +577,14 @@ end
 
 local function addSearchFieldHooks(list, searchField)
     searchField:hook({
-        onKeyRelease = searchFieldKeyRelease(list)
+        onKeyRelease = searchFieldKeyRelease(list),
+        onKeyPress = listCommonKeyPress(list)
+    })
+end
+
+local function addListHooks(list)
+    list:hook({
+        onKeyPress = listCommonKeyPress(list)
     })
 end
 
@@ -651,6 +679,8 @@ local function getListCommon(magicList, callback, items, options)
     list.updateItems = listWidgets.updateItems
     list.setFilterText = listWidgets.setFilterText
     list.setSelection = listWidgets.setSelection
+
+    addListHooks(list)
 
     local column = getColumnForList(searchField, scrolledList, options.searchBarLocation)
 
