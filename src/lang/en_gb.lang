@@ -103,6 +103,8 @@ entities.default.attributes.description.nodes=Nodes for the entity.
 # Refill
 entities.refill.placements.name.one_dash=Refill
 entities.refill.placements.name.two_dashes=Refill (Two Dashes)
+entities.refill.placements.name.one_dash_crystal=Dash Crystal
+entities.refill.placements.name.two_dashes_crystal=Dash Crystal (Two Dashes)
 entities.refill.attributes.description.twoDash=Whether the refill should give two dashes.
 entities.refill.attributes.description.oneUse=Whether the refill should respawn after being used.
 
@@ -570,6 +572,10 @@ entities.lockBlock.placements.name.wood=Lock Block (Wood)
 entities.lockBlock.placements.name.temple_a=Lock Block (Temple A)
 entities.lockBlock.placements.name.temple_b=Lock Block (Temple B)
 entities.lockBlock.placements.name.moon=Lock Block (Moon)
+entities.lockBlock.placements.name.wood_key_door=Key Door (Wood)
+entities.lockBlock.placements.name.temple_a_key_door=Key Door (Temple A)
+entities.lockBlock.placements.name.temple_b_key_door=Key Door (Temple B)
+entities.lockBlock.placements.name.moon_key_door=Key Door (Moon)
 entities.lockBlock.attributes.description.sprite=Changes the visual appearance of the locked door.
 entities.lockBlock.attributes.description.unlock_sfx=The sound to play when unlocking the door. Leave empty for default.
 entities.lockBlock.attributes.description.stepMusicProgress=Whether unlocking the door should increment the music progress by one.
