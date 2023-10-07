@@ -939,6 +939,10 @@ local function pasteItemsHotkey()
 
     local room = state.getSelectedRoom()
 
+    if not room then
+        return
+    end
+
     if useClipboard then
         local clipboard = love.system.getClipboardText()
 
