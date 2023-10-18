@@ -152,8 +152,8 @@ celesteEnums.spike_directions = {
 }
 
 celesteEnums.tentacle_effect_directions = {
-    "Up",
-    "Down",
+    "Top",
+    "Bottom",
     "Left",
     "Right"
 }
