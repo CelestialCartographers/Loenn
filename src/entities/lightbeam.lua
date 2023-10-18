@@ -17,5 +17,6 @@ lightBeam.placements = {
 lightBeam.sprite = lightBeamHelper.getSprites
 lightBeam.selection = lightBeamHelper.getSelection
 lightBeam.rotate = lightBeamHelper.rotate
+lightBeam.updateResizeSelection = lightBeamHelper.updateResizeSelection
 
 return lightBeam
