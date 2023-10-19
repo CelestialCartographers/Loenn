@@ -549,13 +549,15 @@ local function toolChangedCallback(self, tool)
     updateToolModeList(tool.name)
 end
 
-local function updateLayerAndPlacementsCallback(list, filename)
+local function updateLayerAndPlacementsCallback(list, layer, value)
     -- We get the event before the main editor
     -- Placements for example will be out of date if we update now
-    ui.runLate(function()
-        toolWindow.layerList:updateItems(getLayerItems())
-        toolWindow.materialList:updateItems(getMaterialItems())
-    end)
+    if layer == toolWindow.eventStates.layer then
+        ui.runLate(function()
+            toolWindow.layerList:updateItems(getLayerItems())
+            toolWindow.materialList:updateItems(getMaterialItems())
+        end)
+    end
 end
 
 local function materialSearchFieldChanged(element, new, old)

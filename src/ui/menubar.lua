@@ -72,12 +72,28 @@ local function getLayerValueFunction(layer)
     end
 end
 
-local function toggleOnlyShowDependencies()
-    loadedState.setShowDependendedOnMods(not loadedState.onlyShowDependedOnMods)
+local function toggleOnlyShowDependencies(layer)
+    return function()
+        if type(layer) == "table" then
+            for _, l in ipairs(layer) do
+                loadedState.setShowDependendedOnMods(l, not loadedState.getShowDependedOnMods(l))
+            end
+
+        else
+            loadedState.setShowDependendedOnMods(layer, not loadedState.getShowDependedOnMods(layer))
+        end
+    end
 end
 
-local function getOnlyShowDependencies()
-    return loadedState.onlyShowDependedOnMods
+local function getOnlyShowDependencies(layer)
+    return function()
+        if type(layer) == "table" then
+            return loadedState.getShowDependedOnMods(layer[1])
+
+        else
+            return loadedState.getShowDependedOnMods(layer)
+        end
+    end
 end
 
 
@@ -148,7 +164,11 @@ menubar.menubar = {
             {"view_decals_fg", getLayerToggleFunction("decalsFg"), "checkbox", getLayerValueFunction("decalsFg")},
             {"view_decals_bg", getLayerToggleFunction("decalsBg"), "checkbox", getLayerValueFunction("decalsBg")},
         }},
-        {"view_only_depended_on", toggleOnlyShowDependencies, "checkbox", getOnlyShowDependencies},
+        {"view_only_depended_on", {
+            {"view_depended_on_entities", toggleOnlyShowDependencies("entities"), "checkbox", getOnlyShowDependencies("entities")},
+            {"view_depended_on_triggers", toggleOnlyShowDependencies("triggers"), "checkbox", getOnlyShowDependencies("triggers")},
+            {"view_depended_on_decals", toggleOnlyShowDependencies({"decalsFg", "decalsBg"}), "checkbox", getOnlyShowDependencies({"decalsFg", "decalsBg"})},
+        }}
     }},
     {"map", {
         {"stylegrounds", stylegroundEditor.editStylegrounds},
