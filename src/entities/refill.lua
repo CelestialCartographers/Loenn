@@ -5,6 +5,7 @@ refill.depth = -100
 refill.placements = {
     {
         name = "one_dash",
+        alternativeName = "one_dash_crystal",
         data = {
             oneUse = false,
             twoDash = false
@@ -12,6 +13,7 @@ refill.placements = {
     },
     {
         name = "two_dashes",
+        alternativeName = "two_dashes_crystal",
         data = {
             oneUse = false,
             twoDash = true

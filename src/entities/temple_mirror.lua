@@ -11,8 +11,8 @@ templeMirror.placements = {
     data = {
         width = 24,
         height = 24,
-        reflectionX = 0.0,
-        reflectionY = 0.0
+        reflectX = 0.0,
+        reflectY = 0.0
     }
 }
 

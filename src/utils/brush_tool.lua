@@ -13,7 +13,6 @@ local brushToolUtils = {}
 
 function brushToolUtils.getPlacements(tool)
     local materialsLookup = tool.materialsLookup or brushHelper.getMaterialLookup(tool.layer)
-    local paths = brushHelper.getValidTiles(tool.layer)
     local placements = {}
 
     for displayName, id in pairs(materialsLookup) do
@@ -40,14 +39,11 @@ function brushToolUtils.setLayer(tool, layer)
 end
 
 function brushToolUtils.setMaterial(tool, material)
-    local paths = brushHelper.getValidTiles(tool.layer)
+    local validTiles = brushHelper.getValidTiles(tool.layer)
     local target
 
-    if paths[material] then
+    if validTiles[material] then
         target = material
-
-    else
-        target = tool.materialsLookup[material]
     end
 
     if target and target ~= tool.material then

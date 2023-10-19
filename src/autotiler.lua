@@ -68,12 +68,27 @@ local function getTile(tiles, x, y, emptyTile)
     return tiles:get(x, y, emptyTile)
 end
 
-local function checkPadding(tiles, x, y, airTile, emptyTile)
-    return getTile(tiles, x - 2, y, emptyTile) == airTile or getTile(tiles, x + 2, y, emptyTile) == airTile or getTile(tiles, x, y - 2, emptyTile) == airTile or getTile(tiles, x, y + 2, emptyTile) == airTile
+local function checkPadding(tiles, x, y, tile, ignores, airTile, emptyTile, wildcard)
+    local left = getTile(tiles, x - 2, y, emptyTile)
+    local right = getTile(tiles, x + 2, y, emptyTile)
+    local up = getTile(tiles, x, y - 2, emptyTile)
+    local down = getTile(tiles, x, y + 2, emptyTile)
+
+    -- Special case for tiles with ignores, should treat ignored tiles as "air"
+    if ignores and ignores.count and ignores.count > 0 then
+        return not autotiler.checkTile(tile, left, ignores, airTile, wildcard) or
+            not autotiler.checkTile(tile, right, ignores, airTile, wildcard) or
+            not autotiler.checkTile(tile, up, ignores, airTile, wildcard) or
+            not autotiler.checkTile(tile, down, ignores, airTile, wildcard)
+    end
+
+    return left == airTile or right == airTile or up == airTile or down == airTile
 end
 
-local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
-    if checkPadding(tiles, x, y, airTile, emptyTile) then
+local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+    local ignores = meta[tile].ignores
+
+    if checkPadding(tiles, x, y, tile, ignores, airTile, emptyTile, wildcard) then
         local padding = meta[tile].padding
 
         return padding and #padding > 0 and padding or defaultQuad, defaultSprite
@@ -177,7 +192,7 @@ function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, def
         return quads, sprites
 
     else
-        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
+        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
     end
 end
 
@@ -194,7 +209,7 @@ function autotiler.getQuadsWithBitmask(x, y, tiles, meta, airTile, emptyTile, wi
         return quads, sprites
 
     else
-        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, defaultQuad, defaultSprite)
+        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
     end
 end
 
@@ -328,9 +343,11 @@ function autotiler.loadTilesetXML(filename)
         local copy = element._attr.copy
         local ignores = element._attr.ignores
         local path = element._attr.path
+        local displayName = element._attr.displayName
         local tileset = getTilesetStructure(id)
 
         tileset.path = "tilesets/" .. path
+        tileset.displayName = displayName
 
         readTilesetInfo(tileset, id, element)
 
@@ -343,7 +360,10 @@ function autotiler.loadTilesetXML(filename)
         end
 
         if ignores then
-            tileset.ignores = table.flip($(ignores):split(","))
+            local ignoredTiles = $(ignores):split(",")()
+
+            tileset.ignores = table.flip(ignoredTiles)
+            tileset.ignores.count = #ignoredTiles
         end
 
         tilesetsMeta[id] = tileset

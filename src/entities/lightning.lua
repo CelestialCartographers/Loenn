@@ -8,6 +8,7 @@ lightning.nodeLineRenderType = "line"
 lightning.nodeLimits = {0, 1}
 lightning.placements = {
     name = "lightning",
+    alternativeName = "electricity",
     data = {
         width = 8,
         height = 8,

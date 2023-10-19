@@ -84,4 +84,14 @@ function lightBeamHelper.rotate(room, entity, direction)
     return true
 end
 
+function lightBeamHelper.updateResizeSelection(room, entity, node, selection, offsetX, offsetY, directionX, directionY)
+    local newSelection = lightBeamHelper.getSelection(room, entity)
+
+    selection.x = newSelection.x
+    selection.y = newSelection.y
+
+    selection.width = newSelection.width
+    selection.height = newSelection.height
+end
+
 return lightBeamHelper

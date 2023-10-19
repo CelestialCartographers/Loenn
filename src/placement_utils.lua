@@ -30,7 +30,7 @@ function placementUtils.getPlacements(layer, specificMods)
 
     if handler and handler.getPlacements then
         if specificMods == nil then
-            local dependedOnOnly = state.onlyShowDependedOnMods
+            local dependedOnOnly = state.onlyShowDependedOnMods[layer]
 
             if dependedOnOnly then
                 specificMods = currentDependedOnMods()

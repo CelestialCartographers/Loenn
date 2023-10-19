@@ -21,7 +21,7 @@ function fileLocations.getStorageDir()
     local linuxFolderName = fileLocations.loennLinuxFolderName
 
     if userOS == "Windows" then
-        return filesystem.joinpath(os.getenv("LocalAppData"), simpleFolderName)
+        return filesystem.joinpath(utils.getenv("LocalAppData"), simpleFolderName)
 
     elseif userOS == "Linux" then
         local xdgConfig = os.getenv("XDG_CONFIG_HOME")

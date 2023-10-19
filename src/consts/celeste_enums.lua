@@ -152,15 +152,17 @@ celesteEnums.spike_directions = {
 }
 
 celesteEnums.tentacle_effect_directions = {
-    "Up",
-    "Down",
+    "Top",
+    "Bottom",
     "Left",
     "Right"
 }
 
 celesteEnums.planet_effect_sizes = {
     "big",
-    "small"
+    "small",
+    "Planets/big",
+    "Planets/small"
 }
 
 celesteEnums.trigger_spike_directions = {

@@ -51,11 +51,15 @@ function drawableNinePatchMt.__index:getMatrix()
     return self:cacheNinePatchMatrix()
 end
 
-local function getMatrixSprite(atlas, texture, x, y, matrix, quadX, quadY)
+local function getMatrixSprite(atlas, texture, x, y, matrix, quadX, quadY, color)
     local sprite = drawableSprite.fromTexture(texture, {x = x, y = y, atlas = atlas})
 
     sprite:setJustification(0.0, 0.0)
     sprite.quad = matrix:get(quadX, quadY)
+
+    if color then
+        sprite:setColor(color)
+    end
 
     return sprite
 end
@@ -120,16 +124,16 @@ function drawableNinePatchMt.__index:addEdgeQuads(sprites, atlas, texture, x, y,
         for ty = 2, heightInTiles - 1 do
             local offsetY = (ty - 1) * tileHeight
 
-            table.insert(sprites, getMatrixSprite(atlas, texture, x, y + offsetY, matrix, 1, math.random(2, matrixHeight - 1)))
-            table.insert(sprites, getMatrixSprite(atlas, texture, x + oppositeOffsetX, y + offsetY, matrix, matrixWidth, math.random(2, matrixHeight - 1)))
+            table.insert(sprites, getMatrixSprite(atlas, texture, x, y + offsetY, matrix, 1, math.random(2, matrixHeight - 1), color))
+            table.insert(sprites, getMatrixSprite(atlas, texture, x + oppositeOffsetX, y + offsetY, matrix, matrixWidth, math.random(2, matrixHeight - 1), color))
         end
 
         -- Horizontal
         for tx = 2, widthInTiles - 1 do
             local offsetX = (tx - 1) * tileWidth
 
-            table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y, matrix, math.random(2, matrixWidth - 1), 1))
-            table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y + oppositeOffsetY, matrix, math.random(2, matrixHeight - 1), matrixHeight))
+            table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y, matrix, math.random(2, matrixWidth - 1), 1, color))
+            table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y + oppositeOffsetY, matrix, math.random(2, matrixHeight - 1), matrixHeight, color))
         end
 
     elseif repeatMode == "repeat" then
@@ -176,7 +180,7 @@ function drawableNinePatchMt.__index:addMiddleQuads(sprites, atlas, texture, x, 
                 local offsetX = (tx - 1) * tileWidth
                 local offsetY = (ty - 1) * tileHeight
 
-                table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y + offsetY, matrix, math.random(2, matrixWidth - 1), math.random(2, matrixHeight - 1)))
+                table.insert(sprites, getMatrixSprite(atlas, texture, x + offsetX, y + offsetY, matrix, math.random(2, matrixWidth - 1), math.random(2, matrixHeight - 1), color))
             end
         end
 

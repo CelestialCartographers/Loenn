@@ -29,7 +29,7 @@ tool.image = nil
 
 tool.layer = "entities"
 tool.validLayers = {
-    "all_layers",
+    "allLayers",
     "tilesFg",
     "tilesBg",
     "entities",
@@ -107,7 +107,7 @@ function tool.unselect()
 end
 
 function tool.setLayer(layer)
-    if layer == "all_layers" then
+    if layer == "allLayers" then
         tool.layer = allLayers
 
     else
@@ -397,6 +397,27 @@ local function getRotationCallback(room, layer, targets, direction)
     end
 end
 
+local function getAreaFlipCallback(room, layer, targets, horizontal, vertical)
+    local backingMatrices = tiles.getBackingMatrices(targets)
+    local targetArea = utils.rectangle(utils.coverRectangles(targets))
+
+    return function()
+        local redraw = false
+
+        tiles.beforeSelectionChanges(room, targets, backingMatrices)
+
+        for _, item in ipairs(targets) do
+            local flipped = selectionItemUtils.areaFlipSelection(room, layer, item, horizontal, vertical, targetArea)
+
+            if flipped then
+                redraw = true
+            end
+        end
+
+        return redraw
+    end
+end
+
 local function getFlipCallback(room, layer, targets, horizontal, vertical)
     local backingMatrices = tiles.getBackingMatrices(targets)
 
@@ -445,6 +466,14 @@ end
 local function flipItems(room, layer, targets, horizontal, vertical, callForward)
     local forward = getFlipCallback(room, layer, targets, horizontal, vertical)
     local backward = getFlipCallback(room, layer, targets, horizontal, vertical)
+    local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
+
+    return snapshot, redraw
+end
+
+local function areaFlipItems(room, layer, targets, horizontal, vertical, callForward)
+    local forward = getAreaFlipCallback(room, layer, targets, horizontal, vertical)
+    local backward = getAreaFlipCallback(room, layer, targets, horizontal, vertical)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
@@ -525,7 +554,7 @@ local function addNode(room, layer, targets)
                 end
 
                 -- Add new node to selections
-                local rectangles = selectionUtils.getSelectionsForItem(room, layer, item)
+                local rectangles = selectionUtils.getSelectionsForItem(room, selection.layer, item)
 
                 -- Nodes are off by one here since the main entity would be the first rectangle
                 -- We also insert after the target node, meaning the total offset is two
@@ -910,6 +939,10 @@ local function pasteItemsHotkey()
 
     local room = state.getSelectedRoom()
 
+    if not room then
+        return
+    end
+
     if useClipboard then
         local clipboard = love.system.getClipboardText()
 
@@ -1122,7 +1155,21 @@ local function selectAllHotkey()
     movementFinished(x, y)
 end
 
+local function areaFlipHotkeyCommon(horizontal, vertical)
+    return function()
+        local room = state.getSelectedRoom()
+        local snapshot, redraw = areaFlipItems(room, tool.layer, selectionTargets, horizontal, vertical)
+
+        if redraw then
+            history.addSnapshot(snapshot)
+            selectionUtils.redrawTargetLayers(room, selectionTargets)
+        end
+    end
+end
+
 local toolHotkeys = {
+    hotkeyStruct.createHotkey(configs.hotkeys.itemAreaFlipHorizontal, areaFlipHotkeyCommon(true, false)),
+    hotkeyStruct.createHotkey(configs.hotkeys.itemAreaFlipVertical, areaFlipHotkeyCommon(false, true)),
     hotkeyStruct.createHotkey(configs.hotkeys.itemsCopy, copyItemsHotkey),
     hotkeyStruct.createHotkey(configs.hotkeys.itemsPaste, pasteItemsHotkey),
     hotkeyStruct.createHotkey(configs.hotkeys.itemsCut, cutItemsHotkey),

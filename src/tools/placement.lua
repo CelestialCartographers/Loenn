@@ -469,8 +469,10 @@ function tool.editorMapLoaded()
     updatePlacements(tool.layer)
 end
 
-function tool.editorShownDependenciesChanged()
-    updatePlacements(tool.layer)
+function tool.editorShownDependenciesChanged(layer)
+    if layer == tool.layer then
+        updatePlacements(tool.layer)
+    end
 end
 
 function tool.setMaterial(material)

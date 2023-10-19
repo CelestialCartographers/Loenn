@@ -28,7 +28,7 @@ local function runFunctionOnData(channel, func)
     while true do
         local res = channel:pop()
 
-        if res then
+        if res ~= nil then
             func(res)
 
         else

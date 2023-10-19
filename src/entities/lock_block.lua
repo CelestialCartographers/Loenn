@@ -26,9 +26,10 @@ lockBlock.fieldInformation = {
 }
 lockBlock.placements = {}
 
-for name, texture in pairs(textures) do
+for name, _ in pairs(textures) do
     table.insert(lockBlock.placements, {
         name = name,
+        alternativeName = name .. "_key_door",
         data = {
             sprite = name,
             unlock_sfx = "",

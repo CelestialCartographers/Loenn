@@ -29,6 +29,7 @@ setmetatable(atlases, atlasesMt)
 
 local celesteAtlasRelativePath = utils.joinpath("Content", "Graphics", "Atlases")
 local gameplayMeta = "Gameplay.meta"
+local guiMeta = "Gui.meta"
 
 local function addAtlasMetatable(name)
     local atlas = atlases[name] or {}
@@ -59,6 +60,7 @@ function atlases.loadCelesteAtlases()
     local celesteAtlasPath = utils.joinpath(fileLocations.getCelesteDir(), celesteAtlasRelativePath)
 
     atlases.loadCelesteAtlas("Gameplay", gameplayMeta, celesteAtlasPath)
+    atlases.loadCelesteAtlas("Gui", guiMeta, celesteAtlasPath)
 end
 
 -- Remove everything until after the atlas name

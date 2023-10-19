@@ -148,6 +148,31 @@ function tiles.deleteSelection(room, layer, selection)
     return true
 end
 
+function tiles.areaFlipSelection(room, layer, selection, horizontal, vertical, area)
+    local matrix = selection.item
+    local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, selection)
+    local tileWidth = tileStopX - tileStartX + 1
+    local tileHeight = tileStopY - tileStartY + 1
+    local areaStartX, areaStartY, areaStopX, areaStopY = getRectanglePoints(room, area)
+    local areaWidth = areaStopX - areaStartX + 1
+    local areaHeight = areaStopY - areaStartY + 1
+
+    if horizontal then
+        tileStartX = 2 * areaStartX + areaWidth - tileStartX - tileWidth
+        selection.x = 2 * area.x + area.width - selection.width - selection.x
+    end
+
+    if vertical then
+        tileStartY = 2 * areaStartY + areaHeight - tileStartY - tileHeight
+        selection.y = 2 * area.y + area.height - selection.height - selection.y
+    end
+
+    matrix:flip(horizontal, vertical)
+    brushHelper.placeTile(room, tileStartX, tileStartY, matrix, layer)
+
+    return true
+end
+
 function tiles.flipSelection(room, layer, selection, horizontal, vertical)
     local matrix = selection.item
     local tileStartX, tileStartY, tileStopX, tileStopY = getRectanglePoints(room, selection)

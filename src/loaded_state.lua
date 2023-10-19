@@ -401,7 +401,9 @@ function state.getRoomByName(name)
 end
 
 function state.initFromPersistence()
-    if persistence.onlyShowDependedOnMods ~= nil then
+    local persistenceType = type(persistence.onlyShowDependedOnMods)
+
+    if persistenceType == "table" then
         state.onlyShowDependedOnMods = persistence.onlyShowDependedOnMods
     end
 end
@@ -443,12 +445,20 @@ function state.setLayerVisible(layer, visible, silent)
     end
 end
 
-function state.setShowDependendedOnMods(value)
-    state.onlyShowDependedOnMods = value
-    persistence.onlyShowDependedOnMods = value
+function state.setShowDependendedOnMods(layer, value)
+    if type(persistence.onlyShowDependedOnMods) ~= "table" then
+        persistence.onlyShowDependedOnMods = {}
+    end
+
+    state.onlyShowDependedOnMods[layer] = value
+    persistence.onlyShowDependedOnMods[layer] = value
 
     -- Send event to notify changes in shown dependencies
-    sceneHandler.sendEvent("editorShownDependenciesChanged", value)
+    sceneHandler.sendEvent("editorShownDependenciesChanged", layer, value)
+end
+
+function state.getShowDependedOnMods(layer)
+    return state.onlyShowDependedOnMods[layer] or false
 end
 
 -- The currently loaded map
@@ -465,7 +475,7 @@ state.viewport = viewportHandler.viewport
 state.layerInformation = {}
 
 -- Hide content that is not in Everest.yaml
-state.onlyShowDependedOnMods = false
+state.onlyShowDependedOnMods = {}
 
 -- Map rendering
 state.showRoomBorders = true

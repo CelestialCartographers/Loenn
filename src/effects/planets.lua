@@ -5,8 +5,7 @@ local planets = {}
 planets.name = "planets"
 planets.fieldInformation = {
     size = {
-        options = celesteEnums.planet_effect_sizes,
-        editable = false
+        options = celesteEnums.planet_effect_sizes
     },
     count = {
         fieldType = "integer"

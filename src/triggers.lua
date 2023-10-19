@@ -90,10 +90,27 @@ function triggers.getDrawableDisplayText(trigger)
     return displayName
 end
 
+function triggers.triggerText(room, trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+    local fallbackText = triggers.getDrawableDisplayText(trigger)
+
+    if handler.triggerText then
+        if utils.isCallable(handler.triggerText) then
+            return handler.triggerText(room, trigger) or fallbackText
+
+        else
+            return handler.triggerText or fallbackText
+        end
+    end
+
+    return fallbackText
+end
+
 -- Returns drawable, depth
 function triggers.getDrawable(name, handler, room, trigger, viewport)
     local func = function()
-        local displayName = triggers.getDrawableDisplayText(trigger)
+        local displayName = triggers.triggerText(room, trigger)
 
         local x = trigger.x or 0
         local y = trigger.y or 0
@@ -142,7 +159,7 @@ function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
     local textBatch = love.graphics.newText(font)
 
     for i, trigger in ipairs(targets) do
-        local displayName = triggers.getDrawableDisplayText(trigger)
+        local displayName = triggers.triggerText(room, trigger)
 
         local x = trigger.x or 0
         local y = trigger.y or 0
@@ -229,6 +246,52 @@ function triggers.drawSelected(room, layer, trigger, color)
             end)
         end
     end
+end
+
+local function updateSelectionNaive(room, trigger, node, selection)
+    local rectangle, nodeRectangles = triggers.getSelection(room, trigger)
+    local newSelectionRectangle = node == 0 and rectangle or nodeRectangles and nodeRectangles[node]
+
+    if newSelectionRectangle then
+        selection.x = newSelectionRectangle.x
+        selection.y = newSelectionRectangle.y
+
+        selection.width = newSelectionRectangle.width
+        selection.height = newSelectionRectangle.height
+    end
+end
+
+function triggers.areaFlipSelection(room, layer, selection, horizontal, vertical, area)
+    local trigger, node = selection.item, selection.node
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    local target = trigger
+    local width = trigger.width or 0
+    local height = trigger.height or 0
+
+    if selection.node > 0 then
+        local nodes = entity.nodes
+
+        if nodes and node <= #nodes then
+            target = nodes[node]
+
+        else
+            return false
+        end
+    end
+
+    if horizontal then
+        target.x = 2 * area.x + area.width - width - target.x
+    end
+
+    if vertical then
+        target.y = 2 * area.y + area.height - height - target.y
+    end
+
+    updateSelectionNaive(room, trigger, node, selection)
+
+    return horizontal or vertical
 end
 
 function triggers.moveSelection(room, layer, selection, offsetX, offsetY)
