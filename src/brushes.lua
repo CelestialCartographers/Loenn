@@ -259,7 +259,7 @@ function brushHelper.cleanMaterialPath(path, layer, displayName)
     return utils.humanizeVariableName(path)
 end
 
-function brushHelper.getMaterialLookup(layer)
+function brushHelper.getMaterialLookup(layer, addAir)
     local lookup = {}
     local tilesets = brushHelper.getTilerMeta(layer)
 
@@ -267,6 +267,10 @@ function brushHelper.getMaterialLookup(layer)
         local cleanPath = brushHelper.cleanMaterialPath(tileset.path, layer, tileset.displayName)
 
         lookup[cleanPath] = id
+    end
+
+    if addAir ~= false then
+        lookup["Air"] = "0"
     end
 
     return lookup

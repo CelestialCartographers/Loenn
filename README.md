@@ -68,6 +68,7 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
  - Ctrl + ➕ (plus): Zoom in
  - Ctrl + ➖ (minus): Zoom out
  - F11: Toggle fullscreen
+ - Arrow keys: Navigate lists
 
  #### Placements
 
@@ -97,6 +98,7 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
  - Holding Ctrl + any of the above: use 1 as step size instead of 8 for more fine-grained control
  - L, R: Rotate supported objects counter-clockwise / clockwise
  - V, H: Flip supported objects vertically / horizontally
+ - Shift + V / Shift + H: Flip selected area vertically / horizontally
  - N on entity/trigger: Add starting node to entity/trigger
  - N on node: Add node to entity/trigger after selected node
  - Delete: Delete selected objects
@@ -110,7 +112,12 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
  - Left click & drag: Drag brush
  - Middle click: Change material to tile under cursor
 
- #### Debug - For developers
+#### Stylegrounds
+
+ - Arrow keys: Navigate list
+ - Alt + Arrow keys: Rearrange Stylegrounds
+
+#### Debug - For developers
 
  - F5: Reload entities and triggers
  - F6: Clear rendering cache and redraw map

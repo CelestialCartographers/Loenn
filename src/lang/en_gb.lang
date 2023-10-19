@@ -15,7 +15,7 @@ scenes.startup.os_x=Please select Celeste.exe or Celeste.app in the dialog.
 # -- Layers --
 # layers.name.layerName
 # layers.description.layerName
-layers.name.all_layers=All
+layers.name.allLayers=All
 layers.name.tilesFg=Foreground Tiles
 layers.name.tilesBg=Background Tiles
 layers.name.decalsFg=Foreground Decals
