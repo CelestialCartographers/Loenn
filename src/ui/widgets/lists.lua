@@ -7,6 +7,7 @@ local widgetUtils = require("ui.widgets.utils")
 local textSearching = require("utils.text_search")
 local configs = require("configs")
 local keyboard = require("utils.keyboard")
+local utils = require("utils")
 
 local listWidgets = {}
 
@@ -35,6 +36,12 @@ local function defaultFilterItems(items, search, options)
 
     local fuzzy = configs.ui.searching.searchFuzzy
     local caseSensitive = getCaseSensitive(search)
+
+    -- Enable fuzzy search if the term starts with ~
+    if utils.startsWith(search, "~") then
+        fuzzy = true
+        search = string.sub(search, 2)
+    end
 
     if searchPreprocessor then
         search = searchPreprocessor(search, caseSensitive, fuzzy)
