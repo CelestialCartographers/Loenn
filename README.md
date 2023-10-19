@@ -16,7 +16,7 @@
 Lönn is a visual level maker and editor for the game Celeste. It allows editing map binaries, creating new ones, adding rooms, and filling the rooms with anything your heart desires (as long as what your heart desires is possible within the realms of the game).
 The generated map binaries can be loaded in the stock game or using [Everest](https://everestapi.github.io/), although the use of Everest is highly recommended. For use without Everest, you can replace a map in `Content/Maps` (remember backups), otherwise, you can place it in `Mods/<yourmodname>/Maps` with Everest and use the custom chapter loading (refer to the [Mod Structure guide](https://github.com/EverestAPI/Resources/wiki/Mod-Structure)).
 
-The program is still in an early state, many things are still missing and it is under active development. If you spot something that is missing, it will most likely be added some time in the near future. If you spot a bug or the program crashes, please report it.
+The program is still in an early state, some things are still missing and it is under active development. If you spot something that is missing, it will most likely be added some time in the near future. If you spot a bug or the program crashes, please report it.
 
 Lönn is a successor to [Ahorn][ahorn], a visual level maker based on [Maple][maple]. If you want to be able to generate and edit maps using code, give Maple a try.
 
@@ -152,7 +152,7 @@ A player is able to move from one room to another if the rooms are directly adja
 
 **So, I made a map. What now? How do I load it?**
 
-While you can load maps without, it is _highly_ recommended to install [Everest](https://github.com/EverestAPI/Everest). Once Everest is installed, place your map binary in `Mods/<yourmodname>/Maps` in your Celeste installtion directory. It should now be accessible from inside the game.
+While you can load maps without, it is _highly_ recommended to install [Everest](https://github.com/EverestAPI/Everest). Once Everest is installed, place your map binary in `Mods/<yourmodname>/Maps` in your Celeste installation directory. It should now be accessible from inside the game.
 
 **Something is broken!**
 
