@@ -250,7 +250,7 @@ function brushHelper.cleanMaterialPath(path, layer, displayName)
 
     -- Remove path and humanize just the filename
 
-    path = utils.filename(path) or path
+    path = utils.filename(utils.convertToUnixPath(path), "/") or path
 
     if layer == "tilesBg" then
         path = path:match("^bg(.*)") or path

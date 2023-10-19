@@ -30,8 +30,8 @@ local defaultHotkeys = {
     -- Selection
     itemsSelectAll = "ctrl + a",
 
-    itemAreaFlipVertical = "ctrl + shift + v",
-    itemAreaFlipHorizontal = "ctrl + shift + h",
+    itemAreaFlipVertical = "shift + v",
+    itemAreaFlipHorizontal = "shift + h",
 
     -- Room Resizing
     roomResizeLeftGrow = false,
