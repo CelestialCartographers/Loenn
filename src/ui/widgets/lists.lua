@@ -115,7 +115,10 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
         list.selected = newSelection
 
         if list.selectedIndex ~= selectedIndex then
-            if not magicList then
+            if magicList then
+                list._selectedIndex = selectedIndex
+
+            else
                 list.selectedIndex = selectedIndex
             end
         end
