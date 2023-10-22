@@ -78,7 +78,10 @@ local function roomDataToElement(list, data, element)
 
         contextMenu.addContextMenu(
             element,
-            roomListItemContexthandler(data.data, language)
+            roomListItemContexthandler(data.data, language),
+            {
+                mode = "focused",
+            }
         )
     end
 
