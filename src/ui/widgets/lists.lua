@@ -629,7 +629,7 @@ local function listCommonKeyPress(list)
         local handled = handleListKeyboardNavigation(list, key)
 
         if not handled then
-            orig(self, key, ...)
+            return orig(self, key, ...) or false
         end
     end
 end
