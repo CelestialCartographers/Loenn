@@ -148,6 +148,8 @@ function debugUtils.reloadEverything()
     debugUtils.reloadScenes()
     debugUtils.redrawMap()
     debugUtils.reloadUI()
+
+    sceneHandler.sendEvent("editorDebugReloadEverything")
 end
 
 function debugUtils.restartLuaInstance()
