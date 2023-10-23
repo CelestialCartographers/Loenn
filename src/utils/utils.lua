@@ -164,6 +164,28 @@ function utils.subtractRectangle(r1, r2)
     return remaining
 end
 
+function utils.getBestScale(width, height, maxWidth, maxHeight, maxScale, preMultiplied)
+    local scaleX = maxScale or 1
+    local scaleY = maxScale or 1
+
+    if maxScale and not preMultiplied then
+        width *= scaleX
+        height *= scaleY
+    end
+
+    while width >= maxWidth do
+        width /= 2
+        scaleX /= 2
+    end
+
+    while height >= maxHeight do
+        height /= 2
+        scaleY /= 2
+    end
+
+    return math.min(scaleX, scaleY)
+end
+
 function utils.getFileHandle(path, mode, internal)
     if internal then
         return love.filesystem.newFile(path, mode:gsub("b", ""))

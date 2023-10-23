@@ -1,9 +1,5 @@
-local inputDevice = require("input_device")
 local utils = require("utils")
-local configs = require("configs")
 local persistence = require("persistence")
-
-local movementButton = configs.editor.canvasMoveButton
 
 local viewportHandler = {}
 
@@ -19,10 +15,7 @@ local viewport = {
     visible = true
 }
 
-local viewportDevice = {}
-
 viewportHandler.viewport = viewport
-viewportHandler.device = viewportDevice
 
 function viewportHandler.roomVisible(room, viewport)
     return utils.aabbCheckInline(
@@ -124,12 +117,16 @@ function viewportHandler.moveToPosition(x, y, scale, centered)
     viewportHandler.persistCamera()
 end
 
-function viewportHandler.enable()
-    viewportHandler.device._enabled = true
-end
+function viewportHandler.zoomToRectangle(rectangle)
+    local windowWidth, windowHeight = love.graphics.getDimensions()
+    local halfWidth = math.floor(rectangle.width / 2)
+    local halfHeight = math.floor(rectangle.height / 2)
 
-function viewportHandler.disable()
-    viewportHandler.device._enabled = false
+    local scale = utils.getBestScale(rectangle.width, rectangle.height, windowWidth, windowHeight)
+    local moveX = rectangle.x + halfWidth
+    local moveY = rectangle.y + halfHeight
+
+    viewportHandler.moveToPosition(moveX, moveY, scale, true)
 end
 
 function viewportHandler.drawRelativeTo(x, y, func, customViewport)
@@ -146,47 +143,5 @@ function viewportHandler.drawRelativeTo(x, y, func, customViewport)
     love.graphics.pop()
 end
 
-function viewportDevice.mousedragmoved(x, y, dx, dy, button, istouch)
-    if button == movementButton then
-        viewport.x -= dx
-        viewport.y -= dy
-
-        viewportHandler.persistCamera()
-
-        return true
-    end
-end
-
-function viewportDevice.mousemoved(x, y, dx, dy, istouch)
-    if istouch then
-        viewport.x -= dx
-        viewport.y -= dy
-
-        viewportHandler.persistCamera()
-
-        return true
-    end
-end
-
-function viewportDevice.resize(width, height)
-    viewportHandler.updateSize(width, height)
-end
-
-function viewportDevice.wheelmoved(dx, dy)
-    if dy > 0 then
-        viewportHandler.zoomIn()
-
-        return true
-
-    elseif dy < 0 then
-        viewportHandler.zoomOut()
-
-        return true
-    end
-end
-
-function viewportDevice.visible(visible)
-    viewport.visible = visible
-end
 
 return viewportHandler

@@ -10,6 +10,18 @@ local celesteRender = require("celeste_render")
 
 local mapItemUtils = {}
 
+function mapItemUtils.getMapBounds(map)
+    local rectangles = {}
+
+    for _, room in ipairs(map.rooms) do
+        local rectangle = utils.rectangle(room.x, room.y, room.width, room.height)
+
+        table.insert(rectangles, rectangle)
+    end
+
+    return utils.rectangleBounds(rectangles)
+end
+
 function mapItemUtils.deleteRoom(map, room)
     for i, r in ipairs(map.rooms) do
         if r.name == room.name then

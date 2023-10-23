@@ -1,26 +1,14 @@
 local loadedState = require("loaded_state")
 local utils = require("utils")
 local celesteRender = require("celeste_render")
-local viewportHandler = require("viewport_handler")
+local mapItemUtils = require("map_item_utils")
 
 local mapImageGenerator = {}
-
-function mapImageGenerator.getMapBounds(map)
-    local rectangles = {}
-
-    for _, room in ipairs(map.rooms) do
-        local rectangle = utils.rectangle(room.x, room.y, room.width, room.height)
-
-        table.insert(rectangles, rectangle)
-    end
-
-    return utils.rectangleBounds(rectangles)
-end
 
 local function getImageState(map)
     local imageState = utils.deepcopy(loadedState)
 
-    local tlx, tly, brx, bry = mapImageGenerator.getMapBounds(map)
+    local tlx, tly, brx, bry = mapItemUtils.getMapBounds(map)
     local width, height = brx - tlx, bry - tly
 
     imageState.map = map

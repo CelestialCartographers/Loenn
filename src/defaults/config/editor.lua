@@ -3,6 +3,7 @@ return {
     toolActionButton = 1,
     contextMenuButton = 2,
     canvasMoveButton = 2,
+    canvasZoomExtentsButton = 3,
     objectCloneButton = 3,
 
     copyUsesClipboard = true,
