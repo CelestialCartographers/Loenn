@@ -55,8 +55,8 @@ local dragMovementTotalX, dragMovementTotalY = 0, 0
 
 local selectionRectangle = nil
 local selectionCompleted = true
-local selectionTargets = {}
-local selectionPreviews = {}
+local selectionTargets = state.selectionToolTargets
+local selectionPreviews = state.selectionToolPreviews
 local selectionCycleTargets = {}
 local selectionCycleIndex = 1
 
@@ -101,9 +101,32 @@ local selectionRotationKeys = {
     {"itemRotateRight", 1}
 }
 
+function tool.load()
+    tool.setSelectionTargets({})
+    tool.setSelectionPreviews({})
+end
+
 function tool.unselect()
-    selectionPreviews = {}
-    selectionTargets = {}
+    tool.setSelectionTargets({})
+    tool.setSelectionPreviews({})
+end
+
+function tool.getSelectionTargets()
+    return state.selectionToolTargets
+end
+
+function tool.getSelectionPreviews()
+    return state.selectionToolPreviews
+end
+
+function tool.setSelectionTargets(targets)
+    state.selectionToolTargets = targets
+    selectionTargets = targets
+end
+
+function tool.setSelectionPreviews(previews)
+    state.selectionToolPreviews = previews
+    selectionPreviews = previews
 end
 
 function tool.setLayer(layer)
@@ -136,10 +159,10 @@ local function selectionChanged(x, y, width, height, fromClick)
             end
 
             selectionCycleTargets = newSelections
-            selectionPreviews = {selectionCycleTargets[selectionCycleIndex]}
+            tool.setSelectionPreviews({selectionCycleTargets[selectionCycleIndex]})
 
         else
-            selectionPreviews = newSelections
+            tool.setSelectionPreviews(newSelections)
             selectionCycleTargets = {}
             selectionCycleIndex = 0
         end
@@ -661,8 +684,7 @@ local function pasteItems(room, layer, targets)
             end
         end
 
-        selectionTargets = newTargets
-
+        tool.setSelectionTargets(newTargets)
         tiles.selectionsChanged(newTargets)
 
         return relevantLayers
@@ -1045,13 +1067,13 @@ local function updateSelectionTargetsFromPreviews(keepExisting)
         end
 
     else
-        selectionTargets = selectionPreviews
+        tool.setSelectionTargets(selectionPreviews)
     end
 end
 
 local function selectionStarted(x, y)
     selectionRectangle = utils.rectangle(x, y, 0, 0)
-    selectionPreviews = {}
+    tool.setSelectionPreviews({})
     selectionCompleted = false
     resizeDirection = nil
     resizeDirectionPreview = nil
@@ -1073,7 +1095,7 @@ local function selectionFinished(x, y, fromClick)
         updateSelectionTargetsFromPreviews(addModifier)
         tiles.selectionsChanged(selectionTargets)
 
-        selectionPreviews = {}
+        tool.setSelectionPreviews({})
     end
 end
 
@@ -1430,13 +1452,13 @@ function tool.keypressed(key, scancode, isrepeat)
 end
 
 function tool.editorMapLoaded(item, itemType)
-    selectionPreviews = {}
-    selectionTargets = {}
+    tool.setSelectionTargets({})
+    tool.setSelectionPreviews({})
 end
 
 function tool.editorMapTargetChanged(item, itemType)
-    selectionPreviews = {}
-    selectionTargets = {}
+    tool.setSelectionTargets({})
+    tool.setSelectionPreviews({})
 end
 
 function tool.draw()
