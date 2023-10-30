@@ -143,8 +143,8 @@ function roomList:editorMapTargetChanged()
             local selected = self:setSelection(roomNameCleaned, true, true)
 
             if not selected then
-                self:setFilterText("", true)
-                self:setSelection(roomNameCleaned, true, true)
+                self:setFilterText("")
+                self:updateItems(getRoomItems(), roomNameCleaned, nil, true)
             end
         end
     end
