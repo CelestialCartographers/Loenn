@@ -193,26 +193,4 @@ function widgetUtils.centerWindow(window, parent)
     widgetUtils.moveWindow(window, x, y, 0, 0, 0)
 end
 
-function widgetUtils.getBestImageScale(width, height, maxWidth, maxHeight, maxScale, preMultiplied)
-    local scaleX = maxScale or 1
-    local scaleY = maxScale or 1
-
-    if maxScale and not preMultiplied then
-        width *= scaleX
-        height *= scaleY
-    end
-
-    while width >= maxWidth do
-        width /= 2
-        scaleX /= 2
-    end
-
-    while height >= maxHeight do
-        height /= 2
-        scaleY /= 2
-    end
-
-    return math.min(scaleX, scaleY)
-end
-
 return widgetUtils

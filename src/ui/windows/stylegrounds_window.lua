@@ -165,7 +165,7 @@ function stylegroundWindow.getStylegroundPreview(interactionData)
             imageElement:layout()
 
             local imageWidth, imageHeight = imageElement.width / imageElement.scaleX, imageElement.height / imageElement.scaleY
-            local bestScale = widgetUtils.getBestImageScale(imageWidth, imageHeight, PREVIEW_MAX_WIDTH, PREVIEW_MAX_HEIGHT)
+            local bestScale = utils.getBestScale(imageWidth, imageHeight, PREVIEW_MAX_WIDTH, PREVIEW_MAX_HEIGHT)
 
             imageElement.scaleX = bestScale
             imageElement.scaleY = bestScale
