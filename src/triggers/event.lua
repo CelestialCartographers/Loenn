@@ -11,7 +11,8 @@ event.fieldInformation = {
 event.placements = {
     name = "event",
     data = {
-        event = ""
+        event = "",
+        onSpawn = false,
     }
 }
 
