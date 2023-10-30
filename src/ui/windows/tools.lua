@@ -381,13 +381,15 @@ local function layerCallback(list, layer)
     local sameLayer = toolWindow.eventStates.layer == layer
 
     if not sameLayer or not sameTool then
+        local targetMaterial = toolUtils.getPersistenceMaterial(toolHandler.currentTool, layer) 
+
         toolWindow.eventStates.tool = toolHandler.currentToolName
         toolWindow.eventStates.layer = layer
         toolWindow.eventStates.searchTerm = nil
         toolWindow.eventStates.material = nil
 
         toolHandler.setLayer(layer)
-        toolWindow.materialList:updateItems(getMaterialItems(layer), nil, nil, true)
+        toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial)
     end
 end
 
@@ -395,6 +397,11 @@ local function toolLayerChangedCallback(self, tool, layer)
     local searchText = toolUtils.getPersistenceSearch(tool, layer) or ""
     local sameLayer = toolWindow.eventStates.layer == layer
     local sameSearch = toolWindow.eventStates.searchTerm == searchText
+    local targetMaterial = nil
+
+    if not sameLayer then
+        targetMaterial = toolUtils.getPersistenceMaterial(tool, layer)
+    end
 
     if not sameLayer or not sameSearch then
         toolWindow.eventStates.searchTerm = searchText
@@ -406,7 +413,7 @@ local function toolLayerChangedCallback(self, tool, layer)
         searchField.index = #searchField
 
         toolWindow.layerList:setSelection(layer, true)
-        toolWindow.materialList:updateItems(getMaterialItems(layer), nil, nil, true)
+        toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial, nil, true)
     end
 end
 
