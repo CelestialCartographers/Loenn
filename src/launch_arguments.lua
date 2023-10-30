@@ -30,7 +30,7 @@ function launchArguments.updateArguments(raw)
     launchArguments.rawArguments = raw
     launchArguments.parsed = parser:parse(arguments)
 
-    return launchArguments._parsed
+    return launchArguments.parsed
 end
 
 launchArguments.arguments = {}

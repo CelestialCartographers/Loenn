@@ -116,15 +116,19 @@ function sceneHandler.changeScene(name)
         prevScene:exit(name)
     end
 
+    local hasFirstEntered = newScene._firstEnter
+
     sceneHandler.currentScene = name
 
-    if not newScene._firstEnter then
+    if not hasFirstEntered then
         newScene._firstEnter = true
 
         newScene:firstEnter(prevName)
     end
 
     newScene:enter(prevName)
+
+    sceneHandler.sendEvent("editorSceneChanged", name, prevName, not hasFirstEntered)
 
     sceneHandler.wipeDuration = sceneHandler.defaultWipeDuration
     sceneHandler.wipeRemaining = sceneHandler.wipeDuration

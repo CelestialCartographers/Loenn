@@ -21,8 +21,12 @@ function libraries.registerLibrary(filename, registerAt, verbose)
     registerAt = registerAt or libraries.registeredLibraries
 
     local pathNoExt = utils.stripExtension(filename)
-    local filenameNoExt = utils.filename(pathNoExt, "/")
     local library = utils.rerequire(pathNoExt)
+
+    if type(library) ~= "table" then
+        return
+    end
+
     local name = library.name or pathNoExt
 
     registerAt[name] = library

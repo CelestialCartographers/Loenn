@@ -7,6 +7,7 @@ local meta = require("meta")
 local versionParser = require("utils.version_parser")
 local sceneHandler = require("scene_handler")
 local threadHandler = require("utils.threads")
+local launchArguments = require("launch_arguments")
 
 -- TODO - Prompt to restart the program afterwards
 
@@ -167,15 +168,19 @@ function updater.shouldNotifyUser(version)
 end
 
 -- Check for updates and queue up related events
-function updater.checkForUpdates(forceNotification)
+function updater.checkForUpdates()
     local code = [[
         require("selene").load()
         require("selene/selene/wrappers/searcher/love2d/searcher").load()
         require("love.system")
 
         local args = {...}
-        local channelName = unpack(args)
+        local channelName, parsedLaunchArguments = unpack(args)
         local channel = love.thread.getChannel(channelName)
+
+        -- Update the launch arguments so the config/persistence is read from the right path
+        local launchArguments = require("launch_arguments")
+        launchArguments.parsed = parsedLaunchArguments
 
         local updater = require("updater")
         local meta = require("meta")
@@ -196,7 +201,7 @@ function updater.checkForUpdates(forceNotification)
 
     return threadHandler.createStartWithCallback(code, function(event)
         sceneHandler.sendEvent(unpack(event))
-    end)
+    end, launchArguments.parsed)
 end
 
 function updater.startupUpdateCheck()
