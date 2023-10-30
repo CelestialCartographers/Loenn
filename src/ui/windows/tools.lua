@@ -341,7 +341,12 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     toolWindow.eventStates.material = material
 
     toolWindow.layerList:setSelection(layer, true)
-    toolWindow.materialList:setSelection(material, true)
+
+    local selectedMaterial = toolWindow.materialList:setSelection(material, true)
+
+    if not selectedMaterial then
+        toolWindow.materialList:clearSelection()
+    end
 end
 
 local function getLayerItems(toolName)

@@ -79,6 +79,17 @@ local function defaultFilterItems(items, search, options)
     return filtered
 end
 
+function listWidgets.clearSelection(list)
+    local magicList = list._magicList
+
+    if magicList then
+        list._selectedIndex = nil
+
+    else
+        list.selectedIndex = nil
+    end
+end
+
 function listWidgets.setSelection(list, target, preventCallback, callbackRequiresChange)
     -- Select first item as default, callback if it exists
     -- If target is defined attempt to select this instead of the first item
@@ -740,6 +751,7 @@ local function getListCommon(magicList, callback, items, options)
     list.updateItems = listWidgets.updateItems
     list.setFilterText = listWidgets.setFilterText
     list.setSelection = listWidgets.setSelection
+    list.clearSelection = listWidgets.clearSelection
 
     addListHooks(list)
 
