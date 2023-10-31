@@ -225,7 +225,9 @@ function snapshotUtils.multiSnapshot(description, snapshots)
     end
 
     local function backward(data)
-        for _, snap in ipairs(snapshots) do
+        for i = #snapshots, 1, -1 do
+            local snap = snapshots[i]
+
             snap.backward(snap.data)
         end
     end
