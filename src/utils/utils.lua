@@ -842,10 +842,6 @@ for k, v <- filesystem do
     utils[k] = v
 end
 
-function utils.getenv(key)
-    return filesystem.codepageSysToUtf8(os.getenv(key))
-end
-
 -- Add filesystem specific helper methods
 local osFilename = utils.getOS():lower():gsub(" ", "_")
 local hasOSHelper, osHelper = requireUtils.tryrequire("utils.system." .. osFilename)

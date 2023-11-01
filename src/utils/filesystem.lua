@@ -1,5 +1,4 @@
 local lfs = require("lib.lfs_ffi")
-local ffi = require("ffi")
 local nfd = require("nfd")
 local physfs = require("lib.physfs")
 local requireUtils = require("utils.require")
@@ -477,72 +476,6 @@ function filesystem.unzip(zipPath, outputDir)
     filesystem.copyFromLoveFilesystem("temp", outputDir)
 
     love.filesystem.unmount("temp")
-end
-
-if osUtils.getOS() ~= "Windows" then
-    local function identity(value)
-        return value
-    end
-
-    filesystem.codepageUtf8ToSys = identity
-    filesystem.codepageSysToUtf8 = identity
-
-else
-    ffi.cdef[[
-        int MultiByteToWideChar(
-            unsigned int CodePage,
-            int dwFlags,
-            char* lpMultiByteStr,
-            int cbMultiByte,
-            wchar_t* lpWideCharStr,
-            int cchWideChar
-        );
-        int WideCharToMultiByte(
-            unsigned int CodePage,
-            int dwFlags,
-            wchar_t* lpWideCharStr,
-            int cchWideChar,
-            char* lpMultiByteStr,
-            int cbMultiByte,
-            char* lpDefaultChar,
-            bool* lpUsedDefaultChar
-        );
-    ]]
-
-    local codepageSys = 0
-    local codepageUtf8 = 65001
-
-    local function convert(from, to, orig)
-        local length = #orig + 1
-        local valueC = ffi.new("char[?]", length)
-        ffi.copy(valueC, orig)
-        valueC[#orig] = 0
-
-        -- char from -> wchar_t
-        local size = ffi.C.MultiByteToWideChar(from, 0, valueC, length, nil, 0)
-        assert(size ~= 0)
-        local valueW = ffi.new("wchar_t[?]", size)
-        length = ffi.C.MultiByteToWideChar(from, 0, valueC, length, valueW, size)
-        assert(size == length)
-
-        -- wchar_t -> char to
-        length = ffi.C.WideCharToMultiByte(to, 0, valueW, size, nil, 0, nil, nil)
-        assert(length ~= 0)
-        valueC = ffi.new("char[?]", length + 1)
-        length = ffi.C.WideCharToMultiByte(to, 0, valueW, size, valueC, length, nil, nil)
-        assert(length == size)
-        valueC[length + 1] = 0
-
-        return ffi.string(valueC)
-    end
-
-    function filesystem.codepageUtf8ToSys(value)
-        return convert(codepageUtf8, codepageSys, value)
-    end
-
-    function filesystem.codepageSysToUtf8(value)
-        return convert(codepageSys, codepageUtf8, value)
-    end
 end
 
 return filesystem
