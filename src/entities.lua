@@ -227,6 +227,16 @@ function entities.getEntityDrawable(name, handler, room, entity, viewport)
         end
 
         return drawableSprites
+
+    else
+        -- No drawing defined for the entity, use fallback
+        -- Make sure the entity doesn't have color or any other special attributes
+        local position = {
+            x = entity.x,
+            y = entity.y
+        }
+
+        return entities.getDrawable(name, missingEntityHandler, room, position, viewport)
     end
 end
 
