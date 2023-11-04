@@ -67,6 +67,7 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
  - Scroll wheel: Zoom
  - Ctrl + ➕ (plus): Zoom in
  - Ctrl + ➖ (minus): Zoom out
+ - Double middle click: Zoom to map extents
  - F11: Toggle fullscreen
  - Arrow keys: Navigate lists
 
