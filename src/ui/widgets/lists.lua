@@ -589,12 +589,13 @@ local function handleListKeyboardNavigation(list, key)
 
     local magicList = list._magicList
     local dataList = magicList and list.data or list.children
+    local selectedIndex = list.selectedIndex or 0
 
     -- Set direction if move is allowed
-    if key == nextResultKey and list.selectedIndex < #dataList then
+    if key == nextResultKey and selectedIndex < #dataList then
         direction = 1
 
-    elseif key == previousResultKey and list.selectedIndex > 1 then
+    elseif key == previousResultKey and selectedIndex > 1 then
         direction = -1
     end
 
@@ -635,12 +636,12 @@ local function searchFieldKeyRelease(list)
     end
 end
 
-local function listCommonKeyPress(list)
+local function listCommonKeyPress(list, isSearchField)
     return function(orig, self, key, ...)
         local handled = handleListKeyboardNavigation(list, key)
 
         if not handled then
-            return orig(self, key, ...) or false
+            return orig(self, key, ...) or isSearchField
         end
     end
 end
@@ -648,7 +649,7 @@ end
 local function addSearchFieldHooks(list, searchField)
     searchField:hook({
         onKeyRelease = searchFieldKeyRelease(list),
-        onKeyPress = listCommonKeyPress(list)
+        onKeyPress = listCommonKeyPress(list, true)
     })
 end
 
@@ -656,7 +657,7 @@ local function addListHooks(list)
     list.interactive = 1
 
     list:hook({
-        onKeyPress = listCommonKeyPress(list)
+        onKeyPress = listCommonKeyPress(list, false)
     })
 end
 
