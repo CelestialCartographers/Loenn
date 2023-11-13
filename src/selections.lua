@@ -6,6 +6,16 @@ local tiles = require("tiles")
 
 local selectionUtils = {}
 
+-- Higher is better
+local layerSortingPriority = {
+    entities = 4,
+    triggers = 4,
+    decalsFg = 4,
+    decalsBg = 3,
+    tilesFg = 2,
+    tilesBg = 1,
+}
+
 function selectionUtils.selectionTargetLayers(selectionTargets, includeTiles)
     local layers = {}
 
@@ -117,9 +127,17 @@ function selectionUtils.getSelectionsForRoom(room, layer)
     return rectangles
 end
 
--- Sort by area, smaller first
+-- Sorts by priority, then selection area
+-- Smaller area is better
 function selectionUtils.orderSelectionsByScore(selections)
     table.sort(selections, function(lhs, rhs)
+        local lhsPriority = layerSortingPriority[lhs.layer] or 1
+        local rhsPriority = layerSortingPriority[rhs.layer] or 1
+
+        if lhsPriority ~= rhsPriority then
+            return lhsPriority > rhsPriority
+        end
+
         return lhs.width * lhs.height < rhs.width * rhs.height
     end)
 
