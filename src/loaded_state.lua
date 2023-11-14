@@ -408,22 +408,21 @@ function state.initFromPersistence()
     end
 end
 
-function state.getLayerVisible(layer)
+function state.getLayerInformation(layer, key, default)
     local info = state.layerInformation[layer]
 
     if info then
-        if info.visible == nil then
-            return true
+        if info[key] == nil then
+            return default
         end
 
-        return info.visible
+        return info[key]
     end
 
-    return true
+    return default
 end
 
-function state.setLayerVisible(layer, visible, silent)
-    local rooms = state.map and state.map.rooms or {}
+function state.setLayerInformation(layer, key, value)
     local info = state.layerInformation[layer]
 
     if not info then
@@ -431,9 +430,22 @@ function state.setLayerVisible(layer, visible, silent)
         state.layerInformation[layer] = info
     end
 
-    info.visible = visible
+    local changed = info[key] ~= value
 
-    if silent ~= false then
+    info[key] = value
+
+    return changed
+end
+
+function state.getLayerVisible(layer)
+    return state.getLayerInformation(layer, "visible", true)
+end
+
+function state.setLayerVisible(layer, visible, silent)
+    local rooms = state.map and state.map.rooms or {}
+    local changed = state.setLayerInformation(layer, "visible", visible)
+
+    if changed and silent ~= false then
         -- Clear target canvas and complete cache for all rooms
         celesteRender.invalidateRoomCache(nil, {"canvas", "complete"})
 
