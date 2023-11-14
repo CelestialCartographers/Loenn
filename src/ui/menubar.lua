@@ -49,6 +49,10 @@ end
 
 local function saveMapImage()
     filesystem.saveDialog(loadedState.filename, "png", function(filename)
+        if not filename then
+            return
+        end
+
         local saved = mapImageGenerator.saveMapImage(filename)
 
         if not saved then
