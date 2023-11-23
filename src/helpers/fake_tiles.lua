@@ -6,6 +6,8 @@ local drawableRectangle = require("structs.drawable_rectangle")
 local colors = require("consts.colors")
 local brushes = require("brushes")
 local utf8 = require("utf8")
+local toolUtils = require("tool_utils")
+local brushTool = require("tools.brush")
 
 local fakeTilesHelper = {}
 
@@ -282,6 +284,22 @@ function fakeTilesHelper.getFieldInformation(materialKey, layer)
             }
         }
     end
+end
+
+function fakeTilesHelper.getPlacementMaterial(fallback, layer, allowAir)
+    -- Snow
+    fallback = fallback or "3"
+    layer = layer or "tilesFg"
+
+    local material = toolUtils.getPersistenceMaterial(brushTool, layer) or fallback
+
+    if not allowAir then
+        if material == " " or material == "0" then
+            material = fallback
+        end
+    end
+
+    return material
 end
 
 return fakeTilesHelper

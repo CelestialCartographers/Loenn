@@ -8,15 +8,18 @@ introCrusher.depth = 0
 introCrusher.nodeLineRenderType = "line"
 introCrusher.nodeLimits = {1, 1}
 introCrusher.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
-introCrusher.placements = {
-    name = "intro_crusher",
-    data = {
-        tiletype = "3",
-        flags = "1,0b",
-        width = 8,
-        height = 8
+
+function introCrusher.placements()
+    return {
+        name = "intro_crusher",
+        data = {
+            tiletype = fakeTilesHelper.getPlacementMaterial(),
+            flags = "1,0b",
+            width = 8,
+            height = 8
+        }
     }
-}
+end
 
 introCrusher.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
 introCrusher.nodeSprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)

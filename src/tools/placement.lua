@@ -654,6 +654,10 @@ function tool.update(dt)
     updatePlacement()
 end
 
+function tool.selected()
+    updatePlacements(tool.layer)
+end
+
 function tool.draw()
     local room = state.getSelectedRoom()
 

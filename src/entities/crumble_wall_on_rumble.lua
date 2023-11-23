@@ -3,16 +3,19 @@ local fakeTilesHelper = require("helpers.fake_tiles")
 local crumbleWall = {}
 
 crumbleWall.name = "crumbleWallOnRumble"
-crumbleWall.placements = {
-    name = "crumble_wall",
-    data = {
-        tiletype = "m",
-        blendin = true,
-        permanent = false,
-        width = 8,
-        height = 8
+
+function crumbleWall.placements()
+    return {
+        name = "crumble_wall",
+        data = {
+            tiletype = fakeTilesHelper.getPlacementMaterial("m"),
+            blendin = true,
+            permanent = false,
+            width = 8,
+            height = 8
+        }
     }
-}
+end
 
 crumbleWall.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", "blendin")
 crumbleWall.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
