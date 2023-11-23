@@ -86,6 +86,8 @@ function roomStruct.decode(data)
             local handler = structTilesNames[name]
             local target, struct = handler[1], handler[2]
 
+            -- Resize to make sure the tiles fill the room
+            -- Fixes a few awkward issues with tiles
             room[target] = struct.resize(struct.decode(value), roomTilesWidth, roomTilesHeight)
         end
 

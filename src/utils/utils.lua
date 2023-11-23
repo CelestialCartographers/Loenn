@@ -261,10 +261,17 @@ function utils.splitUTF8(s, separator)
         res = s:split(separator)()
 
     elseif separatorType == "number" then
-        local length = utf8.len(s)
+        if separator == 1 then
+            for p, c in utf8.codes(s) do
+                table.insert(res, utf8.char(c))
+            end
 
-        for i = 1, length, separator do
-            table.insert(res, utf8.char(utf8.codepoint(s, utf8.offset(s, i), utf8.offset(s, math.min(i + separator - 1, length)))))
+        else
+            local length = utf8.len(s)
+
+            for i = 1, length, separator do
+                table.insert(res, utf8.char(utf8.codepoint(s, utf8.offset(s, i), utf8.offset(s, math.min(i + separator - 1, length)))))
+            end
         end
     end
 

@@ -112,22 +112,36 @@ end
 
 -- Returns nil if no resizing is needed
 function tilesStruct.resizeMatrix(tiles, width, height, default, offsetX, offsetY)
+    offsetX = offsetX or 0
+    offsetY = offsetY or 0
+
     local tilesMatrix = tiles.matrix
     local tilesWidth, tilesHeight = tilesMatrix:size()
 
-    local offsetXPos = math.max(offsetX or 0, 0)
-    local offsetYPos = math.max(offsetY or 0, 0)
-    local offsetXNeg = math.min(offsetX or 0, 0)
-    local offsetYNeg = math.min(offsetY or 0, 0)
+    local offsetXPos = math.max(offsetX, 0)
+    local offsetYPos = math.max(offsetY, 0)
+    local offsetXNeg = math.min(offsetX, 0)
+    local offsetYNeg = math.min(offsetY, 0)
 
-    local hasOffset = offsetX ~= 0 and offsetY ~= 0
+    local hasOffset = offsetX ~= 0 or offsetY ~= 0
+    local sameSize = tilesWidth == width and tilesHeight == height
 
-    if tilesWidth ~= width or tilesHeight ~= height or hasOffset then
+    if not sameSize or hasOffset then
+        local simpleResize = not hasOffset and tilesWidth <= width and tilesHeight <= height
         local newTilesMatrix = matrix.filled(default, width, height)
 
-        for x = 1, width do
-            for y = 1, height do
-                newTilesMatrix:set(x + offsetXPos, y + offsetYPos, tilesMatrix:get(x - offsetXNeg, y - offsetYNeg, default))
+        if simpleResize then
+            for x = 1, tilesWidth do
+                for y = 1, tilesHeight do
+                    newTilesMatrix:setInbounds(x, y, tilesMatrix:getInbounds(x, y))
+                end
+            end
+
+        else
+            for x = 1, width do
+                for y = 1, height do
+                    newTilesMatrix:set(x + offsetXPos, y + offsetYPos, tilesMatrix:get(x - offsetXNeg, y - offsetYNeg, default))
+                end
             end
         end
 
