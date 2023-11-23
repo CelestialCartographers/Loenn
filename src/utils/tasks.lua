@@ -71,6 +71,10 @@ function taskUtils.processTask(task, time)
         if timeSpent >= calcTime or waiting then
             task.processedCount += 1
 
+            if waiting then
+                task.processedWaitingCount += 1
+            end
+
             return false, waiting, timeSpent
         end
 
@@ -97,6 +101,8 @@ function taskUtils.processTask(task, time)
             logging.warning(string.format("Task Failed: %s", status))
             logging.warning(debug.traceback(task.coroutine))
 
+            task.timeFinished = love.timer.getTime()
+            task.timeTotal = task.timeFinished - task.timeStart
             task.done = true
             task.success = false
         end
@@ -105,11 +111,13 @@ function taskUtils.processTask(task, time)
         local deltaTime = stop - start
 
         timeSpent += deltaTime
-        task.timeTotal += deltaTime
+        task.timeProcessed += deltaTime
         task.processedYieldCount += 1
     end
 
     if not task.done then
+        task.timeFinished = love.timer.getTime()
+        task.timeTotal = task.timeFinished - task.timeStart
         task.done = true
         task.success = true
     end
@@ -194,7 +202,10 @@ function taskUtils.newTask(func, callback, tasks, data)
     task._type = "task"
     task.coroutine = coroutine.create(function(task) func(task) end)
     task.callback = callback or emptyCallback
+    task.timeStart = love.timer.getTime()
+    task.timeFinished = nil
     task.timeTotal = 0
+    task.timeProcessed = 0
     task.processedCount = 0
     task.processedYieldCount = 0
     task.processedWaitingCount = 0
