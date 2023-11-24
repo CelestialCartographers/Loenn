@@ -447,13 +447,19 @@ end
 local function updatePlacements(layer)
     placementsAvailable = placementUtils.getPlacements(layer)
 
+    -- Try to use persisted material if possible
+    -- Otherwise select the first available placement
     local persistenceMaterial = toolUtils.getPersistenceMaterial(tool, layer)
+    local useFallback = not persistenceMaterial
 
-    selectPlacement(nil, 1)
     toolUtils.sendLayerEvent(tool, layer)
 
     if persistenceMaterial then
-        tool.setMaterial(persistenceMaterial)
+        useFallback = not selectPlacement(persistenceMaterial)
+    end
+
+    if useFallback then
+        selectPlacement(nil, 1)
     end
 end
 
@@ -652,6 +658,10 @@ end
 
 function tool.update(dt)
     updatePlacement()
+end
+
+function tool.selected()
+    updatePlacements(tool.layer)
 end
 
 function tool.draw()

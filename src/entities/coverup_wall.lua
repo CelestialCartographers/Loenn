@@ -4,14 +4,17 @@ local coverupWall = {}
 
 coverupWall.name = "coverupWall"
 coverupWall.depth = -13000
-coverupWall.placements = {
-    name = "coverup_wall",
-    data = {
-        tiletype = "3",
-        width = 8,
-        height = 8
+
+function coverupWall.placements()
+    return {
+        name = "coverup_wall",
+        data = {
+            tiletype = fakeTilesHelper.getPlacementMaterial(),
+            width = 8,
+            height = 8
+        }
     }
-}
+end
 
 coverupWall.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", true, "tilesFg", {1.0, 1.0, 1.0, 0.7})
 coverupWall.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")

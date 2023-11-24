@@ -3,16 +3,19 @@ local fakeTilesHelper = require("helpers.fake_tiles")
 local fallingBlock = {}
 
 fallingBlock.name = "fallingBlock"
-fallingBlock.placements = {
-    name = "falling_block",
-    data = {
-        tiletype = "3",
-        climbFall = true,
-        behind = false,
-        width = 8,
-        height = 8
+
+function fallingBlock.placements()
+    return {
+        name = "falling_block",
+        data = {
+            tiletype = fakeTilesHelper.getPlacementMaterial(),
+            climbFall = true,
+            behind = false,
+            width = 8,
+            height = 8
+        }
     }
-}
+end
 
 fallingBlock.sprite = fakeTilesHelper.getEntitySpriteFunction("tiletype", false)
 fallingBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")

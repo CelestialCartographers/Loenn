@@ -1,20 +1,21 @@
 local fakeTilesHelper = require("helpers.fake_tiles")
 local utils = require("utils")
-local matrixLib = require("utils.matrix")
 
 local floatySpaceBlock = {}
 
 floatySpaceBlock.name = "floatySpaceBlock"
 floatySpaceBlock.depth = -9000
-floatySpaceBlock.placements = {
-    name = "floaty_space_block",
-    data = {
-        tiletype = "3",
-        disableSpawnOffset = false,
-        width = 8,
-        height = 8
+function floatySpaceBlock.placements()
+    return {
+        name = "floaty_space_block",
+        data = {
+            tiletype = fakeTilesHelper.getPlacementMaterial("m"),
+            disableSpawnOffset = false,
+            width = 8,
+            height = 8
+        }
     }
-}
+end
 
 floatySpaceBlock.fieldInformation = fakeTilesHelper.getFieldInformation("tiletype")
 
