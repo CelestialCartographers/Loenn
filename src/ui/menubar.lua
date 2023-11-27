@@ -14,6 +14,8 @@ local filesystem = require("utils.filesystem")
 local mapImageGenerator = require("map_image")
 local persistence = require("persistence")
 local mods = require("mods")
+local meta = require("meta")
+local version = require("utils.version_parser")
 
 local utils = require("utils")
 local languageRegistry = require("language_registry")
@@ -25,6 +27,7 @@ local dependencyEditor = require("ui.dependency_editor")
 local aboutWindow = require("ui.about_window_wrapper")
 
 local activeMenubar
+local devBuild = meta.version == version("0.0.0")
 
 local menubar = {}
 
@@ -118,6 +121,23 @@ end
 -- debugUtils.reloadUI might change, wrap in function
 local function reloadUI()
     debugUtils.reloadUI()
+end
+
+local function featureToggleWrapper(enabled, funcEnabled, funcDisabled, ...)
+    local args = {...}
+
+    return function()
+        local featureEnabled = utils.callIfFunction(enabled, unpack(args))
+
+        if featureEnabled then
+            funcEnabled(unpack(args))
+
+        else
+            funcDisabled = funcDisabled or notYetImplementedNotification
+
+            funcDisabled()
+        end
+    end
 end
 
 local addDebug = configs.debug.enableDebugOptions
