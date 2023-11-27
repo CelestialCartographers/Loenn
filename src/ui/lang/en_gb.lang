@@ -67,6 +67,18 @@ ui.metadata_window.group.overworld.name=Overworld
 ui.metadata_window.group.xml.name=XML
 ui.metadata_window.group.music.name=Music
 
+# Settings Window
+ui.settings_window.window_title=Settings
+
+ui.settings_window.save_changes=Save changes
+
+ui.settings_window.group.general.name=General
+ui.settings_window.group.backups.name=Backups
+ui.settings_window.group.debug.name=Debug
+ui.settings_window.group.hotkeys.name=Hotkeys
+ui.settings_window.group.editor.name=Editor
+ui.settings_window.group.graphics.name=Graphics
+
 
 # Dependency Window
 ui.dependency_window.window_title=Dependencies

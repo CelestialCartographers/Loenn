@@ -24,6 +24,7 @@ local roomEditor = require("ui.room_editor")
 local stylegroundEditor = require("ui.styleground_editor")
 local metadataEditor = require("ui.metadata_editor")
 local dependencyEditor = require("ui.dependency_editor")
+local settingsEditor = require("ui.settings_editor")
 local aboutWindow = require("ui.about_window_wrapper")
 
 local activeMenubar
@@ -177,7 +178,7 @@ menubar.menubar = {
         {"undo", history.undo},
         {"redo", history.redo},
         {},
-        {"settings", notYetImplementedNotification}
+        {"settings", featureToggleWrapper(devBuild, settingsEditor.editSettings)},
     }},
     {"view", {
         {"view_layer", {
