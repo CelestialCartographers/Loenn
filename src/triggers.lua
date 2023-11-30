@@ -720,6 +720,9 @@ function triggers.fieldInformation(layer, trigger)
     local name = trigger._name
     local handler = triggers.registeredTriggers[name]
 
+    local minimumWidth, minimumHeight = triggers.minimumSize(nil, layer, trigger)
+    local maximumWidth, maximumHeight = triggers.maximumSize(nil, layer, trigger)
+
     local fieldInfo = {
         x = {
             fieldType = "integer",
@@ -729,10 +732,14 @@ function triggers.fieldInformation(layer, trigger)
         },
 
         width = {
-            fieldType = "integer"
+            fieldType = "integer",
+            minimumValue = minimumWidth,
+            maximumValue = maximumWidth
         },
         height = {
-            fieldType = "integer"
+            fieldType = "integer",
+            minimumValue = minimumHeight,
+            maximumValue = maximumHeight
         }
     }
 

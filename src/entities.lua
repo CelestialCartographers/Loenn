@@ -1311,6 +1311,9 @@ function entities.fieldInformation(layer, entity)
     local name = entity._name
     local handler = entities.registeredEntities[name]
 
+    local minimumWidth, minimumHeight = entities.minimumSize(nil, layer, entity)
+    local maximumWidth, maximumHeight = entities.maximumSize(nil, layer, entity)
+
     local fieldInfo = {
         x = {
             fieldType = "integer",
@@ -1320,10 +1323,14 @@ function entities.fieldInformation(layer, entity)
         },
 
         width = {
-            fieldType = "integer"
+            fieldType = "integer",
+            minimumValue = minimumWidth,
+            maximumValue = maximumWidth
         },
         height = {
-            fieldType = "integer"
+            fieldType = "integer",
+            minimumValue = minimumHeight,
+            maximumValue = maximumHeight
         }
     }
 
