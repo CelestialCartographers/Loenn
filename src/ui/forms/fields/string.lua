@@ -37,8 +37,12 @@ function stringField._MT.__index:fieldValid()
     return self.validator(self:getValue(), self:getCurrentText())
 end
 
-local function updateFieldStyle(formField, wasValid, valid)
-    if wasValid ~= valid then
+local function updateFieldStyle(formField, valid)
+    -- Make sure the textbox visual style matches the input validity
+    local validVisuals = formField.validVisuals
+    local needsChange = (valid and not validVisuals) or (not valid and validVisuals)
+
+    if needsChange then
         if valid then
             -- Reset to default
             formField.field.style = nil
@@ -47,20 +51,20 @@ local function updateFieldStyle(formField, wasValid, valid)
             formField.field.style = invalidStyle
         end
 
+        formField.validVisuals = valid
+
         formField.field:repaint()
     end
 end
 
 local function fieldChanged(formField)
     return function(element, new, old)
-        local wasValid = formField:fieldValid()
-
         formField.currentValue = formField.valueTransformer(new)
         formField.currentText = new
 
         local valid = formField:fieldValid()
 
-        updateFieldStyle(formField, wasValid, valid)
+        updateFieldStyle(formField, valid)
         formField:notifyFieldChanged()
     end
 end
@@ -222,6 +226,7 @@ function stringField.getElement(name, value, options)
     formField.validator = validator
     formField.valueTransformer = valueTransformer
     formField.displayTransformer = displayTransformer
+    formField.validVisuals = true
     formField.width = 2
     formField.elements = {
         label, element
@@ -230,7 +235,7 @@ function stringField.getElement(name, value, options)
     formField = setmetatable(formField, stringField._MT)
 
     if not validator(value) then
-        updateFieldStyle(formField, nil, false)
+        updateFieldStyle(formField, false)
     end
 
     return formField
