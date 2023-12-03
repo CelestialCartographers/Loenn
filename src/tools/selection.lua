@@ -364,7 +364,7 @@ local function drawAxisBoundMovement(room)
     end
 end
 
-local function getMoveCallback(room, layer, targets, offsetX, offsetY)
+local function getMoveCallback(room, layer, targets, offsetX, offsetY, redrawInCallback)
     local backingMatrices = tiles.getBackingMatrices(targets)
 
     return function()
@@ -378,13 +378,17 @@ local function getMoveCallback(room, layer, targets, offsetX, offsetY)
             if moved then
                 redraw = true
             end
+
+            if redraw and redrawInCallback then
+                selectionUtils.redrawTargetLayers(room, selectionTargets)
+            end
         end
 
         return redraw
     end
 end
 
-local function getResizeCallback(room, layer, targets, offsetX, offsetY, directionX, directionY)
+local function getResizeCallback(room, layer, targets, offsetX, offsetY, directionX, directionY, redrawInCallback)
     return function()
         local redraw = false
 
@@ -394,13 +398,17 @@ local function getResizeCallback(room, layer, targets, offsetX, offsetY, directi
             if resized then
                 redraw = true
             end
+
+            if redraw and redrawInCallback then
+                selectionUtils.redrawTargetLayers(room, selectionTargets)
+            end
         end
 
         return redraw
     end
 end
 
-local function getRotationCallback(room, layer, targets, direction)
+local function getRotationCallback(room, layer, targets, direction, redrawInCallback)
     local backingMatrices = tiles.getBackingMatrices(targets)
 
     return function()
@@ -416,11 +424,15 @@ local function getRotationCallback(room, layer, targets, direction)
             end
         end
 
+        if redraw and redrawInCallback then
+            selectionUtils.redrawTargetLayers(room, selectionTargets)
+        end
+
         return redraw
     end
 end
 
-local function getAreaFlipCallback(room, layer, targets, horizontal, vertical)
+local function getAreaFlipCallback(room, layer, targets, horizontal, vertical, redrawInCallback)
     local backingMatrices = tiles.getBackingMatrices(targets)
     local targetArea = utils.rectangle(utils.coverRectangles(targets))
 
@@ -437,11 +449,15 @@ local function getAreaFlipCallback(room, layer, targets, horizontal, vertical)
             end
         end
 
+        if redraw and redrawInCallback then
+            selectionUtils.redrawTargetLayers(room, selectionTargets)
+        end
+
         return redraw
     end
 end
 
-local function getFlipCallback(room, layer, targets, horizontal, vertical)
+local function getFlipCallback(room, layer, targets, horizontal, vertical, redrawInCallback)
     local backingMatrices = tiles.getBackingMatrices(targets)
 
     return function()
@@ -457,13 +473,17 @@ local function getFlipCallback(room, layer, targets, horizontal, vertical)
             end
         end
 
+        if redraw and redrawInCallback then
+            selectionUtils.redrawTargetLayers(room, selectionTargets)
+        end
+
         return redraw
     end
 end
 
 local function moveItems(room, layer, targets, offsetX, offsetY, callForward)
     local forward = getMoveCallback(room, layer, targets, offsetX, offsetY)
-    local backward = getMoveCallback(room, layer, targets, -offsetX, -offsetY)
+    local backward = getMoveCallback(room, layer, targets, -offsetX, -offsetY, true)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection moved", callForward)
 
     return snapshot, redraw
@@ -471,16 +491,15 @@ end
 
 local function resizeItems(room, layer, targets, offsetX, offsetY, directionX, directionY, callForward)
     local forward = getResizeCallback(room, layer, targets, offsetX, offsetY, directionX, directionY)
-    local backward = getResizeCallback(room, layer, targets, -offsetX, -offsetY, directionX, directionY)
+    local backward = getResizeCallback(room, layer, targets, -offsetX, -offsetY, directionX, directionY, true)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
 end
 
-
 local function rotateItems(room, layer, targets, direction, callForward)
     local forward = getRotationCallback(room, layer, targets, direction)
-    local backward = getRotationCallback(room, layer, targets, -direction)
+    local backward = getRotationCallback(room, layer, targets, -direction, true)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
@@ -488,7 +507,7 @@ end
 
 local function flipItems(room, layer, targets, horizontal, vertical, callForward)
     local forward = getFlipCallback(room, layer, targets, horizontal, vertical)
-    local backward = getFlipCallback(room, layer, targets, horizontal, vertical)
+    local backward = getFlipCallback(room, layer, targets, horizontal, vertical, true)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
@@ -496,7 +515,7 @@ end
 
 local function areaFlipItems(room, layer, targets, horizontal, vertical, callForward)
     local forward = getAreaFlipCallback(room, layer, targets, horizontal, vertical)
-    local backward = getAreaFlipCallback(room, layer, targets, horizontal, vertical)
+    local backward = getAreaFlipCallback(room, layer, targets, horizontal, vertical, true)
     local snapshot, redraw = snapshotUtils.roomLayerRevertableSnapshot(forward, backward, room, layer, "Selection resized", callForward)
 
     return snapshot, redraw
@@ -923,7 +942,7 @@ local function copyCommon(cut)
 
         if redraw then
             history.addSnapshot(snapshot)
-            toolUtils.redrawTargetLayer(room, tool.layer)
+            selectionUtils.redrawTargetLayers(room, selectionTargets)
         end
     end
 
@@ -981,11 +1000,9 @@ local function pasteItemsHotkey()
         local snapshot, usedLayers = pasteItems(room, tool.layer, newTargets)
 
         history.addSnapshot(snapshot)
-        toolUtils.redrawTargetLayer(room, tool.layer)
+        selectionUtils.redrawTargetLayers(room, selectionTargets)
 
-        for _, layer in ipairs(usedLayers) do
-            toolUtils.redrawTargetLayer(room, layer)
-        end
+        toolUtils.redrawTargetLayer(room, usedLayers)
     end
 end
 
@@ -1121,7 +1138,7 @@ local function resizeFinished(x, y)
         end
 
         if redraw then
-            toolUtils.redrawTargetLayer(room, tool.layer)
+            selectionUtils.redrawTargetLayers(room, selectionTargets)
         end
     end
 
@@ -1154,7 +1171,7 @@ local function movementFinished(x, y)
         end
 
         if redraw then
-            toolUtils.redrawTargetLayer(room, tool.layer)
+            selectionUtils.redrawTargetLayers(room, selectionTargets)
         end
     end
 
@@ -1273,7 +1290,7 @@ local function mouseMovedResize(cursorX, cursorY)
             local snapshot, redraw = resizeItems(room, tool.layer, selectionTargets, deltaX * directionX, deltaY * directionY, directionX, directionY)
 
             if redraw then
-                toolUtils.redrawTargetLayer(room, tool.layer)
+                selectionUtils.redrawTargetLayers(room, selectionTargets)
             end
         end
     end
@@ -1325,7 +1342,7 @@ local function mouseMovedMovement(cursorX, cursorY)
             local snapshot, redraw = moveItems(room, tool.layer, selectionTargets, deltaX, deltaY)
 
             if redraw then
-                toolUtils.redrawTargetLayer(room, tool.layer)
+                selectionUtils.redrawTargetLayers(room, selectionTargets)
             end
         end
     end
