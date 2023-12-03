@@ -590,6 +590,7 @@ local function handleListKeyboardNavigation(list, key)
     local magicList = list._magicList
     local dataList = magicList and list.data or list.children
     local selectedIndex = list.selectedIndex or 0
+    local handled = key == nextResultKey or key == previousResultKey
 
     -- Set direction if move is allowed
     if key == nextResultKey and selectedIndex < #dataList then
@@ -607,6 +608,10 @@ local function handleListKeyboardNavigation(list, key)
             if list.draggable and not magicList then
                 moveListItemInDirection(list, direction)
                 listWidgets.scrollSelectionVisible(list)
+
+            else
+                -- Don't consume if the list isn't rearrangable
+                handled = false
             end
 
         else
@@ -615,7 +620,7 @@ local function handleListKeyboardNavigation(list, key)
         end
     end
 
-    return key == nextResultKey or key == previousResultKey
+    return handled
 end
 
 local function searchFieldKeyRelease(list)
