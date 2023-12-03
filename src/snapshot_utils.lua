@@ -3,10 +3,9 @@ local utils = require("utils")
 local toolUtils = require("tool_utils")
 local state = require("loaded_state")
 local snapshot = require("structs.snapshot")
-local matrix = require("utils.matrix")
 local celesteRender = require("celeste_render")
-local viewportHandler = require("viewport_handler")
 local tiles = require("tiles")
+local sceneHandler = require("scene_handler")
 
 local snapshotUtils = {}
 
@@ -170,16 +169,26 @@ local function applyRoomChanges(data, target, clearFirst)
 
         celesteRender.invalidateRoomCache(targetRoom)
         celesteRender.forceRoomBatchRender(targetRoom, state)
+
+        return targetRoom
     end
 end
 
 function snapshotUtils.roomSnapshot(room, description, before, after, clearFirst)
     local function forward(data)
-        applyRoomChanges(data, after, clearFirst)
+        local room = applyRoomChanges(data, after, clearFirst)
+
+        if room then
+            sceneHandler.sendEvent("editorRoomChanged", room)
+        end
     end
 
     local function backward(data)
-        applyRoomChanges(data, before, clearFirst)
+        local room = applyRoomChanges(data, before, clearFirst)
+
+        if room then
+            sceneHandler.sendEvent("editorRoomChanged", room)
+        end
     end
 
     local data = {

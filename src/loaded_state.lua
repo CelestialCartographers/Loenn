@@ -9,8 +9,8 @@ local utils = require("utils")
 local history = require("history")
 local persistence = require("persistence")
 local configs = require("configs")
-local meta = require("meta")
 local saveSanitizers = require("save_sanitizers")
+local windowTitleUtils = require("window_title")
 
 local sideStruct = require("structs.side")
 
@@ -18,12 +18,6 @@ local state = {}
 
 state.currentSaves = {}
 state.pendingSaves = {}
-
-local function getWindowTitle(side)
-    local name = sideStruct.getMapName(side)
-
-    return string.format("%s - %s", meta.title, name)
-end
 
 -- Add to persistence most recent files
 -- Ordered from most recently opened -> oldest, with no duplicates
@@ -81,7 +75,7 @@ local function updateSideState(side, roomName, filename, eventName)
 
     addToRecentFiles(filename)
 
-    love.window.setTitle(getWindowTitle(side))
+    windowTitleUtils.updateWindowTitle(state)
 
     sceneHandler.changeScene("Editor")
     sceneHandler.sendEvent(eventName, filename)

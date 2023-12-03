@@ -1,6 +1,9 @@
 # Lönn Language File
 # Comments start with '#'
 
+# -- Window title --
+window_title.new_map=New map
+
 # -- Scenes --
 # scenes.sceneName.*
 scenes.loading.loading=Loading

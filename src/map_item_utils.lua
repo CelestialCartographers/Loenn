@@ -7,6 +7,7 @@ local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local sceneHandler = require("scene_handler")
 local celesteRender = require("celeste_render")
+local configs = require("configs")
 
 local mapItemUtils = {}
 
@@ -91,6 +92,18 @@ function mapItemUtils.addItem(map, item)
     elseif itemType == "table" then
         for _, subItem in ipairs(item) do
             mapItemUtils.addItem(map, subItem)
+        end
+    end
+end
+
+function mapItemUtils.sortRoomList(map, force)
+    if configs.editor.sortRoomsOnSave or force then
+        if map then
+            table.sort(map.rooms, function(lhs, rhs)
+                return lhs.name < rhs.name
+            end)
+
+            sceneHandler.sendEvent("editorRoomOrderChanged", map)
         end
     end
 end

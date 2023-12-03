@@ -33,20 +33,25 @@ function viewportDevice.mousemoved(x, y, dx, dy, istouch)
     end
 end
 
-function viewportDevice.mouseclicked(x, y, button, istouch, presses)
-    local zoomToExtentsButton = configs.editor.canvasZoomExtentsButton
-    local map = loadedState.map
+function viewportDevice.zoomToExtents(map)
+    map = loadedState.map or map
 
     if not map then
         return
     end
 
-    if button == zoomToExtentsButton and presses % 2 == 0 then
-        local tlx, tly, brx, bry = mapItemUtils.getMapBounds(map)
-        local rectangle = utils.rectangle(tlx, tly, brx - tlx, bry - tly)
+    local tlx, tly, brx, bry = mapItemUtils.getMapBounds(map)
+    local rectangle = utils.rectangle(tlx, tly, brx - tlx, bry - tly)
 
-        viewportHandler.zoomToRectangle(rectangle)
-        viewportHandler.persistCamera()
+    viewportHandler.zoomToRectangle(rectangle)
+    viewportHandler.persistCamera()
+end
+
+function viewportDevice.mouseclicked(x, y, button, istouch, presses)
+    local zoomToExtentsButton = configs.editor.canvasZoomExtentsButton
+
+    if button == zoomToExtentsButton and presses % 2 == 0 then
+        viewportDevice.zoomToExtents()
     end
 end
 
