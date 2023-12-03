@@ -9,6 +9,7 @@ local contextMenu = require("ui.context_menu")
 local roomEditor = require("ui.room_editor")
 local sceneHandler = require("scene_handler")
 local languageRegistry = require("language_registry")
+local mapItemUtils = require("map_item_utils")
 
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
@@ -174,6 +175,13 @@ function roomList:editorRoomAdded()
     end
 end
 
+function roomList:editorRoomChanged()
+    return function(list, room)
+        mapItemUtils.sortRoomList(state.map)
+        updateList(self, room.name)
+    end
+end
+
 function roomList:editorRoomOrderChanged()
     return function()
         updateList(self)
@@ -211,6 +219,7 @@ function roomList.getWindow()
         editorMapNew = roomList.editorMapNew(list),
         editorRoomDeleted = roomList.editorRoomDeleted(list),
         editorRoomAdded = roomList.editorRoomAdded(list),
+        editorRoomChanged = roomList.editorRoomChanged(list),
         uiRoomWindowRoomChanged = roomList.uiRoomWindowRoomChanged(list)
     })
 
