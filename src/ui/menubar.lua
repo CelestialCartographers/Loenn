@@ -16,6 +16,7 @@ local persistence = require("persistence")
 local mods = require("mods")
 local meta = require("meta")
 local version = require("utils.version_parser")
+local viewportDevice = require("input_devices.viewport_device")
 
 local utils = require("utils")
 local languageRegistry = require("language_registry")
@@ -193,7 +194,8 @@ menubar.menubar = {
             {"view_depended_on_entities", toggleOnlyShowDependencies("entities"), "checkbox", getOnlyShowDependencies("entities")},
             {"view_depended_on_triggers", toggleOnlyShowDependencies("triggers"), "checkbox", getOnlyShowDependencies("triggers")},
             {"view_depended_on_decals", toggleOnlyShowDependencies({"decalsFg", "decalsBg"}), "checkbox", getOnlyShowDependencies({"decalsFg", "decalsBg"})},
-        }}
+        }},
+        {"view_zoom_to_extents", viewportDevice.zoomToExtents},
     }},
     {"map", {
         {"stylegrounds", stylegroundEditor.editStylegrounds},
