@@ -104,7 +104,7 @@ local function callWithHistory(functionName, item, ...)
             local tableSnapshot = callWithSnapshot(functionName, tableItemType, tableItem, ...)
 
             if tableSnapshot then
-                table.insert(snapshots, callWithSnapshot(functionName, tableItemType, tableItem, ...))
+                table.insert(snapshots, tableSnapshot)
             end
         end
 
