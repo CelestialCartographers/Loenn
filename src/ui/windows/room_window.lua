@@ -258,6 +258,7 @@ local function saveRoomCallback(formFields, room, editing, usingPixels)
 
         if map then
             mapItemUtils.addItem(map, newRoom)
+            loadedState.selectItem(newRoom)
         end
     end
 
