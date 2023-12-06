@@ -13,7 +13,7 @@ local function currentDependedOnMods()
     local modPath = mods.getFilenameModPath(state.filename)
 
     -- Make sure mod is packaged and has metadata
-    -- Otherwise fall back to allowing all mods
+    -- Otherwise fall back to Celeste and Everest
     if modPath then
         local currentModMetadata = mods.getModMetadataFromPath(modPath)
 
@@ -23,6 +23,8 @@ local function currentDependedOnMods()
             return dependedOnMods
         end
     end
+
+    return {"Celeste", "Everest"}
 end
 
 function placementUtils.getPlacements(layer, specificMods)
