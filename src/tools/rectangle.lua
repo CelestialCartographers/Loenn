@@ -170,4 +170,8 @@ function tool.draw()
     end
 end
 
+function tool.editorMapTargetChanged()
+    brushToolUtils.clearTileSnapshot(tool)
+end
+
 return tool
