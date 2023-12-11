@@ -417,10 +417,15 @@ local function toolLayerChangedCallback(self, tool, layer)
     end
 end
 
-local function updateLayerList(name)
-    local items = getLayerItems(name)
+local function updateLayerList(toolName, tool)
+    local items = getLayerItems(toolName)
+    local targetLayer = nil
 
-    toolWindow.layerList:updateItems(items)
+    if tool then
+        targetLayer = toolUtils.getPersistenceLayer(tool)
+    end
+
+    toolWindow.layerList:updateItems(items, targetLayer)
 
     local newVisible = #items > 0
 
@@ -549,7 +554,7 @@ local function toolCallback(list, toolName)
         toolWindow.eventStates.material = nil
 
         toolHandler.selectTool(toolName)
-        toolWindow.layerList:updateItems(getLayerItems(toolName))
+        updateLayerList(toolName, tool)
     end
 end
 
@@ -557,7 +562,7 @@ local function toolChangedCallback(self, tool)
     toolWindow.eventStates.tool = tool.name
 
     toolWindow.toolList:setSelection(tool.name, true)
-    updateLayerList(tool.name)
+    updateLayerList(tool.name, tool)
     updateToolModeList(tool.name)
 end
 
