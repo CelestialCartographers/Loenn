@@ -452,8 +452,6 @@ local function updatePlacements(layer)
     local persistenceMaterial = toolUtils.getPersistenceMaterial(tool, layer)
     local useFallback = not persistenceMaterial
 
-    toolUtils.sendLayerEvent(tool, layer)
-
     if persistenceMaterial then
         useFallback = not selectPlacement(persistenceMaterial)
     end
@@ -464,11 +462,15 @@ local function updatePlacements(layer)
 end
 
 function tool.setLayer(layer)
-    if layer ~= tool.layer or not placementsAvailable and state.map then
+    local sameLayer = layer == tool.layer
+
+    if not sameLayer or not placementsAvailable and state.map then
         tool.layer = layer
 
         updatePlacements(layer)
     end
+
+    return not sameLayer
 end
 
 function tool.editorMapLoaded()

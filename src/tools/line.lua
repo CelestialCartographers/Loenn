@@ -154,6 +154,7 @@ function tool.mousereleased(x, y, button)
 end
 
 function tool.editorMapTargetChanged()
+    brushToolUtils.clearTileSnapshot(tool)
     resetDrag()
 
     local room = state.getSelectedRoom()

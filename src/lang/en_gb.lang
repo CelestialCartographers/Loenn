@@ -113,6 +113,7 @@ entities.refill.attributes.description.oneUse=Whether the refill should respawn 
 
 # Bonfire
 entities.bonfire.placements.name.bonfire=Bonfire
+entities.bonfire.placements.name.campfire=Campfire
 entities.bonfire.attributes.description.mode=Changes the bonfire between lit, unlit, or smoking.
 
 # Booster

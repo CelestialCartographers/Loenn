@@ -94,15 +94,28 @@ end
 function brushToolUtils.getTileSnapshotValue(tool)
     local room = state.getSelectedRoom()
 
+
     return tiles.getRoomTileSnapshotValue(room, tool.layer)
 end
 
-function brushToolUtils.startTileSnapshot(tool)
-    tool.snapshotValue = brushToolUtils.getTileSnapshotValue(tool)
-    tool.snapshotHasChanged = false
+function brushToolUtils.startTileSnapshot(tool, force)
+    if not tool.snapshotValue or force then
+        tool.snapshotValue = brushToolUtils.getTileSnapshotValue(tool)
+        tool.snapshotHasChanged = false
+
+        return true
+    end
+
+    return false
+end
+
+function brushToolUtils.clearTileSnapshot(tool)
+    tool.snapshotValue = nil
 end
 
 function brushToolUtils.stopTileSnapshot(tool)
+    local addedToHistory = false
+
     if tool.snapshotValue and tool.snapshotHasChanged then
         local room = state.getSelectedRoom()
         local afterSnapshotValue = brushToolUtils.getTileSnapshotValue(tool)
@@ -111,8 +124,14 @@ function brushToolUtils.stopTileSnapshot(tool)
             local snapshot = snapshotUtils.roomTilesSnapshot(room, tool.layer, "Brush", tool.snapshotValue, afterSnapshotValue)
 
             history.addSnapshot(snapshot)
+
+            addedToHistory = true
         end
     end
+
+    tool.snapshotValue = nil
+
+    return addedToHistory
 end
 
 function brushToolUtils.toolMadeChanges(tool)

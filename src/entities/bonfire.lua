@@ -13,6 +13,7 @@ bonfire.fieldInformation = {
 }
 bonfire.placements = {
     name = "bonfire",
+    alternativeName = "campfire",
     data = {
         mode = "Lit"
     }
