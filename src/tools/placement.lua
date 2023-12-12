@@ -371,7 +371,7 @@ local function updatePlacement(force)
     end
 end
 
-local function setPlacement(placement)
+local function setPlacement(placement, sendEvent)
     placementTemplate = {
         item = utils.deepcopy(placement.itemTemplate),
         placement = placement,
@@ -380,13 +380,15 @@ local function setPlacement(placement)
     updatePlacementNodes()
     updatePlacementDrawable()
 
-    toolUtils.sendMaterialEvent(tool, tool.layer, placement.name)
+    if sendEvent ~= false then
+        toolUtils.sendMaterialEvent(tool, tool.layer, placement.name)
+    end
 end
 
-local function selectPlacement(name, index)
+local function selectPlacement(name, index, sendEvent)
     for i, placement in ipairs(placementsAvailable) do
         if i == index or placement.displayName == name or placement.name == name then
-            setPlacement(placement)
+            setPlacement(placement, sendEvent)
 
             return true
         end
@@ -444,7 +446,7 @@ local function cloneSelection(selections)
     return false
 end
 
-local function updatePlacements(layer)
+local function updatePlacements(layer, sendEvent)
     placementsAvailable = placementUtils.getPlacements(layer)
 
     -- Try to use persisted material if possible
@@ -453,24 +455,26 @@ local function updatePlacements(layer)
     local useFallback = not persistenceMaterial
 
     if persistenceMaterial then
-        useFallback = not selectPlacement(persistenceMaterial)
+        useFallback = not selectPlacement(persistenceMaterial, nil, sendEvent)
     end
 
     if useFallback then
-        selectPlacement(nil, 1)
+        selectPlacement(nil, 1, sendEvent)
     end
 end
 
 function tool.setLayer(layer)
     local sameLayer = layer == tool.layer
 
-    if not sameLayer or not placementsAvailable and state.map then
-        tool.layer = layer
+    toolUtils.sendLayerEvent(tool, layer)
 
+    tool.layer = layer
+
+    if state.map and (not sameLayer or not placementsAvailable) then
         updatePlacements(layer)
     end
 
-    return not sameLayer
+    return false
 end
 
 function tool.editorMapLoaded()
@@ -663,7 +667,7 @@ function tool.update(dt)
 end
 
 function tool.selected()
-    updatePlacements(tool.layer)
+    updatePlacements(tool.layer, false)
 end
 
 function tool.draw()
