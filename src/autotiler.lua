@@ -69,10 +69,10 @@ local function getTile(tiles, x, y, emptyTile)
 end
 
 local function checkPadding(tiles, x, y, tile, ignores, airTile, emptyTile, wildcard)
-    local left = getTile(tiles, x - 2, y, emptyTile)
-    local right = getTile(tiles, x + 2, y, emptyTile)
-    local up = getTile(tiles, x, y - 2, emptyTile)
-    local down = getTile(tiles, x, y + 2, emptyTile)
+    local left = getTile(tiles, x - 2, y, tile)
+    local right = getTile(tiles, x + 2, y, tile)
+    local up = getTile(tiles, x, y - 2, tile)
+    local down = getTile(tiles, x, y + 2, tile)
 
     -- Special case for tiles with ignores, should treat ignored tiles as "air"
     if ignores and ignores.count and ignores.count > 0 then
