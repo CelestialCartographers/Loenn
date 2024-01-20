@@ -407,10 +407,7 @@ local function toolLayerChangedCallback(self, tool, layer)
         toolWindow.eventStates.searchTerm = searchText
         toolWindow.eventStates.layer = layer
 
-        local searchField = toolWindow.materialList.searchField
-
-        searchField:setText(searchText)
-        searchField.index = #searchField
+        toolWindow.materialList:setFilterText(searchText, true)
 
         toolWindow.layerList:setSelection(layer, true)
         toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial)

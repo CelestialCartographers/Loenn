@@ -564,13 +564,25 @@ local function getSearchFieldChanged(onChange)
     end
 end
 
-function listWidgets.setFilterText(list, text, updateList)
+function listWidgets.setFilterText(list, text, preventCallback)
+    preventCallback = preventCallback ~= false
+
     local searchField = list.searchField
 
     if searchField then
-        searchField:setText(text)
+        local searchCallback = searchField.cb
 
-        if updateList or updateList == nil then
+        if preventCallback then
+            searchField.cb = nil
+        end
+
+        searchField:setText(text)
+        searchField.index = #text
+
+        if preventCallback then
+            searchField.cb = searchCallback
+
+        else
             filterList(list, text)
         end
     end
