@@ -19,7 +19,7 @@ startupScene._performedGameScan = false
 startupScene._dialogChannel = nil
 startupScene._dialogThread = nil
 startupScene._nextScene = "Loading"
-startupScene._messageKey = string.lower(utils.getOS())
+startupScene._messageKey = utils.getOS():lower():gsub(" ", "_")
 
 -- Save the path to config and then change to the loading scene
 local function saveGotoLoading(path)
