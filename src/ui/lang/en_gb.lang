@@ -179,7 +179,7 @@ ui.menubar.view_only_depended_on=Dependencies Only
 ui.menubar.view_depended_on_entities=Entities
 ui.menubar.view_depended_on_triggers=Triggers
 ui.menubar.view_depended_on_decals=Decals
-ui.menubar.view_zoom_to_extents=Zoom To Extents
+ui.menubar.view_zoom_to_extents=Zoom to Extents
 
 ui.menubar.map=Map
 ui.menubar.stylegrounds=Stylegrounds
