@@ -938,11 +938,12 @@ local function copyCommon(cut)
     end
 
     if cut then
+        local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
         local snapshot, redraw = deleteItems(room, tool.layer, selectionTargets)
 
         if redraw then
             history.addSnapshot(snapshot)
-            selectionUtils.redrawTargetLayers(room, selectionTargets)
+            toolUtils.redrawTargetLayer(room, relevantLayers)
         end
     end
 
