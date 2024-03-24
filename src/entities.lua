@@ -1150,166 +1150,113 @@ function entities.placeItem(room, layer, item)
     return true
 end
 
-function entities.canResize(room, layer, entity)
+function entities.getHandler(entity)
     local name = entity._name
     local handler = entities.registeredEntities[name]
 
-    if handler.canResize then
-        if utils.isCallable(handler.canResize) then
-            return handler.canResize(room, entity)
+    return handler
+end
 
-        else
-            return unpack(handler.canResize)
-        end
+-- All extra arguments considered default value
+function entities.getHandlerValue(entity, room, key, ...)
+    local handler = entities.getHandler(entity)
 
-    else
-        return entity.width ~= nil, entity.height ~= nil
+    if not handler then
+        return ...
     end
+
+    local handlerValue = handler[key]
+
+    if handlerValue then
+        return utils.unpackIfTable(utils.callIfFunction(handlerValue, room, entity))
+    end
+
+    return ...
+end
+
+function entities.canResize(room, layer, entity)
+    return entities.getHandlerValue(entity, room, "canResize", entity.width ~= nil, entity.height ~= nil)
 end
 
 function entities.minimumSize(room, layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
-
-    if handler.minimumSize then
-        if utils.isCallable(handler.minimumSize) then
-            return handler.minimumSize(room, entity)
-
-        else
-            return unpack(handler.minimumSize)
-        end
-    end
-
-    return 8, 8
+    return entities.getHandlerValue(entity, room, "minimumSize", 8, 8)
 end
 
 function entities.maximumSize(room, layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
-
-    if handler.maximumSize then
-        if utils.isCallable(handler.maximumSize) then
-            return handler.maximumSize(room, entity)
-
-        else
-            return unpack(handler.maximumSize)
-        end
-    end
-
-    return math.huge, math.huge
+    return entities.getHandlerValue(entity, room, "minimumSize", math.huge, math.huge)
 end
 
 function entities.nodeLimits(room, layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
-
-    if handler and handler.nodeLimits then
-        if utils.isCallable(handler.nodeLimits) then
-            return handler.nodeLimits(room, entity)
-
-        else
-            return unpack(handler.nodeLimits)
-        end
-
-    else
-        return 0, 0
-    end
+    return entities.getHandlerValue(entity, room, "nodeLimits", 0, 0)
 end
 
 function entities.nodeLineRenderType(layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
-
-    if handler and handler.nodeLineRenderType then
-        return utils.callIfFunction(handler.nodeLineRenderType, entity)
-
-    else
-        return false
-    end
+    return entities.getHandlerValue(entity, nil, "nodeLineRenderType", false)
 end
 
 function entities.nodeLineRenderOffset(layer, entity, node, nodeIndex)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = entities.getHandler(entity)
+    local nodeLineRenderOffset = handler and handler.nodeLineRenderOffset
 
-    if handler and handler.nodeLineRenderOffset then
-        if utils.isCallable(handler.nodeLineRenderOffset) then
-            return handler.nodeLineRenderOffset(entity, node, nodeIndex)
-
-        else
-            return unpack(handler.nodeLimits)
-        end
-
-    else
-        return (entity.width or 0) / 2, (entity.height or 0) / 2
+    if nodeLineRenderOffset then
+        return utils.unpackIfTable(utils.callIfFunction(nodeLineRenderOffset, entity, node, nodeIndex))
     end
+
+    return (entity.width or 0) / 2, (entity.height or 0) / 2
 end
 
 function entities.nodeVisibility(layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
-
-    if handler and handler.nodeVisibility then
-        return utils.callIfFunction(handler.nodeVisibility, entity)
-
-    else
-        return "selected"
-    end
+    return entities.getHandlerValue(entity, nil, "nodeVisibility", "selected")
 end
 
 function entities.ignoredFields(layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = entities.getHandler(entity)
+    local ignoredFields = handler and handler.ignoredFields
 
-    if handler and handler.ignoredFields then
-        return utils.callIfFunction(handler.ignoredFields, entity)
-
-    else
-        return {"_name", "_id", "originX", "originY"}
+    if ignoredFields then
+        return utils.callIfFunction(ignoredFields, entity)
     end
+
+    return {"_name", "_id", "originX", "originY"}
 end
 
 function entities.ignoredFieldsMultiple(layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = entities.getHandler(entity)
+    local ignoredFieldsMultiple = handler and handler.ignoredFieldsMultiple
 
-    if handler and handler.ignoredFieldsMultiple then
-        return utils.callIfFunction(handler.ignoredFieldsMultiple, entity)
-
-    else
-        return {"x", "y", "width", "height", "nodes"}
+    if ignoredFieldsMultiple then
+        return utils.callIfFunction(ignoredFieldsMultiple, entity)
     end
+
+    return {"x", "y", "width", "height", "nodes"}
 end
 
 function entities.fieldOrder(layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = entities.getHandler(entity)
 
     if handler and handler.fieldOrder then
         return utils.callIfFunction(handler.fieldOrder, entity)
-
-    else
-        local fields = {"x", "y"}
-
-        local ignoredFields = entities.ignoredFields(layer, entity)
-        local ignoredLookup = table.flip(ignoredFields)
-
-        -- Automatically add width/height if it exists and is not explicitly ignored
-        if entity.width ~= nil and not ignoredLookup.width then
-            table.insert(fields, "width")
-        end
-
-        if entity.height ~= nil and not ignoredLookup.height then
-            table.insert(fields, "height")
-        end
-
-        return fields
     end
+
+    local fields = {"x", "y"}
+
+    local ignoredFields = entities.ignoredFields(layer, entity)
+    local ignoredLookup = table.flip(ignoredFields)
+
+    -- Automatically add width/height if it exists and is not explicitly ignored
+    if entity.width ~= nil and not ignoredLookup.width then
+        table.insert(fields, "width")
+    end
+
+    if entity.height ~= nil and not ignoredLookup.height then
+        table.insert(fields, "height")
+    end
+
+    return fields
 end
 
 function entities.fieldInformation(layer, entity)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = entities.getHandler(entity)
 
     local minimumWidth, minimumHeight = entities.minimumSize(nil, layer, entity)
     local maximumWidth, maximumHeight = entities.maximumSize(nil, layer, entity)
@@ -1347,19 +1294,17 @@ end
 
 function entities.languageData(language, layer, entity)
     local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = entities.getHandler(entity)
 
     if handler and handler.languageData then
         return handler.languageData(entity)
-
-    else
-        return language.entities[name], language.entities.default
     end
+
+    return language.entities[name], language.entities.default
 end
 
 function entities.associatedMods(entity, layer)
-    local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = entities.getHandler(entity)
 
     if handler then
         if handler.associatedMods then
