@@ -5,23 +5,32 @@ local numberField = {}
 
 numberField.fieldType = "number"
 
+local function valueValidator(raw, value, allowEmpty, minimum, maximum)
+    if raw == "" then
+        return allowEmpty
+    end
+
+    local number = tonumber(value)
+
+    return number ~= nil and number <= maximum and number >= minimum
+end
+
 function numberField.getElement(name, value, options)
     -- Add extra options and pass it onto string field
 
     local minimumValue = options.minimumValue or -math.huge
     local maximumValue = options.maximumValue or math.huge
+    local warningMinimumValue = options.warningMinimumValue or minimumValue
+    local warningMaximumValue = options.warningMaximumValue or maximumValue
     local allowEmpty = options.allowEmpty or false
 
     options.valueTransformer = tonumber
     options.displayTransformer = utils.prettifyFloat
+    options.warningValidator = function(v, raw)
+        return valueValidator(raw, v, allowEmpty, warningMinimumValue, warningMaximumValue)
+    end
     options.validator = function(v, raw)
-        if raw == "" then
-            return allowEmpty
-        end
-
-        local number = tonumber(v)
-
-        return number ~= nil and number >= minimumValue and number <= maximumValue
+        return valueValidator(raw, v, allowEmpty, minimumValue, maximumValue)
     end
 
     return stringField.getElement(name, value, options)
