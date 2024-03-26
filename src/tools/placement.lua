@@ -466,13 +466,13 @@ end
 function tool.setLayer(layer)
     local sameLayer = layer == tool.layer
 
+    tool.layer = layer
+
     if state.map and (not sameLayer or not placementsAvailable) then
         updatePlacements(layer, false)
     end
 
     toolUtils.sendLayerEvent(tool, layer)
-
-    tool.layer = layer
 
     return false
 end
