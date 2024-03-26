@@ -10,7 +10,7 @@ local moveBlockDirections = {
 
 moveBlock.name = "moveBlock"
 moveBlock.depth = 8995
-moveBlock.minimumSize = {16, 16}
+moveBlock.warnBelowSize = {16, 16}
 moveBlock.fieldInformation = {
     direction = {
         options = moveBlockDirections,

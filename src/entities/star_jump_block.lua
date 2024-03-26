@@ -7,7 +7,7 @@ local starJumpBlock = {}
 
 starJumpBlock.name = "starJumpBlock"
 starJumpBlock.depth = 9010
-starJumpBlock.minimumSize = {8, 8}
+starJumpBlock.warnBelowSize = {8, 8}
 starJumpBlock.placements = {
     name = "star_jump_block",
     data = {

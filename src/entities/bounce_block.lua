@@ -5,7 +5,7 @@ local bounceBlock = {}
 
 bounceBlock.name = "bounceBlock"
 bounceBlock.depth = 8990
-bounceBlock.minimumSize = {16, 16}
+bounceBlock.warnBelowSize = {16, 16}
 bounceBlock.placements = {
     {
         name = "fire",

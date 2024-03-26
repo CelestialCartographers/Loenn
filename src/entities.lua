@@ -785,8 +785,10 @@ function entities.resizeSelection(room, layer, selection, offsetX, offsetY, dire
 
     else
         local canHorizontal, canVertical = entities.canResize(room, layer, entity)
-        local minimumWidth, minimumHeight = entities.minimumSize(room, layer, entity)
-        local maximumWidth, maximumHeight = entities.maximumSize(room, layer, entity)
+
+        -- Clamp between recommended sizes
+        local minimumWidth, minimumHeight = entities.warnBelowSize(room, layer, entity)
+        local maximumWidth, maximumHeight = entities.warnAboveSize(room, layer, entity)
 
         local oldWidth, oldHeight = entity.width or 0, entity.height or 0
         local newWidth, newHeight = oldWidth, oldHeight
@@ -1179,11 +1181,19 @@ function entities.canResize(room, layer, entity)
 end
 
 function entities.minimumSize(room, layer, entity)
-    return entities.getHandlerValue(entity, room, "minimumSize", 8, 8)
+    return entities.getHandlerValue(entity, room, "minimumSize", 1, 1)
 end
 
 function entities.maximumSize(room, layer, entity)
     return entities.getHandlerValue(entity, room, "minimumSize", math.huge, math.huge)
+end
+
+function entities.warnBelowSize(room, layer, entity)
+    return entities.getHandlerValue(entity, room, "warnBelowSize", 8, 8)
+end
+
+function entities.warnAboveSize(room, layer, entity)
+    return entities.getHandlerValue(entity, room, "warnAbove", math.huge, math.huge)
 end
 
 function entities.nodeLimits(room, layer, entity)
@@ -1260,6 +1270,8 @@ function entities.fieldInformation(layer, entity)
 
     local minimumWidth, minimumHeight = entities.minimumSize(nil, layer, entity)
     local maximumWidth, maximumHeight = entities.maximumSize(nil, layer, entity)
+    local warnBelowWidth, warnBelowHeight = entities.warnBelowSize(nil, layer, entity)
+    local warnAboveWidth, warnAboveHeight = entities.warnAboveSize(nil, layer, entity)
 
     local fieldInfo = {
         x = {
@@ -1272,12 +1284,16 @@ function entities.fieldInformation(layer, entity)
         width = {
             fieldType = "integer",
             minimumValue = minimumWidth,
-            maximumValue = maximumWidth
+            maximumValue = maximumWidth,
+            warningBelowValue = warnBelowWidth,
+            warningAboveValue = warnAboveWidth
         },
         height = {
             fieldType = "integer",
             minimumValue = minimumHeight,
-            maximumValue = maximumHeight
+            maximumValue = maximumHeight,
+            warningBelowValue = warnBelowHeight,
+            warningAboveValue = warnAboveHeight
         }
     }
 

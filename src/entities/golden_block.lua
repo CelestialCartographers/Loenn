@@ -5,7 +5,7 @@ local goldenBlock = {}
 
 goldenBlock.name = "goldenBlock"
 goldenBlock.depth = -10000
-goldenBlock.minimumSize = {16, 16}
+goldenBlock.warnBelowSize = {16, 16}
 goldenBlock.placements = {
     name = "golden_block",
     data = {

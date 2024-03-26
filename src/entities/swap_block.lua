@@ -64,7 +64,7 @@ swapBlock.fieldInformation = {
     }
 }
 swapBlock.placements = {}
-swapBlock.minimumSize = {16, 16}
+swapBlock.warnBelowSize = {16, 16}
 
 for i, theme in ipairs(themes) do
     swapBlock.placements[i] = {

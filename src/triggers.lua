@@ -656,10 +656,18 @@ function triggers.canResize(room, layer, trigger)
 end
 
 function triggers.minimumSize(room, layer, trigger)
-    return 8, 8
+    return 1, 1
 end
 
 function triggers.maximumSize(room, layer, trigger)
+    return math.huge, math.huge
+end
+
+function triggers.warnBelowSize(room, layer, trigger)
+    return 8, 8
+end
+
+function triggers.warnAboveSize(room, layer, trigger)
     return math.huge, math.huge
 end
 
@@ -708,6 +716,8 @@ function triggers.fieldInformation(layer, trigger)
 
     local minimumWidth, minimumHeight = triggers.minimumSize(nil, layer, trigger)
     local maximumWidth, maximumHeight = triggers.maximumSize(nil, layer, trigger)
+    local warnBelowWidth, warnBelowHeight = triggers.warnBelowSize(nil, layer, trigger)
+    local warnAboveWidth, warnAboveHeight = triggers.warnAboveSize(nil, layer, trigger)
 
     local fieldInfo = {
         x = {
@@ -720,12 +730,16 @@ function triggers.fieldInformation(layer, trigger)
         width = {
             fieldType = "integer",
             minimumValue = minimumWidth,
-            maximumValue = maximumWidth
+            maximumValue = maximumWidth,
+            warningBelowValue = warnBelowWidth,
+            warningAboveValue = warnAboveWidth
         },
         height = {
             fieldType = "integer",
             minimumValue = minimumHeight,
-            maximumValue = maximumHeight
+            maximumValue = maximumHeight,
+            warningBelowValue = warnBelowHeight,
+            warningAboveValue = warnAboveHeight
         }
     }
 
