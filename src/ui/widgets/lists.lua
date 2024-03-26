@@ -11,8 +11,20 @@ local utils = require("utils")
 
 local listWidgets = {}
 
-local function calculateWidth(orig, element)
+local function calculateWidthScrollable(orig, element)
     return element.inner.width
+end
+
+local function calculateWidthList(orig, element)
+    local width = orig(element) or element.innerWidth
+
+    if not configs.ui.lists.shrinkToFit then
+        element._largestWidth = math.max(element._largestWidth or width, width)
+
+        return element._largestWidth
+    end
+
+    return width
 end
 
 local function getCaseSensitive(search)
@@ -743,6 +755,9 @@ local function getListCommon(magicList, callback, items, options)
         list = uiElements.list(filteredItems, callback):with(listData)
     end
 
+    list:with(uiUtils.hook({
+        calcWidth = calculateWidthList
+    }))
     listWidgets.addDraggableHooks(list)
 
     ui.runLate(function()
@@ -750,7 +765,7 @@ local function getListCommon(magicList, callback, items, options)
     end)
 
     local scrolledList = uiElements.scrollbox(list):with(uiUtils.hook({
-        calcWidth = calculateWidth
+        calcWidth = calculateWidthScrollable
     })):with(uiUtils.fillHeight(true))
 
     local searchFieldCallback = getSearchFieldChanged(options.searchBarCallback)
