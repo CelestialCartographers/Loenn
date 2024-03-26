@@ -20,14 +20,14 @@ function numberField.getElement(name, value, options)
 
     local minimumValue = options.minimumValue or -math.huge
     local maximumValue = options.maximumValue or math.huge
-    local warningMinimumValue = options.warningMinimumValue or minimumValue
-    local warningMaximumValue = options.warningMaximumValue or maximumValue
+    local warningBelowValue = options.warningBelowValue or minimumValue
+    local warningAboveValue = options.warningAboveValue or maximumValue
     local allowEmpty = options.allowEmpty or false
 
     options.valueTransformer = tonumber
     options.displayTransformer = utils.prettifyFloat
     options.warningValidator = function(v, raw)
-        return valueValidator(raw, v, allowEmpty, warningMinimumValue, warningMaximumValue)
+        return valueValidator(raw, v, allowEmpty, warningBelowValue, warningAboveValue)
     end
     options.validator = function(v, raw)
         return valueValidator(raw, v, allowEmpty, minimumValue, maximumValue)

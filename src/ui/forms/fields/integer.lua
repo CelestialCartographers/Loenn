@@ -24,14 +24,14 @@ function integerField.getElement(name, value, options)
 
     local minimumValue = math.max(options.minimumValue or smallestInt, smallestInt)
     local maximumValue = math.min(options.maximumValue or largestInt, largestInt)
-    local warningMinimumValue = options.warnBelowValue or minimumValue
-    local warningMaximumValue = options.warnAboveValue or maximumValue
+    local warningBelowValue = options.warningBelowValue or minimumValue
+    local warningAboveValue = options.warningAboveValue or maximumValue
     local allowEmpty = options.allowEmpty or false
 
     options.valueTransformer = tonumber
     options.displayTransformer = tostring
     options.warningValidator = function(v, raw)
-        return valueValidator(raw, v, allowEmpty, warningMinimumValue, warningMaximumValue)
+        return valueValidator(raw, v, allowEmpty, warningBelowValue, warningAboveValue)
     end
     options.validator = function(v, raw)
         return valueValidator(raw, v, allowEmpty, minimumValue, maximumValue)
