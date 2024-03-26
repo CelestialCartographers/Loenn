@@ -170,6 +170,26 @@ function placementUtils.maximumSize(room, layer, target)
     return math.huge, math.huge
 end
 
+function placementUtils.warnBelowSize(room, layer, target)
+    local handler = layerHandlers.getHandler(layer)
+
+    if handler and handler.warnBelowSize then
+        return handler.warnBelowSize(room, layer, target)
+    end
+
+    return placementUtils.minimumSize(room, layer, target)
+end
+
+function placementUtils.warnAboveSize(room, layer, target)
+    local handler = layerHandlers.getHandler(layer)
+
+    if handler and handler.warnAboveSize then
+        return handler.warnAboveSize(room, layer, target)
+    end
+
+    return placementUtils.maximumSize(room, layer, target)
+end
+
 function placementUtils.nodeLimits(room, layer, target)
     local handler = layerHandlers.getHandler(layer)
 

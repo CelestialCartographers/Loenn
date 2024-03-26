@@ -488,6 +488,16 @@ function utils.callIfFunction(f, ...)
     return f
 end
 
+-- Unpack the first value if it is a table, otherwise return all arguments
+-- Assuming this will never see more than two or three arguments
+function utils.unpackIfTable(a, b, c, d, e, f, g, h, i, j)
+    if utils.typeof(a) == "table" then
+        return unpack(a)
+    end
+
+    return a, b, c, d, e, f, g, h, i, j
+end
+
 -- Call function with arguments
 -- Use sub values of first argument if it is a table and call function for each of those instead
 function utils.callIterateFirstIfTable(f, value, ...)

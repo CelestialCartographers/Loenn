@@ -33,7 +33,7 @@ local colorNames = {
 }
 
 cassetteBlock.name = "cassetteBlock"
-cassetteBlock.minimumSize = {16, 16}
+cassetteBlock.warnBelowSize = {16, 16}
 cassetteBlock.fieldInformation = {
     index = {
         fieldType = "integer",

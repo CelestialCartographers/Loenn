@@ -7,7 +7,7 @@ local playbackBillboard = {}
 
 playbackBillboard.name = "playbackBillboard"
 playbackBillboard.depth = 9010
-playbackBillboard.minimumSize = {8, 8}
+playbackBillboard.warnBelowSize = {8, 8}
 playbackBillboard.placements = {
     name = "playback_billboard",
     data = {

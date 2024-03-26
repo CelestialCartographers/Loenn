@@ -4,7 +4,7 @@ local templeCrackedBlock = {}
 
 templeCrackedBlock.name = "templeCrackedBlock"
 templeCrackedBlock.depth = 0
-templeCrackedBlock.minimumSize = {24, 24}
+templeCrackedBlock.warnBelowSize = {24, 24}
 templeCrackedBlock.placements = {
     name = "temple_block",
     data = {

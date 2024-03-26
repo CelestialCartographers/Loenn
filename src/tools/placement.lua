@@ -134,9 +134,9 @@ local function dragFinished()
         end
 
         if placementType == "rectangle" then
-            -- Reset rectangle template to minimum size
+            -- Reset rectangle template to recommended minimum size
             local item = placementTemplate.item
-            local minimumWidth, minimumHeight = placementUtils.minimumSize(room, tool.layer, item)
+            local minimumWidth, minimumHeight = placementUtils.warnBelowSize(room, tool.layer, item)
 
             item.width = item.width and minimumWidth
             item.height = item.height and minimumHeight
@@ -213,8 +213,10 @@ local function updateRectanglePlacement(template, item, itemX, itemY)
     local layer = tool.layer
 
     local resizeWidth, resizeHeight = placementUtils.canResize(room, layer, item)
-    local minimumWidth, minimumHeight = placementUtils.minimumSize(room, layer, item)
-    local maximumWidth, maximumHeight = placementUtils.maximumSize(room, layer, item)
+
+    -- Clamp between recommended sizes
+    local minimumWidth, minimumHeight = placementUtils.warnBelowSize(room, layer, item)
+    local maximumWidth, maximumHeight = placementUtils.warnAboveSize(room, layer, item)
 
     local gridSize = placementUtils.getGridSize()
     local itemWidthRaw = dragging and placementRectangle.width or gridSize
@@ -466,13 +468,13 @@ end
 function tool.setLayer(layer)
     local sameLayer = layer == tool.layer
 
+    tool.layer = layer
+
     if state.map and (not sameLayer or not placementsAvailable) then
         updatePlacements(layer, false)
     end
 
     toolUtils.sendLayerEvent(tool, layer)
-
-    tool.layer = layer
 
     return false
 end

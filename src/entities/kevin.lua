@@ -12,7 +12,7 @@ local axesOptions = {
 
 kevin.name = "crushBlock"
 kevin.depth = 0
-kevin.minimumSize = {24, 24}
+kevin.warnBelowSize = {24, 24}
 kevin.fieldInformation = {
     axes = {
         options = axesOptions,

@@ -627,101 +627,97 @@ function triggers.placeItem(room, layer, item)
     return true
 end
 
+function triggers.getHandler(trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    return handler
+end
+
+-- All extra arguments considered default value
+function triggers.getHandlerValue(trigger, room, key, ...)
+    local handler = triggers.getHandler(trigger)
+
+    if not handler then
+        return ...
+    end
+
+    local handlerValue = handler[key]
+
+    if handlerValue then
+        return utils.unpackIfTable(utils.callIfFunction(handlerValue, room, trigger))
+    end
+
+    return ...
+end
+
 function triggers.canResize(room, layer, trigger)
     return true, true
 end
 
 function triggers.minimumSize(room, layer, trigger)
-    return 8, 8
+    return 1, 1
 end
 
 function triggers.maximumSize(room, layer, trigger)
     return math.huge, math.huge
 end
 
+function triggers.warnBelowSize(room, layer, trigger)
+    return 8, 8
+end
+
+function triggers.warnAboveSize(room, layer, trigger)
+    return math.huge, math.huge
+end
+
 function triggers.nodeLimits(room, layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
-
-    if handler and handler.nodeLimits then
-        if utils.isCallable(handler.nodeLimits) then
-            return handler.nodeLimits(room, trigger)
-
-        else
-            return unpack(handler.nodeLimits)
-        end
-
-    else
-        return 0, 0
-    end
+    return triggers.getHandlerValue(trigger, room, "nodeLimits", 0, 0)
 end
 
 function triggers.nodeLineRenderType(layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
-
-    if handler and handler.nodeLineRenderType then
-        return utils.callIfFunction(handler.nodeLineRenderType, trigger)
-
-    else
-        return "line"
-    end
+    return triggers.getHandlerValue(trigger, nil, "nodeLineRenderType", "line")
 end
 
 function triggers.nodeVisibility(layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
-
-    if handler and handler.nodeVisibility then
-        return utils.callIfFunction(handler.nodeVisibility, trigger)
-
-    else
-        return "selected"
-    end
+    return triggers.getHandlerValue(trigger, nil, "nodeVisibility", "selected")
 end
 
 function triggers.ignoredFields(layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
+    local handler = triggers.getHandler(trigger)
+    local ignoredFields = handler and handler.ignoredFields
 
-    if handler and handler.ignoredFields then
-        return utils.callIfFunction(handler.ignoredFields, trigger)
-
-    else
-        return {"_name", "_id", "originX", "originY"}
+    if ignoredFields then
+        return utils.callIfFunction(ignoredFields, trigger)
     end
+
+    return {"_name", "_id", "originX", "originY"}
 end
 
 function triggers.ignoredFieldsMultiple(layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
+    local handler = triggers.getHandler(trigger)
+    local ignoredFieldsMultiple = handler and handler.ignoredFieldsMultiple
 
-    if handler and handler.ignoredFieldsMultiple then
-        return utils.callIfFunction(handler.ignoredFieldsMultiple, trigger)
-
-    else
-        return {"x", "y", "width", "height", "nodes"}
+    if ignoredFieldsMultiple then
+        return utils.callIfFunction(ignoredFieldsMultiple, trigger)
     end
+
+    return {"x", "y", "width", "height", "nodes"}
 end
 
 function triggers.fieldOrder(layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
+    local defaultFieldOrder = {"x", "y", "width", "height"}
 
-    if handler and handler.fieldOrder then
-        return utils.callIfFunction(handler.fieldOrder, trigger)
-
-    else
-        return {"x", "y", "width", "height"}
-    end
+    return triggers.getHandlerValue(trigger, nil, "fieldOrder", defaultFieldOrder)
 end
 
 function triggers.fieldInformation(layer, trigger)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
+    local handler = triggers.getHandler(trigger)
 
     local minimumWidth, minimumHeight = triggers.minimumSize(nil, layer, trigger)
     local maximumWidth, maximumHeight = triggers.maximumSize(nil, layer, trigger)
+    local warnBelowWidth, warnBelowHeight = triggers.warnBelowSize(nil, layer, trigger)
+    local warnAboveWidth, warnAboveHeight = triggers.warnAboveSize(nil, layer, trigger)
 
     local fieldInfo = {
         x = {
@@ -734,12 +730,16 @@ function triggers.fieldInformation(layer, trigger)
         width = {
             fieldType = "integer",
             minimumValue = minimumWidth,
-            maximumValue = maximumWidth
+            maximumValue = maximumWidth,
+            warningBelowValue = warnBelowWidth,
+            warningAboveValue = warnAboveWidth
         },
         height = {
             fieldType = "integer",
             minimumValue = minimumHeight,
-            maximumValue = maximumHeight
+            maximumValue = maximumHeight,
+            warningBelowValue = warnBelowHeight,
+            warningAboveValue = warnAboveHeight
         }
     }
 
@@ -754,21 +754,19 @@ function triggers.fieldInformation(layer, trigger)
     return fieldInfo
 end
 
-function triggers.languageData(language, layer, entity)
-    local name = entity._name
-    local handler = triggers.registeredTriggers[name]
+function triggers.languageData(language, layer, trigger)
+    local name = trigger._name
+    local handler = triggers.getHandler(trigger)
 
     if handler and handler.languageData then
-        return handler.languageData(entity)
-
-    else
-        return language.triggers[name], language.triggers.default
+        return handler.languageData(trigger)
     end
+
+    return language.triggers[name], language.triggers.default
 end
 
 function triggers.associatedMods(trigger, layer)
-    local name = trigger._name
-    local handler = triggers.registeredTriggers[name]
+    local handler = triggers.getHandler(trigger)
 
     if handler then
         if handler.associatedMods then

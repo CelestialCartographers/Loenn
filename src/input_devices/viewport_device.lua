@@ -40,6 +40,10 @@ function viewportDevice.zoomToExtents(map)
         return
     end
 
+    if #map.rooms == 0 then
+        return
+    end
+
     local tlx, tly, brx, bry = mapItemUtils.getMapBounds(map)
     local rectangle = utils.rectangle(tlx, tly, brx - tlx, bry - tly)
 

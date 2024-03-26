@@ -5,7 +5,7 @@ local templeMirror = {}
 
 templeMirror.name = "templeMirror"
 templeMirror.depth = 8995
-templeMirror.minimumSize = {24, 24}
+templeMirror.warnBelowSize = {24, 24}
 templeMirror.placements = {
     name = "mirror",
     data = {
