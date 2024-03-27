@@ -183,12 +183,14 @@ local function getPlacementOffset()
     return getGridPosition(placementCurrentX, placementCurrentY)
 end
 
-local function updatePlacementDrawable()
+local function updatePlacementDrawable(layer)
+    layer = layer or tool.layer
+
     local room = state.getSelectedRoom()
 
     if room and placementTemplate then
         local target = placementTemplate.item._name or placementTemplate.item.texture
-        local drawable = placementUtils.getDrawable(tool.layer, target, room, placementTemplate.item)
+        local drawable = placementUtils.getDrawable(layer, target, room, placementTemplate.item)
 
         placementTemplate.drawable = drawable
     end
@@ -308,12 +310,14 @@ local placementUpdaters = {
     line = updateLinePlacement
 }
 
-local function updatePlacementNodes()
+local function updatePlacementNodes(layer)
+    layer = layer or tool.layer
+
     local room = state.room
 
     local item = placementTemplate.item
     local placementType = getCurrentPlacementType()
-    local minimumNodes, maximumNodes = placementUtils.nodeLimits(room, tool.layer, item)
+    local minimumNodes, maximumNodes = placementUtils.nodeLimits(room, layer, item)
 
     if minimumNodes > 0 then
         -- Set up empty nodes table if needed
@@ -373,24 +377,26 @@ local function updatePlacement(force)
     end
 end
 
-local function setPlacement(placement, sendEvent)
+local function setPlacement(placement, sendEvent, layer)
+    layer = layer or tool.layer
+
     placementTemplate = {
         item = utils.deepcopy(placement.itemTemplate),
         placement = placement,
     }
 
-    updatePlacementNodes()
-    updatePlacementDrawable()
+    updatePlacementNodes(layer)
+    updatePlacementDrawable(layer)
 
     if sendEvent ~= false then
-        toolUtils.sendMaterialEvent(tool, tool.layer, placement.name)
+        toolUtils.sendMaterialEvent(tool, layer, placement.name)
     end
 end
 
-local function selectPlacement(name, index, sendEvent)
+local function selectPlacement(name, index, sendEvent, layer)
     for i, placement in ipairs(placementsAvailable) do
         if i == index or placement.displayName == name or placement.name == name then
-            setPlacement(placement, sendEvent)
+            setPlacement(placement, sendEvent, layer)
 
             return true
         end
@@ -457,22 +463,22 @@ local function updatePlacements(layer, sendEvent)
     local useFallback = not persistenceMaterial
 
     if persistenceMaterial then
-        useFallback = not selectPlacement(persistenceMaterial, nil, sendEvent)
+        useFallback = not selectPlacement(persistenceMaterial, nil, sendEvent, layer)
     end
 
     if useFallback then
-        selectPlacement(nil, 1, sendEvent)
+        selectPlacement(nil, 1, sendEvent, layer)
     end
 end
 
 function tool.setLayer(layer)
     local sameLayer = layer == tool.layer
 
-    tool.layer = layer
-
     if state.map and (not sameLayer or not placementsAvailable) then
         updatePlacements(layer, false)
     end
+
+    tool.layer = layer
 
     toolUtils.sendLayerEvent(tool, layer)
 

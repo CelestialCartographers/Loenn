@@ -1185,15 +1185,23 @@ function entities.minimumSize(room, layer, entity)
 end
 
 function entities.maximumSize(room, layer, entity)
-    return entities.getHandlerValue(entity, room, "minimumSize", math.huge, math.huge)
+    return entities.getHandlerValue(entity, room, "maximumSize", math.huge, math.huge)
 end
 
 function entities.warnBelowSize(room, layer, entity)
-    return entities.getHandlerValue(entity, room, "warnBelowSize", 8, 8)
+    local minimumWidth, minimumHeight = entities.minimumSize(room, layer, entity)
+    local fallbackWidth = math.max(minimumWidth, 8)
+    local fallbackHeight = math.max(minimumHeight, 8)
+
+    return entities.getHandlerValue(entity, room, "warnBelowSize", fallbackWidth, fallbackHeight)
 end
 
 function entities.warnAboveSize(room, layer, entity)
-    return entities.getHandlerValue(entity, room, "warnAbove", math.huge, math.huge)
+    local maximumWidth, maximumHeight = entities.maximumSize(room, layer, entity)
+    local fallbackWidth = math.min(maximumWidth, math.huge)
+    local fallbackHeight = math.min(maximumHeight, math.huge)
+
+    return entities.getHandlerValue(entity, room, "warnAbove", fallbackWidth, fallbackHeight)
 end
 
 function entities.nodeLimits(room, layer, entity)
