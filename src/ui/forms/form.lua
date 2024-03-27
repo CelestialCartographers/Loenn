@@ -14,6 +14,8 @@ local widgetUtils = require("ui.widgets.utils")
 
 local forms = {}
 
+forms.changeMark = "• "
+
 forms.registeredFieldTypes = {}
 
 function forms.getFieldElement(name, value, options)
@@ -218,6 +220,10 @@ local fieldChangedCallback = function(formFields, options)
         if options.formFieldChanged then
             options.formFieldChanged(formFields, changedField)
         end
+
+        if formFields.formFieldChanged then
+            formFields.formFieldChanged(changedField)
+        end
     end
 end
 
@@ -385,11 +391,33 @@ function forms.getForm(buttons, data, options)
         }):with(uiUtils.fillHeight(true))
     end
 
-    return uiElements.column({scrollableBody, buttonRow}):with(uiUtils.fillHeight(true))
+    return uiElements.column({scrollableBody, buttonRow}):with(uiUtils.fillHeight(true)), formFields
 end
 
 function forms.prepareScrollableWindow(window, maxHeight)
     window:with(widgetUtils.fillHeightIfNeeded(maxHeight))
+end
+
+function forms.addTitleChangeHandler(window, baseTitle, formFields)
+    local function formFieldChanged()
+        local titlePrefix = formFields._hasChanges and forms.changeMark or ""
+        local newTitle = titlePrefix .. baseTitle
+
+        widgetUtils.setWindowTitle(window, newTitle)
+    end
+
+    -- Set directly if we can, otherwise add a wrapper
+    if formFields.formFieldChanged then
+        local originalCallback = formFields.formFieldChanged
+
+        formFields.formFieldChanged = function()
+            originalCallback()
+            formFieldChanged()
+        end
+
+    else
+        formFields.formFieldChanged = formFieldChanged
+    end
 end
 
 function forms.loadFieldType(filename, registerAt, verbose)

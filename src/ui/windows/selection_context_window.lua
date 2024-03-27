@@ -136,7 +136,6 @@ local function findCompatibleSelections(selections, targetSelection)
 end
 
 function contextWindow.createContextMenu(selections, bestSelection)
-    local window
     local language = languageRegistry.getLanguage()
 
     -- Filter out selections that would end up making a mess
@@ -163,23 +162,23 @@ function contextWindow.createContextMenu(selections, bestSelection)
     }
 
     local windowTitle = getWindowTitle(language, selections, bestSelection)
-    local selectionForm = form.getForm(buttons, dummyData, {
+    local selectionForm, formFields = form.getForm(buttons, dummyData, {
         fields = fieldInformation,
         fieldOrder = fieldOrder,
         fieldMetadata = {
             formData = dummyData,
             selections = selections,
-        }
+        },
     })
 
-    window = uiElements.window(windowTitle, selectionForm)
-
+    local window = uiElements.window(windowTitle, selectionForm)
     local windowCloseCallback = windowPersister.getWindowCloseCallback(windowPersisterName)
 
     windowPersister.trackWindow(windowPersisterName, window)
     contextGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     form.prepareScrollableWindow(window)
+    form.addTitleChangeHandler(window, windowTitle, formFields)
 
     return window
 end

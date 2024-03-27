@@ -366,7 +366,7 @@ function settingsWindow.editSettings()
         }
     }
 
-    local settingsForm = form.getForm(buttons, formData, {
+    local settingsForm, formFields = form.getForm(buttons, formData, {
         fields = fieldInformation,
         groups = fieldGroups,
         ignoreUnordered = true
@@ -379,6 +379,7 @@ function settingsWindow.editSettings()
     settingsWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     form.prepareScrollableWindow(window)
+    form.addTitleChangeHandler(window, windowTitle, formFields)
 
     return window
 end

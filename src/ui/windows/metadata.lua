@@ -342,7 +342,7 @@ function metadataWindow.editMetadata(side)
         }
     }
 
-    local metadataForm = form.getForm(buttons, formData, {
+    local metadataForm, formFields = form.getForm(buttons, formData, {
         fields = fieldInformation,
         groups = fieldGroups,
         ignoreUnordered = true
@@ -355,6 +355,7 @@ function metadataWindow.editMetadata(side)
     metadataWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     form.prepareScrollableWindow(window)
+    form.addTitleChangeHandler(window, windowTitle, formFields)
 
     return window
 end

@@ -384,7 +384,7 @@ function roomWindow.createRoomWindow(room, editing)
         }
     }
 
-    local roomForm = form.getForm(buttons, room, {
+    local roomForm, formFields = form.getForm(buttons, room, {
         fields = fieldInformation,
         fieldOrder = defaultFieldOrder,
         ignoreUnordered = true
@@ -398,6 +398,7 @@ function roomWindow.createRoomWindow(room, editing)
     roomWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     form.prepareScrollableWindow(window)
+    form.addTitleChangeHandler(window, windowTitle, formFields)
 
     return window
 end
