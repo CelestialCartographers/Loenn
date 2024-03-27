@@ -635,6 +635,8 @@ function triggers.getHandler(trigger)
 end
 
 -- All extra arguments considered default value
+-- Specifically for functions that need both entity and room
+-- Will unpack returned tables, do not use for functions that actually want table returns
 function triggers.getHandlerValue(trigger, room, key, ...)
     local handler = triggers.getHandler(trigger)
 
@@ -676,11 +678,23 @@ function triggers.nodeLimits(room, layer, trigger)
 end
 
 function triggers.nodeLineRenderType(layer, trigger)
-    return triggers.getHandlerValue(trigger, nil, "nodeLineRenderType", "line")
+    local handler = triggers.getHandler(trigger)
+
+    if handler and handler.nodeLineRenderType then
+        return utils.callIfFunction(handler.nodeLineRenderType, trigger)
+    end
+
+    return "line"
 end
 
 function triggers.nodeVisibility(layer, trigger)
-    return triggers.getHandlerValue(trigger, nil, "nodeVisibility", "selected")
+    local handler = triggers.getHandler(trigger)
+
+    if handler and handler.nodeVisibility then
+        return utils.callIfFunction(handler.nodeVisibility, trigger)
+    end
+
+    return "selected"
 end
 
 function triggers.ignoredFields(layer, trigger)
@@ -707,8 +721,13 @@ end
 
 function triggers.fieldOrder(layer, trigger)
     local defaultFieldOrder = {"x", "y", "width", "height"}
+    local handler = triggers.getHandler(trigger)
 
-    return triggers.getHandlerValue(trigger, nil, "fieldOrder", defaultFieldOrder)
+    if handler and handler.fieldOrder then
+        return utils.callIfFunction(handler.fieldOrder, trigger)
+    end
+
+    return defaultFieldOrder
 end
 
 function triggers.fieldInformation(layer, trigger)
