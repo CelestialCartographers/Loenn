@@ -213,6 +213,7 @@ local fieldChangedCallback = function(formFields, options)
     return function(changedField)
         formFields._lastChange = love.timer.getTime()
         formFields._formValid = forms.formValid(formFields)
+        formFields._hasChanges = forms.formHasChanges(formFields)
 
         if options.formFieldChanged then
             options.formFieldChanged(formFields, changedField)
@@ -229,6 +230,7 @@ local function prepareFormFields(formFields, options)
 
     -- Initial validation
     formFields._formValid = forms.formValid(formFields)
+    formFields._initialData = forms.getFormData(formFields)
 end
 
 function forms.getFormBody(data, options)
@@ -260,6 +262,13 @@ function forms.formValid(formFields)
     end
 
     return #invalidFields == 0, invalidFields
+end
+
+function forms.formHasChanges(formFields)
+    local data = forms.getFormData(formFields)
+    local initialData = formFields._initialData
+
+    return not utils.equals(data, initialData)
 end
 
 function forms.getFormData(formFields)
