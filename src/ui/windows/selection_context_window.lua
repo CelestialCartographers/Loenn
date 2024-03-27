@@ -165,7 +165,11 @@ function contextWindow.createContextMenu(selections, bestSelection)
     local windowTitle = getWindowTitle(language, selections, bestSelection)
     local selectionForm = form.getForm(buttons, dummyData, {
         fields = fieldInformation,
-        fieldOrder = fieldOrder
+        fieldOrder = fieldOrder,
+        fieldMetadata = {
+            formData = dummyData,
+            selections = selections,
+        }
     })
 
     window = uiElements.window(windowTitle, selectionForm)
