@@ -1160,6 +1160,8 @@ function entities.getHandler(entity)
 end
 
 -- All extra arguments considered default value
+-- Specifically for functions that need both entity and room
+-- Will unpack returned tables, do not use for functions that actually want table returns
 function entities.getHandlerValue(entity, room, key, ...)
     local handler = entities.getHandler(entity)
 
@@ -1209,7 +1211,13 @@ function entities.nodeLimits(room, layer, entity)
 end
 
 function entities.nodeLineRenderType(layer, entity)
-    return entities.getHandlerValue(entity, nil, "nodeLineRenderType", false)
+    local handler = entities.getHandler(entity)
+
+    if handler and handler.nodeLineRenderType then
+        return utils.callIfFunction(handler.nodeLineRenderType, entity)
+    end
+
+    return false
 end
 
 function entities.nodeLineRenderOffset(layer, entity, node, nodeIndex)
@@ -1224,7 +1232,13 @@ function entities.nodeLineRenderOffset(layer, entity, node, nodeIndex)
 end
 
 function entities.nodeVisibility(layer, entity)
-    return entities.getHandlerValue(entity, nil, "nodeVisibility", "selected")
+    local handler = entities.getHandler(entity)
+
+    if handler and handler.nodeVisibility then
+        return utils.callIfFunction(handler.nodeVisibility, entity)
+    end
+
+    return "selected"
 end
 
 function entities.ignoredFields(layer, entity)
