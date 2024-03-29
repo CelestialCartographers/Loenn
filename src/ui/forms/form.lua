@@ -21,7 +21,7 @@ forms.registeredFieldTypes = {}
 function forms.getFieldElement(name, value, options)
     local fieldType = options and options.fieldType or utils.typeof(value)
     local handler = forms.registeredFieldTypes[fieldType]
-
+    
     if handler then
         return handler.getElement(name, value, options)
 
@@ -87,6 +87,8 @@ function forms.getFormFields(data, options)
         ignored[name] = true
         element._hidden = hidden[name]
         element._options = fieldOptions
+        -- Pass the data to each field by-reference
+        element._dataRef = data
 
         table.insert(elements, element)
     end
