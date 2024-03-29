@@ -87,6 +87,7 @@ function forms.getFormFields(data, options)
         ignored[name] = true
         element._hidden = hidden[name]
         element._options = fieldOptions
+        element._entityData = data
 
         table.insert(elements, element)
     end
