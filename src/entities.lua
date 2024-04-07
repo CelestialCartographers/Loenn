@@ -1146,6 +1146,11 @@ end
 
 function entities.placeItem(room, layer, item)
     local items = entities.getRoomItems(room, layer)
+    
+    local handler = entities.getHandler(item)
+    if handler and type(handler.finalizePlacement) == "function" and not handler.finalizePlacement(room, layer, item) then
+        return false
+    end
 
     table.insert(items, item)
 

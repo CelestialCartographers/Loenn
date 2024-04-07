@@ -622,6 +622,11 @@ end
 function triggers.placeItem(room, layer, item)
     local items = triggers.getRoomItems(room, layer)
 
+    local handler = triggers.getHandler(item)
+    if handler and type(handler.finalizePlacement) == "function" and not handler.finalizePlacement(room, layer, item) then
+        return false
+    end
+    
     table.insert(items, item)
 
     return true
