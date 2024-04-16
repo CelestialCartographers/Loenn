@@ -338,6 +338,7 @@ function metadataWindow.editMetadata(side)
             formMustBeValid = true,
             callback = function(formFields)
                 saveMetadataCallback(formFields, side)
+                form.formDataSaved(formFields)
             end
         }
     }

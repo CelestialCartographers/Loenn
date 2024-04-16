@@ -270,6 +270,15 @@ function forms.formValid(formFields)
     return #invalidFields == 0, invalidFields
 end
 
+function forms.formDataSaved(formFields)
+    local data = forms.getFormData(formFields)
+
+    formFields._initialData = data
+    formFields._hasChanges = false
+
+    forms.updateWindowChangedTitle(formFields)
+end
+
 function forms.formHasChanges(formFields)
     local data = forms.getFormData(formFields)
     local initialData = formFields._initialData
@@ -398,12 +407,26 @@ function forms.prepareScrollableWindow(window, maxHeight)
     window:with(widgetUtils.fillHeightIfNeeded(maxHeight))
 end
 
-function forms.addTitleChangeHandler(window, baseTitle, formFields)
-    local function formFieldChanged()
-        local titlePrefix = formFields._hasChanges and forms.changeMark or ""
-        local newTitle = titlePrefix .. baseTitle
+function forms.updateWindowChangedTitle(formFields)
+    local window = formFields._window
+    local baseTitle = formFields._baseTitle
 
-        widgetUtils.setWindowTitle(window, newTitle)
+    if not window or not baseTitle then
+        return
+    end
+
+    local titlePrefix = formFields._hasChanges and forms.changeMark or ""
+    local newTitle = titlePrefix .. baseTitle
+
+    widgetUtils.setWindowTitle(window, newTitle)
+end
+
+function forms.addTitleChangeHandler(window, baseTitle, formFields)
+    formFields._window = window
+    formFields._baseTitle = baseTitle
+
+    local function formFieldChanged()
+        forms.updateWindowChangedTitle(formFields)
     end
 
     -- Set directly if we can, otherwise add a wrapper

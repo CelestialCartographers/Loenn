@@ -65,7 +65,6 @@ end
 -- TODO - Add history support
 function contextWindow.saveChangesCallback(selections, dummyData)
     return function(formFields)
-        local redraw = {}
         local newData = form.getFormData(formFields)
         local room = loadedState.getSelectedRoom()
 
@@ -89,6 +88,8 @@ function contextWindow.saveChangesCallback(selections, dummyData)
             selectionUtils.updateSelectionRectangles(room, selections)
             selectionUtils.redrawTargetLayers(room, selections)
         end
+
+        form.formDataSaved(formFields)
     end
 end
 
