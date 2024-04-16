@@ -64,11 +64,13 @@ local defaultFieldInformation = {
 
     width = {
         fieldType = "integer",
-        minimumValue = 1
+        minimumValue = 8,
+        warningBelowValue = roomStruct.recommendedMinimumWidth,
     },
     height = {
         fieldType = "integer",
-        minimumValue = 1
+        minimumValue = 8,
+        warningBelowValue = roomStruct.recommendedMinimumHeight,
     },
 
     color = {
@@ -200,8 +202,8 @@ local function saveRoomCallback(formFields, room, editing, usingPixels)
         room.height = room.height * 8
     end
 
-    newRoomData.width = math.max(roomStruct.recommendedMinimumWidth, newRoomData.width)
-    newRoomData.height = math.max(roomStruct.recommendedMinimumHeight, newRoomData.height)
+    newRoomData.width = math.max(8, newRoomData.width)
+    newRoomData.height = math.max(8, newRoomData.height)
 
     if editing then
         local previousName = room.name
@@ -361,6 +363,15 @@ function roomWindow.createRoomWindow(room, editing)
 
     -- Make sure new rooms can't use name from template room
     fieldInformation.name.editedRoom = editing and room.name or false
+
+    -- Adjust minimums for size based on setting
+    if not usingPixels then
+        fieldInformation.width.minimumValue /= 8
+        fieldInformation.width.warningBelowValue /= 8
+
+        fieldInformation.height.minimumValue /= 8
+        fieldInformation.height.warningBelowValue /= 8
+    end
 
     local languageKey = editing and "save_changes_update" or "save_changes_create"
     local saveText = tostring(language.ui.room_window[languageKey])
