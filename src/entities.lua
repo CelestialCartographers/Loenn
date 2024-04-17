@@ -949,6 +949,42 @@ function entities.addNodeToSelection(room, layer, selection)
     return false
 end
 
+function entities.ignoredSimilarityKeys(entity)
+    local handler = entities.getHandler(entity)
+    local ignoredSimilarityKeys = handler and handler.ignoredSimilarityKeys
+
+    if ignoredSimilarityKeys then
+        return utils.callIfFunction(ignoredSimilarityKeys, entity)
+    end
+
+    return {"_name", "_id", "_type", "originX", "originY", "x", "y"}
+end
+
+function entities.selectionsSimilar(selectionA, selectionB, strict)
+    local entityA = selectionA.item
+    local entityB = selectionB.item
+    local sameEntityType = entityA._name == entityB._name
+
+    if strict and sameEntityType then
+        local keyCountA = utils.countKeys(entityA)
+        local keyCountB = utils.countKeys(entityB)
+
+        if keyCountA ~= keyCountB then
+            return false
+        end
+
+        local ignoredKeys = table.flip(entities.ignoredSimilarityKeys(entityA))
+
+        for k, v in pairs(entityA) do
+            if not ignoredKeys[k] and v ~= entityB[k] then
+                return false
+            end
+        end
+    end
+
+    return sameEntityType
+end
+
 local function guessPlacementType(name, handler, placement)
     if placement and placement.data then
         if placement.data.width or placement.data.height then

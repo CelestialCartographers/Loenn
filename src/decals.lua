@@ -412,6 +412,21 @@ function decals.fieldInformation(layer, decal)
     }
 end
 
+function decals.selectionsSimilar(selectionA, selectionB, strict)
+    local decalA = selectionA.item
+    local decalB = selectionB.item
+    local sameDecalTexture = decalA.texture == decalB.texture
+
+    if strict and sameDecalTexture then
+        return decalA.scaleX == decalB.scaleX and
+            decalA.scaleY == decalB.scaleY and
+            decalA.rotation == decalB.rotation and
+            decalA.color == decalB.color
+    end
+
+    return sameDecalTexture
+end
+
 function decals.languageData(language, layer, decal)
     return language.decals
 end

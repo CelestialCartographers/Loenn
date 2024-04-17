@@ -1183,6 +1183,34 @@ local function movementFinished(x, y)
     dragMovementTotalX, dragMovementTotalY = 0, 0
 end
 
+local function getSimilarSelections(targetSelection, strict)
+    local room = state.getSelectedRoom()
+    local rectangle = utils.rectangle(-math.huge, -math.huge, math.huge, math.huge)
+    local allSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, rectangle)
+    local result = {}
+
+    for _, selection in ipairs(allSelections) do
+        if selectionItemUtils.selectionsSimilar(targetSelection, selection, strict) then
+            table.insert(result, selection)
+        end
+    end
+
+    return result
+end
+
+local function selectSimilar(strict)
+    local target = selectionTargets[1]
+
+    if not target then
+        return false
+    end
+
+    local similarSelections = getSimilarSelections(target, strict)
+
+    tool.setSelectionPreviews({})
+    tool.setSelectionTargets(similarSelections)
+end
+
 local function selectAllHotkey()
     -- Fake a infinitely large selection
     local x, y = -math.huge, -math.huge
@@ -1424,11 +1452,18 @@ function tool.mouseclicked(x, y, button, istouch, presses)
         local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
         if cursorX and cursorY then
-            selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
+            if presses == 1 then
+                selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
 
-            selectionFinished(cursorX, cursorY, true)
-            resizeFinished(cursorX, cursorY)
-            movementFinished(cursorX, cursorY)
+                selectionFinished(cursorX, cursorY, true)
+                resizeFinished(cursorX, cursorY)
+                movementFinished(cursorX, cursorY)
+
+            else
+                local strict = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+
+                selectSimilar(strict)
+            end
         end
 
     elseif button == contextMenuButton then

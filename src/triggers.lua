@@ -441,6 +441,42 @@ function triggers.addNodeToSelection(room, layer, selection)
     return false
 end
 
+function triggers.ignoredSimilarityKeys(trigger)
+    local handler = triggers.getHandler(trigger)
+    local ignoredSimilarityKeys = handler and handler.ignoredSimilarityKeys
+
+    if ignoredSimilarityKeys then
+        return utils.callIfFunction(ignoredSimilarityKeys, trigger)
+    end
+
+    return {"_name", "_id", "_type", "originX", "originY", "x", "y"}
+end
+
+function triggers.selectionsSimilar(selectionA, selectionB, strict)
+    local triggerA = selectionA.item
+    local triggerB = selectionB.item
+    local sameTriggerType = triggerA._name == triggerB._name
+
+    if strict and sameTriggerType then
+        local keyCountA = utils.countKeys(triggerA)
+        local keyCountB = utils.countKeys(triggerB)
+
+        if keyCountA ~= keyCountB then
+            return false
+        end
+
+        local ignoredKeys = table.flip(triggers.ignoredSimilarityKeys(triggerA))
+
+        for k, v in pairs(triggerA) do
+            if not ignoredKeys[k] and v ~= triggerB[k] then
+                return false
+            end
+        end
+    end
+
+    return sameTriggerType
+end
+
 -- Returns all triggers of room
 function triggers.getRoomItems(room, layer)
     return room.triggers

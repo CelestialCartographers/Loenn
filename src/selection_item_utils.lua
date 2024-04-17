@@ -71,4 +71,21 @@ function selectionItemUtils.addNodeToSelection(room, layer, item)
     return callHandlerFunction("addNodeToSelection", room, layer, item)
 end
 
+function selectionItemUtils.selectionsSimilar(selectionA, selectionB, strict)
+    local layerA = selectionA.layer
+    local layerB = selectionB.layer
+
+    if layerA ~= layerB then
+        return false
+    end
+
+    local handler = layerHandlers.getHandler(layerA)
+
+    if handler and handler.selectionsSimilar then
+        return handler.selectionsSimilar(selectionA, selectionB, strict)
+    end
+
+    return false
+end
+
 return selectionItemUtils
