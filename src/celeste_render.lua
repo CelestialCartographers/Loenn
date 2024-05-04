@@ -727,7 +727,7 @@ function celesteRender.forceRoomBatchRender(room, state)
 
     for i, data in ipairs(depthBatchingFunctions) do
         local description, key, func, depth = data[1], data[2], data[3], data[4]
-        local layerVisible = state.getLayerVisible(key)
+        local layerVisible = state.getLayerShouldRender(key)
         local result = func(room, room[key], viewport)
         local task = roomCache[room.name][key]
 
@@ -776,7 +776,7 @@ function celesteRender.getRoomBatches(room, state)
 
         for i, data in ipairs(depthBatchingFunctions) do
             local description, key, func, depth = data[1], data[2], data[3], data[4]
-            local layerVisible = state.getLayerVisible(key)
+            local layerVisible = state.getLayerShouldRender(key)
             local batches
 
             if layerVisible then

@@ -5,6 +5,7 @@ local pluginLoader = require("plugin_loader")
 local modHandler = require("mods")
 local toolUtils = require("tool_utils")
 local logging = require("logging")
+local loadedState = require("loaded_state")
 
 local toolHandler = {}
 
@@ -182,6 +183,7 @@ function toolHandler.setLayer(layer, name)
 
         if result ~= false then
             toolUtils.sendLayerEvent(handler, layer)
+            loadedState.setLayerForceRender(layer)
         end
 
         return result

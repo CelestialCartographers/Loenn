@@ -133,9 +133,19 @@ function tool.setLayer(layer)
     if layer == "allLayers" then
         tool.layer = allLayers
 
+        -- Set all layers to forced visible
+        state.setLayerForceRender(layer, true, true)
+
     else
         tool.layer = layer
+
+        -- Set all layers to forced visible
+        state.setLayerForceRender(layer, true)
     end
+
+    toolUtils.sendLayerEvent(tool, layer)
+
+    return false
 end
 
 local function selectionChanged(x, y, width, height, fromClick)

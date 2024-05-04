@@ -481,6 +481,7 @@ function tool.setLayer(layer)
     tool.layer = layer
 
     toolUtils.sendLayerEvent(tool, layer)
+    state.setLayerForceRender(layer, true)
 
     return false
 end
