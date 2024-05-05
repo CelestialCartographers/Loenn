@@ -26,7 +26,7 @@ local depths = {
     fgParticles = -50000,
     top = -1000000,
     formationSequences = -2000000,
-    triggers = -math.huge
+    triggers = -100000000
 }
 
 return depths
