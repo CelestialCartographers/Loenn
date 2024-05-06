@@ -85,16 +85,7 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
         end
 
     elseif typ == "drawableText" then
-        local text = drawable.text
-
-        local x = drawable.x
-        local y = drawable.y
-
-        local width = drawable.width
-        local height = drawable.height
-
         local font = drawable.font
-        local fontSize = drawable.fontSize
 
         if font ~= self._lastFont or self._lastType ~= "drawableText" or not self._lastBatch then
             self._lastFont = font
@@ -103,7 +94,7 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
             table.insert(self._drawables, self._lastBatch)
         end
 
-        drawing.addCenteredText(self._lastBatch, text, x, y, width, height, font, fontSize)
+        drawable:addToBatch(self._lastBatch)
 
     elseif typ == "drawableFunction" then
         -- Handles colors itself
