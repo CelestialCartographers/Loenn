@@ -25,8 +25,9 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
 
     if drawable.getDrawableSprite then
         local sprites = drawable:getDrawableSprite()
+        local spritesIsTable = utils.typeof(sprites) == "table"
 
-        if #sprites == 0 then
+        if not spritesIsTable then
             self:addFromDrawable(sprites)
 
         else
@@ -83,6 +84,18 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
             end
         end
 
+    elseif typ == "drawableText" then
+        local font = drawable.font
+
+        if font ~= self._lastFont or self._lastType ~= "drawableText" or not self._lastBatch then
+            self._lastFont = font
+            self._lastBatch = love.graphics.newText(font)
+
+            table.insert(self._drawables, self._lastBatch)
+        end
+
+        drawable:addToBatch(self._lastBatch)
+
     elseif typ == "drawableFunction" then
         -- Handles colors itself
         table.insert(self._drawables, drawable)
@@ -92,24 +105,13 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
 end
 
 function orderedDrawingBatchMt.__index:draw()
-    -- Initial and previous color
-    local ir, ig, ib, ia
-    local pr, pg, pb, pa
-    local changedColor = false
-
     for _, drawable in ipairs(self._drawables) do
-        local typ = utils.typeof(drawable)
-
-        if typ == "drawableFunction" then
+        if drawable.draw then
             drawable:draw()
 
         else
             love.graphics.draw(drawable, 0, 0)
         end
-    end
-
-    if changedColor then
-        love.graphics.setColor(ir, ig, ib, ia)
     end
 end
 

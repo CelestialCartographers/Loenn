@@ -94,12 +94,27 @@ end
 function brushToolUtils.getTileSnapshotValue(tool)
     local room = state.getSelectedRoom()
 
-
     return tiles.getRoomTileSnapshotValue(room, tool.layer)
 end
 
+function brushToolUtils.hasSnapshottedRoomResized(tool)
+    local room = state.getSelectedRoom()
+    local tiles = room[tool.layer]
+    local currentWidth, currentHeight = tiles.matrix:size()
+
+    if tool.snapshotValue then
+        if tool.snapshotValue.width ~= currentWidth or tool.snapshotValue.height ~= currentHeight then
+            return true
+        end
+    end
+
+    return false
+end
+
 function brushToolUtils.startTileSnapshot(tool, force)
-    if not tool.snapshotValue or force then
+    local resizedRoom = brushToolUtils.hasSnapshottedRoomResized(tool)
+
+    if not tool.snapshotValue or force or resizedRoom then
         tool.snapshotValue = brushToolUtils.getTileSnapshotValue(tool)
         tool.snapshotHasChanged = false
 

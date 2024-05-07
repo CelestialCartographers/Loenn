@@ -4,12 +4,14 @@ local modHandler = require("mods")
 local configs = require("configs")
 local nodeStruct = require("structs.node")
 local logging = require("logging")
+local depths = require("consts.object_depths")
 
 local languageRegistry = require("language_registry")
 
 local drawing = require("utils.drawing")
 local drawableFunction = require("structs.drawable_function")
 local drawableRectangle = require("structs.drawable_rectangle")
+local drawableText = require("structs.drawable_text")
 
 local colors = require("consts.colors")
 local triggerFontSize = 1
@@ -109,77 +111,23 @@ end
 
 -- Returns drawable, depth
 function triggers.getDrawable(name, handler, room, trigger, viewport)
-    local func = function()
-        local displayName = triggers.triggerText(room, trigger)
+    local displayName = triggers.triggerText(room, trigger)
 
-        local x = trigger.x or 0
-        local y = trigger.y or 0
+    local x = trigger.x or 0
+    local y = trigger.y or 0
 
-        local width = trigger.width or 16
-        local height = trigger.height or 16
+    local width = trigger.width or 16
+    local height = trigger.height or 16
 
-        local lineWidth = love.graphics.getLineWidth()
+    local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, colors.triggerColor, colors.triggerBorderColor)
+    local textDrawable = drawableText.fromText(displayName, x, y, width, height, nil, triggerFontSize)
 
-        drawing.callKeepOriginalColor(function()
-            love.graphics.setColor(colors.triggerBorderColor)
-            love.graphics.rectangle("line", x + lineWidth / 2, y + lineWidth / 2, width - lineWidth, height - lineWidth)
+    local drawables = borderedRectangle:getDrawableSprite()
+    table.insert(drawables, textDrawable)
 
-            love.graphics.setColor(colors.triggerColor)
-            love.graphics.rectangle("fill", x + lineWidth, y + lineWidth, width - 2 * lineWidth, height - 2 * lineWidth)
+    textDrawable.depth = depths.triggers - 1
 
-            love.graphics.setColor(colors.triggerTextColor)
-            drawing.printCenteredText(displayName, x, y, width, height, font, triggerFontSize)
-        end)
-    end
-
-    return drawableFunction.fromFunction(func), 0
-end
-
-function triggers.addDrawables(batch, room, targets, viewport, yieldRate)
-    local font = love.graphics.getFont()
-
-    -- Add rectangles first, then batch draw all text
-
-    for i, trigger in ipairs(targets) do
-        local x = trigger.x or 0
-        local y = trigger.y or 0
-
-        local width = trigger.width or 16
-        local height = trigger.height or 16
-
-        local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, colors.triggerColor, colors.triggerBorderColor)
-
-        batch:addFromDrawable(borderedRectangle)
-
-        if i % yieldRate == 0 then
-            coroutine.yield(batch)
-        end
-    end
-
-    local textBatch = love.graphics.newText(font)
-
-    for i, trigger in ipairs(targets) do
-        local displayName = triggers.triggerText(room, trigger)
-
-        local x = trigger.x or 0
-        local y = trigger.y or 0
-
-        local width = trigger.width or 16
-        local height = trigger.height or 16
-
-        drawing.addCenteredText(textBatch, displayName, x, y, width, height, font, triggerFontSize)
-    end
-
-    local function func()
-        drawing.callKeepOriginalColor(function()
-            love.graphics.setColor(colors.triggerTextColor)
-            love.graphics.draw(textBatch)
-        end)
-    end
-
-    batch:addFromDrawable(drawableFunction.fromFunction(func))
-
-    return batch
+    return drawables, depths.triggers
 end
 
 -- Returns main trigger selection rectangle, then table of node rectangles
@@ -439,6 +387,42 @@ function triggers.addNodeToSelection(room, layer, selection)
     end
 
     return false
+end
+
+function triggers.ignoredSimilarityKeys(trigger)
+    local handler = triggers.getHandler(trigger)
+    local ignoredSimilarityKeys = handler and handler.ignoredSimilarityKeys
+
+    if ignoredSimilarityKeys then
+        return utils.callIfFunction(ignoredSimilarityKeys, trigger)
+    end
+
+    return {"_name", "_id", "_type", "originX", "originY", "x", "y"}
+end
+
+function triggers.selectionsSimilar(selectionA, selectionB, strict)
+    local triggerA = selectionA.item
+    local triggerB = selectionB.item
+    local sameTriggerType = triggerA._name == triggerB._name
+
+    if strict and sameTriggerType then
+        local keyCountA = utils.countKeys(triggerA)
+        local keyCountB = utils.countKeys(triggerB)
+
+        if keyCountA ~= keyCountB then
+            return false
+        end
+
+        local ignoredKeys = table.flip(triggers.ignoredSimilarityKeys(triggerA))
+
+        for k, v in pairs(triggerA) do
+            if not ignoredKeys[k] and v ~= triggerB[k] then
+                return false
+            end
+        end
+    end
+
+    return sameTriggerType
 end
 
 -- Returns all triggers of room

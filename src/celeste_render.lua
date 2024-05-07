@@ -618,7 +618,9 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
             -- Special case for multiple drawable sprites
             -- Maybe handle this better later
             if drawable then
-                if #drawable == 0 then
+                local drawableIsTable = utils.typeof(drawable) == "table"
+
+                if not drawableIsTable then
                     local batchDepth = drawable.depth or depth or 0
                     local batch = getOrCreateSmartBatch(batches, batchDepth)
 
@@ -672,16 +674,51 @@ function celesteRender.getEntityBatch(room, entities, viewport, registeredEntiti
     return cache.entities.result
 end
 
-local function getTriggerBatchTaskFunc(room, triggers, viewport)
-    local batch = smartDrawingBatch.createOrderedBatch()
+local function getTriggerBatchTaskFunc(room, triggers, viewport, registeredTriggers)
+    local batches = {}
 
-    triggerHandler.addDrawables(batch, room, triggers, viewport, YIELD_RATE)
-    tasks.update(batch)
+    for i, trigger in ipairs(triggers) do
+        local name = trigger._name
+        local handler = registeredTriggers[name]
 
-    return batch
+        if handler then
+            local drawable, depth = triggerHandler.getDrawable(name, handler, room, trigger, viewport)
+
+            -- Special case for multiple drawable sprites
+            -- Maybe handle this better later
+            if drawable then
+                local drawableIsTable = utils.typeof(drawable) == "table"
+
+                if not drawableIsTable then
+                    local batchDepth = drawable.depth or depth or 0
+                    local batch = getOrCreateSmartBatch(batches, batchDepth)
+
+                    batch:addFromDrawable(drawable)
+
+                else
+                    for _, drawableItem in ipairs(drawable) do
+                        local batchDepth = drawableItem.depth or depth or 0
+                        local batch = getOrCreateSmartBatch(batches, batchDepth)
+
+                        batch:addFromDrawable(drawableItem)
+                    end
+                end
+            end
+
+            if i % YIELD_RATE == 0 then
+                tasks.yield()
+            end
+        end
+    end
+
+    tasks.update(batches)
+
+    return batches
 end
 
-function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
+function celesteRender.getTriggerBatch(room, triggers, viewport, registeredTriggers, forceRedraw)
+    registeredTriggers = registeredTriggers or triggerHandler.registeredTriggers
+
     local roomName = room.name
     local cache = roomCache[roomName]
 
@@ -696,7 +733,7 @@ function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
 
     if not cache.triggers then
         cache.triggers = tasks.newTask(
-            (-> getTriggerBatchTaskFunc(room, triggers, viewport)),
+            (-> getTriggerBatchTaskFunc(room, triggers, viewport, registeredTriggers)),
             (task -> PRINT_BATCHING_DURATION and logging.info(string.format("Batching 'triggers' in '%s' took %s ms", roomName, task.timeTotal * 1000))),
             batchingTasks,
             {room = room}
@@ -706,19 +743,13 @@ function celesteRender.getTriggerBatch(room, triggers, viewport, forceRedraw)
     return cache.triggers.result
 end
 
-function celesteRender.drawTriggers(room, triggers, viewport)
-    local batch = celesteRender.getTriggerBatch(room, triggers, viewport)
-
-    batch:draw()
-end
-
 local depthBatchingFunctions = {
     {"Background Tiles", "tilesBg", celesteRender.getTilesBgBatch, tilesBgDepth},
     {"Background Decals", "decalsBg", celesteRender.getDecalsBgBatch, decalsBgDepth},
     {"Entities", "entities", celesteRender.getEntityBatch},
     {"Foreground Tiles", "tilesFg", celesteRender.getTilesFgBatch, tilesFgDepth},
     {"Foreground Decals", "decalsFg", celesteRender.getDecalsFgBatch, decalsFgDepth},
-    {"Triggers", "triggers", celesteRender.getTriggerBatch, triggersDepth}
+    {"Triggers", "triggers", celesteRender.getTriggerBatch}
 }
 
 -- Force all non finished room batch tasks to finish
@@ -727,7 +758,7 @@ function celesteRender.forceRoomBatchRender(room, state)
 
     for i, data in ipairs(depthBatchingFunctions) do
         local description, key, func, depth = data[1], data[2], data[3], data[4]
-        local layerVisible = state.getLayerVisible(key)
+        local layerVisible = state.getLayerShouldRender(key)
         local result = func(room, room[key], viewport)
         local task = roomCache[room.name][key]
 
@@ -739,9 +770,10 @@ end
 
 local function addBatch(depthBatches, depth, batches)
     local batchTarget = depthBatches[depth]
+    local batchesIsTable = utils.typeof(batches) == "table"
 
     if batchTarget then
-        if #batches > 0 then
+        if batchesIsTable then
             for _, sprite in ipairs(batches) do
                 table.insert(batchTarget, sprite)
             end
@@ -751,7 +783,7 @@ local function addBatch(depthBatches, depth, batches)
         end
 
     else
-        if #batches > 0 then
+        if batchesIsTable then
             depthBatches[depth] = batches
 
         else
@@ -776,7 +808,7 @@ function celesteRender.getRoomBatches(room, state)
 
         for i, data in ipairs(depthBatchingFunctions) do
             local description, key, func, depth = data[1], data[2], data[3], data[4]
-            local layerVisible = state.getLayerVisible(key)
+            local layerVisible = state.getLayerShouldRender(key)
             local batches
 
             if layerVisible then
@@ -784,8 +816,10 @@ function celesteRender.getRoomBatches(room, state)
             end
 
             if batches then
-                if depth then
-                    addBatch(depthBatches, depth, batches)
+                local batchesIsTable = utils.typeof(batches) == "table"
+
+                if not batchesIsTable then
+                    addBatch(depthBatches, depth or 0, batches)
 
                 else
                     for d, batch in pairs(batches) do
@@ -830,7 +864,7 @@ local function drawRoomFromBatches(room, state, selected)
     local orderedBatches = celesteRender.getRoomBatches(room, state)
 
     if orderedBatches then
-        for depth, batch in ipairs(orderedBatches) do
+        for _, batch in ipairs(orderedBatches) do
             for _, drawable in ipairs(batch) do
                 drawable:draw()
             end

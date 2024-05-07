@@ -431,23 +431,57 @@ function state.setLayerInformation(layer, key, value)
     return changed
 end
 
+function state.clearRoomRenderCache()
+    local rooms = state.map and state.map.rooms or {}
+
+    -- Clear target canvas and complete cache for all rooms
+    celesteRender.invalidateRoomCache(nil, {"canvas", "complete"})
+
+    -- Redraw any visible rooms
+    local selectedItem, selectedItemType = state.getSelectedItem()
+
+    celesteRender.clearBatchingTasks()
+    celesteRender.forceRedrawVisibleRooms(rooms, state, selectedItem, selectedItemType)
+end
+
+function state.getLayerShouldRender(layer)
+    return state.getLayerInformation(layer, "visible", true) or state.getLayerInformation(layer, "forceRender", false)
+end
+
+function state.setLayerForceRender(layer, currentValue, otherValue)
+    local changesVisibility = false
+
+    for target in pairs(state.layerInformation) do
+        local layerVisibleBefore = state.getLayerShouldRender(target)
+
+        if target == layer then
+            state.setLayerInformation(target, "forceRender", currentValue)
+
+        else
+            state.setLayerInformation(target, "forceRender", otherValue or false)
+        end
+
+        local layerVisibleAfter = state.getLayerShouldRender(target)
+
+        if layerVisibleBefore ~= layerVisibleAfter then
+            changesVisibility = true
+        end
+    end
+
+    if changesVisibility and silent ~= false then
+        state.clearRoomRenderCache()
+    end
+end
+
 function state.getLayerVisible(layer)
     return state.getLayerInformation(layer, "visible", true)
 end
 
 function state.setLayerVisible(layer, visible, silent)
-    local rooms = state.map and state.map.rooms or {}
     local changed = state.setLayerInformation(layer, "visible", visible)
 
     if changed and silent ~= false then
-        -- Clear target canvas and complete cache for all rooms
-        celesteRender.invalidateRoomCache(nil, {"canvas", "complete"})
-
-        -- Redraw any visible rooms
-        local selectedItem, selectedItemType = state.getSelectedItem()
-
-        celesteRender.clearBatchingTasks()
-        celesteRender.forceRedrawVisibleRooms(rooms, state, selectedItem, selectedItemType)
+        state.clearRoomRenderCache()
     end
 end
 
