@@ -161,6 +161,16 @@ local function prepareDropdownOptions(value, options, displayTransformer, insert
     return flattenedOptions, seenValueName
 end
 
+local function getDisplayValue(displayTransformer, value)
+    local success, displayValue = pcall(displayTransformer, value)
+
+    if success then
+        return displayValue
+    end
+
+    return tostring(value)
+end
+
 function stringField.getElement(name, value, options)
     local formField = {}
 
@@ -187,8 +197,10 @@ function stringField.getElement(name, value, options)
     local editable = options.editable
     local dropdown
 
+    local displayValue = getDisplayValue(displayTransformer, value)
+
     local label = uiElements.label(options.displayName or name)
-    local field = uiElements.field(displayTransformer(value), fieldChanged(formField)):with({
+    local field = uiElements.field(displayValue, fieldChanged(formField)):with({
         minWidth = minWidth,
         maxWidth = maxWidth
     })
@@ -198,7 +210,7 @@ function stringField.getElement(name, value, options)
         field:setEnabled(false)
     end
 
-    field:setPlaceholder(displayTransformer(value))
+    field:setPlaceholder(displayValue)
 
     if dropdownOptions then
         local optionsFlattened, currentText = prepareDropdownOptions(value, dropdownOptions, displayTransformer)

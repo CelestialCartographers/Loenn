@@ -227,8 +227,8 @@ local fieldChangedCallback = function(formFields, options)
     end
 end
 
-local function prepareFormFields(formFields, options)
-    -- Add extra fields for validation/metadata
+function forms.prepareFormFields(formFields, options)
+    -- Add extra fields for validation
     for _, field in ipairs(formFields) do
         field.notifyFieldChanged = fieldChangedCallback(formFields, options)
         field.metadata = options.fieldMetadata
@@ -253,7 +253,7 @@ function forms.getFormBody(data, options)
         formFields._options = options
     end
 
-    prepareFormFields(formFields, options)
+    forms.prepareFormFields(formFields, options)
 
     return grid, formFields
  end
