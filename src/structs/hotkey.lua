@@ -1,7 +1,7 @@
 local keyboardHelper = require("utils.keyboard")
 
 local specialKeyAliases = {
-    plus = "+",
+    plus = "=",
     minus = "-",
 }
 
