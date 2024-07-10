@@ -334,6 +334,9 @@ local function saveSettings(formFields)
     -- TODO - Reload hotkeys
 
     local newSettings = form.getFormData(formFields)
+    local oldSettings = rawget(configs, "data")
+
+    utils.mergeTables(oldSettings, newSettings)
 
     rawset(configs, "data", newSettings)
     config.writeConfig(configs, true)
