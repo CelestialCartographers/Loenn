@@ -787,6 +787,24 @@ function utils.deepcopy(v, copyMetatables)
     end
 end
 
+-- Add all items missing in "from" into "to" recursively
+-- Returns true if "to" was changed
+function utils.mergeTables(from, to)
+    local madeChanges = false
+
+    for k, v in pairs(from) do
+        if to[k] == nil then
+            to[k] = v
+            madeChanges = true
+
+        elseif type(to[k]) == "table" and type(v) == "table" then
+            madeChanges = madeChanges or utils.mergeTables(v, to[k])
+        end
+    end
+
+    return madeChanges
+end
+
 function utils.shuffle(t)
     for i = #t, 2, -1 do
         local j = math.random(i)
