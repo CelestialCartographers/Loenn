@@ -427,6 +427,7 @@ function dependencyWindow.editDependencies(filename, side)
     windowPersister.trackWindow(windowPersisterName, window)
     dependencyWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
+    widgetUtils.preventOutOfBoundsMovement(window)
     window:with(widgetUtils.fillHeightIfNeeded())
 
     return window

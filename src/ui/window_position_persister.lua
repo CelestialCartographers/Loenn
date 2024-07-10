@@ -53,6 +53,7 @@ function windowPersister.restorePosition(name, window)
     local newX, newY = -4096, -4096
 
     window.x, window.y = -4096, -4096
+    window._disableMovementClamping = true
 
     -- Set window to center of screen if no previous position
     if previous then
@@ -68,6 +69,8 @@ function windowPersister.restorePosition(name, window)
     -- Needs to run pretty late to get correct size
     ui.runLate(function()
         ui.runLate(function()
+            window._disableMovementClamping = false
+
             if previous then
                 widgetUtils.moveWindow(window, newX, newY)
 

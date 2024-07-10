@@ -81,6 +81,7 @@ function aboutWindow.showAboutWindow()
     windowPersister.trackWindow(windowPersisterName, window)
     aboutWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
+    widgetUtils.preventOutOfBoundsMovement(window)
     form.prepareScrollableWindow(window)
 
     return window

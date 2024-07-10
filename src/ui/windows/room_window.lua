@@ -409,6 +409,7 @@ function roomWindow.createRoomWindow(room, editing)
     windowPersister.trackWindow(windowPersisterName, window)
     roomWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
+    widgetUtils.preventOutOfBoundsMovement(window)
     form.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, formFields)
 

@@ -79,6 +79,40 @@ function widgetUtils.getSimpleOverlayWidget(widget, ...)
     return widget
 end
 
+-- TODO
+-- Double check this with ui root size and menubar, seems it is a bit off with Löve window size
+-- Also a potential issue with moveWindow
+function widgetUtils.preventOutOfBoundsMovement(window, padding)
+    padding = padding or 16
+
+    window:hook({
+        update = function(orig, self)
+            orig(self)
+
+            if self._disableMovementClamping then
+                return
+            end
+
+            -- No need to run if position hasn't changed
+            if self.x ~= self._previousX or self.y ~= self._previousY then
+                local windowWidth, windowHeight = love.graphics.getDimensions()
+                local newX, newY = self.x, self.y
+
+                newX = math.max(math.min(windowWidth - window.width - padding, newX), padding)
+                newY = math.max(math.min(windowHeight - window.height - padding, newY), padding)
+
+                self.x = newX
+                self.realX = newX
+                self.y = newY
+                self.realY = newY
+            end
+
+            self._previousX = self.x
+            self._previousY = self.y
+        end
+    })
+end
+
 function widgetUtils.moveWindow(window, newX, newY, threshold, clamp, padding)
     padding = padding or 16
     threshold = threshold or 4

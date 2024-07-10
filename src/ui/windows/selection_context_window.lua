@@ -178,6 +178,7 @@ function contextWindow.createContextMenu(selections, bestSelection)
     windowPersister.trackWindow(windowPersisterName, window)
     contextGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
+    widgetUtils.preventOutOfBoundsMovement(window)
     form.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, formFields)
 

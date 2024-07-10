@@ -355,6 +355,7 @@ function metadataWindow.editMetadata(side)
     windowPersister.trackWindow(windowPersisterName, window)
     metadataWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
+    widgetUtils.preventOutOfBoundsMovement(window)
     form.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, formFields)
 

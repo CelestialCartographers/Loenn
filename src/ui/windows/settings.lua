@@ -439,6 +439,7 @@ function settingsWindow.editSettings()
     windowPersister.trackWindow(windowPersisterName, window)
     settingsWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
+    widgetUtils.preventOutOfBoundsMovement(window)
     form.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, allFields)
 

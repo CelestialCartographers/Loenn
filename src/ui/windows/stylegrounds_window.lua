@@ -882,6 +882,7 @@ function stylegroundWindow.editStylegrounds(map)
     windowPersister.trackWindow(windowPersisterName, window)
     stylegroundWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
+    widgetUtils.preventOutOfBoundsMovement(window)
 
     return window
 end
