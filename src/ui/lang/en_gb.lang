@@ -72,6 +72,8 @@ ui.settings_window.window_title=Settings
 
 ui.settings_window.save_changes=Save changes
 
+ui.settings_window.tab.general=General
+ui.settings_window.tab.graphics=Graphics
 ui.settings_window.group.general.name=General
 ui.settings_window.group.backups.name=Backups
 ui.settings_window.group.debug.name=Debug

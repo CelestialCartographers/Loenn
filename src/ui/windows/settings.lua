@@ -9,6 +9,7 @@ local form = require("ui.forms.form")
 local settingsEditor = require("ui.settings_editor")
 local configs = require("configs")
 local config = require("utils.config")
+local tabbedWindow = require("ui.widgets.tabbed_window")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "settings_window"
@@ -19,6 +20,38 @@ local settingsWindow = {}
 
 -- TODO - Some of these should probably be locked behind advanced settings
 -- TODO - Add support for a "description" for the category
+
+local defaultTabForms = {
+    {
+        title = "ui.settings_window.tab.general",
+        groups = {
+            {
+                title = "ui.settings_window.group.general",
+                fieldOrder = {
+                    "celesteGameDirectory", "general.language",
+                    "general.persistWindowFullScreen", "general.persistWindowPosition",
+                    "general.persistWindowSize",
+                }
+            }
+        }
+    },
+    {
+        title = "ui.settings_window.tab.graphics",
+        groups = {
+            {
+                title = "ui.settings_window.group.general",
+                fieldOrder = {
+                    "graphics.focusedDrawRate", "graphics.focusedMainLoopSleep",
+                    "graphics.focusedUpdateRate", "graphics.unfocusedDrawRate",
+                    "graphics.unfocusedMainLoopSleep", "graphics.unfocusedUpdateRate",
+                    "graphics.vsync", "editor.displayFPS",
+                }
+            }
+        }
+    },
+}
+
+-- TODO - Remove once moved into tabs, this is a semi complete list of all settings
 local defaultFieldGroups = {
     {
         title = "ui.settings_window.group.general",
@@ -289,10 +322,6 @@ local settingsWindowGroup = uiElements.group({}):with({
     editSettings = settingsWindow.editSettings
 })
 
-local function prepareSaveData(data)
-    return data
-end
-
 local function prepareFormData()
     local data = rawget(configs, "data")
 
@@ -301,31 +330,30 @@ local function prepareFormData()
     return utils.deepcopy(data)
 end
 
-local function saveMetadataCallback(formFields, side)
-    local formData = form.getFormData(formFields)
-    local newSettings = prepareSaveData(formData)
+local function saveSettings(formFields)
+    -- TODO - Reload hotkeys
+
+    local newSettings = form.getFormData(formFields)
 
     rawset(configs, "data", newSettings)
     config.writeConfig(configs, true)
-
-    -- TODO - Reload hotkeys
 end
 
-function settingsWindow.editSettings()
-    local language = languageRegistry.getLanguage()
-    local windowTitle = tostring(language.ui.settings_window.window_title)
-
-    local formData = prepareFormData()
-    local fieldInformation = utils.deepcopy(defaultFieldInformation)
-    local fieldGroups = utils.deepcopy(defaultFieldGroups) -- TODO - Inject translations
-
+local function prepareTabForm(language, tabData, fieldInformation, formData, buttons)
+    local tab = {}
     local fieldNames = {}
+
+    local titleParts = tabData.title:split(".")()
+    local titleLanguage = utils.getPath(language, titleParts)
+    local title = tostring(titleLanguage)
+
+    local fieldGroups = tabData.groups or {}
 
     for _, group in ipairs(fieldGroups) do
         -- Use title name as language path
         if group.title then
-            local parts = group.title:split(".")()
-            local baseLanguage = utils.getPath(language, parts)
+            local groupTitleParts = group.title:split(".")()
+            local baseLanguage = utils.getPath(language, groupTitleParts)
 
             group.title = tostring(baseLanguage.name)
         end
@@ -356,30 +384,60 @@ function settingsWindow.editSettings()
         fieldInformation[field].tooltipText = tostring(settingsDescriptions[fieldLanguageKey])
     end
 
+    local tabForm, tabFields = form.getForm(buttons, formData, {
+        fields = fieldInformation,
+        groups = fieldGroups,
+        ignoreUnordered = true,
+    })
+
+    tab.title = title
+    tab.content = tabForm
+    tab.fields = tabFields
+    tab.fieldNames = fieldNames
+
+    return tab
+end
+
+function settingsWindow.editSettings()
+    local language = languageRegistry.getLanguage()
+    local windowTitle = tostring(language.ui.settings_window.window_title)
+
+    local formData = prepareFormData()
+    local fieldInformation = utils.deepcopy(defaultFieldInformation)
+
+    local tabs = {}
+    local allFields = {}
+
     local buttons = {
         {
             text = tostring(language.ui.settings_window.save_changes),
             formMustBeValid = true,
-            callback = function(formFields)
-                saveMetadataCallback(formFields)
+            callback = function()
+                saveSettings(allFields)
             end
         }
     }
 
-    local settingsForm, formFields = form.getForm(buttons, formData, {
-        fields = fieldInformation,
-        groups = fieldGroups,
-        ignoreUnordered = true
-    })
+    for _, tabData in ipairs(defaultTabForms) do
+        local tab = prepareTabForm(language, utils.deepcopy(tabData), fieldInformation, formData, buttons)
 
-    local window = uiElements.window(windowTitle, settingsForm)
+        table.insert(tabs, tab)
+    end
+
+    for _, tab in ipairs(tabs) do
+        for _, field in ipairs(tab.fields) do
+            table.insert(allFields, field)
+        end
+    end
+
+    local window = tabbedWindow.createWindow(windowTitle, tabs)
     local windowCloseCallback = windowPersister.getWindowCloseCallback(windowPersisterName)
 
     windowPersister.trackWindow(windowPersisterName, window)
     settingsWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     form.prepareScrollableWindow(window)
-    form.addTitleChangeHandler(window, windowTitle, formFields)
+    form.addTitleChangeHandler(window, windowTitle, allFields)
 
     return window
 end
