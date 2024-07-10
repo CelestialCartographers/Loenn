@@ -29,6 +29,7 @@ local defaultHotkeys = {
 
     -- Selection
     itemsSelectAll = "ctrl + a",
+    itemsDeselect = "ctrl + shift + a",
 
     itemAreaFlipVertical = "shift + v",
     itemAreaFlipHorizontal = "shift + h",
