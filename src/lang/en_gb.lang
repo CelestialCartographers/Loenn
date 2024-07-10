@@ -1,8 +1,10 @@
 # Lönn Language File
 # Comments start with '#'
 
+
 # -- Window title --
 window_title.new_map=New map
+
 
 # -- Scenes --
 # scenes.sceneName.*
@@ -1522,6 +1524,7 @@ metadata.cassettemodifier.description.BeatsMax=Maximum number of beats before th
 metadata.cassettemodifier.description.BeatIndexOffset=An offset in beats between the beat counter in the game and the FMOD music parameter. Defaults to 0. Allows changing the timing of cassette music.
 metadata.cassettemodifier.description.OldBehavior=Activates old cassette music behaviour. Makes Tempo Multiplier override the Tempo attribute in cassette blocks, makes Max Beats ignore cassette block indices, and changes how initial cassette block states are calculated.
 
+
 # -- Parallax --
 # style.parallax.attribute.Attribute=Attribute Display Name
 # style.parallax.description.Attribute=Tooltip
@@ -1706,3 +1709,211 @@ dependencies.foundModFile=Uses file "%s"
 dependencies.category.metadata=Metadata
 dependencies.category.parallax=Parallax
 dependencies.category.effect=Effects
+
+
+# -- Settings --
+settings.attribute.celesteGameDirectory=Celeste Game Directory
+settings.description.celesteGameDirectory=Celeste Game Directory
+
+settings.general.attribute.language=Language
+settings.general.attribute.persistWindowFullScreen=Persist Window Full Screen
+settings.general.attribute.persistWindowPosition=Persist Window Position
+settings.general.attribute.persistWindowSize=Persist Window Size
+settings.general.description.language=Language
+settings.general.description.persistWindowFullScreen=Persist Window Full Screen
+settings.general.description.persistWindowPosition=Persist Window Position
+settings.general.description.persistWindowSize=Persist Window Size
+
+settings.backups.attribute.backupMode=Backup Mode
+settings.backups.attribute.backupRate=Backup Rate
+settings.backups.attribute.enabled=Enabled
+settings.backups.attribute.maximumFiles=Maximum Files
+settings.backups.description.backupMode=Backup Mode
+settings.backups.description.backupRate=Backup Rate
+settings.backups.description.enabled=Enabled
+settings.backups.description.maximumFiles=Maximum Files
+
+settings.debug.attribute.displayConsole=Display Console
+settings.debug.attribute.enableDebugOptions=Enable Debug Options
+settings.debug.attribute.logPluginLoading=Log Plugin Loading
+settings.debug.attribute.loggingFlushImmediatelyLevel=Logging Flush Immediately Level
+settings.debug.attribute.loggingLevel=Logging Level
+settings.debug.description.displayConsole=Display Console
+settings.debug.description.enableDebugOptions=Enable Debug Options
+settings.debug.description.logPluginLoading=Log Plugin Loading
+settings.debug.description.loggingFlushImmediatelyLevel=Logging Flush Immediately Level
+settings.debug.description.loggingLevel=Logging Level
+
+settings.hotkeys.attribute.cameraZoomIn=Camera Zoom In
+settings.hotkeys.attribute.cameraZoomOut=Camera Zoom Out
+settings.hotkeys.attribute.debugMode=Debug Mode
+settings.hotkeys.attribute.debugRedrawMap=Debug Redraw Map
+settings.hotkeys.attribute.debugReloadEntities=Debug Reload Entities
+settings.hotkeys.attribute.debugReloadEverything=Debug Reload Everything
+settings.hotkeys.attribute.debugReloadLuaInstance=Debug Reload Lua Instance
+settings.hotkeys.attribute.debugReloadTools=Debug Reload Tools
+settings.hotkeys.attribute.itemSelectAll=Item Select All
+settings.hotkeys.attribute.itemsCopy=Items Copy
+settings.hotkeys.attribute.itemsCut=Items Cut
+settings.hotkeys.attribute.itemsPaste=Items Paste
+settings.hotkeys.attribute.itemsSelectAll=Items Select All
+settings.hotkeys.attribute.new=New
+settings.hotkeys.attribute.open=Open
+settings.hotkeys.attribute.redo=Redo
+settings.hotkeys.attribute.roomAddNew=Room Add New
+settings.hotkeys.attribute.roomConfigureCurrent=Room Configure Current
+settings.hotkeys.attribute.roomDelete=Room Delete
+settings.hotkeys.attribute.roomMoveDown=Room Move Down
+settings.hotkeys.attribute.roomMoveDownPrecise=Room Move Down Precise
+settings.hotkeys.attribute.roomMoveLeft=Room Move Left
+settings.hotkeys.attribute.roomMoveLeftPrecise=Room Move Left Precise
+settings.hotkeys.attribute.roomMoveRight=Room Move Right
+settings.hotkeys.attribute.roomMoveRightPrecise=Room Move Right Precise
+settings.hotkeys.attribute.roomMoveUp=Room Move Up
+settings.hotkeys.attribute.roomMoveUpPrecise=Room Move Up Precise
+settings.hotkeys.attribute.roomResizeDownGrow=Room Resize Down Grow
+settings.hotkeys.attribute.roomResizeDownShrink=Room Resize Down Shrink
+settings.hotkeys.attribute.roomResizeLeftGrow=Room Resize Left Grow
+settings.hotkeys.attribute.roomResizeLeftShrink=Room Resize Left Shrink
+settings.hotkeys.attribute.roomResizeRightGrow=Room Resize Right Grow
+settings.hotkeys.attribute.roomResizeRightShrink=Room Resize Right Shrink
+settings.hotkeys.attribute.roomResizeUpGrow=Room Resize Up Grow
+settings.hotkeys.attribute.roomResizeUpShrink=Room Resize Up Shrink
+settings.hotkeys.attribute.save=Save
+settings.hotkeys.attribute.saveAs=Save As
+settings.hotkeys.attribute.toggleFullscreen=Toggle Fullscreen
+settings.hotkeys.attribute.undo=Undo
+settings.hotkeys.description.cameraZoomIn=Camera Zoom In
+settings.hotkeys.description.cameraZoomOut=Camera Zoom Out
+settings.hotkeys.description.debugMode=Debug Mode
+settings.hotkeys.description.debugRedrawMap=Debug Redraw Map
+settings.hotkeys.description.debugReloadEntities=Debug Reload Entities
+settings.hotkeys.description.debugReloadEverything=Debug Reload Everything
+settings.hotkeys.description.debugReloadLuaInstance=Debug Reload Lua Instance
+settings.hotkeys.description.debugReloadTools=Debug Reload Tools
+settings.hotkeys.description.itemSelectAll=Item Select All
+settings.hotkeys.description.itemsCopy=Items Copy
+settings.hotkeys.description.itemsCut=Items Cut
+settings.hotkeys.description.itemsPaste=Items Paste
+settings.hotkeys.description.itemsSelectAll=Items Select All
+settings.hotkeys.description.new=New
+settings.hotkeys.description.open=Open
+settings.hotkeys.description.redo=Redo
+settings.hotkeys.description.roomAddNew=Room Add New
+settings.hotkeys.description.roomConfigureCurrent=Room Configure Current
+settings.hotkeys.description.roomDelete=Room Delete
+settings.hotkeys.description.roomMoveDown=Room Move Down
+settings.hotkeys.description.roomMoveDownPrecise=Room Move Down Precise
+settings.hotkeys.description.roomMoveLeft=Room Move Left
+settings.hotkeys.description.roomMoveLeftPrecise=Room Move Left Precise
+settings.hotkeys.description.roomMoveRight=Room Move Right
+settings.hotkeys.description.roomMoveRightPrecise=Room Move Right Precise
+settings.hotkeys.description.roomMoveUp=Room Move Up
+settings.hotkeys.description.roomMoveUpPrecise=Room Move Up Precise
+settings.hotkeys.description.roomResizeDownGrow=Room Resize Down Grow
+settings.hotkeys.description.roomResizeDownShrink=Room Resize Down Shrink
+settings.hotkeys.description.roomResizeLeftGrow=Room Resize Left Grow
+settings.hotkeys.description.roomResizeLeftShrink=Room Resize Left Shrink
+settings.hotkeys.description.roomResizeRightGrow=Room Resize Right Grow
+settings.hotkeys.description.roomResizeRightShrink=Room Resize Right Shrink
+settings.hotkeys.description.roomResizeUpGrow=Room Resize Up Grow
+settings.hotkeys.description.roomResizeUpShrink=Room Resize Up Shrink
+settings.hotkeys.description.save=Save
+settings.hotkeys.description.saveAs=Save As
+settings.hotkeys.description.toggleFullscreen=Toggle Fullscreen
+settings.hotkeys.description.undo=Undo
+
+settings.editor.attribute.alwaysRedrawUnselectedRooms=Always Redraw Unselected Rooms
+settings.editor.attribute.canvasMoveButton=Canvas Move Button
+settings.editor.attribute.checkDependenciesOnSave=Check Dependencies On Save
+settings.editor.attribute.contextMenuButton=Context Menu Button
+settings.editor.attribute.copyUsesClipboard=Copy Uses Clipboard
+settings.editor.attribute.displayFPS=Display FPS
+settings.editor.attribute.historyEntryLimit=History Entry Limit
+settings.editor.attribute.itemAddNode=Item Add Node
+settings.editor.attribute.itemAllowPixelPerfect=Item Allow Pixel Perfect
+settings.editor.attribute.itemDelete=Item Delete
+settings.editor.attribute.itemFlipHorizontal=Item Flip Horizontal
+settings.editor.attribute.itemFlipVertical=Item Flip Vertical
+settings.editor.attribute.itemMoveDown=Item Move Down
+settings.editor.attribute.itemMoveLeft=Item Move Left
+settings.editor.attribute.itemMoveRight=Item Move Right
+settings.editor.attribute.itemMoveUp=Item Move Up
+settings.editor.attribute.itemResizeDownGrow=Item Resize Down Grow
+settings.editor.attribute.itemResizeDownShrink=Item Resize Down Shrink
+settings.editor.attribute.itemResizeLeftGrow=Item Resize Left Grow
+settings.editor.attribute.itemResizeLeftShrink=Item Resize Left Shrink
+settings.editor.attribute.itemResizeRightGrow=Item Resize Right Grow
+settings.editor.attribute.itemResizeRightShrink=Item Resize Right Shrink
+settings.editor.attribute.itemResizeUpGrow=Item Resize Up Grow
+settings.editor.attribute.itemResizeUpShrink=Item Resize Up Shrink
+settings.editor.attribute.itemRotateLeft=Item Rotate Left
+settings.editor.attribute.itemRotateRight=Item Rotate Right
+settings.editor.attribute.lazyLoadExternalAtlases=Lazy Load External Atlases
+settings.editor.attribute.movementAxisBoundModifier=Movement Axis Bound Modifier
+settings.editor.attribute.objectCloneButton=Object Clone Button
+settings.editor.attribute.pasteCentered=Paste Centered
+settings.editor.attribute.precisionModifier=Precision Modifier
+settings.editor.attribute.prepareRoomRenderInBackground=Prepare Room Render In Background
+settings.editor.attribute.recentFilesEntryLimit=Recent Files Entry Limit
+settings.editor.attribute.selectionAddModifier=Selection Add Modifier
+settings.editor.attribute.sortRoomsOnSave=Sort Rooms On Save
+settings.editor.attribute.toolActionButton=Tool Action Button
+settings.editor.attribute.toolsPersistUsingGroup=Tools Persist Using Group
+settings.editor.attribute.warnOnMissingEntityHandler=Warn On Missing Entity Handler
+settings.editor.attribute.warnOnMissingTexture=Warn On Missing Texture
+settings.editor.description.alwaysRedrawUnselectedRooms=Always Redraw Unselected Rooms
+settings.editor.description.canvasMoveButton=Canvas Move Button
+settings.editor.description.checkDependenciesOnSave=Check Dependencies On Save
+settings.editor.description.contextMenuButton=Context Menu Button
+settings.editor.description.copyUsesClipboard=Copy Uses Clipboard
+settings.editor.description.displayFPS=Display FPS
+settings.editor.description.historyEntryLimit=History Entry Limit
+settings.editor.description.itemAddNode=Item Add Node
+settings.editor.description.itemAllowPixelPerfect=Item Allow Pixel Perfect
+settings.editor.description.itemDelete=Item Delete
+settings.editor.description.itemFlipHorizontal=Item Flip Horizontal
+settings.editor.description.itemFlipVertical=Item Flip Vertical
+settings.editor.description.itemMoveDown=Item Move Down
+settings.editor.description.itemMoveLeft=Item Move Left
+settings.editor.description.itemMoveRight=Item Move Right
+settings.editor.description.itemMoveUp=Item Move Up
+settings.editor.description.itemResizeDownGrow=Item Resize Down Grow
+settings.editor.description.itemResizeDownShrink=Item Resize Down Shrink
+settings.editor.description.itemResizeLeftGrow=Item Resize Left Grow
+settings.editor.description.itemResizeLeftShrink=Item Resize Left Shrink
+settings.editor.description.itemResizeRightGrow=Item Resize Right Grow
+settings.editor.description.itemResizeRightShrink=Item Resize Right Shrink
+settings.editor.description.itemResizeUpGrow=Item Resize Up Grow
+settings.editor.description.itemResizeUpShrink=Item Resize Up Shrink
+settings.editor.description.itemRotateLeft=Item Rotate Left
+settings.editor.description.itemRotateRight=Item Rotate Right
+settings.editor.description.lazyLoadExternalAtlases=Lazy Load External Atlases
+settings.editor.description.movementAxisBoundModifier=Movement Axis Bound Modifier
+settings.editor.description.objectCloneButton=Object Clone Button
+settings.editor.description.pasteCentered=Paste Centered
+settings.editor.description.precisionModifier=Precision Modifier
+settings.editor.description.prepareRoomRenderInBackground=Prepare Room Render In Background
+settings.editor.description.recentFilesEntryLimit=Recent Files Entry Limit
+settings.editor.description.selectionAddModifier=Selection Add Modifier
+settings.editor.description.sortRoomsOnSave=Sort Rooms On Save
+settings.editor.description.toolActionButton=Tool Action Button
+settings.editor.description.toolsPersistUsingGroup=Tools Persist Using Group
+settings.editor.description.warnOnMissingEntityHandler=Warn On Missing Entity Handler
+settings.editor.description.warnOnMissingTexture=Warn On Missing Texture
+
+
+settings.graphics.attribute.focusedDrawRate=Focused Draw Rate
+settings.graphics.attribute.focusedMainLoopSleep=Focused Main Loop Sleep
+settings.graphics.attribute.focusedUpdateRate=Focused Update Rate
+settings.graphics.attribute.unfocusedDrawRate=Unfocused Draw Rate
+settings.graphics.attribute.unfocusedMainLoopSleep=Unfocused Main Loop Sleep
+settings.graphics.attribute.unfocusedUpdateRate=Unfocused Update Rate
+settings.graphics.attribute.vsync=Vsync
+settings.graphics.description.focusedDrawRate=Focused Draw Rate
+settings.graphics.description.focusedMainLoopSleep=Focused Main Loop Sleep
+settings.graphics.description.focusedUpdateRate=Focused Update Rate
+settings.graphics.description.unfocusedDrawRate=Unfocused Draw Rate
+settings.graphics.description.unfocusedMainLoopSleep=Unfocused Main Loop Sleep
+settings.graphics.description.unfocusedUpdateRate=Unfocused Update Rate
+settings.graphics.description.vsync=Vsync

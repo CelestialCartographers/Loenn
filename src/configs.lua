@@ -10,22 +10,6 @@ local defaultsUIPath = "ui/defaults/config"
 
 local configs = config.readConfig(fileLocations.getSettingsPath())
 
-local function mergeIfMissing(from, to)
-    local madeChanges = false
-
-    for k, v in pairs(from) do
-        if to[k] == nil then
-            to[k] = v
-            madeChanges = true
-
-        elseif type(to[k]) == "table" and type(v) == "table" then
-            madeChanges = madeChanges or mergeIfMissing(v, to[k])
-        end
-    end
-
-    return madeChanges
-end
-
 local function readDefaultData(path)
     local data = {}
 
@@ -42,8 +26,8 @@ end
 local defaultData = readDefaultData(defaultsPath)
 local defaultUIData = readDefaultData(defaultsUIPath)
 
-local mergedDefaults = mergeIfMissing(defaultData, configs)
-local mergedUIDefaults = mergeIfMissing({ui = defaultUIData}, configs)
+local mergedDefaults = utils.mergeTables(defaultData, configs)
+local mergedUIDefaults = utils.mergeTables({ui = defaultUIData}, configs)
 
 if mergedDefaults or mergedUIDefaults then
     config.writeConfig(configs, true)

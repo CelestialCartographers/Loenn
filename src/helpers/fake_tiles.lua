@@ -130,8 +130,8 @@ function fakeTilesHelper.generateFakeTilesSprites(room, x, y, fakeTiles, layer, 
         local tileX, tileY = missing[1], missing[2]
 
         -- Filter out padding pieces for blending
-        if tileX > 1 and tileX < tileWidth - 2 and tileY > 1 and tileX < tileHeight - 2 then
-            local drawX, drawY = tileX * 8 + offsetX - 16, tileY * 8 + offsetY - 16
+        if tileX > 1 and tileX < tileWidth - 1 and tileY > 1 and tileY < tileHeight - 1 then
+            local drawX, drawY = tileX * 8 + offsetX - 24, tileY * 8 + offsetY - 24
             local sprite = drawableRectangle.fromRectangle("fill", drawX, drawY, 8, 8, missingColor)
 
             table.insert(sprites, sprite)

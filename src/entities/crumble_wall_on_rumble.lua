@@ -10,7 +10,7 @@ function crumbleWall.placements()
         data = {
             tiletype = fakeTilesHelper.getPlacementMaterial("m"),
             blendin = true,
-            permanent = false,
+            persistent = false,
             width = 8,
             height = 8
         }
