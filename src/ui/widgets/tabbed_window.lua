@@ -7,7 +7,6 @@ local tabbedWindow = {}
 function tabbedWindow.createWindow(title, tabs, initialTab)
     initialTab = initialTab or 1
 
-    local tabContent = tabs[initialTab].content
     local windowTabItems = {}
 
     for i, tab in ipairs(tabs) do
@@ -55,10 +54,13 @@ function tabbedWindow.createWindow(title, tabs, initialTab)
 
     local windowContent = uiElements.column({
         tabsElement,
-        tabContent
     }):with({
         minWidth = 128
     }):with(uiUtils.fillHeight(true))
+
+    ui.runLate(function()
+        tabsCallback(tabsElement, initialTab)
+    end)
 
     local window = uiElements.window(title, windowContent)
 
