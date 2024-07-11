@@ -1864,6 +1864,7 @@ settings.editor.attribute.toolActionButton=Tool Action Button
 settings.editor.attribute.toolsPersistUsingGroup=Tools Persist Using Group
 settings.editor.attribute.warnOnMissingEntityHandler=Warn On Missing Entity Handler
 settings.editor.attribute.warnOnMissingTexture=Warn On Missing Texture
+settings.editor.attribute.triggersTrimModName=Trim Trigger Names
 settings.editor.description.alwaysRedrawUnselectedRooms=Always Redraw Unselected Rooms
 settings.editor.description.canvasMoveButton=Canvas Move Button
 settings.editor.description.checkDependenciesOnSave=Check Dependencies On Save
@@ -1903,6 +1904,7 @@ settings.editor.description.toolActionButton=Tool Action Button
 settings.editor.description.toolsPersistUsingGroup=Tools Persist Using Group
 settings.editor.description.warnOnMissingEntityHandler=Warn On Missing Entity Handler
 settings.editor.description.warnOnMissingTexture=Warn On Missing Texture
+settings.editor.description.triggersTrimModName=Trim Trigger Names
 
 
 settings.graphics.attribute.focusedDrawRate=Focused Draw Rate
