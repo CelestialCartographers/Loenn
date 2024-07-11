@@ -18,6 +18,10 @@ local function dropdownItemOnClickHook(field, dropdown)
 
         field:setCursorIndex(#newSelection)
         field:repaint()
+
+        -- Needed to not crash in textfield render when forcing focus
+        field.blinkTime = 0
+        ui.focusing = field
     end
 end
 
@@ -78,6 +82,7 @@ function fieldDropdown.addDropdown(field, dropdown, currentText)
     field._text = currentText
 
     dropdown.submenuParent = field
+    dropdown._parentProxy = field
 
     field._backingDropdown = dropdown
     field:addChild(icon)
@@ -88,6 +93,7 @@ function fieldDropdown.addDropdown(field, dropdown, currentText)
     uiUtils.map(dropdown.data, function(data, i)
         local item = dropdown:getItemCached(data, i)
 
+        item._parentProxy = field
         item:hook({
             onClick = dropdownItemOnClickHook(field, dropdown)
         })

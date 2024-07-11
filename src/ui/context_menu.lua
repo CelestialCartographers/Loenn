@@ -83,7 +83,7 @@ function contextMenuHandler.contextWindowUpdate(orig, self, dt)
             target = hovering
 
         elseif visibilityMode == "focused" then
-            target = focusing
+            target = focusing or hovering
         end
 
         while target do
@@ -91,7 +91,7 @@ function contextMenuHandler.contextWindowUpdate(orig, self, dt)
                 return
             end
 
-            target = target.parent
+            target = target._parentProxy or target.parent
         end
 
         contextStack[i]:removeSelf()
