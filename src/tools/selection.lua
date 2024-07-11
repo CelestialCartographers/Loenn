@@ -1233,6 +1233,11 @@ local function selectAllHotkey()
     movementFinished(x, y)
 end
 
+local function deselectHotkey()
+    tool.setSelectionPreviews({})
+    tool.setSelectionTargets({})
+end
+
 local function areaFlipHotkeyCommon(horizontal, vertical)
     return function()
         local room = state.getSelectedRoom()
@@ -1252,6 +1257,7 @@ local toolHotkeys = {
     hotkeyStruct.createHotkey(configs.hotkeys.itemsPaste, pasteItemsHotkey),
     hotkeyStruct.createHotkey(configs.hotkeys.itemsCut, cutItemsHotkey),
     hotkeyStruct.createHotkey(configs.hotkeys.itemsSelectAll, selectAllHotkey),
+    hotkeyStruct.createHotkey(configs.hotkeys.itemsDeselect, deselectHotkey),
 }
 
 -- Modifier keys that update behavior/visuals

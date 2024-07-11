@@ -76,14 +76,24 @@ function triggers.loadExternalTriggers(registerAt)
 end
 
 local humanizedNameCache = {}
+local humanizedNameTrimmedModNameCache = {}
 
 function triggers.getDrawableDisplayText(trigger)
     local name = trigger._name
-    local displayName = humanizedNameCache[name]
+    local trimModName = configs.editor.triggersTrimModName
+    local displayName = trimModName and humanizedNameTrimmedModNameCache[name] or humanizedNameCache[name]
 
     if not displayName then
         -- Humanize data name and then remove " Trigger" at the end if possible
-        displayName = utils.humanizeVariableName(name)
+        -- Remove mod name if trimming is enabled
+
+        displayName = name
+
+        if trimModName then
+            displayName = string.match(displayName, "^.-/(.*)") or displayName
+        end
+
+        displayName = utils.humanizeVariableName(displayName)
         displayName = string.match(displayName, "(.-) Trigger$") or displayName
 
         humanizedNameCache[name] = displayName

@@ -44,6 +44,9 @@ return {
     prepareRoomRenderInBackground = true,
     alwaysRedrawUnselectedRooms = false,
 
+    -- Triggers
+    triggersTrimModName = true,
+
     -- Loading
     lazyLoadExternalAtlases = true,
 
