@@ -97,6 +97,7 @@ local function dropdownChanged(formField, optionsFlattened)
 
         if value ~= old then
             formField.currentValue = value
+            formField.currentText = new
 
             local valid = formField:fieldValid()
             local warningValid = formField:fieldWarning()
