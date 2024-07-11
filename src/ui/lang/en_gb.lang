@@ -73,13 +73,21 @@ ui.settings_window.window_title=Settings
 ui.settings_window.save_changes=Save changes
 
 ui.settings_window.tab.general=General
+ui.settings_window.group.general.startup.name=Startup
+ui.settings_window.group.general.backups.name=Backups
+
+ui.settings_window.tab.editor=Editor
+
+ui.settings_window.tab.hotkeys=Hotkeys
+ui.settings_window.group.hotkeys.general=General
+ui.settings_window.group.hotkeys.mapview.name=Map View
+ui.settings_window.group.hotkeys.selections.name=Selections
+ui.settings_window.group.hotkeys.rooms.name=Rooms
+ui.settings_window.group.hotkeys.debug.name=Debug
+
 ui.settings_window.tab.graphics=Graphics
-ui.settings_window.group.general.name=General
-ui.settings_window.group.backups.name=Backups
-ui.settings_window.group.debug.name=Debug
-ui.settings_window.group.hotkeys.name=Hotkeys
-ui.settings_window.group.editor.name=Editor
-ui.settings_window.group.graphics.name=Graphics
+
+ui.settings_window.tab.debug=Debug
 
 
 # Dependency Window
