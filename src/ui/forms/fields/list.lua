@@ -17,6 +17,12 @@ local function getValueParts(value, options)
     local separator = options.valueSeparator
     local parts = string.split(value, separator)()
 
+    -- Special case for empty string and empty default
+    -- Otherwise we will never be able to add when the field is empty
+    if value == "" and options.valueDefault == "" then
+        table.insert(parts, "")
+    end
+
     return parts
 end
 
@@ -76,7 +82,7 @@ end
 local function getSubFormElements(formField, value, options)
     local language = languageRegistry.getLanguage()
     local elements = {}
-    local parts = string.split(value, options.valueSeparator)()
+    local parts = getValueParts(value, options)
 
     local baseFormElement = form.getFieldElement("base", options.valueDefault or "", options.valueOptions)
     local valueTransformer = baseFormElement.valueTransformer or tostring
