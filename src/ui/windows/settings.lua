@@ -16,123 +16,165 @@ local windowPersisterName = "settings_window"
 
 local settingsWindow = {}
 
--- TODO - Show default somewhere?
-
--- TODO - Some of these should probably be locked behind advanced settings
--- TODO - Add support for a "description" for the category
+-- TODO - Show default somewhere? Automatically append to the end of tooltip?
+-- TODO - Some of these should probably be locked behind advanced settings or not be exposed
 
 local defaultTabForms = {
     {
         title = "ui.settings_window.tab.general",
         groups = {
             {
-                title = "ui.settings_window.group.general",
+                title = "ui.settings_window.group.general.startup",
                 fieldOrder = {
-                    "celesteGameDirectory", "general.language",
-                    "general.persistWindowFullScreen", "general.persistWindowPosition",
-                    "general.persistWindowSize",
+                    "general.celesteGameDirectory",
+                    "general.persistWindowFullScreen",
+                    "general.persistWindowPosition",
+                    "general.persistWindowSize"
+                }
+            },
+            {
+                title = "ui.settings_window.group.general.backups",
+                fieldOrder = {
+                    "backups.backupMode",
+                    "backups.backupRate",
+                    "backups.enabled",
+                    "backups.maximumFiles"
                 }
             }
+        }
+    },
+    {
+        title = "ui.settings_window.tab.editor",
+        fieldOrder = {
+            "editor.checkDependenciesOnSave",
+            "editor.copyUsesClipboard",
+            "editor.pasteCentered",
+            "editor.historyEntryLimit",
+            "editor.itemAllowPixelPerfect",
+            "editor.recentFilesEntryLimit",
+            "editor.sortRoomsOnSave",
+            "editor.toolsPersistUsingGroup"
+        }
+    },
+    {
+        title = "ui.settings_window.tab.hotkeys",
+        groups = {
+            {
+                title = "ui.settings_window.group.hotkeys.general",
+                fieldOrder = {
+                    "hotkeys.new",
+                    "hotkeys.open",
+                    "hotkeys.save",
+                    "hotkeys.saveAs",
+                    "hotkeys.undo",
+                    "hotkeys.redo",
+                    "hotkeys.toggleFullscreen"
+                }
+            },
+            {
+                title = "ui.settings_window.group.hotkeys.map_view",
+                fieldOrder = {
+                    "editor.toolActionButton",
+                    "editor.canvasMoveButton",
+                    "editor.contextMenuButton",
+                    "hotkeys.cameraZoomIn",
+                    "hotkeys.cameraZoomOut"
+                }
+            },
+            {
+                title = "ui.settings_window.group.hotkeys.selections",
+                fieldOrder = {
+                    "hotkeys.itemsCopy",
+                    "hotkeys.itemsCut",
+                    "hotkeys.itemsPaste",
+                    "hotkeys.itemsSelectAll",
+                    "editor.selectionAddModifier",
+                    "editor.itemAddNode",
+                    "editor.objectCloneButton",
+                    "editor.itemDelete",
+                    "editor.itemFlipHorizontal",
+                    "editor.itemFlipVertical",
+                    "editor.itemRotateLeft",
+                    "editor.itemRotateRight",
+                    "editor.precisionModifier",
+                    "editor.movementAxisBoundModifier",
+                    "editor.itemMoveDown",
+                    "editor.itemMoveUp",
+                    "editor.itemMoveLeft",
+                    "editor.itemMoveRight",
+                    "editor.itemResizeDownGrow",
+                    "editor.itemResizeUpGrow",
+                    "editor.itemResizeLeftGrow",
+                    "editor.itemResizeRightGrow",
+                    "editor.itemResizeDownShrink",
+                    "editor.itemResizeUpShrink",
+                    "editor.itemResizeLeftShrink",
+                    "editor.itemResizeRightShrink"
+                }
+            },
+            {
+                title = "ui.settings_window.group.hotkeys.rooms",
+                fieldOrder = {
+                    "hotkeys.roomAddNew",
+                    "hotkeys.roomConfigureCurrent",
+                    "hotkeys.roomDelete",
+                    "hotkeys.roomMoveDown",
+                    "hotkeys.roomMoveUp",
+                    "hotkeys.roomMoveLeft",
+                    "hotkeys.roomMoveRight",
+                    "hotkeys.roomMoveDownPrecise",
+                    "hotkeys.roomMoveUpPrecise",
+                    "hotkeys.roomMoveLeftPrecise",
+                    "hotkeys.roomMoveRightPrecise",
+                    "hotkeys.roomResizeDownGrow",
+                    "hotkeys.roomResizeUpGrow",
+                    "hotkeys.roomResizeLeftGrow",
+                    "hotkeys.roomResizeRightGrow",
+                    "hotkeys.roomResizeDownShrink",
+                    "hotkeys.roomResizeUpShrink",
+                    "hotkeys.roomResizeLeftShrink",
+                    "hotkeys.roomResizeRightShrink"
+                }
+            },
+            {
+                title = "ui.settings_window.group.hotkeys.debug",
+                fieldOrder = {
+                    "hotkeys.debugMode",
+                    "hotkeys.debugRedrawMap",
+                    "hotkeys.debugReloadEntities",
+                    "hotkeys.debugReloadEverything",
+                    "hotkeys.debugReloadLuaInstance",
+                    "hotkeys.debugReloadTools"
+                }
+            },
         }
     },
     {
         title = "ui.settings_window.tab.graphics",
-        groups = {
-            {
-                title = "ui.settings_window.group.general",
-                fieldOrder = {
-                    "graphics.focusedDrawRate", "graphics.focusedMainLoopSleep",
-                    "graphics.focusedUpdateRate", "graphics.unfocusedDrawRate",
-                    "graphics.unfocusedMainLoopSleep", "graphics.unfocusedUpdateRate",
-                    "graphics.vsync", "editor.displayFPS",
-                }
-            }
-        }
-    },
-}
-
--- TODO - Remove once moved into tabs, this is a semi complete list of all settings
-local defaultFieldGroups = {
-    {
-        title = "ui.settings_window.group.general",
         fieldOrder = {
-            "celesteGameDirectory", "general.language",
-            "general.persistWindowFullScreen", "general.persistWindowPosition",
-            "general.persistWindowSize",
+            "editor.displayFPS",
+            "editor.alwaysRedrawUnselectedRooms",
+            "editor.lazyLoadExternalAtlases",
+            "editor.prepareRoomRenderInBackground",
+            "graphics.focusedDrawRate",
+            "graphics.focusedMainLoopSleep",
+            "graphics.focusedUpdateRate",
+            "graphics.unfocusedDrawRate",
+            "graphics.unfocusedMainLoopSleep",
+            "graphics.unfocusedUpdateRate",
+            "graphics.vsync"
         }
     },
     {
-        title = "ui.settings_window.group.backups",
+        title = "ui.settings_window.tab.debug",
         fieldOrder = {
-            "backups.backupMode", "backups.backupRate",
-            "backups.enabled", "backups.maximumFiles",
-        }
-    },
-    {
-        title = "ui.settings_window.group.debug",
-        fieldOrder = {
-            "debug.displayConsole", "debug.enableDebugOptions",
-            "debug.logPluginLoading", "debug.loggingFlushImmediatelyLevel",
+            "debug.displayConsole",
+            "debug.enableDebugOptions",
+            "debug.logPluginLoading",
+            "debug.loggingFlushImmediatelyLevel",
             "debug.loggingLevel",
-        }
-    },
-    {
-        title = "ui.settings_window.group.hotkeys",
-        fieldOrder = {
-            "hotkeys.cameraZoomIn", "hotkeys.cameraZoomOut",
-            "hotkeys.debugMode", "hotkeys.debugRedrawMap",
-            "hotkeys.debugReloadEntities", "hotkeys.debugReloadEverything",
-            "hotkeys.debugReloadLuaInstance", "hotkeys.debugReloadTools",
-            "hotkeys.itemSelectAll", "hotkeys.itemsCopy",
-            "hotkeys.itemsCut", "hotkeys.itemsPaste",
-            "hotkeys.itemsSelectAll", "hotkeys.new",
-            "hotkeys.open", "hotkeys.redo",
-            "hotkeys.roomAddNew", "hotkeys.roomConfigureCurrent",
-            "hotkeys.roomDelete", "hotkeys.roomMoveDown",
-            "hotkeys.roomMoveDownPrecise", "hotkeys.roomMoveLeft",
-            "hotkeys.roomMoveLeftPrecise", "hotkeys.roomMoveRight",
-            "hotkeys.roomMoveRightPrecise", "hotkeys.roomMoveUp",
-            "hotkeys.roomMoveUpPrecise", "hotkeys.roomResizeDownGrow",
-            "hotkeys.roomResizeDownShrink", "hotkeys.roomResizeLeftGrow",
-            "hotkeys.roomResizeLeftShrink", "hotkeys.roomResizeRightGrow",
-            "hotkeys.roomResizeRightShrink", "hotkeys.roomResizeUpGrow",
-            "hotkeys.roomResizeUpShrink", "hotkeys.save",
-            "hotkeys.saveAs", "hotkeys.toggleFullscreen",
-            "hotkeys.undo",
-        }
-    },
-    {
-        title = "ui.settings_window.group.editor",
-        fieldOrder = {
-            "editor.alwaysRedrawUnselectedRooms", "editor.canvasMoveButton",
-            "editor.checkDependenciesOnSave", "editor.contextMenuButton",
-            "editor.copyUsesClipboard", "editor.displayFPS",
-            "editor.historyEntryLimit", "editor.itemAddNode",
-            "editor.itemAllowPixelPerfect", "editor.itemDelete",
-            "editor.itemFlipHorizontal", "editor.itemFlipVertical",
-            "editor.itemMoveDown", "editor.itemMoveLeft",
-            "editor.itemMoveRight", "editor.itemMoveUp",
-            "editor.itemResizeDownGrow", "editor.itemResizeDownShrink",
-            "editor.itemResizeLeftGrow", "editor.itemResizeLeftShrink",
-            "editor.itemResizeRightGrow", "editor.itemResizeRightShrink",
-            "editor.itemResizeUpGrow", "editor.itemResizeUpShrink",
-            "editor.itemRotateLeft", "editor.itemRotateRight",
-            "editor.lazyLoadExternalAtlases", "editor.movementAxisBoundModifier",
-            "editor.objectCloneButton", "editor.pasteCentered",
-            "editor.precisionModifier", "editor.prepareRoomRenderInBackground",
-            "editor.recentFilesEntryLimit", "editor.selectionAddModifier",
-            "editor.sortRoomsOnSave", "editor.toolActionButton",
-            "editor.toolsPersistUsingGroup", "editor.warnOnMissingEntityHandler",
-            "editor.warnOnMissingTexture",
-        }
-    },
-    {
-        title = "ui.settings_window.group.graphics",
-        fieldOrder = {
-            "graphics.focusedDrawRate", "graphics.focusedMainLoopSleep",
-            "graphics.focusedUpdateRate", "graphics.unfocusedDrawRate",
-            "graphics.unfocusedMainLoopSleep", "graphics.unfocusedUpdateRate",
-            "graphics.vsync",
+            "editor.warnOnMissingEntityHandler",
+            "editor.warnOnMissingTexture"
         }
     },
 }
@@ -256,11 +298,36 @@ local defaultFieldInformation = {
         fieldType = "keyboard_hotkey"
     },
 
+    ["backups.backupRate"] = {
+        fieldType = "integer"
+    },
+    ["backups.maximumFiles"] = {
+        fieldType = "integer"
+    },
+
+    ["editor.recentFilesEntryLimit"] = {
+        fieldType = "integer"
+    },
+    ["editor.canvasMoveButton"] = {
+        fieldType = "mouse_button"
+    },
+    ["editor.contextMenuButton"] = {
+        fieldType = "mouse_button"
+    },
     ["editor.toolActionButton"] = {
         fieldType = "mouse_button"
     },
     ["editor.objectCloneButton"] = {
         fieldType = "mouse_button"
+    },
+    ["editor.selectionAddModifier"] = {
+        fieldType = "keyboard_modifier"
+    },
+    ["editor.precisionModifier"] = {
+        fieldType = "keyboard_modifier"
+    },
+    ["editor.movementAxisBoundModifier"] = {
+        fieldType = "keyboard_modifier"
     },
     ["editor.itemAddNode"] = {
         fieldType = "keyboard_hotkey"
@@ -315,6 +382,13 @@ local defaultFieldInformation = {
     },
     ["editor.itemRotateRight"] = {
         fieldType = "keyboard_hotkey"
+    },
+
+    ["debug.loggingFlushImmediatelyLevel"] = {
+        fieldType = "integer"
+    },
+    ["debug.loggingLevel"] = {
+        fieldType = "integer"
     }
 }
 
@@ -324,8 +398,6 @@ local settingsWindowGroup = uiElements.group({}):with({
 
 local function prepareFormData()
     local data = rawget(configs, "data")
-
-    print(utils.serialize(data))
 
     return utils.deepcopy(data)
 end
@@ -350,15 +422,20 @@ local function prepareTabForm(language, tabData, fieldInformation, formData, but
     local titleLanguage = utils.getPath(language, titleParts)
     local title = tostring(titleLanguage)
 
-    local fieldGroups = tabData.groups or {}
+    local fieldGroups = tabData.groups
+    local fieldOrder = tabData.fieldOrder
 
-    for _, group in ipairs(fieldGroups) do
+    for _, name in ipairs(fieldOrder or {}) do
+        table.insert(fieldNames, name)
+    end
+
+    for _, group in ipairs(fieldGroups or {}) do
         -- Use title name as language path
         if group.title then
             local groupTitleParts = group.title:split(".")()
-            local baseLanguage = utils.getPath(language, groupTitleParts)
+            local groupLanguageName = utils.getPath(language, groupTitleParts)
 
-            group.title = tostring(baseLanguage.name)
+            group.title = tostring(groupLanguageName)
         end
 
         for _, name in ipairs(group.fieldOrder) do
@@ -390,6 +467,7 @@ local function prepareTabForm(language, tabData, fieldInformation, formData, but
     local tabForm, tabFields = form.getForm(buttons, formData, {
         fields = fieldInformation,
         groups = fieldGroups,
+        fieldOrder = fieldOrder,
         ignoreUnordered = true,
     })
 

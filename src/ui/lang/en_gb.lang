@@ -73,17 +73,17 @@ ui.settings_window.window_title=Settings
 ui.settings_window.save_changes=Save changes
 
 ui.settings_window.tab.general=General
-ui.settings_window.group.general.startup.name=Startup
-ui.settings_window.group.general.backups.name=Backups
+ui.settings_window.group.general.startup=Startup
+ui.settings_window.group.general.backups=Backups
 
 ui.settings_window.tab.editor=Editor
 
 ui.settings_window.tab.hotkeys=Hotkeys
 ui.settings_window.group.hotkeys.general=General
-ui.settings_window.group.hotkeys.mapview.name=Map View
-ui.settings_window.group.hotkeys.selections.name=Selections
-ui.settings_window.group.hotkeys.rooms.name=Rooms
-ui.settings_window.group.hotkeys.debug.name=Debug
+ui.settings_window.group.hotkeys.map_view=Map View
+ui.settings_window.group.hotkeys.selections=Selections
+ui.settings_window.group.hotkeys.rooms=Rooms
+ui.settings_window.group.hotkeys.debug=Debug
 
 ui.settings_window.tab.graphics=Graphics
 
