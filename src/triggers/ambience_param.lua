@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 local ambienceParam = {}
 
 ambienceParam.name = "ambienceParamTrigger"
+ambienceParam.category = "audio"
 ambienceParam.fieldInformation = {
     direction = {
         options = enums.trigger_position_modes

@@ -10,6 +10,18 @@ colors.triggerColor = {47 / 255, 114 / 255, 100 / 255, 0.3}
 colors.triggerBorderColor = {38 / 255, 91 / 255, 80 / 255, 0.7}
 colors.triggerTextColor = {255 / 255, 255 / 255, 255 / 255}
 
+colors.triggerBorderColorCategory = {
+    camera = {255 / 255, 127 / 255, 127 / 255, 0.7},
+    audio = {255 / 255, 255 / 255, 127 / 255, 0.7},
+    visual = {255 / 255, 127 / 255, 255 / 255, 0.7},
+}
+
+colors.triggerColorCategory = {
+    camera = {220 / 255, 100 / 255, 100 / 255, 0.3},
+    audio = {220 / 255, 220 / 255, 100 / 255, 0.3},
+    visual = {220 / 255, 100 / 255, 220 / 255, 0.3},
+}
+
 -- Room background colors
 colors.roomBorderColors = {
     {255 / 255, 255 / 255, 255 / 255},

@@ -9,7 +9,6 @@ local depths = require("consts.object_depths")
 local languageRegistry = require("language_registry")
 
 local drawing = require("utils.drawing")
-local drawableFunction = require("structs.drawable_function")
 local drawableRectangle = require("structs.drawable_rectangle")
 local drawableText = require("structs.drawable_text")
 
@@ -102,6 +101,34 @@ function triggers.getDrawableDisplayText(trigger)
     return displayName
 end
 
+function triggers.getCategory(trigger)
+    local name = trigger._name
+    local handler = triggers.registeredTriggers[name]
+
+    if handler.category then
+        local category = utils.callIfFunction(handler.category)
+
+        return category or "default"
+    end
+
+    return "default"
+end
+
+function triggers.triggerColor(room, trigger)
+    local useCategoryColors = configs.editor.triggersUseCategoryColors
+
+    if not useCategoryColors then
+        return colors.triggerColor, colors.triggerBorderColor
+    end
+
+    local category = triggers.getCategory(trigger)
+
+    local triggerColor = colors.triggerColorCategory[category] or colors.triggerColor
+    local triggerBorderColor = colors.triggerBorderColorCategory[category] or colors.triggerBorderColor
+
+    return triggerColor, triggerBorderColor
+end
+
 function triggers.triggerText(room, trigger)
     local name = trigger._name
     local handler = triggers.registeredTriggers[name]
@@ -129,7 +156,8 @@ function triggers.getDrawable(name, handler, room, trigger, viewport)
     local width = trigger.width or 16
     local height = trigger.height or 16
 
-    local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, colors.triggerColor, colors.triggerBorderColor)
+    local fillColor, borderColor = triggers.triggerColor(room, trigger)
+    local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, fillColor, borderColor)
     local textDrawable = drawableText.fromText(displayName, x, y, width, height, nil, triggerFontSize)
 
     local drawables = borderedRectangle:getDrawableSprite()

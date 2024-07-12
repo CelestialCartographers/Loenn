@@ -6,6 +6,7 @@ table.sort(songs)
 local music = {}
 
 music.name = "musicTrigger"
+music.category = "audio"
 music.fieldInformation = {
     death_count = {
         fieldType = "integer",

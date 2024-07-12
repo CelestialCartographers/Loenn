@@ -1748,6 +1748,8 @@ settings.editor.attribute.itemAllowPixelPerfect=Allow Precise Room Movement
 settings.editor.attribute.recentFilesEntryLimit=Number of Recent Files
 settings.editor.attribute.sortRoomsOnSave=Sort Rooms on Save
 settings.editor.attribute.toolsPersistUsingGroup=Remember Tool Settings
+settings.editor.attribute.triggersTrimModName=Trim Trigger Name
+settings.editor.attribute.triggersUseCategoryColors=Use Trigger Category Colors
 
 settings.editor.description.checkDependenciesOnSave=When saving, check whether the map contains any objects from a mod not in its dependency list.
 settings.editor.description.copyUsesClipboard=Copying a selection adds it to the system clipboard for easy editing and transfer.
@@ -1757,6 +1759,8 @@ settings.editor.description.itemAllowPixelPerfect=Allow moving rooms to position
 settings.editor.description.recentFilesEntryLimit=Number of recently edited maps displayed in the "Recent Files" menu.
 settings.editor.description.sortRoomsOnSave=Automatically sort the room list when saving the map.
 settings.editor.description.toolsPersistUsingGroup=Remember the settings on a tool when switching to it.
+settings.editor.description.triggersTrimModName=Remove mod name from trigger in editor.
+settings.editor.description.triggersUseCategoryColors=Wheter triggers should be colored based on their category.
 
 # Hotkeys - General
 settings.hotkeys.attribute.new=New Map

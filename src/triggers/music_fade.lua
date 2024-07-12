@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 local musicFade = {}
 
 musicFade.name = "musicFadeTrigger"
+musicFade.category = "audio"
 musicFade.fieldInformation = {
     direction = {
         options = enums.music_fade_trigger_directions,

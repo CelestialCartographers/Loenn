@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 local cameraTarget = {}
 
 cameraTarget.name = "cameraTargetTrigger"
+cameraTarget.category = "camera"
 cameraTarget.nodeLimits = {1, 1}
 cameraTarget.fieldInformation = {
     positionMode = {
