@@ -45,8 +45,8 @@ function orderedDrawingBatchMt.__index:addFromDrawable(drawable)
         local layer = drawable.meta and drawable.meta.layer
 
         if image then
-            local offsetX = drawable.offsetX or math.floor((drawable.justificationX or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX)
-            local offsetY = drawable.offsetY or math.floor((drawable.justificationY or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY)
+            local offsetX = drawable.offsetX or math.floor((drawable.justificationX or 0.0) * drawable.meta.realWidth + drawable.meta.offsetX) + drawable.renderOffsetX
+            local offsetY = drawable.offsetY or math.floor((drawable.justificationY or 0.0) * drawable.meta.realHeight + drawable.meta.offsetY) + drawable.renderOffsetY
 
             local colorChanged = not utils.sameColor(drawable.color, self._lastColor)
             local targetImage = layer and self._layeredImage or image

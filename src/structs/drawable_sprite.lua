@@ -51,6 +51,7 @@ function drawableSpriteMt.__index:setScale(scaleX, scaleY)
     return self
 end
 
+-- Set the absolute offset of the sprite, overriding image padding and justification
 function drawableSpriteMt.__index:setOffset(offsetX, offsetY)
     if type(offsetX) == "table" then
         offsetX, offsetY = offsetX[1], offsetX[2]
@@ -58,6 +59,18 @@ function drawableSpriteMt.__index:setOffset(offsetX, offsetY)
 
     self.offsetX = offsetX
     self.offsetY = offsetY
+
+    return self
+end
+
+-- Additional offset after justification and image padding
+function drawableSpriteMt.__index:setAdditionalOffset(offsetX, offsetY)
+    if type(offsetX) == "table" then
+        offsetX, offsetY = offsetX[1], offsetX[2]
+    end
+
+    self.renderOffsetX = offsetX
+    self.renderOffsetY = offsetY
 
     return self
 end
@@ -97,6 +110,9 @@ function drawableSpriteMt.__index:getRectangleRaw()
     local offsetX = self.offsetX or self.meta.offsetX
     local offsetY = self.offsetY or self.meta.offsetY
 
+    local renderOffsetX = self.renderOffsetX or 0
+    local renderOffsetY = self.renderOffsetY or 0
+
     local justificationX = self.justificationX
     local justificationY = self.justificationY
 
@@ -105,8 +121,9 @@ function drawableSpriteMt.__index:getRectangleRaw()
     local scaleX = self.scaleX
     local scaleY = self.scaleY
 
-    local drawX = math.floor(x - (realWidth * justificationX + offsetX) * scaleX)
-    local drawY = math.floor(y - (realHeight * justificationY + offsetY) * scaleY)
+    -- TODO Offset here (justification + offset) calculation might be wrong compared to the draw function
+    local drawX = math.floor(x - (realWidth * justificationX + offsetX + renderOffsetX) * scaleX)
+    local drawY = math.floor(y - (realHeight * justificationY + offsetY + renderOffsetY) * scaleY)
 
     drawX += (scaleX < 0 and width * scaleX or 0)
     drawY += (scaleY < 0 and height * scaleY or 0)
@@ -158,8 +175,8 @@ function drawableSpriteMt.__index:drawRectangle(mode, color)
 end
 
 function drawableSpriteMt.__index:draw(alpha)
-    local offsetX = self.offsetX or math.floor((self.justificationX or 0.0) * self.meta.realWidth + self.meta.offsetX)
-    local offsetY = self.offsetY or math.floor((self.justificationY or 0.0) * self.meta.realHeight + self.meta.offsetY)
+    local offsetX = self.offsetX or math.floor((self.justificationX or 0.0) * self.meta.realWidth + self.meta.offsetX) + self.renderOffsetX
+    local offsetY = self.offsetY or math.floor((self.justificationY or 0.0) * self.meta.realHeight + self.meta.offsetY) + self.renderOffsetY
 
     local layer = self.meta.layer
 
@@ -253,6 +270,9 @@ function drawableSpriteStruct.fromMeta(meta, data)
 
     drawableSprite.scaleX = data.sx or data.scaleX or 1
     drawableSprite.scaleY = data.sy or data.scaleY or 1
+
+    drawableSprite.renderOffsetX = data.renderOffsetX or 0
+    drawableSprite.renderOffsetY = data.renderOffsetX or 0
 
     drawableSprite.rotation = data.r or data.rotation or 0
 
