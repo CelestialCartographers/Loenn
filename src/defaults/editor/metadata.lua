@@ -72,6 +72,7 @@ defaultMetadata.cassetteModifiers = {
     Blocks = 2,
     BeatsMax = 256,
     BeatIndexOffset = 0,
+    ActiveDuringTransitions = false,
     OldBehavior = false
 }
 

@@ -1513,15 +1513,17 @@ metadata.cassettemodifier.attribute.TicksPerSwap=Ticks Per Swap
 metadata.cassettemodifier.attribute.Blocks=Number of Colours
 metadata.cassettemodifier.attribute.BeatsMax=Max Beats
 metadata.cassettemodifier.attribute.BeatIndexOffset=Beat Index Offset
+metadata.cassettemodifier.attribute.ActiveDuringTransitions=Active During Transitions
 metadata.cassettemodifier.attribute.OldBehavior=Old Behaviour
 
-metadata.cassettemodifier.description.TempoMult=Cassette music tempo multiplier. Only used with Old Behaviour and overrides the Tempo attribute in cassette blocks. Defaults to 1.0, which triggers one beat every 10 frames (360 beats per minute).
+metadata.cassettemodifier.description.TempoMult=Cassette music tempo multiplier. Only used with Old Behaviour and overrides the Tempo attribute in cassette blocks.\nDefaults to 1.0, which triggers one beat every 10 frames (360 beats per minute).
 metadata.cassettemodifier.description.LeadBeats=Beats of silence after a room is loaded before the cassette music starts. Defaults to 16.
-metadata.cassettemodifier.description.BeatsPerTick=Number of beats to the next tick. Defaults to 4. Each tick triggers the cassette click sound when using per-room cassette music. At a tempo multiplier of 1.0, a beat is 10 frames in duration.
+metadata.cassettemodifier.description.BeatsPerTick=Number of beats to the next tick. Defaults to 4. Each tick triggers the cassette click sound when using per-room cassette music.\nAt a tempo multiplier of 1.0, a beat is 10 frames in duration.
 metadata.cassettemodifier.description.TicksPerSwap=Number of ticks to the next cassette block swap. Defaults to 2. Each swap activates the next cassette block index.
 metadata.cassettemodifier.description.Blocks=Total number of distinct cassette block colours. Defaults to 2. Only used with Old Behaviour and otherwise determined by the highest cassette block index in the current room.
 metadata.cassettemodifier.description.BeatsMax=Maximum number of beats before the cassette music loops. Defaults to 256. The maximum value of the cassette music FMOD parameter is one less than this number.
 metadata.cassettemodifier.description.BeatIndexOffset=An offset in beats between the beat counter in the game and the FMOD music parameter. Defaults to 0. Allows changing the timing of cassette music.
+metadata.cassettemodifier.description.ActiveDuringTransitions=Whether cassette music should keep playing during room transitions, reducing the silence between rooms of maps with global cassette music.
 metadata.cassettemodifier.description.OldBehavior=Activates old cassette music behaviour. Makes Tempo Multiplier override the Tempo attribute in cassette blocks, makes Max Beats ignore cassette block indices, and changes how initial cassette block states are calculated.
 
 
@@ -1898,7 +1900,6 @@ settings.hotkeys.description.debugReloadLuaInstance=Restart the editor.
 settings.hotkeys.description.debugReloadTools=Reload Tools from plugins.
 
 # Graphics
-
 settings.editor.attribute.displayFPS=Display FPS
 settings.editor.attribute.alwaysRedrawUnselectedRooms=Always Redraw Unselected Rooms
 settings.editor.attribute.lazyLoadExternalAtlases=Lazy Load External Atlases
