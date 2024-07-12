@@ -68,7 +68,7 @@ local defaultFieldGroups = {
             "cassettemodifier.TicksPerSwap", "cassettemodifier.LeadBeats",
             "cassettemodifier.BeatIndexOffset", "cassettemodifier.TempoMult",
             "cassettemodifier.Blocks", "cassettemodifier.OldBehavior",
-            "mode.IgnoreLevelAudioLayerData"
+            "cassettemodifier.ActiveDuringTransitions", "mode.IgnoreLevelAudioLayerData"
         }
     }
 }
