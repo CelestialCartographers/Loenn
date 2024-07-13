@@ -33,4 +33,9 @@ if mergedDefaults or mergedUIDefaults then
     config.writeConfig(configs, true)
 end
 
-return configs
+-- Full config as standard table for default values, matching structure of the config itself
+local defaultDataComplete = utils.deepcopy(defaultData)
+
+defaultDataComplete.ui = defaultUIData
+
+return configs, defaultDataComplete
