@@ -518,7 +518,7 @@ function settingsWindow.editSettings()
     settingsWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     widgetUtils.preventOutOfBoundsMovement(window)
-    form.prepareScrollableWindow(window)
+    tabbedWindow.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, allFields)
 
     return window

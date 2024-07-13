@@ -2,6 +2,8 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
+local widgetUtils = require("ui.widgets.utils")
+
 local tabbedWindow = {}
 
 function tabbedWindow.createWindow(title, tabs, initialTab)
@@ -65,6 +67,13 @@ function tabbedWindow.createWindow(title, tabs, initialTab)
     local window = uiElements.window(title, windowContent)
 
     return window, windowContent
+end
+
+-- Use all available window height
+function tabbedWindow.prepareScrollableWindow(window)
+    local _, usableHeight = widgetUtils.getUsableSize()
+
+    window:with(widgetUtils.fillHeightIfNeeded(usableHeight, usableHeight))
 end
 
 return tabbedWindow
