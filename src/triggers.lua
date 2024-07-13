@@ -108,10 +108,10 @@ function triggers.getCategory(trigger)
     if handler.category then
         local category = utils.callIfFunction(handler.category)
 
-        return category or "default"
+        return category or "general"
     end
 
-    return "default"
+    return "general"
 end
 
 function triggers.triggerColor(room, trigger)
@@ -466,6 +466,19 @@ end
 -- Returns all triggers of room
 function triggers.getRoomItems(room, layer)
     return room.triggers
+end
+
+-- TODO - Implement
+local function selectionRenderFilterPredicate(room, layer, trigger)
+    return true
+end
+
+function triggers.selectionFilterPredicate(room, layer, trigger)
+    return selectionRenderFilterPredicate(room, layer, trigger)
+end
+
+function triggers.renderFilterPredicate(room, trigger)
+    return selectionRenderFilterPredicate(room, nil, trigger)
 end
 
 local function getPlacements(handler)
