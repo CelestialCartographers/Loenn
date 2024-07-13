@@ -231,6 +231,13 @@ function stringField.getElement(name, value, options)
             maxWidth = maxWidth
         })
 
+        -- Set up parentProxy to make dropdowns work in context menus
+        uiUtils.map(dropdown.data, function(data, i)
+            local item = dropdown:getItemCached(data, i)
+
+            item._parentProxy = dropdown
+        end)
+
         dropdown:setSelected(value, currentText)
         dropdown.selected = dropdown:getItem(selectedIndex)
 
