@@ -5,6 +5,7 @@ local configs = require("configs")
 local nodeStruct = require("structs.node")
 local logging = require("logging")
 local depths = require("consts.object_depths")
+local loadedState = require("loaded_state")
 
 local languageRegistry = require("language_registry")
 
@@ -468,8 +469,17 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
--- TODO - Implement
 local function selectionRenderFilterPredicate(room, layer, trigger)
+    local hiddenCategories = loadedState.getLayerInformation("triggers", "hiddenCategories")
+
+    if hiddenCategories then
+        local category = triggers.getCategory(trigger)
+
+        if hiddenCategories[category] then
+            return false
+        end
+    end
+
     return true
 end
 

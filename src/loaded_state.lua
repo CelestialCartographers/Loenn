@@ -1,7 +1,6 @@
 local viewportHandler = require("viewport_handler")
 local tasks = require("utils.tasks")
 local mapcoder = require("mapcoder")
-local celesteRender = require("celeste_render")
 local sceneHandler = require("scene_handler")
 local filesystem = require("utils.filesystem")
 local fileLocations = require("file_locations")
@@ -45,6 +44,9 @@ local function addToRecentFiles(filename)
 end
 
 local function updateSideState(side, roomName, filename, eventName)
+    -- Require late so triggers/entities can use state
+    local celesteRender = require("celeste_render")
+
     eventName = eventName or "editorMapLoaded"
 
     celesteRender.invalidateRoomCache()
@@ -432,6 +434,8 @@ function state.setLayerInformation(layer, key, value)
 end
 
 function state.clearRoomRenderCache()
+    -- Require late so triggers/entities can use state
+    local celesteRender = require("celeste_render")
     local rooms = state.map and state.map.rooms or {}
 
     -- Clear target canvas and complete cache for all rooms
