@@ -6,6 +6,8 @@ local utils = require("utils")
 
 local widgetUtils = {}
 
+widgetUtils.defaultPadding = 16
+
 function widgetUtils.removeWindowTitlebar(window)
     return window:with(function(el)
         table.remove(el.children, 1).parent = el
@@ -79,11 +81,8 @@ function widgetUtils.getSimpleOverlayWidget(widget, ...)
     return widget
 end
 
--- TODO
--- Double check this with ui root size and menubar, seems it is a bit off with Löve window size
--- Also a potential issue with moveWindow
 function widgetUtils.preventOutOfBoundsMovement(window, padding)
-    padding = padding or 16
+    padding = padding or widgetUtils.defaultPadding
 
     window:hook({
         update = function(orig, self)
@@ -95,11 +94,11 @@ function widgetUtils.preventOutOfBoundsMovement(window, padding)
 
             -- No need to run if position hasn't changed
             if self.x ~= self._previousX or self.y ~= self._previousY then
-                local windowWidth, windowHeight = love.graphics.getDimensions()
+                local usableWidth, usableHeight = widgetUtils.getUsableSize(padding)
                 local newX, newY = self.x, self.y
 
-                newX = math.max(math.min(windowWidth - window.width - padding, newX), padding)
-                newY = math.max(math.min(windowHeight - window.height - padding, newY), padding)
+                newX = math.max(math.min(usableWidth - window.width + padding, newX), padding)
+                newY = math.max(math.min(usableHeight - window.height + padding, newY), padding)
 
                 self.x = newX
                 self.realX = newX
@@ -114,7 +113,7 @@ function widgetUtils.preventOutOfBoundsMovement(window, padding)
 end
 
 function widgetUtils.moveWindow(window, newX, newY, threshold, clamp, padding)
-    padding = padding or 16
+    padding = padding or widgetUtils.defaultPadding
     threshold = threshold or 4
 
     local windowWidth, windowHeight = love.graphics.getDimensions()
@@ -138,7 +137,7 @@ function widgetUtils.moveWindow(window, newX, newY, threshold, clamp, padding)
 end
 
 function widgetUtils.lerpWindowPosition(window, fromX, fromY, toX, toY, percent, threshold, padding)
-    padding = padding or 16
+    padding = padding or widgetUtils.defaultPadding
     threshold = threshold or 4
 
     local newX, newY = math.floor(fromX + (toX - fromX) * percent), math.floor(fromY + (toY - fromY) * percent)
@@ -146,9 +145,19 @@ function widgetUtils.lerpWindowPosition(window, fromX, fromY, toX, toY, percent,
     widgetUtils.moveWindow(window, newX, newY, threshold, false, padding)
 end
 
+-- The max usable size to not overlap with menubar and have some side padding
+function widgetUtils.getUsableSize(padding)
+    padding = padding or widgetUtils.defaultPadding
+
+    local root = ui.root.children[1]
+    local windowGroup = root._windowGroup
+
+    return windowGroup.width - padding * 2, windowGroup.height - padding * 2
+end
+
 -- Based on OlympUI fillHeight
 -- Very naive, meant for very simple windows with scrollboxes (like forms)
-function widgetUtils.fillHeightIfNeeded(maxHeight)
+function widgetUtils.fillHeightIfNeeded(minHeight, maxHeight)
     local function apply(el)
         uiUtils.hook(el, {
             layoutLazy = function(orig, self)
@@ -165,6 +174,12 @@ function widgetUtils.fillHeightIfNeeded(maxHeight)
             end,
 
             layoutLate = function(orig, self)
+                if not maxHeight then
+                    local _, usableHeight = widgetUtils.getUsableSize()
+
+                    maxHeight = usableHeight
+                end
+
                 local spacing = self.parent.style:get("spacing") or 0
                 local height = 0
 
@@ -194,7 +209,7 @@ function widgetUtils.fillHeightIfNeeded(maxHeight)
                     end
                 end
 
-                height = math.min(math.floor(height), maxHeight or self.parent.innerHeight)
+                height = math.max(math.min(math.floor(height), maxHeight or self.parent.innerHeight), minHeight or 0)
                 self.height = height
                 self.innerHeight = height - (self.style:get("padding") or 0) * 2
 

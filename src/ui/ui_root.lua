@@ -62,6 +62,9 @@ function uiRoot.updateWindows(windows)
             }
         })
 
+        rootElement._menubar = menubar
+        rootElement._windowGroup = windowGroup
+
     else
         rootElement.children[1] = mainColumn
 

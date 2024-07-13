@@ -404,7 +404,7 @@ function forms.getForm(buttons, data, options)
 end
 
 function forms.prepareScrollableWindow(window, maxHeight)
-    window:with(widgetUtils.fillHeightIfNeeded(maxHeight))
+    window:with(widgetUtils.fillHeightIfNeeded(minHeight, maxHeight))
 end
 
 function forms.updateWindowChangedTitle(formFields)
