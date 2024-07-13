@@ -20,15 +20,26 @@ function startup.cleanupPath(path)
         path = filesystem.dirname(path)
     end
 
-    if macOS and filename == "Celeste.app" then
-        local pathResources = filesystem.joinpath(path, "Contents", "Resources")
-        local pathMacOS = filesystem.joinpath(path, "Contents", "MacOS")
+    if macOS then
+        if filename == "Celeste" then
+            local pathApp = filesystem.joinpath(path, "Celeste.app")
 
-        if filesystem.isDirectory(pathResources) then
-            path = pathResources
+            if filesystem.isDirectory(pathApp) then
+                filename = "Celeste.app"
+                path = pathApp
+            end
+        end
 
-        else
-            path = pathMacOS
+        if filename == "Celeste.app" then
+            local pathResources = filesystem.joinpath(path, "Contents", "Resources")
+            local pathMacOS = filesystem.joinpath(path, "Contents", "MacOS")
+
+            if filesystem.isDirectory(pathResources) then
+                path = pathResources
+
+            else
+                path = pathMacOS
+            end
         end
     end
 
