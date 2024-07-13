@@ -15,7 +15,6 @@ local drawableRectangle = require("structs.drawable_rectangle")
 local drawableText = require("structs.drawable_text")
 
 local colors = require("consts.colors")
-local triggerFontSize = 1
 
 local triggers = {}
 
@@ -25,6 +24,7 @@ local triggerRegisteryMT = {
     __index = function() return missingTriggerHandler end
 }
 
+triggers.triggerFontSize = 1
 triggers.registeredTriggers = nil
 
 -- Sets the registry to the given table (or empty one)
@@ -161,7 +161,7 @@ function triggers.getDrawable(name, handler, room, trigger, viewport)
 
     local fillColor, borderColor, textColor = triggers.triggerColor(room, trigger)
     local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, fillColor, borderColor)
-    local textDrawable = drawableText.fromText(displayName, x, y, width, height, nil, triggerFontSize, textColor)
+    local textDrawable = drawableText.fromText(displayName, x, y, width, height, nil, triggers.triggerFontSize, textColor)
 
     local drawables = borderedRectangle:getDrawableSprite()
     table.insert(drawables, textDrawable)
