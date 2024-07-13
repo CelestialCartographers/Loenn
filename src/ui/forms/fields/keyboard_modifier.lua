@@ -2,6 +2,7 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
+local utils = require("utils")
 local languageRegistry = require("language_registry")
 local inputCapturingDevice = require("input_devices.input_capture_device")
 
@@ -35,7 +36,7 @@ local function captureKeyboard(formField, buttonElement)
         if hotkeyActivator then
             formField:setValue(hotkeyActivator)
             formField:notifyFieldChanged()
-            buttonElement:setText(hotkeyActivator)
+            buttonElement:setText(utils.titleCase(hotkeyActivator))
 
         else
             buttonElement:setText(previousText)
@@ -47,7 +48,7 @@ function shortcutField.getElement(name, value, options)
     local formField = {}
 
     local language = languageRegistry.getLanguage()
-    local buttonText = value or tostring(language.ui.userInput.noValue)
+    local buttonText = value and utils.titleCase(value) or tostring(language.ui.userInput.noValue)
 
     local label = uiElements.label(options.displayName or name)
     local buttonElement = uiElements.button(buttonText, function(self, x, y, button)
