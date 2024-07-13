@@ -2,12 +2,7 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
-local stringField = require("ui.forms.fields.string")
-local iconUtils = require("ui.utils.icons")
-local utils = require("utils")
 local languageRegistry = require("language_registry")
-
-local hotkeyStruct = require("structs.hotkey")
 local inputCapturingDevice = require("input_devices.input_capture_device")
 
 local shortcutField = {}
@@ -66,6 +61,11 @@ function shortcutField.getElement(name, value, options)
         minWidth = minWidth,
         maxWidth = maxWidth
     })
+
+    if options.tooltipText then
+        label.interactive = 1
+        label.tooltipText = options.tooltipText
+    end
 
     label.centerVertically = true
 
