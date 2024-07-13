@@ -105,6 +105,24 @@ local function getOnlyShowDependencies(layer)
     end
 end
 
+local function getToggleTriggerCategory(category)
+    return function()
+        local hiddenCategories = loadedState.getLayerInformation("triggers", "hiddenCategories", {})
+
+        hiddenCategories[category] = not hiddenCategories[category]
+
+        loadedState.setLayerInformation("triggers", "hiddenCategories", hiddenCategories)
+        loadedState.clearRoomRenderCache()
+    end
+end
+
+local function getShowTriggerCategory(category)
+    return function()
+        local hiddenCategories = loadedState.getLayerInformation("triggers", "hiddenCategories", {})
+
+        return not hiddenCategories[category]
+    end
+end
 
 local function noRecentFilesNotification()
     local language = languageRegistry.getLanguage()
@@ -189,6 +207,12 @@ menubar.menubar = {
             {"view_triggers", getLayerToggleFunction("triggers"), "checkbox", getLayerValueFunction("triggers")},
             {"view_decals_fg", getLayerToggleFunction("decalsFg"), "checkbox", getLayerValueFunction("decalsFg")},
             {"view_decals_bg", getLayerToggleFunction("decalsBg"), "checkbox", getLayerValueFunction("decalsBg")},
+            {"view_trigger_categories", {
+                {"view_trigger_category_general", getToggleTriggerCategory("general"), "checkbox", getShowTriggerCategory("general")},
+                {"view_trigger_category_camera", getToggleTriggerCategory("camera"), "checkbox", getShowTriggerCategory("camera")},
+                {"view_trigger_category_audio", getToggleTriggerCategory("audio"), "checkbox", getShowTriggerCategory("audio")},
+                {"view_trigger_category_visual", getToggleTriggerCategory("visual"), "checkbox", getShowTriggerCategory("visual")},
+            }},
         }},
         {"view_only_depended_on", {
             {"view_depended_on_entities", toggleOnlyShowDependencies("entities"), "checkbox", getOnlyShowDependencies("entities")},
