@@ -116,12 +116,12 @@ function widgetUtils.moveWindow(window, newX, newY, threshold, clamp, padding)
     padding = padding or widgetUtils.defaultPadding
     threshold = threshold or 4
 
-    local windowWidth, windowHeight = love.graphics.getDimensions()
+    local usableWidth, usableHeight = widgetUtils.getUsableSize(padding)
     local currentX, currentY = window.x, window.y
 
     if clamp ~= false then
-        newX = math.max(math.min(windowWidth - window.width - padding, newX), padding)
-        newY = math.max(math.min(windowHeight - window.height - padding, newY), padding)
+        newX = math.max(math.min(usableWidth - window.width + padding, newX), padding)
+        newY = math.max(math.min(usableHeight - window.height + padding, newY), padding)
     end
 
     if math.abs(currentX - newX) > threshold or math.abs(currentY - newY) > threshold then
