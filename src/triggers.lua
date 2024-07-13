@@ -6,6 +6,7 @@ local nodeStruct = require("structs.node")
 local logging = require("logging")
 local depths = require("consts.object_depths")
 local loadedState = require("loaded_state")
+local modificationWarner = require("modification_warner")
 
 local languageRegistry = require("language_registry")
 
@@ -843,5 +844,7 @@ function triggers.associatedMods(trigger, layer)
 end
 
 triggers.initDefaultRegistry()
+
+modificationWarner.addModificationWarner(triggers)
 
 return triggers

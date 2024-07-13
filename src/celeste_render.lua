@@ -14,6 +14,7 @@ local bit = require("bit")
 local modHandler = require("mods")
 local depths = require("consts.object_depths")
 local logging = require("logging")
+local modificationWarner = require("modification_warner")
 
 local entityHandler = require("entities")
 local triggerHandler = require("triggers")
@@ -1073,5 +1074,7 @@ function celesteRender.drawMap(state)
         end
     end
 end
+
+modificationWarner.addModificationWarner(celesteRender)
 
 return celesteRender

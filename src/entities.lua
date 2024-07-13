@@ -5,6 +5,7 @@ local configs = require("configs")
 local drawing = require("utils.drawing")
 local nodeStruct = require("structs.node")
 local logging = require("logging")
+local modificationWarner = require("modification_warner")
 
 local languageRegistry = require("language_registry")
 
@@ -1396,5 +1397,7 @@ function entities.getRoomItems(room, layer)
 end
 
 entities.initDefaultRegistry()
+
+modificationWarner.addModificationWarner(entities)
 
 return entities

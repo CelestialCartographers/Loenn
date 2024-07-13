@@ -2,6 +2,7 @@ local atlases = require("atlases")
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
 local mods = require("mods")
+local modificationWarner = require("modification_warner")
 
 local languageRegistry = require("language_registry")
 
@@ -454,5 +455,7 @@ function decals.associatedMods(decal, layer)
         end
     end
 end
+
+modificationWarner.addModificationWarner(decals)
 
 return decals

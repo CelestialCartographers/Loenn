@@ -362,6 +362,11 @@ function modHandler.getCurrentModName(maxDepth)
 
     for i = 2, maxDepth do
         local info = debug.getinfo(i)
+
+        if not info then
+            return
+        end
+
         local source = info.source
 
         if utils.startsWith(source, modHandler.specificModContentSymbol) then
