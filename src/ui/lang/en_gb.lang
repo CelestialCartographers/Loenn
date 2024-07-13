@@ -72,6 +72,10 @@ ui.settings_window.window_title=Settings
 
 ui.settings_window.save_changes=Save changes
 
+ui.settings_window.defaultTooltipFormat=%s\nDefault: %s
+ui.settings_window.defaultValueEnabled=Enabled
+ui.settings_window.defaultValueDisabled=Disabled
+
 ui.settings_window.tab.general=General
 ui.settings_window.group.general.startup=Startup
 ui.settings_window.group.general.backups=Backups

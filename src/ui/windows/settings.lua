@@ -7,7 +7,7 @@ local utils = require("utils")
 local widgetUtils = require("ui.widgets.utils")
 local form = require("ui.forms.form")
 local settingsEditor = require("ui.settings_editor")
-local configs = require("configs")
+local configs, defaultConfigData = require("configs")
 local config = require("utils.config")
 local tabbedWindow = require("ui.widgets.tabbed_window")
 
@@ -460,8 +460,27 @@ local function prepareTabForm(language, tabData, fieldInformation, formData, but
         local settingsAttributes = baseLanguage.attribute
         local settingsDescriptions = baseLanguage.description
 
-        fieldInformation[field].displayName = tostring(settingsAttributes[fieldLanguageKey])
-        fieldInformation[field].tooltipText = tostring(settingsDescriptions[fieldLanguageKey])
+        local displayName = tostring(settingsAttributes[fieldLanguageKey])
+        local tooltipText = tostring(settingsDescriptions[fieldLanguageKey])
+
+        -- TODO - Remove later
+        defaultConfigData = defaultConfigData or configs
+
+        local fieldDefault = utils.getPath(defaultConfigData, nameParts)
+
+        if fieldDefault then
+            local settingsWindowLanguage = language.ui.settings_window
+            local defaultFormatString = tostring(settingsWindowLanguage.defaultTooltipFormat)
+
+            if type(fieldDefault) == "boolean" then
+                fieldDefault = fieldDefault and tostring(settingsWindowLanguage.defaultValueEnabled) or tostring(settingsWindowLanguage.defaultValueDisabled)
+            end
+
+            tooltipText = string.format(defaultFormatString, tooltipText, fieldDefault)
+        end
+
+        fieldInformation[field].displayName = displayName
+        fieldInformation[field].tooltipText = tooltipText
     end
 
     local tabForm, tabFields = form.getForm(buttons, formData, {
