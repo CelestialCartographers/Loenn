@@ -224,8 +224,12 @@ function triggers.drawSelected(room, layer, trigger, color)
                     end
 
                     if renderNodes then
-                        love.graphics.setColor(colors.triggerColor)
+                        local triggerColor, triggerBorderColor = triggers.triggerColor(room, trigger)
+
+                        love.graphics.setColor(triggerColor)
                         love.graphics.rectangle("fill", nodeX - 2, nodeY - 2, 5, 5)
+
+                        love.graphics.setColor(triggerBorderColor)
                         love.graphics.rectangle("line", nodeX - 2, nodeY - 2, 5, 5)
                     end
 
