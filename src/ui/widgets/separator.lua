@@ -51,7 +51,7 @@ uiElements.add("lineSeparator", {
     base = "row",
 
     style = {
-        padding = {0, 0, 0, 2},
+        padding = {0, 0, 0, 4},
         spacing = 8,
         contentPadding = 8
     },

@@ -17,7 +17,6 @@ local windowPersisterName = "settings_window"
 local settingsWindow = {}
 
 -- TODO - Show default somewhere? Automatically append to the end of tooltip?
--- TODO - Some of these should probably be locked behind advanced settings or not be exposed
 
 local defaultTabForms = {
     {
@@ -33,28 +32,49 @@ local defaultTabForms = {
                 }
             },
             {
+                title = "ui.settings_window.group.general.files",
+                fieldOrder = {
+                    "editor.recentFilesEntryLimit",
+                    "spacer",
+                    "editor.checkDependenciesOnSave",
+                    "editor.sortRoomsOnSave",
+                }
+            },
+            {
                 title = "ui.settings_window.group.general.backups",
                 fieldOrder = {
-                    "backups.backupMode",
-                    "backups.backupRate",
                     "backups.enabled",
-                    "backups.maximumFiles"
+                    "spacer",
+                    "backups.backupRate",
+                    "backups.maximumFiles",
                 }
             }
         }
     },
     {
         title = "ui.settings_window.tab.editor",
-        fieldOrder = {
-            "editor.checkDependenciesOnSave",
-            "editor.copyUsesClipboard",
-            "editor.pasteCentered",
-            "editor.historyEntryLimit",
-            "editor.itemAllowPixelPerfect",
-            "editor.recentFilesEntryLimit",
-            "editor.sortRoomsOnSave",
-            "editor.toolsPersistUsingGroup"
-        }
+        groups = {
+            {
+                title = "ui.settings_window.group.editor.clipboard",
+                fieldOrder = {
+                    "editor.copyUsesClipboard",
+                    "editor.pasteCentered",
+                }
+            },
+            {
+                title = "ui.settings_window.group.editor.tools",
+                fieldOrder = {
+                    "editor.toolsPersistUsingGroup"
+                }
+            },
+            {
+                title = "ui.settings_window.group.editor.triggers",
+                fieldOrder = {
+                    "editor.triggersTrimModName",
+                    "editor.triggersUseCategoryColors",
+                }
+            },
+        },
     },
     {
         title = "ui.settings_window.tab.hotkeys",
@@ -77,6 +97,7 @@ local defaultTabForms = {
                     "editor.toolActionButton",
                     "editor.canvasMoveButton",
                     "editor.contextMenuButton",
+                    "spacer",
                     "hotkeys.cameraZoomIn",
                     "hotkeys.cameraZoomOut"
                 }
@@ -87,9 +108,11 @@ local defaultTabForms = {
                     "hotkeys.itemsCopy",
                     "hotkeys.itemsCut",
                     "hotkeys.itemsPaste",
-                    "hotkeys.itemsSelectAll",
                     "editor.selectionAddModifier",
+                    "hotkeys.itemsSelectAll",
+                    "hotkeys.itemsDeselect",
                     "editor.itemAddNode",
+                    "spacer",
                     "editor.objectCloneButton",
                     "editor.itemDelete",
                     "editor.itemFlipHorizontal",
@@ -98,16 +121,16 @@ local defaultTabForms = {
                     "editor.itemRotateRight",
                     "editor.precisionModifier",
                     "editor.movementAxisBoundModifier",
-                    "editor.itemMoveDown",
                     "editor.itemMoveUp",
+                    "editor.itemMoveDown",
                     "editor.itemMoveLeft",
                     "editor.itemMoveRight",
-                    "editor.itemResizeDownGrow",
                     "editor.itemResizeUpGrow",
+                    "editor.itemResizeDownGrow",
                     "editor.itemResizeLeftGrow",
                     "editor.itemResizeRightGrow",
-                    "editor.itemResizeDownShrink",
                     "editor.itemResizeUpShrink",
+                    "editor.itemResizeDownShrink",
                     "editor.itemResizeLeftShrink",
                     "editor.itemResizeRightShrink"
                 }
@@ -116,22 +139,19 @@ local defaultTabForms = {
                 title = "ui.settings_window.group.hotkeys.rooms",
                 fieldOrder = {
                     "hotkeys.roomAddNew",
-                    "hotkeys.roomConfigureCurrent",
                     "hotkeys.roomDelete",
-                    "hotkeys.roomMoveDown",
+                    "hotkeys.roomConfigureCurrent",
+                    "spacer",
                     "hotkeys.roomMoveUp",
+                    "hotkeys.roomMoveDown",
                     "hotkeys.roomMoveLeft",
                     "hotkeys.roomMoveRight",
-                    "hotkeys.roomMoveDownPrecise",
-                    "hotkeys.roomMoveUpPrecise",
-                    "hotkeys.roomMoveLeftPrecise",
-                    "hotkeys.roomMoveRightPrecise",
-                    "hotkeys.roomResizeDownGrow",
                     "hotkeys.roomResizeUpGrow",
+                    "hotkeys.roomResizeDownGrow",
                     "hotkeys.roomResizeLeftGrow",
                     "hotkeys.roomResizeRightGrow",
-                    "hotkeys.roomResizeDownShrink",
                     "hotkeys.roomResizeUpShrink",
+                    "hotkeys.roomResizeDownShrink",
                     "hotkeys.roomResizeLeftShrink",
                     "hotkeys.roomResizeRightShrink"
                 }
@@ -139,12 +159,12 @@ local defaultTabForms = {
             {
                 title = "ui.settings_window.group.hotkeys.debug",
                 fieldOrder = {
-                    "hotkeys.debugMode",
-                    "hotkeys.debugRedrawMap",
                     "hotkeys.debugReloadEntities",
+                    "hotkeys.debugRedrawMap",
+                    "hotkeys.debugReloadTools",
+                    "spacer",
                     "hotkeys.debugReloadEverything",
                     "hotkeys.debugReloadLuaInstance",
-                    "hotkeys.debugReloadTools"
                 }
             },
         }
@@ -153,26 +173,27 @@ local defaultTabForms = {
         title = "ui.settings_window.tab.graphics",
         fieldOrder = {
             "editor.displayFPS",
+            "graphics.vsync",
+            "spacer",
             "editor.alwaysRedrawUnselectedRooms",
             "editor.lazyLoadExternalAtlases",
             "editor.prepareRoomRenderInBackground",
-            "graphics.focusedDrawRate",
-            "graphics.focusedMainLoopSleep",
-            "graphics.focusedUpdateRate",
-            "graphics.unfocusedDrawRate",
-            "graphics.unfocusedMainLoopSleep",
-            "graphics.unfocusedUpdateRate",
-            "graphics.vsync"
+            -- TODO - Implement these options as a dropdown
+            -- "graphics.focusedDrawRate",
+            -- "graphics.focusedMainLoopSleep",
+            -- "graphics.focusedUpdateRate",
+            -- "graphics.unfocusedDrawRate",
+            -- "graphics.unfocusedMainLoopSleep",
+            -- "graphics.unfocusedUpdateRate",
         }
     },
     {
         title = "ui.settings_window.tab.debug",
         fieldOrder = {
-            "debug.displayConsole",
             "debug.enableDebugOptions",
+            "debug.displayConsole",
+            "spacer",
             "debug.logPluginLoading",
-            "debug.loggingFlushImmediatelyLevel",
-            "debug.loggingLevel",
             "editor.warnOnMissingEntityHandler",
             "editor.warnOnMissingTexture"
         }
@@ -180,6 +201,10 @@ local defaultTabForms = {
 }
 
 local defaultFieldInformation = {
+    ["spacer"] = {
+        fieldType = "spacer"
+    },
+
     ["hotkeys.cameraZoomIn"] = {
         fieldType = "keyboard_hotkey"
     },
@@ -217,6 +242,9 @@ local defaultFieldInformation = {
         fieldType = "keyboard_hotkey"
     },
     ["hotkeys.itemsSelectAll"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.itemsDeselect"] = {
         fieldType = "keyboard_hotkey"
     },
     ["hotkeys.new"] = {
@@ -299,14 +327,17 @@ local defaultFieldInformation = {
     },
 
     ["backups.backupRate"] = {
-        fieldType = "integer"
+        fieldType = "integer",
+        minimumValue = 15,
     },
     ["backups.maximumFiles"] = {
-        fieldType = "integer"
+        fieldType = "integer",
+        minimumValue = 1,
     },
 
     ["editor.recentFilesEntryLimit"] = {
-        fieldType = "integer"
+        fieldType = "integer",
+        minimumValue = 0,
     },
     ["editor.canvasMoveButton"] = {
         fieldType = "mouse_button"

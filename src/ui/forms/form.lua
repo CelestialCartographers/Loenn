@@ -122,6 +122,7 @@ function forms.getFormFields(data, options)
     return elements
 end
 
+-- TODO - Force new row somehow support thanks
 function forms.getFormFieldsGrid(formFields, options)
     local columnCount = options.columns or 4
     local elements = {}
@@ -130,6 +131,15 @@ function forms.getFormFieldsGrid(formFields, options)
 
     for _, field in ipairs(formFields) do
         local fieldWidth = field.width or 1
+
+        if field.breakRow then
+            for i = column, columnCount do
+                table.insert(elements, false)
+            end
+
+            column = 1
+            rows += 1
+        end
 
         if not field._hidden then
             if column + fieldWidth - 1 > columnCount then

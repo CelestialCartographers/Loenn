@@ -79,8 +79,12 @@ ui.settings_window.defaultValueDisabled=Disabled
 ui.settings_window.tab.general=General
 ui.settings_window.group.general.startup=Startup
 ui.settings_window.group.general.backups=Backups
+ui.settings_window.group.general.files=Files
 
 ui.settings_window.tab.editor=Editor
+ui.settings_window.group.editor.clipboard=Clipboard
+ui.settings_window.group.editor.tools=Tools
+ui.settings_window.group.editor.triggers=Triggers
 
 ui.settings_window.tab.hotkeys=Hotkeys
 ui.settings_window.group.hotkeys.general=General
