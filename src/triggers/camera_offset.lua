@@ -1,6 +1,7 @@
 local cameraOffset = {}
 
 cameraOffset.name = "cameraOffsetTrigger"
+cameraOffset.category = "camera"
 cameraOffset.placements = {
     name = "camera_offset",
     data = {

@@ -6,6 +6,7 @@ table.sort(ambientSounds)
 local ambience = {}
 
 ambience.name = "everest/ambienceTrigger"
+ambience.category = "audio"
 ambience.associatedMods = {"Everest"}
 ambience.fieldInformation = {
     track = {

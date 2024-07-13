@@ -57,8 +57,10 @@ function editorScene:firstEnter()
     local graphicsDevice = require("input_devices.graphics_device")
     local inputCaptureDevice = require("input_devices.input_capture_device")
     local titleUpdaterDevice = require("input_devices.title_updater")
+    local hudDevice = require("input_devices.hud_device")
 
     inputDevice.newInputDevice(self.inputDevices, inputCaptureDevice)
+    inputDevice.newInputDevice(self.inputDevices, hudDevice)
     inputDevice.newInputDevice(self.inputDevices, userInterfaceDevice)
     inputDevice.newInputDevice(self.inputDevices, viewportDevice)
     inputDevice.newInputDevice(self.inputDevices, hotkeyDevice)
@@ -90,10 +92,6 @@ function editorScene:draw()
     if self.viewerState.map then
         love.graphics.setLineWidth(1)
         self.celesteRender.drawMap(self.viewerState)
-
-        if configs.editor.displayFPS then
-            love.graphics.printf("FPS: " .. tostring(love.timer.getFPS()), 20, 40, self.viewerState.viewport.width, "left", 0, self.fonts.fontScale, self.fonts.fontScale)
-        end
 
     else
         local windowWidth, windowHeight = self.viewerState.viewport.width, self.viewerState.viewport.height

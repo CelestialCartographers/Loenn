@@ -103,8 +103,16 @@ function selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
         local items = handler.getRoomItems and handler.getRoomItems(room, layer)
 
         if items then
-            for i, item in ipairs(items) do
-                selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
+            for _, item in ipairs(items) do
+                local processItem = true
+
+                if handler.selectionFilterPredicate then
+                    processItem = handler.selectionFilterPredicate(room, layer, item)
+                end
+
+                if processItem then
+                    selectionUtils.getSelectionsForItem(room, layer, item, rectangles)
+                end
             end
         end
     end

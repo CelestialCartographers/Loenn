@@ -682,31 +682,35 @@ local function getTriggerBatchTaskFunc(room, triggers, viewport, registeredTrigg
         local handler = registeredTriggers[name]
 
         if handler then
-            local drawable, depth = triggerHandler.getDrawable(name, handler, room, trigger, viewport)
+            local renderTrigger = triggerHandler.renderFilterPredicate(room, trigger)
 
-            -- Special case for multiple drawable sprites
-            -- Maybe handle this better later
-            if drawable then
-                local drawableIsTable = utils.typeof(drawable) == "table"
+            if renderTrigger then
+                local drawable, depth = triggerHandler.getDrawable(name, handler, room, trigger, viewport)
 
-                if not drawableIsTable then
-                    local batchDepth = drawable.depth or depth or 0
-                    local batch = getOrCreateSmartBatch(batches, batchDepth)
+                -- Special case for multiple drawable sprites
+                -- Maybe handle this better later
+                if drawable then
+                    local drawableIsTable = utils.typeof(drawable) == "table"
 
-                    batch:addFromDrawable(drawable)
-
-                else
-                    for _, drawableItem in ipairs(drawable) do
-                        local batchDepth = drawableItem.depth or depth or 0
+                    if not drawableIsTable then
+                        local batchDepth = drawable.depth or depth or 0
                         local batch = getOrCreateSmartBatch(batches, batchDepth)
 
-                        batch:addFromDrawable(drawableItem)
+                        batch:addFromDrawable(drawable)
+
+                    else
+                        for _, drawableItem in ipairs(drawable) do
+                            local batchDepth = drawableItem.depth or depth or 0
+                            local batch = getOrCreateSmartBatch(batches, batchDepth)
+
+                            batch:addFromDrawable(drawableItem)
+                        end
                     end
                 end
-            end
 
-            if i % YIELD_RATE == 0 then
-                tasks.yield()
+                if i % YIELD_RATE == 0 then
+                    tasks.yield()
+                end
             end
         end
     end

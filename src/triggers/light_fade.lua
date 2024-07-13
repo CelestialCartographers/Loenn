@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 local lightFade = {}
 
 lightFade.name = "lightFadeTrigger"
+lightFade.category = "visual"
 lightFade.fieldInformation = {
     positionMode = {
         options = enums.trigger_position_modes,

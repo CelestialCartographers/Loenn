@@ -126,10 +126,10 @@ local function addAutomaticDrawableFields(handler, drawable, room, entity, isNod
 
     if handler[offsetKey] then
         if utils.isCallable(handler[offsetKey]) then
-            drawable:setOffset(handler[offsetKey](room, entity))
+            drawable:setAdditionalOffset(handler[offsetKey](room, entity))
 
         else
-            drawable:setOffset(unpack(handler[offsetKey]))
+            drawable:setAdditionalOffset(unpack(handler[offsetKey]))
         end
     end
 

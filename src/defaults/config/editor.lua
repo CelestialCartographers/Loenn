@@ -46,6 +46,7 @@ return {
 
     -- Triggers
     triggersTrimModName = true,
+    triggersUseCategoryColors = true,
 
     -- Loading
     lazyLoadExternalAtlases = true,

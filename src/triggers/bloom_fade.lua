@@ -3,6 +3,7 @@ local enums = require("consts.celeste_enums")
 local bloomFade = {}
 
 bloomFade.name = "bloomFadeTrigger"
+bloomFade.category = "visual"
 bloomFade.fieldInformation = {
     positionMode = {
         options = enums.trigger_position_modes,
