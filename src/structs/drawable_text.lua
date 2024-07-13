@@ -27,14 +27,20 @@ end
 
 function drawableTextMt.__index:addToBatch(batch)
     if self.width and self.height then
-        drawing.addCenteredText(batch, self.text, self.x, self.y, self.width, self.height, self.font, self.fontSize)
+        drawing.addCenteredText(batch, self.text, self.x, self.y, self.width, self.height, self.font, self.fontSize, self.color)
 
     else
-        batch:add(self.text, self.x, self.y, 0, self.fontSize, self.fontSize, 0, 0)
+        local text = self.text
+
+        if self.color then
+            text = {self.color, text}
+        end
+
+        batch:add(text, self.x, self.y, 0, self.fontSize, self.fontSize, 0, 0)
     end
 end
 
-function drawableText.fromText(text, x, y, width, height, font, fontSize)
+function drawableText.fromText(text, x, y, width, height, font, fontSize, color)
     local drawable = {
         _type = "drawableText"
     }
@@ -49,6 +55,8 @@ function drawableText.fromText(text, x, y, width, height, font, fontSize)
 
     drawable.font = font or love.graphics.getFont()
     drawable.fontSize = fontSize
+
+    drawable.color = color
 
     return setmetatable(drawable, drawableTextMt)
 end

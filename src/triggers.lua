@@ -127,8 +127,9 @@ function triggers.triggerColor(room, trigger)
 
     local triggerColor = colors.triggerColorCategory[category] or colors.triggerColor
     local triggerBorderColor = colors.triggerBorderColorCategory[category] or colors.triggerBorderColor
+    local triggerTextColor = colors.triggerTextColor
 
-    return triggerColor, triggerBorderColor
+    return triggerColor, triggerBorderColor, triggerTextColor
 end
 
 function triggers.triggerText(room, trigger)
@@ -158,9 +159,9 @@ function triggers.getDrawable(name, handler, room, trigger, viewport)
     local width = trigger.width or 16
     local height = trigger.height or 16
 
-    local fillColor, borderColor = triggers.triggerColor(room, trigger)
+    local fillColor, borderColor, textColor = triggers.triggerColor(room, trigger)
     local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, fillColor, borderColor)
-    local textDrawable = drawableText.fromText(displayName, x, y, width, height, nil, triggerFontSize)
+    local textDrawable = drawableText.fromText(displayName, x, y, width, height, nil, triggerFontSize, textColor)
 
     local drawables = borderedRectangle:getDrawableSprite()
     table.insert(drawables, textDrawable)

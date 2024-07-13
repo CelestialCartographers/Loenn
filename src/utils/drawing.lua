@@ -101,7 +101,7 @@ function drawing.printCenteredText(text, x, y, width, height, font, fontSize, tr
     love.graphics.pop()
 end
 
-function drawing.addCenteredText(batch, text, x, y, width, height, font, fontSize, trim)
+function drawing.addCenteredText(batch, text, x, y, width, height, font, fontSize, color, trim)
     font = font or love.graphics.getFont()
     fontSize = fontSize or 1
 
@@ -117,6 +117,10 @@ function drawing.addCenteredText(batch, text, x, y, width, height, font, fontSiz
     local offsetX = 1
     local offsetY = math.floor((height - textHeight * fontSize) / 2) + 1
     local wrapLimit = math.floor(width / fontSize)
+
+    if color then
+        text = {color, text}
+    end
 
     batch:addf(text, wrapLimit, "center", x + offsetX, y + offsetY, 0, fontSize, fontSize)
 end
