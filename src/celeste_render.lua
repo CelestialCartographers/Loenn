@@ -98,6 +98,12 @@ function celesteRender.loadCustomTilesetAutotiler(state)
     celesteRender.clearScenerySpriteQuadCache()
 end
 
+local function getOrCreateSmartBatch(batches, key)
+    batches[key] = batches[key] or smartDrawingBatch.createOrderedBatch()
+
+    return batches[key]
+end
+
 function celesteRender.sortBatchingTasks(state, taskList)
     local visibleTasks = {}
     local nonVisibileTasks = {}
@@ -532,14 +538,18 @@ function celesteRender.getTilesBgBatch(room, tiles, viewport)
     return getRoomTileBatch(room, tiles, false)
 end
 
-local function getDecalsBatchTaskFunc(decals, room, viewport)
-    local batch = smartDrawingBatch.createOrderedBatch()
+local function getDecalsBatchTaskFunc(decals, room, fg, viewport)
+    local batches = {}
 
     for i, decal in ipairs(decals) do
         local texture = decal.texture
-        local drawable = decalHandler.getDrawable(texture, nil, room, decal, viewport)
+        local drawable, depth = decalHandler.getDrawable(texture, nil, room, decal, viewport)
 
         if drawable then
+            local defaultDepth = fg and decalsFgDepth or decalsBgDepth
+            local batchDepth = depth or defaultDepth
+            local batch = getOrCreateSmartBatch(batches, batchDepth)
+
             batch:addFromDrawable(drawable)
         end
 
@@ -548,9 +558,9 @@ local function getDecalsBatchTaskFunc(decals, room, viewport)
         end
     end
 
-    tasks.update(batch)
+    tasks.update(batches)
 
-    return batch
+    return batches
 end
 
 local function getRoomDecalsBatch(room, decals, fg, viewport)
@@ -566,7 +576,7 @@ local function getRoomDecalsBatch(room, decals, fg, viewport)
 
     if not cache[key]then
         cache[key] = tasks.newTask(
-            (-> getDecalsBatchTaskFunc(decals, room, viewport)),
+            (-> getDecalsBatchTaskFunc(decals, room, fg, viewport)),
             (task -> PRINT_BATCHING_DURATION and logging.info(string.format("Batching '%s' in '%s' took %s ms", key, room.name, task.timeTotal * 1000))),
             batchingTasks,
             {room = room}
@@ -598,12 +608,6 @@ function celesteRender.drawDecalsBg(room, decals)
     if batch then
         love.graphics.draw(batch, 0, 0)
     end
-end
-
-local function getOrCreateSmartBatch(batches, key)
-    batches[key] = batches[key] or smartDrawingBatch.createOrderedBatch()
-
-    return batches[key]
 end
 
 local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntities)
@@ -750,10 +754,10 @@ end
 
 local depthBatchingFunctions = {
     {"Background Tiles", "tilesBg", celesteRender.getTilesBgBatch, tilesBgDepth},
-    {"Background Decals", "decalsBg", celesteRender.getDecalsBgBatch, decalsBgDepth},
+    {"Background Decals", "decalsBg", celesteRender.getDecalsBgBatch},
     {"Entities", "entities", celesteRender.getEntityBatch},
     {"Foreground Tiles", "tilesFg", celesteRender.getTilesFgBatch, tilesFgDepth},
-    {"Foreground Decals", "decalsFg", celesteRender.getDecalsFgBatch, decalsFgDepth},
+    {"Foreground Decals", "decalsFg", celesteRender.getDecalsFgBatch},
     {"Triggers", "triggers", celesteRender.getTriggerBatch}
 }
 
