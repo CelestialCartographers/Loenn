@@ -175,11 +175,11 @@ end
 function stringField.getElement(name, value, options)
     local formField = {}
 
-    local validator = options.validator or function(v)
+    local validator = options.validator or function(v, text)
         return type(v) == "string"
     end
 
-    local warningValidator = options.warningValidator or function(v)
+    local warningValidator = options.warningValidator or function(v, text)
         return true
     end
 
@@ -273,8 +273,8 @@ function stringField.getElement(name, value, options)
 
     formField = setmetatable(formField, stringField._MT)
 
-    local valid = validator(value)
-    local warningValid = warningValidator(value)
+    local valid = validator(value, displayTransformer(value))
+    local warningValid = warningValidator(value, displayTransformer(value))
 
     if not valid or not warningValid then
         updateFieldStyle(formField, valid, warningValid)
