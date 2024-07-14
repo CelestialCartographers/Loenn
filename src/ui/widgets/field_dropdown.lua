@@ -78,9 +78,6 @@ function fieldDropdown.addDropdown(field, dropdown, currentText)
     icon:with(uiUtils.rightbound(0)):with(uiUtils.at(0, centerOffset))
     icon.style.color = {0.2, 0.2, 0.2}
 
-    field.label.text = currentText
-    field._text = currentText
-
     dropdown.submenuParent = field
     dropdown._parentProxy = field
 
@@ -89,15 +86,6 @@ function fieldDropdown.addDropdown(field, dropdown, currentText)
     field:hook({
         onClick = fieldDropdownOnClickHook(field, icon)
     })
-
-    uiUtils.map(dropdown.data, function(data, i)
-        local item = dropdown:getItemCached(data, i)
-
-        item._parentProxy = field
-        item:hook({
-            onClick = dropdownItemOnClickHook(field, dropdown)
-        })
-    end)
 
     return field
 end

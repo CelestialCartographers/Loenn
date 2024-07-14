@@ -777,6 +777,7 @@ local function getListCommon(magicList, callback, items, options)
 
     list.options = options
     list.searchField = searchField
+    list.scrolledList = scrolledList
     list._magicList = magicList
 
     -- Add utility functions, can't use a metatable

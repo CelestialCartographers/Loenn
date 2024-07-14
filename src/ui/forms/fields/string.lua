@@ -3,6 +3,7 @@ local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
 local fieldDropdown = require("ui.widgets.field_dropdown")
+local dropdowns = require("ui.widgets.dropdown")
 
 local utils = require("utils")
 
@@ -97,7 +98,12 @@ local function dropdownChanged(formField, optionsFlattened)
 
         if value ~= old then
             formField.currentValue = value
-            formField.currentText = new
+            formField.currentText = value
+
+            -- Manually handle for text field, dropdown handles itself
+            if utils.typeof(formField.field) == "field" then
+                formField.field:setText(formField.displayTransformer(value))
+            end
 
             local valid = formField:fieldValid()
             local warningValid = formField:fieldWarning()
@@ -226,25 +232,23 @@ function stringField.getElement(name, value, options)
             end
         end
 
-        dropdown = uiElements.dropdown(optionStrings, dropdownChanged(formField, optionsFlattened)):with({
+        local listOptions = {
+            initialItem = selectedIndex,
+        }
+
+        dropdown = dropdowns.fromList(dropdownChanged(formField, optionsFlattened), optionStrings, listOptions):with({
             minWidth = minWidth,
             maxWidth = maxWidth
         })
 
-        -- Set up parentProxy to make dropdowns work in context menus
-        uiUtils.map(dropdown.data, function(data, i)
-            local item = dropdown:getItemCached(data, i)
-
-            item._parentProxy = dropdown
-        end)
-
-        dropdown:setSelected(value, currentText)
-        dropdown.selected = dropdown:getItem(selectedIndex)
-
         if editable == false then
+            listOptions.parentProxy = dropdown
+            listOptions.spawnParent = dropdown
             element = dropdown
 
         else
+            listOptions.parentProxy = field
+            listOptions.spawnParent = field
             fieldDropdown.addDropdown(field, dropdown, currentText)
         end
     end
