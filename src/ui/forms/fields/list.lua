@@ -153,9 +153,15 @@ function listField.updateSubElements(formField, options)
     end
 
     local value = formField:getValue()
-    local formElements = getSubFormElements(formField, value, options)
+    local previousValue = formField._previousValue
+    local formElements = formField._subElements
+
+    if value ~= previousValue then
+        formElements = getSubFormElements(formField, value, options)
+    end
 
     formField._subElements = formElements
+    formField._previousValue = value
 
     return formElements
 end
