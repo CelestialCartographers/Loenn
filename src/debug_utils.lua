@@ -13,6 +13,7 @@ local utils = require("utils")
 local logging = require("logging")
 local atlases = require("atlases")
 local runtimeAtlas = require("runtime_atlas")
+local loadedState = require("loaded_state")
 
 local hasProfile, profile = utils.tryrequire("profile.profile", false)
 local origYield = coroutine.yield
@@ -126,6 +127,7 @@ end
 function debugUtils.redrawMap()
     logging.info("Redrawing map")
 
+    celesteRender.loadCustomTilesetAutotiler(loadedState)
     celesteRender.invalidateRoomCache()
     celesteRender.clearBatchingTasks()
     celesteRender.clearTileSpriteQuadCache()

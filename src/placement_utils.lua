@@ -1,11 +1,10 @@
 local layerHandlers = require("layer_handlers")
-local utils = require("utils")
 local keyboardHelper = require("utils.keyboard")
 local configs = require("configs")
 local state = require("loaded_state")
 local mods = require("mods")
-local dependencies = require("dependencies")
 local brushHelper = require("brushes")
+local modificationWarner = require("modification_warner")
 
 local placementUtils = {}
 
@@ -199,5 +198,7 @@ function placementUtils.nodeLimits(room, layer, target)
 
     return 0, 0
 end
+
+modificationWarner.addModificationWarner(placementUtils)
 
 return placementUtils

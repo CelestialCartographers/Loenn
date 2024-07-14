@@ -6,6 +6,7 @@ local nodeStruct = require("structs.node")
 local logging = require("logging")
 local depths = require("consts.object_depths")
 local loadedState = require("loaded_state")
+local modificationWarner = require("modification_warner")
 
 local languageRegistry = require("language_registry")
 
@@ -14,7 +15,6 @@ local drawableRectangle = require("structs.drawable_rectangle")
 local drawableText = require("structs.drawable_text")
 
 local colors = require("consts.colors")
-local triggerFontSize = 1
 
 local triggers = {}
 
@@ -24,6 +24,7 @@ local triggerRegisteryMT = {
     __index = function() return missingTriggerHandler end
 }
 
+triggers.triggerFontSize = 1
 triggers.registeredTriggers = nil
 
 -- Sets the registry to the given table (or empty one)
@@ -126,8 +127,9 @@ function triggers.triggerColor(room, trigger)
 
     local triggerColor = colors.triggerColorCategory[category] or colors.triggerColor
     local triggerBorderColor = colors.triggerBorderColorCategory[category] or colors.triggerBorderColor
+    local triggerTextColor = colors.triggerTextColor
 
-    return triggerColor, triggerBorderColor
+    return triggerColor, triggerBorderColor, triggerTextColor
 end
 
 function triggers.triggerText(room, trigger)
@@ -157,9 +159,9 @@ function triggers.getDrawable(name, handler, room, trigger, viewport)
     local width = trigger.width or 16
     local height = trigger.height or 16
 
-    local fillColor, borderColor = triggers.triggerColor(room, trigger)
+    local fillColor, borderColor, textColor = triggers.triggerColor(room, trigger)
     local borderedRectangle = drawableRectangle.fromRectangle("bordered", x, y, width, height, fillColor, borderColor)
-    local textDrawable = drawableText.fromText(displayName, x, y, width, height, nil, triggerFontSize)
+    local textDrawable = drawableText.fromText(displayName, x, y, width, height, nil, triggers.triggerFontSize, textColor)
 
     local drawables = borderedRectangle:getDrawableSprite()
     table.insert(drawables, textDrawable)
@@ -222,8 +224,12 @@ function triggers.drawSelected(room, layer, trigger, color)
                     end
 
                     if renderNodes then
-                        love.graphics.setColor(colors.triggerColor)
+                        local triggerColor, triggerBorderColor = triggers.triggerColor(room, trigger)
+
+                        love.graphics.setColor(triggerColor)
                         love.graphics.rectangle("fill", nodeX - 2, nodeY - 2, 5, 5)
+
+                        love.graphics.setColor(triggerBorderColor)
                         love.graphics.rectangle("line", nodeX - 2, nodeY - 2, 5, 5)
                     end
 
@@ -843,5 +849,7 @@ function triggers.associatedMods(trigger, layer)
 end
 
 triggers.initDefaultRegistry()
+
+modificationWarner.addModificationWarner(triggers)
 
 return triggers

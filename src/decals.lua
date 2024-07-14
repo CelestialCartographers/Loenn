@@ -2,6 +2,7 @@ local atlases = require("atlases")
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
 local mods = require("mods")
+local modificationWarner = require("modification_warner")
 
 local languageRegistry = require("language_registry")
 
@@ -176,6 +177,7 @@ function decals.getDrawable(texture, handler, room, decal, viewport)
     local scaleY = decal.scaleY or 1
 
     local rotation = math.rad(decal.rotation or 0)
+    local depth = decal.depth
 
     if meta then
         local drawable = drawableSprite.fromTexture(texture, decal)
@@ -184,7 +186,7 @@ function decals.getDrawable(texture, handler, room, decal, viewport)
         drawable:setScale(scaleX, scaleY)
         drawable:setJustification(0.5, 0.5)
 
-        return drawable
+        return drawable, depth
     end
 end
 
@@ -398,7 +400,7 @@ function decals.ignoredFieldsMultiple(layer, decal)
 end
 
 function decals.fieldOrder(layer, decal)
-    return {"x", "y", "scaleX", "scaleY", "texture", "rotation", "color"}
+    return {"x", "y", "scaleX", "scaleY", "texture", "depth", "rotation", "color"}
 end
 
 function decals.fieldInformation(layer, decal)
@@ -408,6 +410,11 @@ function decals.fieldInformation(layer, decal)
         },
         texture = {
             fieldType = "decalTexture"
+        },
+        depth = {
+            fieldType = "integer",
+            allowEmpty = true,
+            default = "",
         }
     }
 end
@@ -454,5 +461,7 @@ function decals.associatedMods(decal, layer)
         end
     end
 end
+
+modificationWarner.addModificationWarner(decals)
 
 return decals
