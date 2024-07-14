@@ -62,34 +62,37 @@ local function getWindowTitle(language, selections, bestSelection)
     return table.concat(titleParts, " - ")
 end
 
--- TODO - Add history support
 function contextWindow.saveChangesCallback(selections, dummyData)
     return function(formFields)
         local newData = form.getFormData(formFields)
         local room = loadedState.getSelectedRoom()
+        local layers = selectionUtils.selectionTargetLayers(selections)
 
-        for _, selection in ipairs(selections) do
-            local layer = selection.layer
-            local item = selection.item
+        local snapshot = snapshotUtils.roomLayersSnapshot(function()
+            for _, selection in ipairs(selections) do
+                local item = selection.item
 
-            -- Apply nil values from new data
-            for k, v in pairs(dummyData) do
-                if newData[k] == nil then
-                    item[k] = nil
+                -- Apply nil values from new data
+                for k, v in pairs(dummyData) do
+                    if newData[k] == nil then
+                        item[k] = nil
+                    end
+                end
+
+                for k, v in pairs(newData) do
+                    item[k] = v
                 end
             end
 
-            for k, v in pairs(newData) do
-                item[k] = v
+            if room then
+                selectionUtils.updateSelectionRectangles(room, selections)
+                selectionUtils.redrawTargetLayers(room, selections)
             end
-        end
 
-        if room then
-            selectionUtils.updateSelectionRectangles(room, selections)
-            selectionUtils.redrawTargetLayers(room, selections)
-        end
+            form.formDataSaved(formFields)
+        end, room, layers, "Property menu save")
 
-        form.formDataSaved(formFields)
+        history.addSnapshot(snapshot)
     end
 end
 
