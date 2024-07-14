@@ -7,7 +7,8 @@ local utils = require("utils")
 local widgetUtils = require("ui.widgets.utils")
 local form = require("ui.forms.form")
 local settingsEditor = require("ui.settings_editor")
-local configs, defaultConfigData = require("configs")
+local configs = require("configs")
+local defaultConfigData = require("default_config")
 local config = require("utils.config")
 local tabbedWindow = require("ui.widgets.tabbed_window")
 
@@ -15,8 +16,6 @@ local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "settings_window"
 
 local settingsWindow = {}
-
--- TODO - Show default somewhere? Automatically append to the end of tooltip?
 
 local defaultTabForms = {
     {
@@ -493,9 +492,6 @@ local function prepareTabForm(language, tabData, fieldInformation, formData, but
 
         local displayName = tostring(settingsAttributes[fieldLanguageKey])
         local tooltipText = tostring(settingsDescriptions[fieldLanguageKey])
-
-        -- TODO - Remove later
-        defaultConfigData = defaultConfigData or configs
 
         local fieldDefault = utils.getPath(defaultConfigData, nameParts)
 
