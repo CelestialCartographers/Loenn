@@ -102,7 +102,10 @@ local function dropdownChanged(formField, optionsFlattened)
 
             -- Manually handle for text field, dropdown handles itself
             if utils.typeof(formField.field) == "field" then
-                formField.field:setText(formField.displayTransformer(value))
+                local newText = formField.displayTransformer(value)
+
+                formField.field:setText(newText)
+                formField.field.index = #newText
             end
 
             local valid = formField:fieldValid()
@@ -249,7 +252,7 @@ function stringField.getElement(name, value, options)
         else
             listOptions.parentProxy = field
             listOptions.spawnParent = field
-            fieldDropdown.addDropdown(field, dropdown, currentText)
+            fieldDropdown.addDropdown(field, dropdown, options.searchable or false)
         end
     end
 
@@ -262,6 +265,8 @@ function stringField.getElement(name, value, options)
 
     formField.label = label
     formField.field = field
+    formField.dropdown = dropdown
+    formField.options = options
     formField.name = name
     formField.initialValue = value
     formField.currentValue = value

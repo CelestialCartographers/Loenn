@@ -558,16 +558,16 @@ function listWidgets.sortList(list)
     listWidgets.updateItems(list, unfilteredItems, target, false, true, true, true)
 end
 
-local function filterList(list, search)
+function listWidgets.filterList(list, search, preventCallback)
     local unfilteredItems = list.unfilteredItems
     local filteredItems = list.filterItems(unfilteredItems, search, list.options)
 
-    listWidgets.updateItems(list, filteredItems, nil, true, false, true)
+    listWidgets.updateItems(list, filteredItems, nil, true, preventCallback or false, true)
 end
 
 local function getSearchFieldChanged(onChange)
     return function(element, new, old)
-        filterList(element.list, new)
+        listWidgets.filterList(element.list, new)
         listWidgets.addDraggableHooks(element.list)
 
         if onChange then
@@ -595,7 +595,7 @@ function listWidgets.setFilterText(list, text, preventCallback)
             searchField.cb = searchCallback
 
         else
-            filterList(list, text)
+            listWidgets.filterList(list, text)
         end
     end
 end
@@ -604,7 +604,9 @@ function listWidgets.scrollSelectionVisible(list)
     -- TODO - Implement
 end
 
-local function handleListKeyboardNavigation(list, key)
+local function handleListKeyboardNavigation(list, key, hookOptions)
+    hookOptions = hookOptions or {}
+
     local nextResultKey = configs.ui.searching.searchNextResultKey
     local previousResultKey = configs.ui.searching.searchPreviousResultKey
     local rearrangeModifier = configs.ui.searching.searchRearrangeModifier
@@ -615,6 +617,8 @@ local function handleListKeyboardNavigation(list, key)
     local dataList = magicList and list.data or list.children
     local selectedIndex = list.selectedIndex or 0
     local handled = key == nextResultKey or key == previousResultKey
+
+    local preventCallback = hookOptions.preventCallback or false
 
     -- Set direction if move is allowed
     if key == nextResultKey and selectedIndex < #dataList then
@@ -639,7 +643,7 @@ local function handleListKeyboardNavigation(list, key)
             end
 
         else
-            listWidgets.setSelection(list, list.selectedIndex + direction)
+            listWidgets.setSelection(list, list.selectedIndex + direction, preventCallback)
             listWidgets.scrollSelectionVisible(list)
         end
     end
@@ -647,10 +651,17 @@ local function handleListKeyboardNavigation(list, key)
     return handled
 end
 
-local function searchFieldKeyRelease(list)
+local function searchFieldKeyRelease(list, hookOptions)
+    hookOptions = hookOptions or {}
+
     return function(orig, self, key, ...)
+        if hookOptions.skipHooksPredicate and not hookOptions.skipHooksPredicate() then
+            return orig(self, key, ...)
+        end
+
         local exitKey = configs.ui.searching.searchExitKey
         local exitClearKey = configs.ui.searching.searchExitAndClearKey
+        local selectKey = configs.ui.searching.searchSelect
 
         if key == exitClearKey then
             self:setText("")
@@ -659,15 +670,23 @@ local function searchFieldKeyRelease(list)
         elseif key == exitKey then
             widgetUtils.focusMainEditor()
 
+        elseif key == selectKey then
+            listWidgets.setSelection(list, list.selectedIndex)
+            widgetUtils.focusMainEditor()
+
         else
             orig(self, key, ...)
         end
     end
 end
 
-local function listCommonKeyPress(list, isSearchField)
+local function listCommonKeyPress(list, isSearchField, hookOptions)
     return function(orig, self, key, ...)
-        local handled = handleListKeyboardNavigation(list, key)
+        if hookOptions.skipHooksPredicate and not hookOptions.skipHooksPredicate() then
+            return orig(self, key, ...) or isSearchField
+        end
+
+        local handled = handleListKeyboardNavigation(list, key, hookOptions)
 
         if not handled then
             return orig(self, key, ...) or isSearchField
@@ -675,10 +694,10 @@ local function listCommonKeyPress(list, isSearchField)
     end
 end
 
-local function addSearchFieldHooks(list, searchField)
+function listWidgets.addSearchFieldHooks(list, searchField, hookOptions)
     searchField:hook({
-        onKeyRelease = searchFieldKeyRelease(list),
-        onKeyPress = listCommonKeyPress(list, true)
+        onKeyRelease = searchFieldKeyRelease(list, hookOptions),
+        onKeyPress = listCommonKeyPress(list, true, hookOptions)
     })
 end
 
@@ -773,7 +792,7 @@ local function getListCommon(magicList, callback, items, options)
         list = list
     }):with(uiUtils.fillWidth)
 
-    addSearchFieldHooks(list, searchField)
+    listWidgets.addSearchFieldHooks(list, searchField)
 
     list.options = options
     list.searchField = searchField
@@ -782,6 +801,7 @@ local function getListCommon(magicList, callback, items, options)
 
     -- Add utility functions, can't use a metatable
     list.sort = listWidgets.sortList
+    list.filter = listWidgets.filterList
     list.updateItems = listWidgets.updateItems
     list.setFilterText = listWidgets.setFilterText
     list.setSelection = listWidgets.setSelection

@@ -4,6 +4,7 @@ return {
     sortByScore = true,
     searchExitKey = "escape",
     searchExitAndClearKey = "return",
+    searchSelect = "tab",
     searchNextResultKey = "down",
     searchPreviousResultKey = "up",
     searchRearrangeModifier = "alt"

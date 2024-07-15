@@ -4,6 +4,7 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
+local listWidgets = require("ui.widgets.lists")
 local utils = require("utils")
 
 local function dropdownItemOnClickHook(field, dropdown)
@@ -62,7 +63,7 @@ end
 
 local fieldDropdown = {}
 
-function fieldDropdown.addDropdown(field, dropdown, currentText)
+function fieldDropdown.addDropdown(field, dropdown, searchable)
     local icon = uiElements.icon("ui:icons/drop")
 
     icon:layout()
@@ -86,6 +87,31 @@ function fieldDropdown.addDropdown(field, dropdown, currentText)
     field:hook({
         onClick = fieldDropdownOnClickHook(field, icon)
     })
+
+    if searchable then
+        local origCallback = field.cb
+
+        field.cb = function(element, new, old)
+            if origCallback then
+                origCallback(element, new, old)
+            end
+
+            dropdown:filter(new, true)
+
+            if new ~= "" then
+                dropdown:revealDropdown(true)
+            end
+        end
+
+        local hookOptions = {
+            preventCallback = true,
+            skipHooksPredicate = function()
+                return dropdown.list.dropdownMenuVisible
+            end
+        }
+
+        listWidgets.addSearchFieldHooks(dropdown.list, field, hookOptions)
+    end
 
     return field
 end

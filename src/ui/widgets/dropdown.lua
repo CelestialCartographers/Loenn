@@ -6,6 +6,7 @@ local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
 local lists = require("ui.widgets.lists")
+local utils = require("utils")
 
 local dropdowns = {}
 
@@ -35,11 +36,19 @@ end
 local function listUpdate(orig, self, dt)
     orig(self, dt)
 
-    if self.dropdownMenuVisible and self.parent and self ~= ui.focusing then
-        self.dropdownMenuVisible = false
-        self.column:removeSelf()
+    if self.dropdownMenuVisible and self.parent then
+        local focused = ui.focusing == self or ui.focusing == self.options.spawnParent or self.focusing == self.column
 
-        ui.focusing = self.options.spawnParent
+        if not focused then
+            self.dropdownMenuVisible = false
+            self.column:removeSelf()
+
+            ui.focusing = self.options.spawnParent
+
+            if utils.typeof(ui.focusing) == "field" then
+                ui.focusing.blinkTime = 0
+            end
+        end
     end
 end
 
@@ -68,51 +77,7 @@ function dropdowns.fromList(callback, stringOptions, options)
 
     local button = uiElements.button(initialText, function(self, x, y, button)
         if self.enabled and button == 1 then
-            local dropdownListVisible = not not listColumn.parent
-            local spawnParent = options.spawnParent or self
-            local spawnRoot = options.spawnRoot or ui.root
-
-            if not dropdownListVisible then
-                local spawnX = spawnParent.screenX
-                local spawnY = spawnParent.screenY + spawnParent.height
-
-                if spawnParent.parent then
-                    spawnY += spawnParent.parent.style.spacing
-                end
-
-                spawnRoot:addChild(listColumn)
-
-                listColumn.realX = -4096
-                listColumn.realY = -4096
-
-                list:layout()
-
-                -- Let layouting finish
-                ui.runLate(function()
-                    ui.runLate(function()
-                        -- List height didn't seem to make sense after two layout calls, this is good enough
-                        local listHeight = list:getElementSize() * #listItems + list.style.spacing * (#listItems - 1)
-                        local listBottom = spawnY + listHeight
-                        local rootBottom = spawnRoot.realY + spawnRoot.height
-
-                        if listBottom > rootBottom then
-                            local offsetY = listBottom - rootBottom
-
-                            spawnY = math.max(spawnRoot.realY, spawnY - offsetY)
-                        end
-
-                        listColumn.realX = spawnX
-                        listColumn.realY = spawnY
-
-                        ui.focusing = list
-                        list.dropdownMenuVisible = true
-                        list._parentProxy = options.parentProxy
-                    end)
-                end)
-
-            else
-                listColumn:removeSelf()
-            end
+            self:revealDropdown(false)
         end
     end)
 
@@ -128,10 +93,60 @@ function dropdowns.fromList(callback, stringOptions, options)
     list.column = listColumn
     list._parentProxy = options.parentProxy
 
-    button.data = list
+    button.list = list
     button:addChild(uiElements.icon("ui:icons/drop"):with(uiUtils.at(0.999 + 1, 0.5 + 5)))
     button.callback = callback
     button.submenuParent = button
+
+    function button.revealDropdown(self, fromSearchFilter)
+        local dropdownListVisible = not not listColumn.parent
+        local spawnParent = options.spawnParent or self
+        local spawnRoot = options.spawnRoot or ui.root
+
+        if not dropdownListVisible then
+            local spawnX = spawnParent.screenX
+            local spawnY = spawnParent.screenY + spawnParent.height
+
+            if spawnParent.parent then
+                spawnY += spawnParent.parent.style.spacing
+            end
+
+            spawnRoot:addChild(listColumn)
+
+            listColumn.realX = -4096
+            listColumn.realY = -4096
+
+            list:layout()
+
+            -- Let layouting finish
+            ui.runLate(function()
+                ui.runLate(function()
+                    -- List height didn't seem to make sense after two layout calls, this is good enough
+                    local visibleItems = list.data
+                    local listHeight = list:getElementSize() * #visibleItems + list.style.spacing * (#visibleItems - 1)
+                    local listBottom = spawnY + listHeight
+                    local rootBottom = spawnRoot.realY + spawnRoot.height
+
+                    if listBottom > rootBottom then
+                        if fromSearchFilter then
+                            list.height = rootBottom - spawnY
+
+                        else
+                            local offsetY = listBottom - rootBottom
+
+                            spawnY = math.max(spawnRoot.realY, spawnY - offsetY)
+                        end
+                    end
+
+                    listColumn.realX = spawnX
+                    listColumn.realY = spawnY
+
+                    list.dropdownMenuVisible = true
+                    list._parentProxy = options.parentProxy
+                end)
+            end)
+        end
+    end
 
     function button.setSelection(self, value, preventCallback)
         list:setSelection(value, preventCallback)
@@ -141,6 +156,10 @@ function dropdowns.fromList(callback, stringOptions, options)
         local text = item and item.text or ""
 
         button:setText(text)
+    end
+
+    function button.filter(self, text, preventCallback)
+        list:filter(text, preventCallback)
     end
 
     return button
