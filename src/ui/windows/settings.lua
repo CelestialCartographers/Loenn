@@ -11,6 +11,7 @@ local configs = require("configs")
 local defaultConfigData = require("default_config")
 local config = require("utils.config")
 local tabbedWindow = require("ui.widgets.tabbed_window")
+local startup = require("initial_startup")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "settings_window"
@@ -24,8 +25,9 @@ local defaultTabForms = {
             {
                 title = "ui.settings_window.group.general.startup",
                 fieldOrder = {
-                    "general.celesteGameDirectory",
-                    "general.persistWindowFullScreen",
+                    "celesteGameDirectory",
+                    "spacer",
+                    "general.persistWindowFullscreen",
                     "general.persistWindowPosition",
                     "general.persistWindowSize"
                 }
@@ -202,6 +204,21 @@ local defaultTabForms = {
 local defaultFieldInformation = {
     ["spacer"] = {
         fieldType = "spacer"
+    },
+
+    ["celesteGameDirectory"] = {
+        fieldType = "path",
+        filePickerExtensions = {"exe", "dll", "app"},
+        allowEmpty = false,
+        allowMissingPath = true,
+        relativeToMod = false,
+        useUnixSeparator = false,
+        earlyValidator = function(filename)
+            return startup.verifyCelesteDir(filename)
+        end,
+        filenameProcessor = function(filename)
+            return startup.cleanupPath(filename)
+        end,
     },
 
     ["hotkeys.cameraZoomIn"] = {

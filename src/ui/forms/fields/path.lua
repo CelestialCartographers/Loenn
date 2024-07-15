@@ -16,6 +16,11 @@ pathField.fieldType = "path"
 
 local function getDialogCallback(textField, options)
     return function(filename)
+        -- User closed dialog or hit cancel
+        if not filename then
+            return
+        end
+
         local rawFilename = filename
 
         local useUnixSeparator = options.useUnixSeparator
@@ -114,11 +119,22 @@ function pathField.getElement(name, value, options)
     local relativeToMod = options.relativeToMod
     local celesteAtlas = options.celesteAtlas
     local filenameResolver = options.filenameResolver
+    local earlyValidator = options.earlyValidator
+    local lateValdiator = options.lateValdiator
 
     options.validator = function(filename)
         local rawFilename = filename
         local prefix = ""
         local fieldEmpty = filename == nil or #filename == 0
+
+        -- Early vaidator before all checks and filename transforms
+        if earlyValidator then
+            local result = earlyValidator(filename)
+
+            if result ~= nil then
+                return result
+            end
+        end
 
         if fieldEmpty then
             return allowEmpty ~= false
@@ -170,7 +186,14 @@ function pathField.getElement(name, value, options)
             end
         end
 
-        -- TODO - Custom validator at this point?
+        -- Late vaidator after all checks and filename transforms
+        if lateValdiator then
+            local result = lateValdiator(filename)
+
+            if result ~= nil then
+                return result
+            end
+        end
 
         return true
     end
