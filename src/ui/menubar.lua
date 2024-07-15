@@ -197,7 +197,7 @@ menubar.menubar = {
         {"undo", history.undo},
         {"redo", history.redo},
         {},
-        {"settings", featureToggleWrapper(devBuild, settingsEditor.editSettings)},
+        {"settings", settingsEditor.editSettings},
     }},
     {"view", {
         {"view_layer", {
