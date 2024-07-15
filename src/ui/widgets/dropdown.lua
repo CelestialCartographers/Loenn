@@ -111,6 +111,11 @@ function dropdowns.fromList(callback, stringOptions, options)
                 spawnY += spawnParent.parent.style.spacing
             end
 
+            -- Unfilter list if opened with the dedicated button
+            if not fromSearchFilter then
+                list:filter("", true)
+            end
+
             spawnRoot:addChild(listColumn)
 
             listColumn.realX = -4096
