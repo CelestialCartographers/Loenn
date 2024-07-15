@@ -12,6 +12,7 @@ local defaultConfigData = require("default_config")
 local config = require("utils.config")
 local tabbedWindow = require("ui.widgets.tabbed_window")
 local startup = require("initial_startup")
+local themes = require("ui.themes")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "settings_window"
@@ -189,6 +190,22 @@ local defaultTabForms = {
         }
     },
     {
+        title = "ui.settings_window.tab.interface",
+        fieldOrder = {
+            "ui.lists.shrinkToFit",
+            "ui.searching.searchCaseSensitive",
+            "ui.searching.searchExitAndClearKey",
+            "ui.searching.searchExitKey",
+            "ui.searching.searchFuzzy",
+            "ui.searching.searchNextResultKey",
+            "ui.searching.searchPreviousResultKey",
+            "ui.searching.searchRearrangeModifier",
+            "ui.searching.searchSelectKey",
+            "ui.searching.sortByScore",
+            "ui.theme.themeName",
+        }
+    },
+    {
         title = "ui.settings_window.tab.debug",
         fieldOrder = {
             "debug.enableDebugOptions",
@@ -200,6 +217,12 @@ local defaultTabForms = {
         }
     },
 }
+
+local themeOptions = {}
+
+for themeName, theme in pairs(themes.themes) do
+    table.insert(themeOptions, themeName)
+end
 
 local defaultFieldInformation = {
     ["spacer"] = {
@@ -436,6 +459,40 @@ local defaultFieldInformation = {
     },
     ["debug.loggingLevel"] = {
         fieldType = "integer"
+    },
+
+    ["ui.searching.searchExitAndClearKey"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["ui.searching.searchExitKey"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["ui.searching.searchSelectKey"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["ui.searching.searchNextResultKey"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["ui.searching.searchPreviousResultKey"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["ui.searching.searchRearrangeModifier"] = {
+        fieldType = "keyboard_modifier"
+    },
+    ["ui.searching.searchCaseSensitive"] = {
+        fieldType = "string",
+        editable = false,
+        options = {
+            -- TODO - Translate with language file
+            {"Contextual", "contextual"},
+            {"Always", "always"},
+            {"Never", "never"}
+        }
+    },
+    ["ui.theme.themeName"] = {
+        fieldType = "string",
+        editable = false,
+        options = themeOptions
     }
 }
 

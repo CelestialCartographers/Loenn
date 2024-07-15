@@ -95,8 +95,34 @@ ui.settings_window.group.hotkeys.debug=Debug
 
 ui.settings_window.tab.graphics=Graphics
 
+ui.settings_window.tab.interface=Interface
+
 ui.settings_window.tab.debug=Debug
 
+# Interface settings
+settings.ui.lists.attribute.shrinkToFit=Shrink To Fit
+settings.ui.searching.attribute.searchCaseSensitive=Search Case Sensitive
+settings.ui.searching.attribute.searchExitAndClearKey=Search Exit And Clear Key
+settings.ui.searching.attribute.searchExitKey=Search Exit Key
+settings.ui.searching.attribute.searchFuzzy=Fuzzy Search
+settings.ui.searching.attribute.searchNextResultKey=Search Next Result Key
+settings.ui.searching.attribute.searchPreviousResultKey=Search Previous Result Key
+settings.ui.searching.attribute.searchRearrangeModifier=Search Rearrange Modifier
+settings.ui.searching.attribute.searchSelectKey=Search Select Key
+settings.ui.searching.attribute.sortByScore=Sort By Score
+settings.ui.theme.attribute.themeName=Theme Name
+
+settings.ui.lists.description.shrinkToFit=Shrink To Fit
+settings.ui.searching.description.searchCaseSensitive=Search Case Sensitive
+settings.ui.searching.description.searchExitAndClearKey=Search Exit And Clear Key
+settings.ui.searching.description.searchExitKey=Search Exit Key
+settings.ui.searching.description.searchFuzzy=Fuzzy Search
+settings.ui.searching.description.searchNextResultKey=Search Next Result Key
+settings.ui.searching.description.searchPreviousResultKey=Search Previous Result Key
+settings.ui.searching.description.searchRearrangeModifier=Search Rearrange Modifier
+settings.ui.searching.description.searchSelectKey=Search Select Key
+settings.ui.searching.description.sortByScore=Sort By Score
+settings.ui.theme.description.themeName=Theme Name
 
 # Dependency Window
 ui.dependency_window.window_title=Dependencies

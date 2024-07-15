@@ -718,7 +718,7 @@ local function searchFieldKeyRelease(list, hookOptions)
 
         local exitKey = configs.ui.searching.searchExitKey
         local exitClearKey = configs.ui.searching.searchExitAndClearKey
-        local selectKey = configs.ui.searching.searchSelect
+        local selectKey = configs.ui.searching.searchSelectKey
 
         if key == exitClearKey then
             self:setText("")
