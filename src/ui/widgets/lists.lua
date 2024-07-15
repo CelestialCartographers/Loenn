@@ -652,8 +652,6 @@ local function handleListKeyboardNavigation(list, key, hookOptions)
 end
 
 local function searchFieldKeyRelease(list, hookOptions)
-    hookOptions = hookOptions or {}
-
     return function(orig, self, key, ...)
         if hookOptions.skipHooksPredicate and not hookOptions.skipHooksPredicate() then
             return orig(self, key, ...)
@@ -695,6 +693,8 @@ local function listCommonKeyPress(list, isSearchField, hookOptions)
 end
 
 function listWidgets.addSearchFieldHooks(list, searchField, hookOptions)
+    hookOptions = hookOptions or {}
+
     searchField:hook({
         onKeyRelease = searchFieldKeyRelease(list, hookOptions),
         onKeyPress = listCommonKeyPress(list, true, hookOptions)
