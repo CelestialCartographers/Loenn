@@ -51,7 +51,6 @@ local defaultData = {
     tag = ""
 }
 
--- Texture options are intended to be added on demand
 local fieldInformation = {
     color = {
         fieldType = "color"
@@ -64,9 +63,22 @@ local fieldInformation = {
         editable = false
     },
     texture = {
-        options = {},
-        editable = true
-    }
+        fieldType = "path",
+        filePickerExtensions = {"png"},
+        -- Must be allowed for Misc atlases, for example purplesunset
+        -- This means no validation on "invalid" texture, but its good enough for now
+        allowMissingPath = true,
+        filenameProcessor = function(filename)
+            -- Discard leading "Graphics/Atlases/Gui/" and file extension
+            local filename, ext = utils.splitExtension(filename)
+            local parts = utils.splitpath(filename, "/")
+
+            return utils.convertToUnixPath(utils.joinpath(unpack(parts, 4)))
+        end,
+        filenameResolver = function(filename, text, prefix)
+            return string.format("%s/Graphics/Atlases/Gameplay/%s.png", prefix, text)
+        end
+    },
 }
 
 function parallax.getParallaxNames()
