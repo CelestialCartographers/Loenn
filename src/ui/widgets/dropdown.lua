@@ -122,14 +122,14 @@ function dropdowns.fromList(callback, stringOptions, options)
             ui.runLate(function()
                 ui.runLate(function()
                     -- List height didn't seem to make sense after two layout calls, this is good enough
-                    local visibleItems = list.data
-                    local listHeight = list:getElementSize() * #visibleItems + list.style.spacing * (#visibleItems - 1)
+                    local listHeight = lists.getMagicListHeight(list)
                     local listBottom = spawnY + listHeight
                     local rootBottom = spawnRoot.realY + spawnRoot.height
 
                     if listBottom > rootBottom then
                         if fromSearchFilter then
-                            list.height = rootBottom - spawnY
+                            -- TODO - Fix, this removes the scrollbox it seems
+                            --list.height = rootBottom - spawnY
 
                         else
                             local offsetY = listBottom - rootBottom

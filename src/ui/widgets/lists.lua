@@ -170,6 +170,8 @@ function listWidgets.setSelection(list, target, preventCallback, callbackRequire
         end
     end
 
+    listWidgets.scrollSelectionVisible(list)
+
     return selectedTarget, selectedIndex
 end
 
@@ -601,12 +603,67 @@ function listWidgets.setFilterText(list, text, preventCallback)
 end
 
 function listWidgets.scrollSelectionVisible(list)
-    -- TODO - Implement
+    if not list or not list.parent then
+        return
+    end
+
+    -- Not supported in normal lists
+    if not list._magicList then
+        return
+    end
+
+    local scrollbox = list.parent
+    local scrollHandle = scrollbox.handleY
+
+    if scrollHandle then
+        local column = list.scrolledList
+        local scrollTop = math.abs(list.y)
+        local scrollBottom = scrollTop + column.height
+
+        local selectedIndex = list.selectedIndex or 1
+
+        local itemTop = listWidgets.getMagicListHeight(list, selectedIndex - 1)
+        local itemBottom = listWidgets.getMagicListHeight(list, selectedIndex)
+        local threshold = listWidgets.getMagicListHeight(list, 3)
+        local smallScrollAmount = listWidgets.getMagicListHeight(list, 1)
+
+        local offsetTop = itemTop - scrollTop
+        local offsetBottom = scrollBottom - itemBottom
+        local smallScrollUp = offsetTop >= 0 and offsetTop <= threshold
+        local smallScrollDown = offsetBottom >= 0 and offsetBottom <= threshold
+        local itemOffScreen = offsetTop < 0 or offsetBottom < 0
+
+        if smallScrollUp then
+            scrollbox:onScroll(0, 0, 0, -smallScrollAmount, true)
+
+        elseif smallScrollDown then
+            scrollbox:onScroll(0, 0, 0, smallScrollAmount, true)
+
+        elseif itemOffScreen then
+            -- Attempt to put in center of list
+            local centerOffset = math.floor(offsetTop - column.height / 2)
+
+            scrollbox:onScroll(0, 0, 0, centerOffset, true)
+        end
+    end
+end
+
+-- Get the height of magic list, default to whole list
+function listWidgets.getMagicListHeight(list, itemCount)
+    itemCount = itemCount or #list.data
+
+    if itemCount <= 0 then
+        return 0
+    end
+
+    local elementSize = list:getElementSize()
+    local spacing = list.style.spacing
+    local listHeight = elementSize * itemCount + spacing * (itemCount - 2)
+
+    return listHeight
 end
 
 local function handleListKeyboardNavigation(list, key, hookOptions)
-    hookOptions = hookOptions or {}
-
     local nextResultKey = configs.ui.searching.searchNextResultKey
     local previousResultKey = configs.ui.searching.searchPreviousResultKey
     local rearrangeModifier = configs.ui.searching.searchRearrangeModifier
@@ -652,6 +709,8 @@ local function handleListKeyboardNavigation(list, key, hookOptions)
 end
 
 local function searchFieldKeyRelease(list, hookOptions)
+    hookOptions = hookOptions or {}
+
     return function(orig, self, key, ...)
         if hookOptions.skipHooksPredicate and not hookOptions.skipHooksPredicate() then
             return orig(self, key, ...)
@@ -679,6 +738,8 @@ local function searchFieldKeyRelease(list, hookOptions)
 end
 
 local function listCommonKeyPress(list, isSearchField, hookOptions)
+    hookOptions = hookOptions or {}
+
     return function(orig, self, key, ...)
         if hookOptions.skipHooksPredicate and not hookOptions.skipHooksPredicate() then
             return orig(self, key, ...) or isSearchField
@@ -693,8 +754,6 @@ local function listCommonKeyPress(list, isSearchField, hookOptions)
 end
 
 function listWidgets.addSearchFieldHooks(list, searchField, hookOptions)
-    hookOptions = hookOptions or {}
-
     searchField:hook({
         onKeyRelease = searchFieldKeyRelease(list, hookOptions),
         onKeyPress = listCommonKeyPress(list, true, hookOptions)
