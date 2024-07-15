@@ -51,6 +51,12 @@ local defaultData = {
     tag = ""
 }
 
+parallax.miscAtlasLookup = table.flip({
+    "darkswamp", "fmod", "fna", "mist",
+    "monogame", "northernlights", "purplesunset",
+    "vignette", "whiteCube", "xna",
+})
+
 local fieldInformation = {
     color = {
         fieldType = "color"
@@ -65,9 +71,13 @@ local fieldInformation = {
     texture = {
         fieldType = "path",
         filePickerExtensions = {"png"},
-        -- Must be allowed for Misc atlases, for example purplesunset
-        -- This means no validation on "invalid" texture, but its good enough for now
-        allowMissingPath = true,
+        allowMissingPath = false,
+        celesteAtlas = "Gameplay",
+        earlyValidator = function(filename)
+            if parallax.miscAtlasLookup[filename] then
+                return true
+            end
+        end,
         filenameProcessor = function(filename)
             -- Discard leading "Graphics/Atlases/Gui/" and file extension
             local filename, ext = utils.splitExtension(filename)
