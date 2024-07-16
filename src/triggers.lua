@@ -82,7 +82,8 @@ local humanizedNameTrimmedModNameCache = {}
 function triggers.getDrawableDisplayText(trigger)
     local name = trigger._name
     local trimModName = configs.editor.triggersTrimModName
-    local displayName = trimModName and humanizedNameTrimmedModNameCache[name] or humanizedNameCache[name]
+    local cache = trimModName and humanizedNameTrimmedModNameCache or humanizedNameCache
+    local displayName = cache[name]
 
     if not displayName then
         -- Humanize data name and then remove " Trigger" at the end if possible
@@ -97,7 +98,7 @@ function triggers.getDrawableDisplayText(trigger)
         displayName = utils.humanizeVariableName(displayName)
         displayName = string.match(displayName, "(.-) Trigger$") or displayName
 
-        humanizedNameCache[name] = displayName
+        cache[name] = displayName
     end
 
     return displayName
