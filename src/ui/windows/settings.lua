@@ -13,6 +13,7 @@ local config = require("utils.config")
 local tabbedWindow = require("ui.widgets.tabbed_window")
 local startup = require("initial_startup")
 local themes = require("ui.themes")
+local debugUtils = require("debug_utils")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "settings_window"
@@ -524,11 +525,15 @@ local function prepareFormData()
 end
 
 local function applyNewSettings(newSettings, oldSettings)
-    -- TODO - Reload hotkeys
-
     if newSettings.ui.theme.themeName ~= oldSettings.ui.theme.themeName then
         themes.useTheme(newSettings.ui.theme.themeName)
     end
+
+    -- Reload hotkeys, tools and libraries
+    -- These are the only things that should (hopefully) add hotkeys
+    debugUtils.reloadHotkeys()
+    debugUtils.reloadTools()
+    debugUtils.reloadLibraries()
 end
 
 local function saveSettings(formFields)
