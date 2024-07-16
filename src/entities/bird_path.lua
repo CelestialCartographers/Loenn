@@ -10,7 +10,8 @@ birdPath.placements = {
     data = {
         only_once = false,
         onlyIfLeft = false,
-        speedMult = 1.0
+        speedMult = 1.0,
+        angleFix = false
     }
 }
 
