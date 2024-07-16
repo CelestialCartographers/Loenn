@@ -82,47 +82,58 @@ ui.settings_window.group.general.backups=Backups
 ui.settings_window.group.general.files=Files
 
 ui.settings_window.tab.editor=Editor
+ui.settings_window.group.editor.interface=Interface
 ui.settings_window.group.editor.clipboard=Clipboard
 ui.settings_window.group.editor.tools=Tools
 ui.settings_window.group.editor.triggers=Triggers
+ui.settings_window.group.editor.search=Search
 
 ui.settings_window.tab.hotkeys=Hotkeys
 ui.settings_window.group.hotkeys.general=General
 ui.settings_window.group.hotkeys.map_view=Map View
 ui.settings_window.group.hotkeys.selections=Selections
 ui.settings_window.group.hotkeys.rooms=Rooms
+ui.settings_window.group.hotkeys.lists=Lists
+ui.settings_window.group.hotkeys.search=Search
 ui.settings_window.group.hotkeys.debug=Debug
 
 ui.settings_window.tab.graphics=Graphics
 
-ui.settings_window.tab.interface=Interface
-
 ui.settings_window.tab.debug=Debug
 
-# Interface settings
-settings.ui.lists.attribute.shrinkToFit=Shrink To Fit
-settings.ui.searching.attribute.searchCaseSensitive=Search Case Sensitive
-settings.ui.searching.attribute.searchExitAndClearKey=Search Exit And Clear Key
-settings.ui.searching.attribute.searchExitKey=Search Exit Key
-settings.ui.searching.attribute.searchFuzzy=Fuzzy Search
-settings.ui.searching.attribute.searchNextResultKey=Search Next Result Key
-settings.ui.searching.attribute.searchPreviousResultKey=Search Previous Result Key
-settings.ui.searching.attribute.searchRearrangeModifier=Search Rearrange Modifier
-settings.ui.searching.attribute.searchSelectKey=Search Select Key
-settings.ui.searching.attribute.sortByScore=Sort By Score
-settings.ui.theme.attribute.themeName=Theme Name
+# Settings - Editor - Interface
+settings.ui.theme.attribute.themeName=Theme
+settings.ui.lists.attribute.shrinkToFit=Adapt List Width to Content
 
-settings.ui.lists.description.shrinkToFit=Shrink To Fit
-settings.ui.searching.description.searchCaseSensitive=Search Case Sensitive
-settings.ui.searching.description.searchExitAndClearKey=Search Exit And Clear Key
-settings.ui.searching.description.searchExitKey=Search Exit Key
-settings.ui.searching.description.searchFuzzy=Fuzzy Search
-settings.ui.searching.description.searchNextResultKey=Search Next Result Key
-settings.ui.searching.description.searchPreviousResultKey=Search Previous Result Key
-settings.ui.searching.description.searchRearrangeModifier=Search Rearrange Modifier
-settings.ui.searching.description.searchSelectKey=Search Select Key
-settings.ui.searching.description.sortByScore=Sort By Score
-settings.ui.theme.description.themeName=Theme Name
+settings.ui.theme.description.themeName=Visual theme used by Lönn. Additional themes can be added through plugins.
+settings.ui.lists.description.shrinkToFit=Make the lists on the sides exactly as wide as needed to display the content.\nIf disabled, lists will adapt to always fit the largest content.
+
+# Settings - Editor - Search
+settings.ui.searching.attribute.searchCaseSensitive=Case Sensitive Search
+settings.ui.searching.attribute.searchFuzzy=Always Use Fuzzy Search
+settings.ui.searching.attribute.sortByScore=Show Closest Matches First
+
+settings.ui.searching.description.searchCaseSensitive=When search should be case-sensitive.\n- Contextual: Match case when searching if the search term contains upper-case characters.\n- Always: Match case when searching.\n- Never: Ignore case when searching.
+settings.ui.searching.description.searchFuzzy=Force search to always do fuzzy matching.\nFuzzy search does not need entries to exactly match the search term, other closely matching results will be shown as well.\nIf disabled, fuzzy search may still be performed by starting the search with a ~ tilde sign.
+settings.ui.searching.description.sortByScore=Order search results such that the closest matches show up at the top.\nIf disabled, search results are sorted alphabetically.
+
+# # Settings - Hotkeys - Lists
+settings.ui.searching.attribute.searchPreviousResultKey=Previous Element
+settings.ui.searching.attribute.searchNextResultKey=Next Element
+settings.ui.searching.attribute.searchRearrangeModifier=Rearrange Elements (Modifier)
+
+settings.ui.searching.description.searchPreviousResultKey=Moves up in the list.
+settings.ui.searching.description.searchNextResultKey=Moves down in the list.
+settings.ui.searching.description.searchRearrangeModifier=Pressing 'Previous Element' or 'Next Element' will move the currently selected element up or down.\nOnly for lists that can be rearranged (such as the styleground list).
+
+# Settings - Hotkeys - Search
+settings.ui.searching.attribute.searchExitKey=Exit Search
+settings.ui.searching.attribute.searchExitAndClearKey=Clear And Exit Search
+settings.ui.searching.attribute.searchSelectKey=Select And Exit Search
+
+settings.ui.searching.description.searchExitKey=Exit the search field.
+settings.ui.searching.description.searchExitAndClearKey=Clear the search field and exit it.
+settings.ui.searching.description.searchSelectKey=Select the current element and exit the search field.
 
 # Dependency Window
 ui.dependency_window.window_title=Dependencies

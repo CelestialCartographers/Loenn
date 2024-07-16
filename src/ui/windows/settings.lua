@@ -57,6 +57,14 @@ local defaultTabForms = {
         title = "ui.settings_window.tab.editor",
         groups = {
             {
+                title = "ui.settings_window.group.editor.interface",
+                fieldOrder = {
+                    "ui.theme.themeName",
+                    "spacer",
+                    "ui.lists.shrinkToFit",
+                }
+            },
+            {
                 title = "ui.settings_window.group.editor.clipboard",
                 fieldOrder = {
                     "editor.copyUsesClipboard",
@@ -76,6 +84,15 @@ local defaultTabForms = {
                     "editor.triggersUseCategoryColors",
                 }
             },
+            {
+                title = "ui.settings_window.group.editor.search",
+                fieldOrder = {
+                    "ui.searching.searchCaseSensitive",
+                    "spacer",
+                    "ui.searching.searchFuzzy",
+                    "ui.searching.sortByScore"
+                }
+            }
         },
     },
     {
@@ -159,6 +176,22 @@ local defaultTabForms = {
                 }
             },
             {
+                title = "ui.settings_window.group.hotkeys.lists",
+                fieldOrder = {
+                    "ui.searching.searchPreviousResultKey",
+                    "ui.searching.searchNextResultKey",
+                    "ui.searching.searchRearrangeModifier"
+                }
+            },
+            {
+                title = "ui.settings_window.group.hotkeys.search",
+                fieldOrder = {
+                    "ui.searching.searchExitKey",
+                    "ui.searching.searchExitAndClearKey",
+                    "ui.searching.searchSelectKey"
+                }
+            },
+            {
                 title = "ui.settings_window.group.hotkeys.debug",
                 fieldOrder = {
                     "hotkeys.debugReloadEntities",
@@ -187,22 +220,6 @@ local defaultTabForms = {
             -- "graphics.unfocusedDrawRate",
             -- "graphics.unfocusedMainLoopSleep",
             -- "graphics.unfocusedUpdateRate",
-        }
-    },
-    {
-        title = "ui.settings_window.tab.interface",
-        fieldOrder = {
-            "ui.lists.shrinkToFit",
-            "ui.searching.searchCaseSensitive",
-            "ui.searching.searchExitAndClearKey",
-            "ui.searching.searchExitKey",
-            "ui.searching.searchFuzzy",
-            "ui.searching.searchNextResultKey",
-            "ui.searching.searchPreviousResultKey",
-            "ui.searching.searchRearrangeModifier",
-            "ui.searching.searchSelectKey",
-            "ui.searching.sortByScore",
-            "ui.theme.themeName",
         }
     },
     {
