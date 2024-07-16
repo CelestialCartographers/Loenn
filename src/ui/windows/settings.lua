@@ -506,8 +506,15 @@ local function prepareFormData()
     return utils.deepcopy(data)
 end
 
-local function saveSettings(formFields)
+local function applyNewSettings(newSettings, oldSettings)
     -- TODO - Reload hotkeys
+
+    if newSettings.ui.theme.themeName ~= oldSettings.ui.theme.themeName then
+        themes.useTheme(newSettings.ui.theme.themeName)
+    end
+end
+
+local function saveSettings(formFields)
 
     local newSettings = form.getFormData(formFields)
     local oldSettings = rawget(configs, "data")
@@ -516,6 +523,8 @@ local function saveSettings(formFields)
 
     rawset(configs, "data", newSettings)
     config.writeConfig(configs, true)
+
+    applyNewSettings(newSettings, oldSettings)
 end
 
 local function prepareTabForm(language, tabData, fieldInformation, formData, buttons)
