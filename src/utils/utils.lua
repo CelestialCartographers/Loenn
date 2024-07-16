@@ -798,7 +798,7 @@ function utils.mergeTables(from, to)
             madeChanges = true
 
         elseif type(to[k]) == "table" and type(v) == "table" then
-            madeChanges = madeChanges or utils.mergeTables(v, to[k])
+            madeChanges = utils.mergeTables(v, to[k]) or madeChanges
         end
     end
 
