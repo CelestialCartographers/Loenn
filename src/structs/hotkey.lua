@@ -1,5 +1,8 @@
 local keyboardHelper = require("utils.keyboard")
 
+local defaultScope = "global"
+local defaultScopes = {defaultScope}
+
 local specialKeyAliases = {
     plus = "+",
     minus = "-",
@@ -88,12 +91,19 @@ function hotkeyStruct.callbackIfActive(hotkey, ...)
     end
 end
 
-function hotkeyStruct.callbackFirstActive(hotkeys, ...)
-    for i, hotkey in ipairs(hotkeys) do
-        if hotkey:active() then
-            hotkey(...)
+function hotkeyStruct.callbackFirstActive(hotkeys, scopes, ...)
+    scopes = scopes or defaultScopes
 
-            return true, i
+    local scopeLookup = table.flip(scopes)
+
+    for i, hotkey in ipairs(hotkeys) do
+        -- Skip any hotkeys that doesn't match specified scope
+        if scopeLookup[hotkey.scope] then
+            if hotkey:active() then
+                hotkey(...)
+
+                return true, i
+            end
         end
     end
 
@@ -114,14 +124,16 @@ function hotkeyMt:__call(...)
     self:callback(...)
 end
 
-function hotkeyStruct.createHotkey(activator, callback)
+function hotkeyStruct.createHotkey(scope, activator, callback, options)
     local hotkey = {
         _type = "hotkey",
         _rawActivator = activator
     }
 
+    hotkey.scope = scope or defaultScope
     hotkey.callback = callback
     hotkey.activator = hotkeyStruct.sanitize(activator)
+    hotkey.options = options
     hotkey.enabled = true
 
     return setmetatable(hotkey, hotkeyMt)

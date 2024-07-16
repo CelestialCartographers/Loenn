@@ -124,6 +124,13 @@ function debugUtils.clearRuntimeAtlases()
     atlases.loadCelesteAtlases()
 end
 
+function debugUtils.reloadHotkeys()
+    -- Load late, standard hotkeys uses debug utils
+    local hotkeyHandler = require("hotkey_handler")
+
+    hotkeyHandler.reloadHotkeys()
+end
+
 function debugUtils.redrawMap()
     logging.info("Redrawing map")
 
@@ -139,6 +146,7 @@ function debugUtils.reloadEverything()
     logging.info("Reloading everything")
 
     debugUtils.clearRuntimeAtlases()
+    debugUtils.reloadHotkeys()
     debugUtils.reloadLanguageFiles()
     debugUtils.reloadLibraries()
     debugUtils.reloadSaveSanitizers()

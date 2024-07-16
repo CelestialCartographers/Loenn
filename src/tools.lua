@@ -13,6 +13,14 @@ toolHandler.tools = {}
 toolHandler.currentTool = nil
 toolHandler.currentToolName = nil
 
+function toolHandler.addHotkeyScopes(scopes)
+    table.insert(scopes, "tools")
+
+    if toolHandler.currentToolName then
+        table.insert(scopes, string.format("tools.%s", toolHandler.currentToolName))
+    end
+end
+
 function toolHandler.selectTool(name)
     local handler = toolHandler.tools[name]
     local currentTool = toolHandler.currentTool

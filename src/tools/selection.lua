@@ -13,12 +13,12 @@ local keyboardHelper = require("utils.keyboard")
 local toolUtils = require("tool_utils")
 local history = require("history")
 local snapshotUtils = require("snapshot_utils")
-local hotkeyStruct = require("structs.hotkey")
 local layerHandlers = require("layer_handlers")
 local placementUtils = require("placement_utils")
 local cursorUtils = require("utils.cursor")
 local nodeStruct = require("structs.node")
 local tiles = require("tiles")
+local hotkeyHandler = require("hotkey_handler")
 
 local tool = {}
 
@@ -100,16 +100,6 @@ local selectionRotationKeys = {
     {"itemRotateLeft", -1},
     {"itemRotateRight", 1}
 }
-
-function tool.load()
-    tool.setSelectionTargets({})
-    tool.setSelectionPreviews({})
-end
-
-function tool.unselect()
-    tool.setSelectionTargets({})
-    tool.setSelectionPreviews({})
-end
 
 function tool.getSelectionTargets()
     return state.selectionToolTargets
@@ -1250,16 +1240,6 @@ local function areaFlipHotkeyCommon(horizontal, vertical)
     end
 end
 
-local toolHotkeys = {
-    hotkeyStruct.createHotkey(configs.hotkeys.itemAreaFlipHorizontal, areaFlipHotkeyCommon(true, false)),
-    hotkeyStruct.createHotkey(configs.hotkeys.itemAreaFlipVertical, areaFlipHotkeyCommon(false, true)),
-    hotkeyStruct.createHotkey(configs.hotkeys.itemsCopy, copyItemsHotkey),
-    hotkeyStruct.createHotkey(configs.hotkeys.itemsPaste, pasteItemsHotkey),
-    hotkeyStruct.createHotkey(configs.hotkeys.itemsCut, cutItemsHotkey),
-    hotkeyStruct.createHotkey(configs.hotkeys.itemsSelectAll, selectAllHotkey),
-    hotkeyStruct.createHotkey(configs.hotkeys.itemsDeselect, deselectHotkey),
-}
-
 -- Modifier keys that update behavior/visuals
 local behaviorUpdatingModifiersKey = {
     configs.editor.precisionModifier,
@@ -1502,10 +1482,6 @@ function tool.keypressed(key, scancode, isrepeat)
     local room = state.getSelectedRoom()
     local handled = false
 
-    if not isrepeat then
-        handled = hotkeyStruct.callbackFirstActive(toolHotkeys)
-    end
-
     updateVisualsOnBehaviorChange()
 
     if selectionTargets and room then
@@ -1547,6 +1523,30 @@ function tool.draw()
             drawSelectionRectangles(room)
         end
     end
+end
+
+local function addHotkeys()
+    local hotkeyScope = string.format("tools.%s", tool.name)
+
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemAreaFlipHorizontal, areaFlipHotkeyCommon(true, false))
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemAreaFlipVertical, areaFlipHotkeyCommon(false, true))
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemsCopy, copyItemsHotkey)
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemsPaste, pasteItemsHotkey)
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemsCut, cutItemsHotkey)
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemsSelectAll, selectAllHotkey)
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemsDeselect, deselectHotkey)
+end
+
+function tool.load()
+    tool.setSelectionTargets({})
+    tool.setSelectionPreviews({})
+
+    addHotkeys()
+end
+
+function tool.unselect()
+    tool.setSelectionTargets({})
+    tool.setSelectionPreviews({})
 end
 
 return tool
