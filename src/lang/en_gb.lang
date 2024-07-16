@@ -78,6 +78,7 @@ decals.attribute.scaleY=Scale Y
 decals.attribute.texture=Texture
 decals.attribute.rotation=Rotation
 decals.attribute.color=Colour
+decals.attribute.depth=Depth
 decals.description.x=X position of the decal.
 decals.description.y=Y position of the decal.
 decals.description.scaleX=Horizontal scale of the decal.
@@ -85,6 +86,7 @@ decals.description.scaleY=Vertical scale of the decal.
 decals.description.texture=Texture path of the decal.
 decals.description.rotation=Rotation of the decal in degrees.
 decals.description.color=Colour of the decal.
+decals.description.depth=Depth of the decal. Determines render order.\nLeave this empty to use the default depth of this decal.\nLower values put the decal further into the foreground.
 
 
 # -- Entities --
@@ -913,6 +915,7 @@ entities.birdPath.placements.name.bird_path=Bird Path
 entities.birdPath.attributes.description.only_once=If the bird will only fly the path once, and not come back on death or room transitions.
 entities.birdPath.attributes.description.onlyIfLeft=The bird will only fly if the player is to the left of the entity.
 entities.birdPath.attributes.description.speedMult=Speed multiplier for the flight speed.
+entities.birdPath.attributes.description.angleFix=Changes rotation logic of the flight animation to resolve visual issues when using speed multipliers smaller than 1.
 
 # Fake Crystal Heart
 entities.fakeHeart.placements.name.crystal_heart=Crystal Heart (Fake)
@@ -1718,13 +1721,13 @@ dependencies.category.effect=Effects
 # General - Startup
 settings.attribute.celesteGameDirectory=Celeste Game Directory
 settings.general.attribute.language=Language
-settings.general.attribute.persistWindowFullScreen=Remember Full Screen
+settings.general.attribute.persistWindowFullscreen=Remember Full Screen
 settings.general.attribute.persistWindowPosition=Remember Window Position
 settings.general.attribute.persistWindowSize=Remember Window Size
 
-settings.description.celesteGameDirectory=Directory of the Celeste installation. Must contain Celeste.dll and the Content directory.
+settings.description.celesteGameDirectory=Directory of the Celeste installation. Must contain Celeste.dll and the Content directory.\nSelect Celeste.exe, Celeste.dll, or Celeste.app in the file picker to change this.
 settings.general.description.language=Language used in the application.
-settings.general.description.persistWindowFullScreen=Remember whether the editor was fullscreen between sessions.
+settings.general.description.persistWindowFullscreen=Remember whether the editor was fullscreen between sessions.
 settings.general.description.persistWindowPosition=Remember the position of the editor window between sessions.
 settings.general.description.persistWindowSize=Remember the size of the editor window between sessions.
 
