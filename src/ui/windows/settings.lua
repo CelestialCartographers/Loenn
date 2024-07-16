@@ -525,8 +525,18 @@ local function prepareFormData()
 end
 
 local function applyNewSettings(newSettings, oldSettings)
-    if newSettings.ui.theme.themeName ~= oldSettings.ui.theme.themeName then
+    local function settingChanged(key)
+        local parts = $(key):split(".")()
+
+        return utils.getPath(newSettings, parts) ~= utils.getPath(oldSettings, parts)
+    end
+
+    if settingChanged("ui.theme.themeName") then
         themes.useTheme(newSettings.ui.theme.themeName)
+    end
+
+    if settingChanged("editor.triggersTrimModName") or settingChanged("editor.triggersUseCategoryColors") then
+        debugUtils.redrawMap()
     end
 
     -- Reload hotkeys, tools and libraries
