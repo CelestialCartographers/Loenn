@@ -6,70 +6,60 @@ local history = require("history")
 local roomHotkeyUtils = require("room_hotkey_utils")
 local windowUtils = require("window_utils")
 
-local hotkeyStruct = require("structs.hotkey")
-
--- TODO - Language file
--- TODO - Clean up this file at some point when we start getting a few actuall hotkeys
--- TODO - Support hotswapping hotkey activators
--- TODO - Use language file
-local rawHotkeys = {
-    {configs.hotkeys.redo, history.redo, "Redo last action"},
-    {configs.hotkeys.undo, history.undo, "Undo last action"},
-    {configs.hotkeys.new, loadedState.newMap, "New map"},
-    {configs.hotkeys.open, loadedState.openMap, "Open file"},
-    {configs.hotkeys.save, (-> loadedState.saveCurrentMap()), "Save file"},
-    {configs.hotkeys.saveAs, (-> loadedState.saveAsCurrentMap()), "Save file as"},
-
-    -- Room Movement
-    {configs.hotkeys.roomMoveLeft, roomHotkeyUtils.moveCurrentRoomOneTileLeft, "Move room left one tile"},
-    {configs.hotkeys.roomMoveRight, roomHotkeyUtils.moveCurrentRoomOneTileRight, "Move room right one tile"},
-    {configs.hotkeys.roomMoveUp, roomHotkeyUtils.moveCurrentRoomOneTileUp, "Move room up one tile"},
-    {configs.hotkeys.roomMoveDown, roomHotkeyUtils.moveCurrentRoomOneTileDown, "Move room down one tile"},
-
-    {configs.hotkeys.roomMoveLeftPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelLeft, "Move room left one pixel"},
-    {configs.hotkeys.roomMoveRightPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelRight, "Move room right one pixel"},
-    {configs.hotkeys.roomMoveUpPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelUp, "Move room up one pixel"},
-    {configs.hotkeys.roomMoveDownPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelDown, "Move room down one pixel"},
-
-    -- Room Resizing
-    {configs.hotkeys.roomResizeLeftGrow, roomHotkeyUtils.growCurrentRoomOneTileLeft, "Grow room one tile left"},
-    {configs.hotkeys.roomResizeRightGrow, roomHotkeyUtils.growCurrentRoomOneTileRight, "Grow room one tile right"},
-    {configs.hotkeys.roomResizeUpGrow, roomHotkeyUtils.growCurrentRoomOneTileUp, "Grow room one tile up"},
-    {configs.hotkeys.roomResizeDownGrow, roomHotkeyUtils.growCurrentRoomOneTileDown, "Grow room one tile down"},
-
-    {configs.hotkeys.roomResizeLeftShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileLeft, "Shrink room one tile left"},
-    {configs.hotkeys.roomResizeRightShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileRight, "Shrink room one tile right"},
-    {configs.hotkeys.roomResizeUpShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileUp, "Shrink room one tile up"},
-    {configs.hotkeys.roomResizeDownShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileDown, "Shrink room one tile down"},
-
-    -- Room
-    {configs.hotkeys.roomDelete, roomHotkeyUtils.deleteSelectedRoom, "Delete selected room"},
-    {configs.hotkeys.roomAddNew, roomHotkeyUtils.addRoom, "Add new room"},
-    {configs.hotkeys.roomConfigureCurrent, roomHotkeyUtils.configureSelectedRoom, "Edit selected room"},
-
-    -- Debug hotkeys
-    {configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything, "Reload everything™"},
-    {configs.hotkeys.debugReloadLuaInstance, debugUtils.restartLuaInstance, "Reload Lua instance"},
-    {configs.hotkeys.debugReloadEntities, debugUtils.reloadEntities, "Reload entities"},
-    {configs.hotkeys.debugReloadTools, debugUtils.reloadTools, "Reload tools"},
-    {configs.hotkeys.debugRedrawMap, debugUtils.redrawMap, "Redraw map"},
-    {configs.hotkeys.debugMode, debugUtils.debug, "Debug mode"},
-
-    -- Camera
-    {configs.hotkeys.cameraZoomIn, viewportHandler.zoomIn, "Zoom in"},
-    {configs.hotkeys.cameraZoomOut, viewportHandler.zoomOut, "Zoom out"},
-
-    -- Window
-    {configs.hotkeys.toggleFullscreen, windowUtils.toggleFullscreen, "Toggle fullscreen"}
-}
-
 local hotkeys = {}
 
-for _, data in ipairs(rawHotkeys) do
-    local activation, callback, description = data[1], data[2], data[3]
-    local hotkey = hotkeyStruct.createHotkey(activation, callback)
+function hotkeys.addStandardHotkeys(hotkeyHandler)
+    -- History
+    hotkeyHandler.addHotkey("global", configs.hotkeys.redo, history.redo)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.undo, history.undo)
 
-    table.insert(hotkeys, hotkey)
+    -- Map
+    hotkeyHandler.addHotkey("global", configs.hotkeys.new, loadedState.newMap)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.open, loadedState.openMap)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.save, (-> loadedState.saveCurrentMap()))
+    hotkeyHandler.addHotkey("global", configs.hotkeys.saveAs, (-> loadedState.saveAsCurrentMap()))
+
+    -- Room Movement
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomMoveLeft, roomHotkeyUtils.moveCurrentRoomOneTileLeft)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomMoveRight, roomHotkeyUtils.moveCurrentRoomOneTileRight)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomMoveUp, roomHotkeyUtils.moveCurrentRoomOneTileUp)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomMoveDown, roomHotkeyUtils.moveCurrentRoomOneTileDown)
+
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomMoveLeftPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelLeft)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomMoveRightPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelRight)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomMoveUpPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelUp)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomMoveDownPrecise, roomHotkeyUtils.moveCurrentRoomOnePixelDown)
+
+    -- Room Resizing
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomResizeLeftGrow, roomHotkeyUtils.growCurrentRoomOneTileLeft)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomResizeRightGrow, roomHotkeyUtils.growCurrentRoomOneTileRight)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomResizeUpGrow, roomHotkeyUtils.growCurrentRoomOneTileUp)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomResizeDownGrow, roomHotkeyUtils.growCurrentRoomOneTileDown)
+
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomResizeLeftShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileLeft)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomResizeRightShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileRight)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomResizeUpShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileUp)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomResizeDownShrink, roomHotkeyUtils.shrinkCurrentRoomOneTileDown)
+
+    -- Room
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomDelete, roomHotkeyUtils.deleteSelectedRoom)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomAddNew, roomHotkeyUtils.addRoom)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.roomConfigureCurrent, roomHotkeyUtils.configureSelectedRoom)
+
+    -- Debug hotkeys
+    hotkeyHandler.addHotkey("global", configs.hotkeys.debugReloadEverything, debugUtils.reloadEverything)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.debugReloadLuaInstance, debugUtils.restartLuaInstance)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.debugReloadEntities, debugUtils.reloadEntities)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.debugReloadTools, debugUtils.reloadTools)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.debugRedrawMap, debugUtils.redrawMap)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.debugMode, debugUtils.debug)
+
+    -- Camera
+    hotkeyHandler.addHotkey("global", configs.hotkeys.cameraZoomIn, viewportHandler.zoomIn)
+    hotkeyHandler.addHotkey("global", configs.hotkeys.cameraZoomOut, viewportHandler.zoomOut)
+
+    -- Window
+    hotkeyHandler.addHotkey("global", configs.hotkeys.toggleFullscreen, windowUtils.toggleFullscreen)
 end
 
 return hotkeys

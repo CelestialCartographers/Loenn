@@ -42,12 +42,11 @@ function editorScene:firstEnter()
 
     local backups = require("backups")
     local inputDevice = require("input_device")
-    local standardHotkeys = require("standard_hotkeys")
     local updater = require("updater")
     local hotkeyHandler = require("hotkey_handler")
 
     local viewportDevice = require("input_devices.viewport_device")
-    local hotkeyDevice = hotkeyHandler.createHotkeyDevice(standardHotkeys)
+    local hotkeyDevice = hotkeyHandler.createHotkeyDevice()
     local backupDevice = backups.createBackupDevice()
     local userInterfaceDevice = require("ui.ui_device")
     local mapLoaderDevice = require("input_devices.map_loader")
@@ -58,6 +57,8 @@ function editorScene:firstEnter()
     local inputCaptureDevice = require("input_devices.input_capture_device")
     local titleUpdaterDevice = require("input_devices.title_updater")
     local hudDevice = require("input_devices.hud_device")
+
+    hotkeyHandler.addStandardHotkeys()
 
     inputDevice.newInputDevice(self.inputDevices, inputCaptureDevice)
     inputDevice.newInputDevice(self.inputDevices, hudDevice)

@@ -1,31 +1,47 @@
 local hotkeyStruct = require("structs.hotkey")
+local standardHotkeys = require("standard_hotkeys")
 local utils = require("utils")
+local tools = require("tools")
 
-local defaultHotkeys = {}
+local registeredHotkeys = {}
 local hotkeyHandler = {}
 
--- Register hotkey to hotkey group registerHotkey(hotkey[, group])
--- Make a hotkey and then add to hotkey group registerHotkey(activator, callback[, group])
-function hotkeyHandler.registerHotkey(hotkey, hotkeys)
-    hotkeys = hotkeys or defaultHotkeys
+function hotkeyHandler.addHotkey(scope, activator, callback, options)
+    local hotkey
 
-    table.insert(hotkeys, hotkey)
+    if utils.typeof(scope) == "hotkey" then
+        hotkey = scope
+    end
+
+    hotkey = hotkeyStruct.createHotkey(scope, activator, callback, options)
+
+    table.insert(registeredHotkeys, hotkey)
 end
 
-function hotkeyHandler.createAndRegisterHotkey(activator, callback, hotkeys)
-    hotkeyHandler.registerHotkey(hotkeyStruct.createHotkey(activator, callback), hotkeys)
+function hotkeyHandler.addStandardHotkeys()
+    standardHotkeys.addStandardHotkeys(hotkeyHandler)
 end
 
-function hotkeyHandler.createHotkeyDevice(hotkeys)
+function hotkeyHandler.reloadHotkeys()
+    table.clear(registeredHotkeys)
+
+    standardHotkeys.addStandardHotkeys(hotkeyHandler)
+end
+
+function hotkeyHandler.createHotkeyDevice()
     local device = {
         _type = "device",
         _enabled = true
     }
 
-    device.hotkeys = hotkeys or defaultHotkeys
+    device.hotkeys = registeredHotkeys
 
     function device.keypressed(key, scancode, isrepeat)
-        return hotkeyStruct.callbackFirstActive(device.hotkeys)
+        local scopes = {"global"}
+
+        tools.addHotkeyScopes(scopes)
+
+        return hotkeyStruct.callbackFirstActive(registeredHotkeys, scopes)
     end
 
     return device
