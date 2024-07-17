@@ -8,7 +8,7 @@ local languageRegistry = require("language_registry")
 local colorPicker = {}
 
 local pickerAreaMinimumSize = 200
-local sliderMinimumWidth = 40
+local sliderMinimumWidth = 24
 local hsvFieldDecimals = 2
 
 local valueRanges = {
@@ -47,16 +47,53 @@ local areaHSVPixelCode = [===[
     }
 ]===]
 
-local areaHSVShader = love.graphics.newShader(areaHSVPixelCode)
+local alphaPixelCode = [===[
+    uniform float hue;
+    uniform float saturation;
+    uniform float value;
 
-local function updateAreaColors(hue)
+    uniform float width;
+    uniform float height;
+
+    float checkerSize = 4;
+
+    vec4 whiteChecker = vec4(1.0, 1.0, 1.0, 1.0);
+    vec4 darkChecker = vec4(0.5, 0.5, 0.5, 1.0);
+
+    vec3 hsv_to_rgb(float h, float s, float v) {
+        return mix(vec3(1.0), clamp((abs(fract(h + vec3(3.0, 2.0, 1.0) / 3.0) * 6.0 - 3.0) - 1.0), 0.0, 1.0), s) * v;
+    }
+
+    vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
+    {
+        float x = width * texture_coords[0];
+        float y = height * texture_coords[1];
+
+        float colorIndex = mod(floor(x / checkerSize) + floor(y / checkerSize), 2.0);
+        vec4 checkerColor = colorIndex == 0 ? whiteChecker : darkChecker;
+
+        vec3 selectedColor = hsv_to_rgb(hue, saturation, value);
+        vec4 selectedColorAlpha = vec4(selectedColor[0], selectedColor[1], selectedColor[2], 1);
+
+        return mix(checkerColor, selectedColorAlpha, texture_coords[0]);
+    }
+]===]
+
+local areaHSVShader = love.graphics.newShader(areaHSVPixelCode)
+local alphaShader = love.graphics.newShader(alphaPixelCode)
+
+local function updateShaderHSV(hue, saturation, value)
     areaHSVShader:send("hue", hue)
+
+    alphaShader:send("hue", hue)
+    alphaShader:send("saturation", saturation)
+    alphaShader:send("value", value)
 end
 
 local function getColorPickerArea(h, s, v, width, height)
     local canvas = love.graphics.newCanvas(width, height)
 
-    updateAreaColors(h)
+    updateShaderHSV(h, s, v)
 
     return canvas
 end
@@ -67,7 +104,7 @@ local function getColorPickerSlider(h, s, v, width, height)
     local imageData = canvas:newImageData()
 
     imageData:mapPixel(function(x, y, r, g, b, a)
-        local hue = y / (height - 1)
+        local hue = x / (width - 1)
         local cr, cg, cb = utils.hsvToRgb(hue, 1, 1)
 
         return cr, cg, cb, 1
@@ -76,6 +113,17 @@ local function getColorPickerSlider(h, s, v, width, height)
     local image = love.graphics.newImage(imageData)
 
     return image, imageData
+end
+
+local function getAlphaSlider(h, s, v, width, height)
+    local canvas = love.graphics.newCanvas(width, height)
+
+    updateShaderHSV(h, s, v)
+
+    alphaShader:send("width", width)
+    alphaShader:send("height", height)
+
+    return canvas
 end
 
 local function areaInteraction(interactionData)
@@ -103,14 +151,30 @@ local function sliderInteraction(interactionData)
         local areaSize = interactionData.areaSize
         local formFields = interactionData.formFields
 
-        local innerY = utils.clamp(y - widget.screenY, 0, areaSize)
-        local hue = innerY / areaSize
+        local innerX = utils.clamp(x - widget.screenX, 0, areaSize)
+        local hue = innerX / areaSize
         local data = formHelper.getFormData(formFields)
 
         data.h = utils.round(hue * 360, hsvFieldDecimals)
         interactionData.forceFieldUpdate = true
 
-        updateAreaColors(hue)
+        updateShaderHSV(hue, data.s / 100, data.v / 100)
+        formHelper.setFormData(formFields, data)
+    end
+end
+
+local function alphaInteraction(interactionData)
+    return function(widget, x, y)
+        local areaSize = interactionData.areaSize
+        local formFields = interactionData.formFields
+
+        local innerX = utils.clamp(x - widget.screenX, 0, areaSize)
+        local percent = innerX / areaSize
+        local data = formHelper.getFormData(formFields)
+
+        data.alpha = utils.round(percent * 255)
+        interactionData.forceFieldUpdate = true
+
         formHelper.setFormData(formFields, data)
     end
 end
@@ -220,7 +284,7 @@ local function updateFields(data, changedGroup, interactionData)
         updateHexField(data, r, g, b, alpha)
     end
 
-    updateAreaColors((data.h or 0) / 360)
+    updateShaderHSV((data.h or 0) / 360, (data.s or 0) / 100, (data.v or 0) / 100)
 
     if callback then
         callback(data)
@@ -288,18 +352,44 @@ local function sliderDrawIndication(interactionData)
         local formData = formHelper.getFormData(interactionData.formFields)
         local areaSize = interactionData.areaSize
         local sliderWidth = interactionData.sliderWidth
-        local y = utils.round((formData.h or 0) / 360 * areaSize)
+        local x = utils.round((formData.h or 0) / 360 * areaSize)
         local widgetX, widgetY = widget.screenX, widget.screenY
-        local sliderY = widgetY + y
-        local width, height = widget.width, widget.height
+        local sliderX = widgetX + x
         local pr, pg, pb, pa = love.graphics.getColor()
         local previousLineWidth = love.graphics.getLineWidth()
 
         love.graphics.setLineWidth(1)
         love.graphics.setColor(0, 0, 0, 1)
-        love.graphics.rectangle("fill", widgetX, sliderY - 1, sliderWidth, 3)
+        love.graphics.rectangle("fill", sliderX - 1, widgetY, 3, sliderWidth)
         love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.rectangle("fill", widgetX + 1, sliderY, sliderWidth - 2, 1)
+        love.graphics.rectangle("fill", sliderX, widgetY + 1, 1, sliderWidth - 2)
+        love.graphics.setLineWidth(previousLineWidth)
+        love.graphics.setColor(pr, pg, pb, pa)
+    end
+end
+
+local function alphaDrawIndication(interactionData)
+    return function(orig, widget)
+        local previousShader = love.graphics.getShader()
+
+        love.graphics.setShader(alphaShader)
+        orig(widget)
+        love.graphics.setShader(previousShader)
+
+        local formData = formHelper.getFormData(interactionData.formFields)
+        local areaSize = interactionData.areaSize
+        local sliderWidth = interactionData.sliderWidth
+        local x = utils.round((formData.alpha or 0) / 255 * areaSize)
+        local widgetX, widgetY = widget.screenX, widget.screenY
+        local sliderX = widgetX + x
+        local pr, pg, pb, pa = love.graphics.getColor()
+        local previousLineWidth = love.graphics.getLineWidth()
+
+        love.graphics.setLineWidth(1)
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.rectangle("fill", sliderX - 1, widgetY, 3, sliderWidth)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.rectangle("fill", sliderX, widgetY + 1, 1, sliderWidth - 2)
         love.graphics.setLineWidth(previousLineWidth)
         love.graphics.setColor(pr, pg, pb, pa)
     end
@@ -319,6 +409,7 @@ function colorPicker.getColorPicker(hexColor, options)
         r = (r or 0) * 255,
         g = (g or 0) * 255,
         b = (b or 0) * 255,
+        alpha = (a or 0) * 255,
         h = utils.round(h * 360, hsvFieldDecimals),
         s = utils.round(s * 100, hsvFieldDecimals),
         v = utils.round(v * 100, hsvFieldDecimals),
@@ -361,12 +452,14 @@ function colorPicker.getColorPicker(hexColor, options)
     local sliderWidth = options.sliderWidth or sliderMinimumWidth
 
     local areaCanvas = getColorPickerArea(h, s, v, areaSize, areaSize)
-    local sliderImage, sliderImageData = getColorPickerSlider(h, s, v, sliderWidth, areaSize)
+    local alphaCanvas = getAlphaSlider(h, s, v, areaSize, sliderWidth)
+    local sliderImage, sliderImageData = getColorPickerSlider(h, s, v, areaSize, sliderWidth)
 
     local interactionData = {
         areaCanvas = areaCanvas,
         sliderImage = sliderImage,
         sliderImageData = sliderImageData,
+        alphaCanvas = alphaCanvas,
         formFields = formFields,
         areaSize = areaSize,
         sliderWidth = sliderWidth,
@@ -388,11 +481,35 @@ function colorPicker.getColorPicker(hexColor, options)
     }):hook({
         draw = sliderDrawIndication(interactionData)
     })
+    local alphaElement = uiElements.image(alphaCanvas):with({
+        interactive = 1,
+        onDrag = alphaInteraction(interactionData),
+        onClick = alphaInteraction(interactionData)
+    }):hook({
+        draw = alphaDrawIndication(interactionData)
+    })
+
+    local interactibleRows = {
+        areaElement,
+        sliderElement,
+    }
+
+    if options.showAlpha then
+        table.insert(interactibleRows, alphaElement)
+    end
 
     local columns = {
-        areaElement,
-        sliderElement
+        uiElements.column(interactibleRows),
     }
+
+    -- Make sure child elements repaint
+    columns[1]:hook({
+        update = function(orig, self, dt)
+            self:repaint()
+
+            orig(self)
+        end
+    })
 
     if #fieldOrder > 0 then
         table.insert(columns, formBody)
