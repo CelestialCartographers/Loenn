@@ -29,7 +29,13 @@ function integerField.getElement(name, value, options)
     local allowEmpty = options.allowEmpty or false
 
     options.valueTransformer = tonumber
-    options.displayTransformer = tostring
+    options.displayTransformer = function(v)
+        if allowEmpty and value == nil then
+            return ""
+        end
+
+        return tostring(v)
+    end
     options.warningValidator = function(v, raw)
         return valueValidator(raw, v, allowEmpty, warningBelowValue, warningAboveValue)
     end
