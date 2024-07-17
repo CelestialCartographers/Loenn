@@ -413,8 +413,7 @@ function decals.fieldInformation(layer, decal)
         },
         depth = {
             fieldType = "integer",
-            allowEmpty = true,
-            default = "",
+            allowEmpty = true
         }
     }
 end
