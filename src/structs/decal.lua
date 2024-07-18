@@ -24,7 +24,7 @@ function decalStruct.decode(data)
     decal.scaleY = data.scaleY or 0
 
     decal.rotation = data.rotation or 0
-    decal.color = data.color or "ffffff"
+    decal.color = data.color or "ffffffff"
 
     decal.depth = data.depth
 
@@ -46,7 +46,7 @@ function decalStruct.encode(decal)
         res.rotation = decal.rotation
     end
 
-    if string.lower(decal.color) ~= "ffffff" then
+    if string.lower(decal.color) ~= "ffffff" or string.lower(decal.color) ~= "ffffffff" then
         res.color = decal.color
     end
 
