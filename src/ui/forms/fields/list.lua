@@ -84,11 +84,11 @@ local function getSubFormElements(formField, value, options)
     local elements = {}
     local parts = getValueParts(value, options)
 
-    local baseFormElement = form.getFieldElement("base", options.valueDefault or "", options.valueOptions)
+    local baseFormElement = form.getFieldElement("base", options.valueDefault or "", options.elementOptions)
     local valueTransformer = baseFormElement.valueTransformer or tostring
 
     for i, part in ipairs(parts) do
-        local formElement = form.getFieldElement(tostring(i), valueTransformer(part) or part, options.valueOptions)
+        local formElement = form.getFieldElement(tostring(i), valueTransformer(part) or part, options.elementOptions)
 
         -- Remove label if based on string field
         if formElement.elements[1] == formElement.label then
@@ -244,13 +244,13 @@ function listField.getElement(name, value, options)
     -- Add extra options and pass it onto string field
     options = table.shallowcopy(options or {})
 
-    options.valueOptions = options.valueOptions or {}
+    options.elementOptions = options.elementOptions or {}
     options.valueSeparator = options.valueSeparator or ","
-    options.minimumValues = options.minimumValues or 0
-    options.maximumValues = options.maximumValues or math.huge
+    options.minimumElements = options.minimumElements or 0
+    options.maximumElements = options.maximumElements or math.huge
 
-    if not options.valueOptions.fieldType then
-        options.valueOptions.fieldType = options.valueOptions.fieldType or "string"
+    if not options.elementOptions.fieldType then
+        options.elementOptions.fieldType = options.elementOptions.fieldType or "string"
     end
 
     local formField
@@ -266,7 +266,7 @@ function listField.getElement(name, value, options)
         local value = formField:getValue()
         local parts = string.split(value, options.valueSeparator)()
 
-        if #parts < options.minimumValues or #parts > options.maximumValues then
+        if #parts < options.minimumElements or #parts > options.maximumElements then
             return false
         end
 
