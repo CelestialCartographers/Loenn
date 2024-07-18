@@ -37,7 +37,16 @@ local function listUpdate(orig, self, dt)
     orig(self, dt)
 
     if self.dropdownMenuVisible and self.parent then
-        local focused = ui.focusing == self or ui.focusing == self.options.spawnParent or self.focusing == self.column
+        local target = ui.focusing
+        local focused = ui.focusing == self.options.spawnParent
+
+        while target and not focused do
+            if target == self or target == self.column then
+                focused = true
+            end
+
+            target = target.parent
+        end
 
         if not focused then
             self.dropdownMenuVisible = false
