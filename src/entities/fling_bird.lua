@@ -1,7 +1,7 @@
 local flingBird = {}
 
 flingBird.name = "flingBird"
-flingBird.depth = 0
+flingBird.depth = -1
 flingBird.nodeLineRenderType = "line"
 flingBird.texture = "characters/bird/Hover04"
 flingBird.nodeLimits = {0, -1}

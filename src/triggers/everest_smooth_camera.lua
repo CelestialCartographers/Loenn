@@ -3,7 +3,7 @@ local enums = require("consts.celeste_enums")
 local everestSmoothCamera = {}
 
 everestSmoothCamera.name = "everest/smoothCameraOffsetTrigger"
-everestSmoothCamera.name = "camera"
+everestSmoothCamera.category = "camera"
 everestSmoothCamera.associatedMods = {"Everest"}
 everestSmoothCamera.fieldInformation = {
     positionMode = {
