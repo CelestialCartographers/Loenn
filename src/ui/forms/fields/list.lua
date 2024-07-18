@@ -14,12 +14,12 @@ local listField = {}
 listField.fieldType = "list"
 
 local function getValueParts(value, options)
-    local separator = options.valueSeparator
+    local separator = options.elementSeparator
     local parts = string.split(value, separator)()
 
     -- Special case for empty string and empty default
     -- Otherwise we will never be able to add when the field is empty
-    if value == "" and options.valueDefault == "" then
+    if value == "" and options.elementDefault == "" then
         table.insert(parts, "")
     end
 
@@ -27,7 +27,7 @@ local function getValueParts(value, options)
 end
 
 local function joinValueParts(parts, options)
-    local joined = table.concat(parts, options.valueSeparator)
+    local joined = table.concat(parts, options.elementSeparator)
 
     return joined
 end
@@ -70,7 +70,7 @@ local function valueAddRowHandler(formField)
         local field = formField.field
         local parts = getValueParts(value, formField.options)
 
-        table.insert(parts, options.valueDefault or "")
+        table.insert(parts, options.elementDefault or "")
 
         local joined = joinValueParts(parts, options)
 
@@ -84,7 +84,7 @@ local function getSubFormElements(formField, value, options)
     local elements = {}
     local parts = getValueParts(value, options)
 
-    local baseFormElement = form.getFieldElement("base", options.valueDefault or "", options.elementOptions)
+    local baseFormElement = form.getFieldElement("base", options.elementDefault or "", options.elementOptions)
     local valueTransformer = baseFormElement.valueTransformer or tostring
 
     for i, part in ipairs(parts) do
@@ -245,7 +245,7 @@ function listField.getElement(name, value, options)
     options = table.shallowcopy(options or {})
 
     options.elementOptions = options.elementOptions or {}
-    options.valueSeparator = options.valueSeparator or ","
+    options.elementSeparator = options.elementSeparator or ","
     options.minimumElements = options.minimumElements or 0
     options.maximumElements = options.maximumElements or math.huge
 
