@@ -92,8 +92,11 @@ function widgetUtils.preventOutOfBoundsMovement(window, padding)
                 return
             end
 
+            local positionChanged = self.x ~= self._previousX or self.y ~= self._previousY
+            local sizeChanged = self.width ~= self._previousWidth or self.height ~= self._previousHeight
+
             -- No need to run if position hasn't changed
-            if self.x ~= self._previousX or self.y ~= self._previousY then
+            if positionChanged or sizeChanged then
                 local usableWidth, usableHeight = widgetUtils.getUsableSize(padding)
                 local newX, newY = self.x, self.y
 
@@ -108,6 +111,9 @@ function widgetUtils.preventOutOfBoundsMovement(window, padding)
 
             self._previousX = self.x
             self._previousY = self.y
+            self._previousWidth = self.width
+            self._previousHeight = self.height
+
         end
     })
 end
@@ -126,7 +132,9 @@ function widgetUtils.moveWindow(window, newX, newY, threshold, clamp, padding)
 
     if math.abs(currentX - newX) > threshold or math.abs(currentY - newY) > threshold then
         window.x = newX
+        window.realX = newX
         window.y = newY
+        window.realY = newY
 
         if window.parent then
             window.parent:reflow()
