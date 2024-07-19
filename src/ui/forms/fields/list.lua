@@ -14,6 +14,10 @@ local listField = {}
 listField.fieldType = "list"
 
 local function getValueParts(value, options)
+    if value == nil then
+        return {}
+    end
+
     local separator = options.elementSeparator
     local parts = string.split(value, separator)()
 
@@ -149,10 +153,19 @@ end
 
 function listField.updateSubElements(formField, options)
     if not formField then
-        return {}
+        formField._subElements = {}
+
+        return formField._subElements
     end
 
     local value = formField:getValue()
+
+    if not value then
+        formField._subElements = {}
+
+        return formField._subElements
+    end
+
     local previousValue = formField._previousValue
     local formElements = formField._subElements
 
@@ -264,7 +277,11 @@ function listField.getElement(name, value, options)
 
         -- Do not trust the length of sub elements, might contain delete buttons
         local value = formField:getValue()
-        local parts = string.split(value, options.valueSeparator)()
+        local parts = {}
+
+        if type(value) == "string" then
+            parts = string.split(value, options.elementSeparator)()
+        end
 
         if #parts < options.minimumElements or #parts > options.maximumElements then
             return false
