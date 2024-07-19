@@ -10,6 +10,19 @@ local utils = require("utils")
 
 local dropdowns = {}
 
+local function closeDropdown(list)
+    list.dropdownMenuVisible = false
+    list.column:removeSelf()
+
+    ui.runLate(function()
+        ui.focusing = list.options.spawnParent
+
+        if utils.typeof(ui.focusing) == "field" then
+            ui.focusing.blinkTime = 0
+        end
+    end)
+end
+
 local function dataToElement(list, data, element)
     if not element then
         element = uiElements.listItem()
@@ -20,6 +33,8 @@ local function dataToElement(list, data, element)
 
                 list.button:setText(element.text)
                 list:setSelection(element.data)
+
+                closeDropdown(list)
             end
         })
     end
@@ -52,11 +67,7 @@ local function listUpdate(orig, self, dt)
             self.dropdownMenuVisible = false
             self.column:removeSelf()
 
-            ui.focusing = self.options.spawnParent
-
-            if utils.typeof(ui.focusing) == "field" then
-                ui.focusing.blinkTime = 0
-            end
+            closeDropdown(self)
         end
     end
 end
