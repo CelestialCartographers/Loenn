@@ -30,7 +30,7 @@ function numberField.getElement(name, value, options)
             return ""
         end
 
-        return tostring(v)
+        return utils.prettifyFloat(v)
     end
     options.warningValidator = function(v, raw)
         return valueValidator(raw, v, allowEmpty, warningBelowValue, warningAboveValue)
