@@ -6,6 +6,21 @@ local tools = require("tools")
 local registeredHotkeys = {}
 local hotkeyHandler = {}
 
+function hotkeyHandler.removeHotkey(scope, activator)
+    if utils.typeof(scope) == "hotkey" then
+        activator = scope._rawActivator
+        scope = scope.scope
+    end
+
+    for i, target in ipairs(registeredHotkeys) do
+        if target.scope == scope and target._rawActivator == activator then
+            table.remove(registeredHotkeys, i)
+
+            return target
+        end
+    end
+end
+
 function hotkeyHandler.addHotkey(scope, activator, callback, options)
     local hotkey
 
@@ -13,9 +28,14 @@ function hotkeyHandler.addHotkey(scope, activator, callback, options)
         hotkey = scope
     end
 
+    -- Remove any previously registered hotkeys to same scope and activator
+    hotkeyHandler.removeHotkey(scope, activator)
+
     hotkey = hotkeyStruct.createHotkey(scope, activator, callback, options)
 
     table.insert(registeredHotkeys, hotkey)
+
+    return hotkey
 end
 
 function hotkeyHandler.addStandardHotkeys()
