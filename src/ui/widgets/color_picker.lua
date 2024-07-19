@@ -409,7 +409,6 @@ function colorPicker.getColorPicker(hexColor, options)
         r = (r or 0) * 255,
         g = (g or 0) * 255,
         b = (b or 0) * 255,
-        alpha = (a or 0) * 255,
         h = utils.round(h * 360, hsvFieldDecimals),
         s = utils.round(s * 100, hsvFieldDecimals),
         v = utils.round(v * 100, hsvFieldDecimals),
