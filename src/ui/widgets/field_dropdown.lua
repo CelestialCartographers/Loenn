@@ -74,9 +74,9 @@ function fieldDropdown.addDropdown(field, dropdown, searchable)
 
     local iconHeight = icon.height
     local parentHeight = field.height
-    local centerOffset = math.floor((parentHeight - iconHeight) / 2)
+    local centerOffset = math.floor((parentHeight - iconHeight) / 2) + 1
 
-    icon:with(uiUtils.rightbound(0)):with(uiUtils.at(0, centerOffset))
+    icon:with(uiUtils.rightbound(-1)):with(uiUtils.at(0, centerOffset))
     icon.style.color = {0.2, 0.2, 0.2}
 
     dropdown.submenuParent = field

@@ -213,8 +213,8 @@ function pathField.getElement(name, value, options)
     local folderIcon, iconSize = iconUtils.getIcon("folder", iconMaxSize)
 
     if folderIcon then
-        local centerOffset = math.floor((parentHeight - iconSize) / 2)
-        local folderImage = uiElements.image(folderIcon):with(uiUtils.rightbound(0)):with(uiUtils.at(0, centerOffset))
+        local centerOffset = math.floor((parentHeight - iconSize) / 2) + 1
+        local folderImage = uiElements.image(folderIcon):with(uiUtils.rightbound(-1)):with(uiUtils.at(0, centerOffset))
 
         folderImage.interactive = 1
         folderImage:hook({

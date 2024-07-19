@@ -235,8 +235,8 @@ local function addContextSpawner(formField, options)
     local menuIcon, iconSize = iconUtils.getIcon("list", iconMaxSize)
 
     if menuIcon then
-        local centerOffset = math.floor((parentHeight - iconSize) / 2)
-        local folderImage = uiElements.image(menuIcon):with(uiUtils.rightbound(0)):with(uiUtils.at(0, centerOffset))
+        local centerOffset = math.floor((parentHeight - iconSize) / 2) + 1
+        local folderImage = uiElements.image(menuIcon):with(uiUtils.rightbound(-1)):with(uiUtils.at(0, centerOffset))
 
         folderImage.interactive = 1
         folderImage:hook({
