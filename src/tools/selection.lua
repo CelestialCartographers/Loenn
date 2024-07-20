@@ -1448,17 +1448,19 @@ function tool.mouseclicked(x, y, button, istouch, presses)
         local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
         if cursorX and cursorY then
-            if presses == 1 then
+            local addSelections = keyboardHelper.modifierHeld(configs.editor.selectionAddModifier)
+
+            if addSelections and presses % 2 == 0 then
+                local strict = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
+
+                selectSimilar(strict)
+
+            else
                 selectionChanged(cursorX - 1, cursorY - 1, 3, 3, true)
 
                 selectionFinished(cursorX, cursorY, true)
                 resizeFinished(cursorX, cursorY)
                 movementFinished(cursorX, cursorY)
-
-            else
-                local strict = keyboardHelper.modifierHeld(configs.editor.precisionModifier)
-
-                selectSimilar(strict)
             end
         end
 
