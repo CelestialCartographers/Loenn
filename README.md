@@ -87,8 +87,8 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
 
  - Left click: Select object
  - Left click existing selection: Cycle through objects under cursor (smallest to largest)
- - Double Left click: Select all similar objects
- - Ctrl + Double Left click: Select all similar objects but more strict
+ - Shift + Double Left click: Select all similar objects
+ - Ctrl + Shift + Double Left click: Select all similar objects but more strict
  - Left click & drag: Select multiple objects
  - Shift + Left click & drag: Add to current selection
  - Ctrl + A: Select all objects
