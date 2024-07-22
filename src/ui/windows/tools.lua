@@ -670,6 +670,7 @@ function toolWindow.getWindow()
 
     window.style.bg = {}
     window.style.border = {}
+    window.style.padding = row.style.spacing
 
     widgetUtils.removeWindowTitlebar(window)
 

@@ -6,10 +6,10 @@ local simpleDocks = {}
 
 local function sidePanelUpdatePosition(edge, element, parent)
     if edge == "left" then
-        element.screenX = parent.screenX
+        element.screenX = parent.screenX + parent.style.padding
 
     elseif edge == "right" then
-        element.screenX = parent.screenX + parent.width - element.width
+        element.screenX = parent.screenX + parent.width - parent.style.padding - element.width
     end
 end
 

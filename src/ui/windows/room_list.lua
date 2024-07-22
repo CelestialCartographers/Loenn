@@ -210,7 +210,9 @@ function roomList.getWindow()
         dataToElement = roomDataToElement
     }
     local column, list = lists.getMagicList(roomList.roomSelectedCallback, roomItems, listOptions)
-    local window = uiElements.window("Room List", column:with(uiUtils.fillHeight(true))):with(uiUtils.fillHeight(false))
+
+    local panel = uiElements.panel({column}):with(uiUtils.fillHeight(false))
+    local window = uiElements.window("Room List", panel):with(uiUtils.fillHeight(false))
 
     window:with({
         editorRoomOrderChanged = roomList.editorRoomOrderChanged(list),
@@ -220,8 +222,12 @@ function roomList.getWindow()
         editorRoomDeleted = roomList.editorRoomDeleted(list),
         editorRoomAdded = roomList.editorRoomAdded(list),
         editorRoomChanged = roomList.editorRoomChanged(list),
-        uiRoomWindowRoomChanged = roomList.uiRoomWindowRoomChanged(list)
+        uiRoomWindowRoomChanged = roomList.uiRoomWindowRoomChanged(list),
     })
+
+    window.style.bg = {}
+    window.style.border = {}
+    window.style.padding = column.style.spacing
 
     widgetUtils.removeWindowTitlebar(window)
 
