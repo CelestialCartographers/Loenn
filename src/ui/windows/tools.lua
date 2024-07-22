@@ -17,6 +17,7 @@ local toolUtils = require("tool_utils")
 local persistence = require("persistence")
 local textSearching = require("utils.text_search")
 local utils = require("utils")
+local hotkeyHandler = require("hotkey_handler")
 
 local toolWindow = {}
 
@@ -32,6 +33,7 @@ toolWindow.modePanel = false
 toolWindow.modePanelVisible = true
 
 toolWindow.materialList = false
+toolWindow.materialSearch = false
 toolWindow.materialPanel = false
 
 toolWindow.eventStates = {}
@@ -581,6 +583,12 @@ local function materialSearchFieldChanged(element, new, old)
     toolUtils.setPersistenceSearch(tool, layer, new)
 end
 
+local function focusMaterialSearchHandler()
+    if toolWindow.materialSearch then
+        widgetUtils.focusElement(toolWindow.materialSearch)
+    end
+end
+
 function toolWindow.getWindow()
     local toolListOptions = {
         initialItem = toolHandler.currentToolName
@@ -617,7 +625,9 @@ function toolWindow.getWindow()
     local scrolledLayerList, layerList = lists.getList(layerCallback, layerItems, layerListOptions)
 
     local materialItems = getMaterialItems()
-    local scrolledMaterialList, materialList = lists.getMagicList(materialCallback, materialItems, materialListOptions)
+    local scrolledMaterialList, materialList, materialSearchField = lists.getMagicList(materialCallback, materialItems, materialListOptions)
+
+    hotkeyHandler.addHotkey("global", configs.ui.hotkeys.focusMaterialSearch, focusMaterialSearchHandler)
 
     -- Make sure lists are visually updated
     -- This does some extra logic to hide the lists if they are empty
@@ -638,6 +648,7 @@ function toolWindow.getWindow()
         toolWindow.layerPanel,
         toolWindow.modePanel
     })
+    toolWindow.materialSearch = materialSearchField
 
     local row = uiElements.row({
         toolWindow.leftColumn,

@@ -189,7 +189,8 @@ local defaultTabForms = {
                 fieldOrder = {
                     "ui.searching.searchExitKey",
                     "ui.searching.searchExitAndClearKey",
-                    "ui.searching.searchSelectKey"
+                    "ui.searching.searchSelectKey",
+                    "ui.hotkeys.focusMaterialSearch"
                 }
             },
             {
@@ -284,9 +285,6 @@ local defaultFieldInformation = {
         fieldType = "keyboard_hotkey"
     },
     ["hotkeys.debugReloadTools"] = {
-        fieldType = "keyboard_hotkey"
-    },
-    ["hotkeys.itemSelectAll"] = {
         fieldType = "keyboard_hotkey"
     },
     ["hotkeys.itemsCopy"] = {
@@ -511,7 +509,11 @@ local defaultFieldInformation = {
         fieldType = "string",
         editable = false,
         options = themeOptions
-    }
+    },
+
+    ["ui.hotkeys.focusMaterialSearch"] = {
+        fieldType = "keyboard_hotkey"
+    },
 }
 
 local settingsWindowGroup = uiElements.group({}):with({

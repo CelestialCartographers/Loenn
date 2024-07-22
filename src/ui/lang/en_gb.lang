@@ -135,6 +135,11 @@ settings.ui.searching.description.searchExitKey=Exit the search field.
 settings.ui.searching.description.searchExitAndClearKey=Clear the search field and exit it.
 settings.ui.searching.description.searchSelectKey=Select the current element and exit the search field.
 
+# Settings - Hotkeys
+settings.ui.hotkeys.attribute.focusMaterialSearch=Focus Search
+
+settings.ui.hotkeys.description.focusMaterialSearch=Focus the searchfield.
+
 # Dependency Window
 ui.dependency_window.window_title=Dependencies
 ui.dependency_window.group.missing_mods=Missing from dependencies
