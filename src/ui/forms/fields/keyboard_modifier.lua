@@ -12,7 +12,6 @@ shortcutField._MT = {}
 shortcutField._MT.__index = {}
 
 function shortcutField._MT.__index:setValue(value)
-    self.field:setText(value)
     self.currentValue = value
 end
 
@@ -27,7 +26,6 @@ end
 shortcutField.fieldType = "keyboard_modifier"
 
 local function captureKeyboard(formField, buttonElement)
-    local previousText = buttonElement.text
     local language = languageRegistry.getLanguage()
 
     buttonElement:setText(tostring(language.ui.userInput.capturing))
@@ -39,7 +37,9 @@ local function captureKeyboard(formField, buttonElement)
             buttonElement:setText(utils.titleCase(hotkeyActivator))
 
         else
-            buttonElement:setText(previousText)
+            formField:setValue(false)
+            formField:notifyFieldChanged()
+            buttonElement:setText(tostring(language.ui.userInput.noValue))
         end
     end
 end

@@ -11,7 +11,6 @@ mouseField._MT = {}
 mouseField._MT.__index = {}
 
 function mouseField._MT.__index:setValue(value)
-    self.field:setText(tostring(value))
     self.currentValue = value
 end
 
@@ -26,7 +25,6 @@ end
 mouseField.fieldType = "mouse_button"
 
 local function captureMouseButton(formField, buttonElement)
-    local previousText = buttonElement.text
     local language = languageRegistry.getLanguage()
 
     buttonElement:setText(tostring(language.ui.userInput.capturing))
@@ -40,7 +38,9 @@ local function captureMouseButton(formField, buttonElement)
             buttonElement:setText(buttonText)
 
         else
-            buttonElement:setText(previousText)
+            formField:setValue(false)
+            formField:notifyFieldChanged()
+            buttonElement:setText(tostring(language.ui.userInput.noValue))
         end
     end
 end
