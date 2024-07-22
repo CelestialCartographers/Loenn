@@ -250,4 +250,14 @@ function widgetUtils.centerWindow(window, parent)
     widgetUtils.moveWindow(window, x, y, 0, 0, 0)
 end
 
+-- Focus element and do any extra logic to prevent them from crashing
+function widgetUtils.focusElement(element)
+    ui.focusing = element
+
+    if utils.typeof(element) == "field" then
+        element.blinkTime = 0
+        element.__wasKeyRepeat = love.keyboard.hasKeyRepeat()
+    end
+end
+
 return widgetUtils

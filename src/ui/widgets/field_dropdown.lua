@@ -7,25 +7,6 @@ local uiUtils = require("ui.utils")
 local listWidgets = require("ui.widgets.lists")
 local utils = require("utils")
 
-local function dropdownItemOnClickHook(field, dropdown)
-    -- Update the text without causing a field update
-    return function(orig, self, x, y, button)
-        orig(self, x, y, button)
-
-        local newSelection = dropdown:getSelectedData() or ""
-
-        field.label.text = newSelection
-        field._text = newSelection
-
-        field:setCursorIndex(#newSelection)
-        field:repaint()
-
-        -- Needed to not crash in textfield render when forcing focus
-        field.blinkTime = 0
-        ui.focusing = field
-    end
-end
-
 local function getIconArea(field, icon)
     -- Calculate custom rectangle, as the image one is too small
 

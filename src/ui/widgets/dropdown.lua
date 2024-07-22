@@ -7,6 +7,7 @@ local uiUtils = require("ui.utils")
 
 local lists = require("ui.widgets.lists")
 local utils = require("utils")
+local widgetUtils = require("ui.widgets.utils")
 
 local dropdowns = {}
 
@@ -15,11 +16,7 @@ local function closeDropdown(list)
     list.column:removeSelf()
 
     ui.runLate(function()
-        ui.focusing = list.options.spawnParent
-
-        if utils.typeof(ui.focusing) == "field" then
-            ui.focusing.blinkTime = 0
-        end
+        widgetUtils.focusElement(list.options.spawnParent)
     end)
 end
 
