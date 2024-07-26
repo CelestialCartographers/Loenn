@@ -23,7 +23,7 @@ local snapshotFunctions = {
 
 local historyRelevantFields = {
     filler = {
-        directionalMove = {
+        move = {
             "x",
             "y"
         },
@@ -35,7 +35,7 @@ local historyRelevantFields = {
         }
     },
     room = {
-        directionalMove = {
+        move = {
             "x",
             "y"
         },
@@ -51,6 +51,13 @@ local historyRelevantFields = {
             "sceneryObj"
         }
     }
+}
+
+local directionOffsets = {
+    left = {-1, 0},
+    right = {1, 0},
+    up = {0, -1},
+    down = {0, 1},
 }
 
 function mapItemUtils.getMapBounds(map)
@@ -162,6 +169,31 @@ local function prepareItemHistoryData(functionName, itemType, item)
     return result
 end
 
+local function callStructFunction(functionName, itemType, item, ...)
+    local itemStruct = itemStructs[itemType]
+
+    if not item or not itemStruct then
+        return
+    end
+
+    local func = itemStruct[functionName]
+
+    return func(item, ...)
+end
+
+local function callWithoutHistory(functionName, item, ...)
+    local itemType = utils.typeof(item)
+
+    if itemType == "table" then
+        for tableItem, tableItemType in pairs(item) do
+            callStructFunction(functionName, tableItemType, tableItem, ...)
+        end
+
+    else
+        callStructFunction(functionName, itemType, item, ...)
+    end
+end
+
 local function callWithSnapshot(functionName, itemType, item, ...)
     local itemStruct = itemStructs[itemType]
 
@@ -179,7 +211,7 @@ local function callWithSnapshot(functionName, itemType, item, ...)
 
         local snapshot = snapshotFunction(item, "Room movement", itemBefore, itemAfter)
 
-        return snapshot
+        return snapshot, res
     end
 end
 
@@ -210,12 +242,31 @@ local function callWithHistory(functionName, item, ...)
     end
 end
 
-function mapItemUtils.directionalMove(item, direction, amount, step)
-    callWithHistory("directionalMove", item, direction, amount, step)
+function mapItemUtils.move(item, amountX, amountY, step, useHistory)
+    if useHistory == false then
+        return callWithoutHistory("move", item, amountX, amountY, step)
+    end
+
+    return callWithHistory("move", item, amountX, amountY, step)
 end
 
-function mapItemUtils.directionalResize(item, direction, amount, step)
-    callWithHistory("directionalResize", item, direction, amount, step)
+function mapItemUtils.directionalMove(item, direction, amount, step, useHistory)
+    if not directionOffsets[direction] then
+        return
+    end
+
+    local offsetX, offsetY = unpack(directionOffsets[direction])
+    local amountX, amountY = amount * offsetX, amount * offsetY
+
+    return mapItemUtils.move(item, amountX, amountY, step, useHistory)
+end
+
+function mapItemUtils.directionalResize(item, direction, amount, step, useHistory)
+    if useHistory == false then
+        return callWithoutHistory("directionalResize", item, direction, amount, step)
+    end
+
+    return callWithHistory("directionalResize", item, direction, amount, step)
 end
 
 return mapItemUtils

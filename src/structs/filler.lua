@@ -47,23 +47,14 @@ end
 
 -- Moves amount * step in the direction
 -- Step defaults to 8, being a tile
-function fillerStruct.directionalMove(filler, side, amount, step)
+function fillerStruct.move(filler, amountX, amountY, step)
     step = step or 8
 
-    local moveAmount = math.floor(amount * step / 8)
+    local moveAmountX = math.floor(amountX * step / 8)
+    local moveAmountY = math.floor(amountY * step / 8)
 
-    if side == "left" then
-        filler.x -= moveAmount
-
-    elseif side == "right" then
-        filler.x += moveAmount
-
-    elseif side == "up" then
-        filler.y -= moveAmount
-
-    elseif side == "down" then
-        filler.y += moveAmount
-    end
+    filler.x += moveAmountX
+    filler.y += moveAmountY
 end
 
 -- Pixel position of the filler
