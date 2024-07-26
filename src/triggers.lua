@@ -109,7 +109,7 @@ function triggers.getCategory(trigger)
     local handler = triggers.registeredTriggers[name]
 
     if handler.category then
-        local category = utils.callIfFunction(handler.category)
+        local category = utils.callIfFunction(handler.category, trigger)
 
         return category or "general"
     end

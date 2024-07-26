@@ -141,21 +141,11 @@ end
 
 -- Moves amount * step in the direction
 -- Step defaults to 8, being a tile
-function roomStruct.directionalMove(room, side, amount, step)
+function roomStruct.move(room, amountX, amountY, step)
     step = step or 8
 
-    if side == "left" then
-        room.x -= amount * step
-
-    elseif side == "right" then
-        room.x += amount * step
-
-    elseif side == "up" then
-        room.y -= amount * step
-
-    elseif side == "down" then
-        room.y += amount * step
-    end
+    room.x += amountX * step
+    room.y += amountY * step
 end
 
 function roomStruct.getPosition(room)

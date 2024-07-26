@@ -1,8 +1,8 @@
 -- Utils for adding and removing rooms/fillers with history snapshots
 
--- TODO - History
-
 local utils = require("utils")
+local roomStruct = require("structs.room")
+local fillerStruct = require("structs.filler")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
 local sceneHandler = require("scene_handler")
@@ -10,6 +10,55 @@ local celesteRender = require("celeste_render")
 local configs = require("configs")
 
 local mapItemUtils = {}
+
+local itemStructs = {
+    room = roomStruct,
+    filler = fillerStruct
+}
+
+local snapshotFunctions = {
+    room = snapshotUtils.roomSnapshot,
+    filler = snapshotUtils.fillerSnapshot
+}
+
+local historyRelevantFields = {
+    filler = {
+        move = {
+            "x",
+            "y"
+        },
+        directionResize = {
+            "x",
+            "y",
+            "width",
+            "height",
+        }
+    },
+    room = {
+        move = {
+            "x",
+            "y"
+        },
+        directionResize = {
+            "x",
+            "y",
+            "width",
+            "height",
+            "tilesFg",
+            "tilesBg",
+            "sceneryFg",
+            "sceneryBg",
+            "sceneryObj"
+        }
+    }
+}
+
+local directionOffsets = {
+    left = {-1, 0},
+    right = {1, 0},
+    up = {0, -1},
+    down = {0, 1},
+}
 
 function mapItemUtils.getMapBounds(map)
     local rectangles = {}
@@ -106,6 +155,118 @@ function mapItemUtils.sortRoomList(map, force)
             sceneHandler.sendEvent("editorRoomOrderChanged", map)
         end
     end
+end
+
+
+local function prepareItemHistoryData(functionName, itemType, item)
+    local result = {}
+    local fields = historyRelevantFields[itemType][functionName]
+
+    for _, field in ipairs(fields) do
+        result[field] = utils.deepcopy(item[field])
+    end
+
+    return result
+end
+
+local function callStructFunction(functionName, itemType, item, ...)
+    local itemStruct = itemStructs[itemType]
+
+    if not item or not itemStruct then
+        return
+    end
+
+    local func = itemStruct[functionName]
+
+    return func(item, ...)
+end
+
+local function callWithoutHistory(functionName, item, ...)
+    local itemType = utils.typeof(item)
+
+    if itemType == "table" then
+        for tableItem, tableItemType in pairs(item) do
+            callStructFunction(functionName, tableItemType, tableItem, ...)
+        end
+
+    else
+        callStructFunction(functionName, itemType, item, ...)
+    end
+end
+
+local function callWithSnapshot(functionName, itemType, item, ...)
+    local itemStruct = itemStructs[itemType]
+
+    if not item or not itemStruct then
+        return
+    end
+
+    local func = itemStruct[functionName]
+    local snapshotFunction = snapshotFunctions[itemType]
+
+    if item then
+        local itemBefore = prepareItemHistoryData(functionName, itemType, item)
+        local res = func(item, ...)
+        local itemAfter = prepareItemHistoryData(functionName, itemType, item)
+
+        local snapshot = snapshotFunction(item, "Room movement", itemBefore, itemAfter)
+
+        return snapshot, res
+    end
+end
+
+-- TODO - Proper snapshot description
+local function callWithHistory(functionName, item, ...)
+    local itemType = utils.typeof(item)
+    local snapshot
+
+    if itemType == "table" then
+        local snapshots = {}
+
+        for tableItem, tableItemType in pairs(item) do
+            local tableSnapshot = callWithSnapshot(functionName, tableItemType, tableItem, ...)
+
+            if tableSnapshot then
+                table.insert(snapshots, tableSnapshot)
+            end
+        end
+
+        snapshot = snapshotUtils.multiSnapshot("Room movement", snapshots)
+
+    else
+        snapshot = callWithSnapshot(functionName, itemType, item, ...)
+    end
+
+    if snapshot then
+        history.addSnapshot(snapshot)
+    end
+end
+
+function mapItemUtils.move(item, amountX, amountY, step, useHistory)
+    if useHistory == false then
+        return callWithoutHistory("move", item, amountX, amountY, step)
+    end
+
+    return callWithHistory("move", item, amountX, amountY, step)
+end
+
+function mapItemUtils.directionalMove(item, direction, amount, step, useHistory)
+    if not directionOffsets[direction] then
+        return
+    end
+
+    local offsetX, offsetY = unpack(directionOffsets[direction])
+    local amountX, amountY = amount * offsetX, amount * offsetY
+
+    return mapItemUtils.move(item, amountX, amountY, step, useHistory)
+end
+
+function mapItemUtils.directionalResize(item, direction, amount, step, useHistory)
+    if useHistory == false then
+        return callWithoutHistory("directionalResize", item, direction, amount, step)
+    end
+
+    return callWithHistory("directionalResize", item, direction, amount, step)
 end
 
 return mapItemUtils

@@ -99,6 +99,11 @@ end
 
 function brushToolUtils.hasSnapshottedRoomResized(tool)
     local room = state.getSelectedRoom()
+
+    if not room then
+        return false
+    end
+
     local tiles = room[tool.layer]
     local currentWidth, currentHeight = tiles.matrix:size()
 
