@@ -65,6 +65,10 @@ tools.name.selection=Selection
 
 tools.name.placement=Placement
 
+tools.name.room=Rooms
+tools.room.modes.name.selection=Selection
+tools.room.modes.description.selection=Selection rooms and fillers.
+
 
 # -- Decals --
 # decals.attribute
