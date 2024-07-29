@@ -4,7 +4,7 @@ local defaultScope = "global"
 local defaultScopes = {defaultScope}
 
 local specialKeyAliases = {
-    plus = "+",
+    plus = "=",
     minus = "-",
 }
 
