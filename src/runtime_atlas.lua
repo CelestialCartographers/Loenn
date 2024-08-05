@@ -1,4 +1,6 @@
 local utils = require("utils")
+local configs = require("configs")
+local logging = require("logging")
 
 local textureAtlas = {}
 
@@ -134,6 +136,12 @@ function textureAtlas.addImage(atlas, image, filename, layer)
             love.graphics.draw(image, x, y)
             love.graphics.pop()
             love.graphics.setCanvas(previousCanvas)
+
+            if configs.debug.logImageLoading then
+                local message = string.format("Loaded image '%s' to atlas layer %s at (%s, %s) with size %sx%s", filename, atlas.layer, x, y, width, height)
+
+                logging.info(message)
+            end
 
             return true, atlas.image, x, y, atlas.layer
         end

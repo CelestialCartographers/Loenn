@@ -7,6 +7,7 @@ local threadHandler = require("utils.threads")
 local binaryReader = require("utils.binary_reader")
 local runtimeAtlas = require("runtime_atlas")
 local modHandler = require("mods")
+local logging = require("logging")
 
 local spriteLoader = {}
 
@@ -73,6 +74,9 @@ function spriteLoader.getCachedDataImage(dataFile)
 
         if success then
             return image
+
+        else
+            logging.warning(string.format("Failed to load cache for data image '%s'", dataFile))
         end
     end
 end
