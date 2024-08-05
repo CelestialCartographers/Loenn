@@ -30,6 +30,10 @@ local function tryRoomSwap(x, y, button, istouch, presses)
         local actionButton = configs.editor.toolActionButton
         local addModifier = configs.editor.selectionAddModifier
 
+        if currentTool.manualRoomLogic then
+            return false
+        end
+
         if button == actionButton then
             local mapX, mapY = viewport.getMapCoordinates(x, y)
             local itemClicked = utils.getRoomAtCoords(mapX, mapY, state.map) or utils.getFillerAtCoords(mapX, mapY, state.map)

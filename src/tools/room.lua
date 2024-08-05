@@ -15,6 +15,7 @@ tool._type = "tool"
 tool.name = "room"
 tool.group = "room"
 tool.image = nil
+tool.manualRoomLogic = true
 
 tool.validLayers = {}
 
@@ -109,6 +110,8 @@ end
 
 local function selectionFinished()
     if selectionDrag then
+        selectionPreviews = mapItemsInRectangle(selectionRectangle)
+
         local addModifier = keyboardHelper.modifierHeld(configs.editor.selectionAddModifier)
 
         if not addModifier then
@@ -141,11 +144,10 @@ local function selectionFinished()
     selectionDrag = false
 
     selectionPreviews = nil
+    selectionRectangle = nil
 end
 
 function tool.mouseclicked(x, y, button, istouch, pressed)
-    -- Tool handler itself handle single selection and additions
-
     local actionButton = configs.editor.actionButton
     local contextMenuButton = configs.editor.contextMenuButton
 
@@ -215,11 +217,12 @@ function tool.mousepressed(x, y, button, istouch, pressed)
         local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
         local hovering = hoveringSelection(mapX, mapY)
 
-        movementDrag = hovering
+        movementDrag = not not hovering
         selectionDrag = not hovering
 
         dragStartX = mapX
         dragStartY = mapY
+
         selectionRectangle = rectangleStruct.create(mapX, mapY, 1, 1)
     end
 end
