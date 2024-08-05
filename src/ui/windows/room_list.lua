@@ -10,6 +10,7 @@ local roomEditor = require("ui.room_editor")
 local sceneHandler = require("scene_handler")
 local languageRegistry = require("language_registry")
 local mapItemUtils = require("map_item_utils")
+local utils = require("utils")
 
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
@@ -109,6 +110,13 @@ end
 local function updateList(list, target)
     local roomItems = getRoomItems()
     local preventCallback = false
+
+    local selectedItem = state.getSelectedItem()
+
+    -- Don't update list if we have multiple selections
+    if utils.typeof(selectedItem) == "table" then
+        return
+    end
 
     if not target then
         local currentRoom = state.getSelectedRoom()
