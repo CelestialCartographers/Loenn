@@ -119,7 +119,8 @@ local defaultTabForms = {
                     "editor.contextMenuButton",
                     "spacer",
                     "hotkeys.cameraZoomIn",
-                    "hotkeys.cameraZoomOut"
+                    "hotkeys.cameraZoomOut",
+                    "editor.canvasZoomExtentsButton"
                 }
             },
             {
@@ -231,6 +232,7 @@ local defaultTabForms = {
             "debug.displayConsole",
             "spacer",
             "debug.logPluginLoading",
+            "debug.logImageLoading",
             "editor.warnOnMissingEntityHandler",
             "editor.warnOnMissingTexture"
         }
@@ -404,6 +406,9 @@ local defaultFieldInformation = {
         fieldType = "mouse_button"
     },
     ["editor.objectCloneButton"] = {
+        fieldType = "mouse_button"
+    },
+    ["editor.canvasZoomExtentsButton"] = {
         fieldType = "mouse_button"
     },
     ["editor.selectionAddModifier"] = {
