@@ -2,6 +2,9 @@ return {
     -- Plugins / Scenes
     logPluginLoading = false,
 
+    -- Image loading
+    logImageLoading = false,
+
     -- Hotkeys / UI
     enableDebugOptions = false,
 

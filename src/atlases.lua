@@ -44,8 +44,9 @@ end
 
 function atlases.loadCelesteAtlas(name, meta, path)
     local atlas = spriteLoader.getCacheOrLoadSpriteAtlas(meta, path)
+    local fakeFilename = atlas._imageMeta[1].filename
 
-    spriteLoader.addAtlasToRuntimeAtlas(atlas, path)
+    spriteLoader.addAtlasToRuntimeAtlas(atlas, fakeFilename)
 
     atlases[name] = atlas
 
