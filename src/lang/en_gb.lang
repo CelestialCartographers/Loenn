@@ -1799,12 +1799,14 @@ settings.hotkeys.description.toggleFullscreen=Toggle fullscreen on the applicati
 settings.editor.attribute.toolActionButton=Tool Action
 settings.editor.attribute.canvasMoveButton=Move Map View
 settings.editor.attribute.contextMenuButton=Context Menu
+settings.editor.attribute.canvasZoomExtentsButton=Zoom to Map Extents
 settings.hotkeys.attribute.cameraZoomIn=Zoom In
 settings.hotkeys.attribute.cameraZoomOut=Zoom Out
 
 settings.editor.description.toolActionButton=Mouse button to use for the selected tool.
 settings.editor.description.canvasMoveButton=Mouse button to use for moving the map view.
 settings.editor.description.contextMenuButton=Mouse button to use for opening context menus in the map view.
+settings.editor.description.canvasZoomExtentsButton=Zoom the map view such that the entire map is visible on screen.
 settings.hotkeys.description.cameraZoomIn=Zoom in on the map view.
 settings.hotkeys.description.cameraZoomOut=Zoom out on the map view.
 
