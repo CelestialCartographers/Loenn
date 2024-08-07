@@ -228,9 +228,9 @@ function selectionUtils.getContextSelections(room, layer, x, y, selections)
     return selectionTargets, bestSelection
 end
 
-function selectionUtils.sendContextMenuEvent(selections, bestSelection)
+function selectionUtils.sendContextMenuEvent(selections, bestSelection, room)
     if selections and #selections > 0 then
-        sceneHandler.sendEvent("editorSelectionContextMenu", selections, bestSelection)
+        sceneHandler.sendEvent("editorSelectionContextMenu", selections, bestSelection, room)
     end
 end
 

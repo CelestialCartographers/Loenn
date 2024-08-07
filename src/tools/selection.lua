@@ -1471,7 +1471,7 @@ function tool.mouseclicked(x, y, button, istouch, presses)
             local room = state.getSelectedRoom()
             local contextSelections, bestTarget = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY, selectionTargets)
 
-            selectionUtils.sendContextMenuEvent(contextSelections, bestTarget)
+            selectionUtils.sendContextMenuEvent(contextSelections, bestTarget, room)
         end
     end
 end
