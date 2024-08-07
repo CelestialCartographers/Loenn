@@ -24,8 +24,8 @@ local contextWindow = {}
 
 local contextGroup
 
-local function editorSelectionContextMenuCallback(group, selections, bestSelection)
-    contextWindow.createContextMenu(selections, bestSelection)
+local function editorSelectionContextMenuCallback(group, selections, bestSelection, room)
+    contextWindow.createContextMenu(selections, bestSelection, room)
 end
 
 local function getWindowTitle(language, selections, bestSelection)
@@ -62,10 +62,9 @@ local function getWindowTitle(language, selections, bestSelection)
     return table.concat(titleParts, " - ")
 end
 
-function contextWindow.saveChangesCallback(selections, dummyData)
+function contextWindow.saveChangesCallback(room, selections, dummyData)
     return function(formFields)
         local newData = form.getFormData(formFields)
-        local room = loadedState.getSelectedRoom()
         local layers = selectionUtils.selectionTargetLayers(selections)
 
         local snapshot = snapshotUtils.roomLayersSnapshot(function()
@@ -139,7 +138,7 @@ local function findCompatibleSelections(selections, targetSelection)
     return compatible
 end
 
-function contextWindow.createContextMenu(selections, bestSelection)
+function contextWindow.createContextMenu(selections, bestSelection, room)
     local language = languageRegistry.getLanguage()
 
     -- Filter out selections that would end up making a mess
@@ -161,7 +160,7 @@ function contextWindow.createContextMenu(selections, bestSelection)
         {
             text = tostring(language.ui.selection_context_window.save_changes),
             formMustBeValid = true,
-            callback = contextWindow.saveChangesCallback(selections, dummyData)
+            callback = contextWindow.saveChangesCallback(room, selections, dummyData)
         }
     }
 
