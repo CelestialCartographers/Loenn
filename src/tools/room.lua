@@ -8,6 +8,7 @@ local colors = require("consts.colors")
 local keyboardHelper = require("utils.keyboard")
 local mapItemUtils = require("map_item_utils")
 local sceneHandler = require("scene_handler")
+local hotkeyHandler = require("hotkey_handler")
 
 local tool = {}
 
@@ -331,9 +332,28 @@ local function drawSelectionRectangles()
     drawSelectionRectanglesCommon(selectionTargets, completeBorderColor, completeFillColor, lineWidth, drawnSelections)
 end
 
+local function selectAllHotkey()
+    -- Fake a infinitely large selection
+    selectionDrag = true
+    selectionRectangle = rectangleStruct.create(-math.huge, -math.huge, math.huge, math.huge)
+
+    selectionFinished()
+end
+
+local function deselectHotkey()
+    state.selectItem()
+end
+
 function tool.draw()
     drawSelectionArea()
     drawSelectionRectangles()
+end
+
+function tool.load()
+    local hotkeyScope = string.format("tools.%s", tool.name)
+
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemsSelectAll, selectAllHotkey)
+    hotkeyHandler.addHotkey(hotkeyScope, configs.hotkeys.itemsDeselect, deselectHotkey)
 end
 
 return tool

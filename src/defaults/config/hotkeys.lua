@@ -58,7 +58,18 @@ local defaultHotkeys = {
     debugMode = false,
 
     -- Window
-    toggleFullscreen = "f11"
+    toggleFullscreen = "f11",
+
+    -- Tools
+    selectToolRoom = "1",
+    selectToolPlacement = "2",
+    selectToolSelection = "3",
+    selectToolBrush = "4",
+    selectToolRectangle = "5",
+    selectToolBucket = "6",
+    selectToolLine = "7",
+    selectToolCircle = "8",
+    selectToolEllipse = "9",
 }
 
 -- Use command instead of control on Mac
