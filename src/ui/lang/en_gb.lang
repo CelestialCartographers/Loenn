@@ -91,6 +91,7 @@ ui.settings_window.group.editor.search=Search
 ui.settings_window.tab.hotkeys=Hotkeys
 ui.settings_window.group.hotkeys.general=General
 ui.settings_window.group.hotkeys.map_view=Map View
+ui.settings_window.group.hotkeys.tools=Tools
 ui.settings_window.group.hotkeys.selections=Selections
 ui.settings_window.group.hotkeys.rooms=Rooms
 ui.settings_window.group.hotkeys.lists=Lists
@@ -117,7 +118,7 @@ settings.ui.searching.description.searchCaseSensitive=When search should be case
 settings.ui.searching.description.searchFuzzy=Force search to always do fuzzy matching.\nFuzzy search does not need entries to exactly match the search term, other closely matching results will be shown as well.\nIf disabled, fuzzy search may still be performed by starting the search with a ~ tilde sign.
 settings.ui.searching.description.sortByScore=Order search results such that the closest matches show up at the top.\nIf disabled, search results are sorted alphabetically.
 
-# # Settings - Hotkeys - Lists
+# Settings - Hotkeys - Lists
 settings.ui.searching.attribute.searchPreviousResultKey=Previous Element
 settings.ui.searching.attribute.searchNextResultKey=Next Element
 settings.ui.searching.attribute.searchRearrangeModifier=Rearrange Elements (Modifier)
@@ -130,15 +131,12 @@ settings.ui.searching.description.searchRearrangeModifier=Pressing 'Previous Ele
 settings.ui.searching.attribute.searchExitKey=Exit Search
 settings.ui.searching.attribute.searchExitAndClearKey=Clear And Exit Search
 settings.ui.searching.attribute.searchSelectKey=Select And Exit Search
+settings.ui.hotkeys.attribute.focusMaterialSearch=Focus Search
 
 settings.ui.searching.description.searchExitKey=Exit the search field.
 settings.ui.searching.description.searchExitAndClearKey=Clear the search field and exit it.
 settings.ui.searching.description.searchSelectKey=Select the current element and exit the search field.
-
-# Settings - Hotkeys
-settings.ui.hotkeys.attribute.focusMaterialSearch=Focus Search
-
-settings.ui.hotkeys.description.focusMaterialSearch=Focus the searchfield.
+settings.ui.hotkeys.description.focusMaterialSearch=Focus the search field.
 
 # Dependency Window
 ui.dependency_window.window_title=Dependencies

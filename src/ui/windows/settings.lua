@@ -124,6 +124,20 @@ local defaultTabForms = {
                 }
             },
             {
+                title = "ui.settings_window.group.hotkeys.tools",
+                fieldOrder = {
+                    "hotkeys.selectToolRoom",
+                    "hotkeys.selectToolPlacement",
+                    "hotkeys.selectToolSelection",
+                    "hotkeys.selectToolBrush",
+                    "hotkeys.selectToolRectangle",
+                    "hotkeys.selectToolBucket",
+                    "hotkeys.selectToolLine",
+                    "hotkeys.selectToolCircle",
+                    "hotkeys.selectToolEllipse",
+                }
+            },
+            {
                 title = "ui.settings_window.group.hotkeys.selections",
                 fieldOrder = {
                     "hotkeys.itemsCopy",
@@ -287,6 +301,33 @@ local defaultFieldInformation = {
         fieldType = "keyboard_hotkey"
     },
     ["hotkeys.debugReloadTools"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolRoom"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolPlacement"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolSelection"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolBrush"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolRectangle"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolBucket"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolLine"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolCircle"] = {
+        fieldType = "keyboard_hotkey"
+    },
+    ["hotkeys.selectToolEllipse"] = {
         fieldType = "keyboard_hotkey"
     },
     ["hotkeys.itemsCopy"] = {
