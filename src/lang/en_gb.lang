@@ -67,7 +67,7 @@ tools.name.placement=Placement
 
 tools.name.room=Rooms
 tools.room.modes.name.selection=Selection
-tools.room.modes.description.selection=Selection rooms and fillers.
+tools.room.modes.description.selection=Selects rooms and fillers.
 
 
 # -- Decals --
@@ -1821,15 +1821,15 @@ settings.hotkeys.attribute.selectToolLine=Select Line Tool
 settings.hotkeys.attribute.selectToolCircle=Select Circle Tool
 settings.hotkeys.attribute.selectToolEllipse=Select Brush Tool
 
-settings.hotkeys.description.selectToolRoom=Selects the room tool.
-settings.hotkeys.description.selectToolPlacement=Selects the placement tool.
-settings.hotkeys.description.selectToolSelection=Selects the selection tool.
-settings.hotkeys.description.selectToolBrush=Selects the brush tool.
-settings.hotkeys.description.selectToolRectangle=Selects the rectangle tool.
-settings.hotkeys.description.selectToolBucket=Selects the bucket tool.
-settings.hotkeys.description.selectToolLine=Selects the line tool.
-settings.hotkeys.description.selectToolCircle=Selects the circle tool.
-settings.hotkeys.description.selectToolEllipse=Selects the ellipse tool.
+settings.hotkeys.description.selectToolRoom=Switch to the room tool.
+settings.hotkeys.description.selectToolPlacement=Switch to the placement tool.
+settings.hotkeys.description.selectToolSelection=Switch to the selection tool.
+settings.hotkeys.description.selectToolBrush=Switch to the brush tool.
+settings.hotkeys.description.selectToolRectangle=Switch to the rectangle tool.
+settings.hotkeys.description.selectToolBucket=Switch to the bucket tool.
+settings.hotkeys.description.selectToolLine=Switch to the line tool.
+settings.hotkeys.description.selectToolCircle=Switch to the circle tool.
+settings.hotkeys.description.selectToolEllipse=Switch to the ellipse tool.
 
 # Hotkeys - Selections
 settings.hotkeys.attribute.itemsCopy=Copy Selection to Clipboard
