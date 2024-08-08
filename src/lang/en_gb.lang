@@ -1810,6 +1810,27 @@ settings.editor.description.canvasZoomExtentsButton=Zoom the map view such that 
 settings.hotkeys.description.cameraZoomIn=Zoom in on the map view.
 settings.hotkeys.description.cameraZoomOut=Zoom out on the map view.
 
+# Hotkeys - Tools
+settings.hotkeys.attribute.selectToolRoom=Select Room Tool
+settings.hotkeys.attribute.selectToolPlacement=Select Placement Tool
+settings.hotkeys.attribute.selectToolSelection=Select Selection Tool
+settings.hotkeys.attribute.selectToolBrush=Select Brush Tool
+settings.hotkeys.attribute.selectToolRectangle=Select Rectangle Tool
+settings.hotkeys.attribute.selectToolBucket=Select Bucket Tool
+settings.hotkeys.attribute.selectToolLine=Select Line Tool
+settings.hotkeys.attribute.selectToolCircle=Select Circle Tool
+settings.hotkeys.attribute.selectToolEllipse=Select Brush Tool
+
+settings.hotkeys.description.selectToolRoom=Selects the room tool.
+settings.hotkeys.description.selectToolPlacement=Selects the placement tool.
+settings.hotkeys.description.selectToolSelection=Selects the selection tool.
+settings.hotkeys.description.selectToolBrush=Selects the brush tool.
+settings.hotkeys.description.selectToolRectangle=Selects the rectangle tool.
+settings.hotkeys.description.selectToolBucket=Selects the bucket tool.
+settings.hotkeys.description.selectToolLine=Selects the line tool.
+settings.hotkeys.description.selectToolCircle=Selects the circle tool.
+settings.hotkeys.description.selectToolEllipse=Selects the ellipse tool.
+
 # Hotkeys - Selections
 settings.hotkeys.attribute.itemsCopy=Copy Selection to Clipboard
 settings.hotkeys.attribute.itemsCut=Cut Selection to Clipboard

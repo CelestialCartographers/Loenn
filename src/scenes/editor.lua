@@ -44,6 +44,7 @@ function editorScene:firstEnter()
     local inputDevice = require("input_device")
     local updater = require("updater")
     local hotkeyHandler = require("hotkey_handler")
+    local toolHandler = require("tools")
 
     local viewportDevice = require("input_devices.viewport_device")
     local hotkeyDevice = hotkeyHandler.createHotkeyDevice()
@@ -59,6 +60,7 @@ function editorScene:firstEnter()
     local hudDevice = require("input_devices.hud_device")
 
     hotkeyHandler.addStandardHotkeys()
+    toolHandler.addHotkeys(hotkeyHandler)
 
     inputDevice.newInputDevice(self.inputDevices, inputCaptureDevice)
     inputDevice.newInputDevice(self.inputDevices, hudDevice)

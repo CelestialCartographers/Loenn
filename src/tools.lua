@@ -21,6 +21,21 @@ function toolHandler.addHotkeyScopes(scopes)
     end
 end
 
+local function selectToolHotkey(name)
+    return function()
+        toolHandler.selectTool(name)
+    end
+end
+
+function toolHandler.addHotkeys(hotkeyHandler)
+    for name, _ in pairs(toolHandler.tools) do
+        local nameHumanized = utils.humanizeVariableName(name)
+        local activator = configs.hotkeys["selectTool" .. nameHumanized]
+
+        hotkeyHandler.addHotkey("tools", activator, selectToolHotkey(name))
+    end
+end
+
 function toolHandler.selectTool(name)
     local handler = toolHandler.tools[name]
     local currentTool = toolHandler.currentTool
