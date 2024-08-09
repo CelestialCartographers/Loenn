@@ -9,6 +9,8 @@ local keyboardHelper = require("utils.keyboard")
 local mapItemUtils = require("map_item_utils")
 local sceneHandler = require("scene_handler")
 local hotkeyHandler = require("hotkey_handler")
+local celesteRender = require("celeste_render")
+local roomStruct = require("structs.room")
 
 local tool = {}
 
@@ -22,11 +24,13 @@ tool.validLayers = {}
 
 tool.mode = "selection"
 tool.modes = {
+    "placement",
     "selection",
 }
 
 local movementDrag = false
 local selectionDrag = false
+local placementDrag = false
 
 local dragStartX
 local dragStartY
@@ -109,6 +113,23 @@ local function hoveringMapItem(mapX, mapY)
 
 end
 
+local function getFakeRoomPositionSize()
+    if not lastMoveX or not lastMoveY then
+        return 0, 0, 0, 0
+    end
+
+    local dragStartTileX, dragStartTileY = viewportHandler.pixelToTileCoordinates(dragStartX, dragStartY)
+    local lastMoveTileX, lastMoveTileY = viewportHandler.pixelToTileCoordinates(lastMoveX, lastMoveY)
+
+    local x = math.min(dragStartTileX, lastMoveTileX) * 8
+    local y = math.min(dragStartTileY, lastMoveTileY) * 8
+
+    local width = math.abs(dragStartTileX - lastMoveTileX) * 8
+    local height = math.abs(dragStartTileY - lastMoveTileY) * 8
+
+    return x, y, width, height
+end
+
 local function selectionFinished()
     if selectionDrag then
         selectionPreviews = mapItemsInRectangle(selectionRectangle)
@@ -136,6 +157,29 @@ local function selectionFinished()
         end
     end
 
+    if placementDrag then
+        local fakeRoom = roomStruct.decode({})
+        local selectedRoom = state.getSelectedRoom()
+
+        if selectedRoom then
+            for k, v in pairs(selectedRoom) do
+                -- Copy any simple value over, not tiles etc
+                if type(v) ~= "table" then
+                    fakeRoom[k] = v
+                end
+            end
+        end
+
+        -- Overwrite with what the user inputted
+        fakeRoom.x, fakeRoom.y, fakeRoom.width, fakeRoom.height = getFakeRoomPositionSize()
+
+        if fakeRoom.width > 0 and fakeRoom.height > 0 then
+            sceneHandler.sendEvent("editorRoomAdd", state.map, fakeRoom)
+        end
+    end
+
+    dragStartX = nil
+    dragStartY = nil
     lastMoveX = nil
     lastMoveY = nil
     dragMovementTotalX = 0
@@ -143,6 +187,7 @@ local function selectionFinished()
 
     movementDrag = false
     selectionDrag = false
+    placementDrag = false
 
     selectionPreviews = nil
     selectionRectangle = nil
@@ -208,6 +253,13 @@ function tool.mousemoved(x, y, dx, dy, istouch)
                 dragMovementTotalY += moveTilesY
             end
         end
+
+        if placementDrag then
+            local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
+
+            lastMoveX = mapX
+            lastMoveY = mapY
+        end
     end
 end
 
@@ -218,8 +270,12 @@ function tool.mousepressed(x, y, button, istouch, pressed)
         local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
         local hovering = hoveringSelection(mapX, mapY)
 
-        movementDrag = not not hovering
-        selectionDrag = not hovering
+        placementDrag = tool.mode == "placement"
+
+        if not placementDrag then
+            movementDrag = not not hovering
+            selectionDrag = not hovering
+        end
 
         dragStartX = mapX
         dragStartY = mapY
@@ -332,6 +388,35 @@ local function drawSelectionRectangles()
     drawSelectionRectanglesCommon(selectionTargets, completeBorderColor, completeFillColor, lineWidth, drawnSelections)
 end
 
+local function drawRoomPlacementPreview()
+    if not lastMoveX or not lastMoveY then
+        return
+    end
+
+    -- Try to match border/background color of current selected room
+    local room = state.getSelectedRoom()
+
+    local borderColor = colors.roomBorderDefault
+    local backgroundColor = colors.roomBackgroundDefault
+
+    if room then
+        borderColor = celesteRender.getRoomBorderColor(room, true, state)
+        backgroundColor = celesteRender.getRoomBackgroundColor(room, true, state)
+    end
+
+    local x, y, width, height = getFakeRoomPositionSize()
+
+    viewportHandler.drawRelativeTo(0, 0, function()
+        drawing.callKeepOriginalColor(function()
+            love.graphics.setColor(backgroundColor)
+            love.graphics.rectangle("fill", x, y, width, height)
+
+            love.graphics.setColor(borderColor)
+            love.graphics.rectangle("line", x, y, width, height)
+        end)
+    end)
+end
+
 local function selectAllHotkey()
     -- Fake a infinitely large selection
     selectionDrag = true
@@ -345,8 +430,13 @@ local function deselectHotkey()
 end
 
 function tool.draw()
-    drawSelectionArea()
-    drawSelectionRectangles()
+    if tool.mode == "selection" then
+        drawSelectionArea()
+        drawSelectionRectangles()
+
+    elseif tool.mode == "placement" then
+        drawRoomPlacementPreview()
+    end
 end
 
 function tool.load()
