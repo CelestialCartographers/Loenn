@@ -2,6 +2,7 @@
 
 local utils = require("utils")
 local roomStruct = require("structs.room")
+local snapshotStruct = require("structs.snapshot")
 local fillerStruct = require("structs.filler")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
@@ -75,9 +76,9 @@ end
 function mapItemUtils.deleteRoom(map, room)
     for i, r in ipairs(map.rooms) do
         if r.name == room.name then
-            celesteRender.invalidateRoomCache(room)
+            celesteRender.invalidateRoomCache(r)
             table.remove(map.rooms, i)
-            sceneHandler.sendEvent("editorRoomDeleted", room)
+            sceneHandler.sendEvent("editorRoomDeleted", r)
 
             return true
         end
@@ -99,7 +100,23 @@ function mapItemUtils.deleteFiller(map, filler)
     return false
 end
 
-function mapItemUtils.deleteItem(map, item)
+local function deleteItemWithHistory(map, item)
+    local function forward()
+        mapItemUtils.deleteItem(map, item, false)
+    end
+
+    local function backward()
+        mapItemUtils.addItem(map, item, false)
+    end
+
+    return history.addSnapshot(snapshotStruct.create("Remove map items", {}, backward, forward))
+end
+
+function mapItemUtils.deleteItem(map, item, useHistory)
+    if useHistory ~= false then
+        deleteItemWithHistory(map, item)
+    end
+
     local itemType = utils.typeof(item)
 
     if itemType == "room" then
@@ -129,7 +146,24 @@ function mapItemUtils.addFiller(map, filler)
     sceneHandler.sendEvent("editorFillerAdded", filler)
 end
 
-function mapItemUtils.addItem(map, item)
+local function addItemWithHistory(map, item)
+    local function forward()
+        mapItemUtils.addItem(map, item, false)
+    end
+
+    local function backward()
+        mapItemUtils.deleteItem(map, item, false)
+    end
+
+    return history.addSnapshot(snapshotStruct.create("Add map items", {}, backward, forward))
+end
+
+
+function mapItemUtils.addItem(map, item, useHistory)
+    if useHistory ~= false then
+        addItemWithHistory(map, item)
+    end
+
     local itemType = utils.typeof(item)
 
     if itemType == "room" then
