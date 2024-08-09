@@ -173,7 +173,9 @@ local function selectionFinished()
         -- Overwrite with what the user inputted
         fakeRoom.x, fakeRoom.y, fakeRoom.width, fakeRoom.height = getFakeRoomPositionSize()
 
-        sceneHandler.sendEvent("editorRoomAdd", state.map, fakeRoom)
+        if fakeRoom.width > 0 and fakeRoom.height > 0 then
+            sceneHandler.sendEvent("editorRoomAdd", state.map, fakeRoom)
+        end
     end
 
     dragStartX = nil
