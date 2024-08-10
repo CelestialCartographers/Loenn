@@ -11,7 +11,8 @@ birdPath.placements = {
         only_once = false,
         onlyIfLeft = false,
         speedMult = 1.0,
-        angleFix = false
+        angleFix = false,
+        angleFixMaxRotation = 60.0
     }
 }
 
