@@ -124,8 +124,8 @@ local function getFakeRoomPositionSize()
     local x = math.min(dragStartTileX, lastMoveTileX) * 8
     local y = math.min(dragStartTileY, lastMoveTileY) * 8
 
-    local width = math.abs(dragStartTileX - lastMoveTileX) * 8
-    local height = math.abs(dragStartTileY - lastMoveTileY) * 8
+    local width = math.abs(dragStartTileX - lastMoveTileX) * 8 + 8
+    local height = math.abs(dragStartTileY - lastMoveTileY) * 8 + 8
 
     return x, y, width, height
 end
