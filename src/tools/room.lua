@@ -320,6 +320,12 @@ function tool.keypressed(key, scancode, isrepeat)
             mapItemUtils.directionalMove(selectionItem, direction, 1)
         end
     end
+
+    local deleteKey = configs.editor.itemDelete
+
+    if key == deleteKey then
+        mapItemUtils.deleteItem(state.map, state.getSelectedItem())
+    end
 end
 
 local function drawSelectionArea()
