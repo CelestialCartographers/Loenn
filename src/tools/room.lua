@@ -284,10 +284,19 @@ function tool.mousepressed(x, y, button, istouch, pressed)
     end
 end
 
-function tool.mousereleased(x, y, button)
+function tool.mousereleased(x, y, button, istouch, presses, click)
     local actionButton = configs.editor.toolActionButton
 
     if button == actionButton then
+        -- Update selection if we click in placement mode
+        if click and placementDrag then
+            local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
+
+            selectionRectangle = rectangleStruct.create(mapX, mapY, 1, 1)
+            selectionDrag = true
+            placementDrag = false
+        end
+
         selectionFinished()
     end
 end
