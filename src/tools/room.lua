@@ -268,13 +268,21 @@ function tool.mousepressed(x, y, button, istouch, pressed)
 
     if button == actionButton then
         local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
-        local hovering = hoveringSelection(mapX, mapY)
+        local selectionHovered = hoveringSelection(mapX, mapY)
+        local mapItemHovered = hoveringMapItem(mapX, mapY)
 
-        placementDrag = tool.mode == "placement"
+        local placementMode = tool.mode == "placement"
 
-        if not placementDrag then
-            movementDrag = not not hovering
-            selectionDrag = not hovering
+        if placementMode then
+            placementDrag = not mapItemHovered
+
+            if not placementDrag and selectionHovered then
+                movementDrag = true
+            end
+
+        else
+            movementDrag = not not selectionHovered
+            selectionDrag = not selectionHovered
         end
 
         dragStartX = mapX
@@ -289,7 +297,7 @@ function tool.mousereleased(x, y, button, istouch, presses, click)
 
     if button == actionButton then
         -- Update selection if we click in placement mode
-        if click and placementDrag then
+        if click and tool.mode == "placement" then
             local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
 
             selectionRectangle = rectangleStruct.create(mapX, mapY, 1, 1)
@@ -439,11 +447,11 @@ local function deselectHotkey()
 end
 
 function tool.draw()
-    if tool.mode == "selection" then
+    if selectionDrag then
         drawSelectionArea()
         drawSelectionRectangles()
 
-    elseif tool.mode == "placement" then
+    elseif placementDrag then
         drawRoomPlacementPreview()
     end
 end
