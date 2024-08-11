@@ -39,6 +39,9 @@ local dragMovementTotalY = 0
 local lastMoveX
 local lastMoveY
 
+-- Initial cover of selections
+local coverX, coverY, coverWidth, coverHeight
+
 local selectionRectangle
 local selectionPreviews
 
@@ -130,6 +133,48 @@ local function getFakeRoomPositionSize()
     return x, y, width, height
 end
 
+-- Always return as a set
+local function getSelectionTargets()
+    local selectionTargets = state.getSelectedItem()
+
+    if selectionTargets and utils.typeof(selectionTargets) ~= "table" then
+        local selectedItem = selectionTargets
+
+        selectionTargets = {}
+        selectionTargets[selectedItem] = true
+    end
+
+    return selectionTargets or {}
+end
+
+local function getSelectionCover()
+    local selectionTargets = getSelectionTargets()
+    local rectangles = {}
+
+    for item, _ in pairs(selectionTargets) do
+        local x, y = item.x, item.y
+        local width, height = item.width, item.height
+
+        -- Fillers are stored in tiles
+        if utils.typeof(item) == "filler" then
+            x *= 8
+            y *= 8
+
+            width *= 8
+            height *= 8
+        end
+
+        table.insert(rectangles, rectangleStruct.create(x, y, width, height))
+    end
+
+    local x, y, width, height = utils.coverRectangles(rectangles)
+    local viewportScale = viewportHandler.viewport.scale
+    local windowX, windowY = viewportHandler.getWindowCoordinates(x, y)
+    local windowWidth, windowHeight = width * viewportScale, height * viewportScale
+
+    return windowX, windowY, windowWidth, windowHeight
+end
+
 local function selectionFinished()
     if selectionDrag then
         selectionPreviews = mapItemsInRectangle(selectionRectangle)
@@ -154,6 +199,8 @@ local function selectionFinished()
 
             mapItemUtils.move(selectedItem, -dragMovementTotalX, -dragMovementTotalY, 8, false)
             mapItemUtils.move(selectedItem, dragMovementTotalX, dragMovementTotalY, 8, true)
+
+            coverX, coverY, coverWidth, coverHeight = nil, nil, nil, nil
         end
     end
 
@@ -213,6 +260,7 @@ end
 
 function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
+    local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier)
 
     -- Check if button is held, tool handler might consume mouse up to change room
     if love.mouse.isDown(actionButton) then
@@ -232,6 +280,20 @@ function tool.mousemoved(x, y, dx, dy, istouch)
 
             local deltaX = mapX - lastMoveX
             local deltaY = mapY - lastMoveY
+
+            if axisBound then
+                local totalDeltaX = mapX - dragStartX
+                local totalDeltaY = mapY - dragStartY
+
+                if math.abs(totalDeltaX) > math.abs(totalDeltaY) then
+                    deltaY = -dragMovementTotalY * 8
+                    lastMoveY = dragStartY
+
+                else
+                    deltaX = -dragMovementTotalX * 8
+                    lastMoveX = dragStartX
+                end
+            end
 
             -- Floor towards zero
             local moveTilesX = math.floor(math.abs(deltaX) / 8) * utils.sign(deltaX)
@@ -283,6 +345,10 @@ function tool.mousepressed(x, y, button, istouch, pressed)
         else
             movementDrag = not not selectionHovered
             selectionDrag = not selectionHovered
+
+            if movementDrag then
+                coverX, coverY, coverWidth, coverHeight = getSelectionCover()
+            end
         end
 
         dragStartX = mapX
@@ -398,14 +464,7 @@ local function drawSelectionRectangles()
     local lineWidth = love.graphics.getLineWidth()
     local drawnSelections = {}
 
-    local selectionTargets = state.getSelectedItem()
-
-    if selectionTargets and utils.typeof(selectionTargets) ~= "table" then
-        local selectedItem = selectionTargets
-
-        selectionTargets = {}
-        selectionTargets[selectedItem] = true
-    end
+    local selectionTargets = getSelectionTargets()
 
     drawSelectionRectanglesCommon(selectionPreviews, previewBorderColor, previewFillColor, lineWidth, drawnSelections)
     drawSelectionRectanglesCommon(selectionTargets, completeBorderColor, completeFillColor, lineWidth, drawnSelections)
@@ -440,6 +499,42 @@ local function drawRoomPlacementPreview()
     end)
 end
 
+local function drawAxisBoundMovementLines()
+    drawing.callKeepOriginalColor(function()
+        local windowWidth, windowHeight = love.graphics.getDimensions()
+
+        -- Make length slightly shorter to prevent overlapping at the selection area
+        local lengthOffset = 1
+
+        love.graphics.setColor(colors.selectionAxisBoundMovementLines)
+
+        -- Draw from room borders towards selection
+        -- Left
+        if coverX >= 0 then
+            drawing.drawDashedLine(0, coverY, coverX - lengthOffset, coverY)
+            drawing.drawDashedLine(0, coverY + coverHeight, coverX - lengthOffset, coverY + coverHeight)
+        end
+
+        -- Right
+        if coverX + coverWidth <= windowWidth then
+            drawing.drawDashedLine(windowWidth, coverY, coverX + coverWidth + lengthOffset, coverY)
+            drawing.drawDashedLine(windowWidth, coverY + coverHeight, coverX + coverWidth + lengthOffset, coverY + coverHeight)
+        end
+
+        -- Top
+        if coverY >= 0 then
+            drawing.drawDashedLine(coverX, 0, coverX, coverY - lengthOffset)
+            drawing.drawDashedLine(coverX + coverWidth, 0, coverX + coverWidth, coverY - lengthOffset)
+        end
+
+        -- Bottom
+        if coverY + coverHeight <= windowHeight then
+            drawing.drawDashedLine(coverX, windowHeight, coverX, coverY + coverHeight + lengthOffset)
+            drawing.drawDashedLine(coverX + coverWidth, windowHeight, coverX + coverWidth, coverY + coverHeight + lengthOffset)
+        end
+    end)
+end
+
 local function selectAllHotkey()
     -- Fake a infinitely large selection
     selectionDrag = true
@@ -453,9 +548,16 @@ local function deselectHotkey()
 end
 
 function tool.draw()
-    if selectionDrag then
-        drawSelectionArea()
-        drawSelectionRectangles()
+    if selectionDrag or tool.mode == "selection" then
+        local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier)
+
+        if axisBound and movementDrag then
+            drawAxisBoundMovementLines()
+
+        else
+            drawSelectionArea()
+            drawSelectionRectangles()
+        end
 
     elseif placementDrag then
         drawRoomPlacementPreview()
