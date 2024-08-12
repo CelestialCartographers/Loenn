@@ -392,6 +392,10 @@ function roomWindow.createRoomWindow(room, editing)
                 saveRoomCallback(formFields, room, editing, usingPixels)
                 widgetUtils.setWindowTitle(window, getWindowTitle(language, room, editing))
                 form.formDataSaved(formFields)
+
+                if not editing then
+                    widgetUtils.closeWindow(window)
+                end
             end
         }
     }

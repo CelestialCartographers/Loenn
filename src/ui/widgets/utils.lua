@@ -46,7 +46,19 @@ function widgetUtils.addWindowCloseButton(window, callback)
             end
         end
 
+        window._closeButton = closeButton
+
         table.insert(titlebar.children, closeButton)
+    end
+end
+
+function widgetUtils.closeWindow(window)
+    if window then
+        if window._closeButton then
+            return window._closeButton.cb()
+        end
+
+        window:removeSelf()
     end
 end
 
