@@ -434,6 +434,10 @@ local function updateLayerList(toolName, tool)
 
         else
             toolWindow.layerPanel:removeSelf()
+
+            -- Always update material list if the layer list is invisible
+            -- Layer item callback will never happen and the material list will be stuck
+            toolWindow.materialList:updateItems(getMaterialItems("fake_layer_name"))
         end
 
         toolWindow.layerPanelVisible = newVisible
@@ -553,7 +557,7 @@ local function toolCallback(list, toolName)
         toolWindow.eventStates.material = nil
 
         toolHandler.selectTool(toolName)
-        updateLayerList(toolName, tool)
+        updateLayerList(toolName, toolHandler.tools[toolName])
     end
 end
 
