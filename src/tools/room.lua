@@ -345,10 +345,10 @@ function tool.mousepressed(x, y, button, istouch, pressed)
         else
             movementDrag = not not selectionHovered
             selectionDrag = not selectionHovered
+        end
 
-            if movementDrag then
-                coverX, coverY, coverWidth, coverHeight = getSelectionCover()
-            end
+        if movementDrag then
+            coverX, coverY, coverWidth, coverHeight = getSelectionCover()
         end
 
         dragStartX = mapX
@@ -548,7 +548,7 @@ local function deselectHotkey()
 end
 
 function tool.draw()
-    if selectionDrag or tool.mode == "selection" then
+    if movementDrag or selectionDrag or tool.mode == "selection" then
         local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier)
 
         if axisBound and movementDrag then
