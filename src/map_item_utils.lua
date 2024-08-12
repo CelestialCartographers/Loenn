@@ -109,12 +109,14 @@ local function deleteItemWithHistory(map, item)
         mapItemUtils.addItem(map, item, false)
     end
 
+    forward()
+
     return history.addSnapshot(snapshotStruct.create("Remove map items", {}, backward, forward))
 end
 
 function mapItemUtils.deleteItem(map, item, useHistory)
     if useHistory ~= false then
-        deleteItemWithHistory(map, item)
+        return deleteItemWithHistory(map, item)
     end
 
     local itemType = utils.typeof(item)
@@ -129,7 +131,7 @@ function mapItemUtils.deleteItem(map, item, useHistory)
         local result = false
 
         for subItem, _ in pairs(item) do
-            result = result or mapItemUtils.deleteItem(map, subItem)
+            result = mapItemUtils.deleteItem(map, subItem, useHistory) or result
         end
 
         return result
@@ -155,13 +157,15 @@ local function addItemWithHistory(map, item)
         mapItemUtils.deleteItem(map, item, false)
     end
 
+    forward()
+
     return history.addSnapshot(snapshotStruct.create("Add map items", {}, backward, forward))
 end
 
 
 function mapItemUtils.addItem(map, item, useHistory)
     if useHistory ~= false then
-        addItemWithHistory(map, item)
+        return addItemWithHistory(map, item)
     end
 
     local itemType = utils.typeof(item)
@@ -173,8 +177,8 @@ function mapItemUtils.addItem(map, item, useHistory)
         mapItemUtils.addFiller(map, item)
 
     elseif itemType == "table" then
-        for _, subItem in ipairs(item) do
-            mapItemUtils.addItem(map, subItem)
+        for subItem, _ in pairs(item) do
+            mapItemUtils.addItem(map, subItem, useHistory)
         end
     end
 end
