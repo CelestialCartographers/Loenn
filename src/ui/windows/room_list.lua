@@ -184,6 +184,10 @@ function roomList:editorRoomDeleted()
 
         if firstRoom then
             selectRoom(firstRoom.name, false)
+            updateList(self, firstRoom.name)
+
+        else
+            updateList(self)
         end
     end
 end
@@ -191,6 +195,7 @@ end
 function roomList:editorRoomAdded()
     return function(list, room)
         selectRoom(room.name, false)
+        updateList(self, room.name)
     end
 end
 
