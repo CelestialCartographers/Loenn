@@ -130,7 +130,7 @@ local function updateList(list, target)
     list:updateItems(roomItems, target, nil, preventCallback)
 end
 
-function roomList.roomSelectedCallback(element, roomName)
+local function selectRoom(roomName, moveViewport)
     local currentRoom = state.getSelectedRoom()
     local sameRoomName = currentRoom and cleanRoomName(currentRoom.name) ~= roomName and currentRoom.name ~= roomName
 
@@ -140,9 +140,16 @@ function roomList.roomSelectedCallback(element, roomName)
         if newRoom then
             -- TODO - Allow user to specify zoom after room selection in config
             state.selectItem(newRoom)
-            viewportHandler.moveToPosition(newRoom.x + newRoom.width / 2, newRoom.y + newRoom.height / 2, 1, true)
+
+            if moveViewport ~= false then
+                viewportHandler.moveToPosition(newRoom.x + newRoom.width / 2, newRoom.y + newRoom.height / 2, 1, true)
+            end
         end
     end
+end
+
+function roomList.roomSelectedCallback(element, roomName)
+    selectRoom(roomName)
 end
 
 function roomList:editorMapTargetChanged()
@@ -173,18 +180,24 @@ end
 
 function roomList:editorRoomDeleted()
     return function(list, room)
-        updateList(self, 1)
+        local firstRoom = state.map.rooms[1]
+
+        if firstRoom then
+            selectRoom(firstRoom.name, false)
+        end
     end
 end
 
 function roomList:editorRoomAdded()
     return function(list, room)
-        updateList(self, room.name)
+        selectRoom(room.name, false)
     end
 end
 
 function roomList:editorRoomChanged()
     return function(list, room)
+        -- Manually set room so we don't update viewport
+        selectRoom(room.name, false)
         mapItemUtils.sortRoomList(state.map)
         updateList(self, room.name)
     end
@@ -192,18 +205,6 @@ end
 
 function roomList:editorRoomOrderChanged()
     return function()
-        updateList(self)
-    end
-end
-
-function roomList:uiRoomWindowRoomChanged()
-    return function(list, room)
-        updateList(self, room.name)
-    end
-end
-
-function roomList:editorRoomOrderChanged()
-    return function(list)
         updateList(self)
     end
 end
@@ -230,7 +231,6 @@ function roomList.getWindow()
         editorRoomDeleted = roomList.editorRoomDeleted(list),
         editorRoomAdded = roomList.editorRoomAdded(list),
         editorRoomChanged = roomList.editorRoomChanged(list),
-        uiRoomWindowRoomChanged = roomList.uiRoomWindowRoomChanged(list),
     })
 
     window.style.bg = {}
