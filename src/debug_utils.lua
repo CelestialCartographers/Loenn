@@ -129,6 +129,7 @@ function debugUtils.reloadHotkeys()
     local hotkeyHandler = require("hotkey_handler")
 
     hotkeyHandler.reloadHotkeys()
+    toolHandler.addHotkeys(hotkeyHandler)
 end
 
 function debugUtils.redrawMap()
