@@ -558,15 +558,12 @@ local function toolCallback(list, toolName)
 
         toolHandler.selectTool(toolName)
         updateLayerList(toolName, toolHandler.tools[toolName])
+        updateToolModeList(toolName)
     end
 end
 
 local function toolChangedCallback(self, tool)
-    toolWindow.eventStates.tool = tool.name
-
-    toolWindow.toolList:setSelection(tool.name, true)
-    updateLayerList(tool.name, tool)
-    updateToolModeList(tool.name)
+    toolWindow.toolList:setSelection(tool.name)
 end
 
 local function updateLayerAndPlacementsCallback(list, layer, value)
