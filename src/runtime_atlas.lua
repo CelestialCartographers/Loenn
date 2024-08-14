@@ -179,6 +179,18 @@ function textureAtlas.removeImage(image, quad, layer)
 end
 
 function textureAtlas.addImageFirstAtlas(image, filename, createIfNeeded, onlyCheck)
+    if not image then
+        return nil, 0, 0, -1
+    end
+
+    local imageWidth, imageHeight = image:getDimensions()
+
+    -- Doesn't need a canvas, already has the right size
+    -- This mostly applies to Celeste atlas files
+    if imageWidth == textureAtlas.width and imageHeight == textureAtlas.height then
+        return image, 0, 0
+    end
+
     for i, atlas in ipairs(textureAtlas.atlases) do
         if not onlyCheck or onlyCheck and onlyCheck == i then
             local fit, atlasImage, x, y, layer = textureAtlas.addImage(atlas, image, filename, i)
