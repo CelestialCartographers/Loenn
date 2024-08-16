@@ -196,6 +196,8 @@ end
 local function mapSaveSuccess(filename)
     state.currentSaves[filename] = nil
 
+    addToRecentFiles(filename)
+
     sceneHandler.sendEvent("editorMapSaved", filename)
     resumeQueuedSave(filename)
 end
