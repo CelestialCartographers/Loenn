@@ -405,6 +405,9 @@ function menubar.getMenubar()
     topbar:hook({
         editorMapLoaded = function()
             hotswapMenubar()
+        end,
+        editorMapSaved = function()
+            hotswapMenubar()
         end
     })
 
