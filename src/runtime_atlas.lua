@@ -218,7 +218,14 @@ end
 
 function textureAtlas.dumpCanvasImages()
     for i = 1, #textureAtlas.atlases do
-        local data = textureAtlas.canvasArray:newImageData(i)
+        local data
+
+        if i <= textureAtlas.canvases then
+            data = textureAtlas.canvasArray:newImageData(i)
+
+        else
+            data = textureAtlas.atlases[i].image:newImageData()
+        end
 
         data:encode("png", "canvas_dump_" .. tostring(i) .. ".png")
         data:release()
