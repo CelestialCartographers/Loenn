@@ -58,6 +58,18 @@ local function createPopupWindow(popup)
         popup = popup,
     })
 
+    if popup.settings and popup.settings.clickToClose then
+        panel:with(uiUtils.hook({
+            onClick = function(orig, self, x, y, button, ...)
+                if button == 1 then
+                    return removePopupWindow(panel)
+                end
+
+                orig(self, x, y, button, ...)
+            end
+        }))
+    end
+
     local closeButton = uiElements.button(uiElements.image("ui:icons/close"), function()
         removePopupWindow(panel)
     end):with({

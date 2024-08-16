@@ -62,7 +62,7 @@ function notificationHandlers:editorMapSaved(filename)
         notifications.notify(
             string.format(tostring(language.ui.notifications.editorMapSaved), filename),
             nil,
-            {clearSameTag = true, tag = "editorMapSaved"}
+            {clearSameTag = true, tag = "editorMapSaved", clickToClose = true}
         )
     end
 end
@@ -82,13 +82,21 @@ end
 function notificationHandlers:editorMapLoaded(filename)
     local language = languageRegistry.getLanguage()
 
-    notifications.notify(string.format(tostring(language.ui.notifications.editorMapLoaded), filename))
+    notifications.notify(
+        string.format(tostring(language.ui.notifications.editorMapLoaded), filename),
+        nil,
+        {clickToClose = true}
+    )
 end
 
 function notificationHandlers:editorMapNew(filename)
     local language = languageRegistry.getLanguage()
 
-    notifications.notify(string.format(tostring(language.ui.notifications.editorMapNew), filename))
+    notifications.notify(
+        string.format(tostring(language.ui.notifications.editorMapNew), filename),
+        nil,
+        {clickToClose = true}
+    )
 end
 
 function notificationHandlers:editorMapLoadFailed(filename)
@@ -103,7 +111,7 @@ function notificationHandlers:editorHistoryUndoEmpty()
     notifications.notify(
         tostring(language.ui.notifications.editorHistoryUndoEmpty),
         nil,
-        {clearSameTag = true, tag = "editorHistoryUndoEmpty"}
+        {clearSameTag = true, tag = "editorHistoryUndoEmpty", clickToClose = true}
     )
 end
 
@@ -113,7 +121,7 @@ function notificationHandlers:editorHistoryRedoEmpty()
     notifications.notify(
         tostring(language.ui.notifications.editorHistoryRedoEmpty),
         nil,
-        {clearSameTag = true, tag = "editorHistoryRedoEmpty"}
+        {clearSameTag = true, tag = "editorHistoryRedoEmpty", clickToClose = true}
     )
 end
 
