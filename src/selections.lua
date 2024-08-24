@@ -172,7 +172,7 @@ function selectionUtils.getSelectionsForRoomInRectangle(room, layer, subLayer, r
     end
 
     -- Handle tile selections
-    utils.callIterateFirstIfTable(addTileSelection, layer, subLayer, room, rectangle, selected)
+    utils.callIterateFirstIfTable(addTileSelection, layer, room, rectangle, selected)
 
     -- All other selections
     local rectangles = selectionUtils.getSelectionsForRoom(room, layer, subLayer)
