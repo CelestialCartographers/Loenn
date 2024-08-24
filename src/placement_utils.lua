@@ -56,6 +56,12 @@ end
 
 local idLayers = {"entities", "triggers"}
 
+function placementUtils.addSubLayer(item, layer, subLayer)
+    if layer ~= "tilesFg" or layer ~= "tilesBg" then
+        item._editorLayer = subLayer
+    end
+end
+
 -- Add unique ID to trigger/entity
 function placementUtils.finalizePlacement(room, layer, item)
     if layer == "entities" or layer == "triggers" then
@@ -117,10 +123,11 @@ function placementUtils.getGridPosition(x, y, precise, addHalf)
     end
 end
 
-function placementUtils.placeItem(room, layer, item)
+function placementUtils.placeItem(room, layer, subLayer, item)
     local handler = layerHandlers.getHandler(layer)
 
     if handler and handler.placeItem then
+        placementUtils.addSubLayer(item, layer, subLayer)
         placementUtils.finalizePlacement(room, layer, item)
 
         return handler.placeItem(room, layer, item)

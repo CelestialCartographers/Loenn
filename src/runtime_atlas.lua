@@ -26,8 +26,20 @@ function textureAtlas.init()
             textureAtlas.canvases = count
             textureAtlas.canvasArray = canvas
 
+            if configs.debug.logImageLoading then
+                local message = string.format("Initialized runtime atlases with up to %s layers", count)
+
+                logging.info(message)
+            end
+
             return count
         end
+    end
+
+    if configs.debug.logImageLoading then
+        local message = string.format("Unable to initialize runtime atlases with layers, using normal canvases")
+
+        logging.info(message)
     end
 
     textureAtlas.canvases = 0
@@ -138,7 +150,7 @@ function textureAtlas.addImage(atlas, image, filename, layer)
             love.graphics.setCanvas(previousCanvas)
 
             if configs.debug.logImageLoading then
-                local message = string.format("Loaded image '%s' to atlas layer %s at (%s, %s) with size %sx%s", filename, atlas.layer, x, y, width, height)
+                local message = string.format("Loaded image '%s' to atlas layer %s at (%s, %s) with size %sx%s", filename, atlas.layer or layer, x, y, width, height)
 
                 logging.info(message)
             end
@@ -156,7 +168,7 @@ function textureAtlas.removeImage(image, quad, layer)
     local atlas = textureAtlas.atlases[layer]
 
     if atlas then
-        textureAtlas.clearCanvasArea(image, layer, x, y, wdith, height)
+        textureAtlas.clearCanvasArea(image, layer, x, y, width, height)
 
         table.insert(atlas.rectangles, utils.rectangle(x, y, width, height))
         sortAtlasRectangles(atlas)
@@ -167,6 +179,18 @@ function textureAtlas.removeImage(image, quad, layer)
 end
 
 function textureAtlas.addImageFirstAtlas(image, filename, createIfNeeded, onlyCheck)
+    if not image then
+        return nil, 0, 0, -1
+    end
+
+    local imageWidth, imageHeight = image:getDimensions()
+
+    -- Doesn't need a canvas, already has the right size
+    -- This mostly applies to Celeste atlas files
+    if imageWidth == textureAtlas.width and imageHeight == textureAtlas.height then
+        return image, 0, 0
+    end
+
     for i, atlas in ipairs(textureAtlas.atlases) do
         if not onlyCheck or onlyCheck and onlyCheck == i then
             local fit, atlasImage, x, y, layer = textureAtlas.addImage(atlas, image, filename, i)
@@ -178,6 +202,12 @@ function textureAtlas.addImageFirstAtlas(image, filename, createIfNeeded, onlyCh
     end
 
     if createIfNeeded ~= false then
+        if configs.debug.logImageLoading then
+            local message = string.format("Added another runtime atlas number %s", #textureAtlas.atlases + 1)
+
+            logging.info(message)
+        end
+
         textureAtlas.addAtlas(#textureAtlas.atlases + 1)
 
         return textureAtlas.addImageFirstAtlas(image, filename, false, #textureAtlas.atlases)
@@ -188,7 +218,14 @@ end
 
 function textureAtlas.dumpCanvasImages()
     for i = 1, #textureAtlas.atlases do
-        local data = textureAtlas.canvasArray:newImageData(i)
+        local data
+
+        if i <= textureAtlas.canvases then
+            data = textureAtlas.canvasArray:newImageData(i)
+
+        else
+            data = textureAtlas.atlases[i].image:newImageData()
+        end
 
         data:encode("png", "canvas_dump_" .. tostring(i) .. ".png")
         data:release()

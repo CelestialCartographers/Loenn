@@ -22,6 +22,22 @@ local threadHandler = require("utils.threads")
 
 local tasks = require("utils.tasks")
 
+local function getInstallInformation()
+    local major, minor, revision, codename = love.getVersion()
+    local installInfoLines = {
+        string.format("Editor version: %s", meta.version),
+        string.format("Love2d version: %d.%d.%d - %s", major, minor, revision, codename),
+        string.format("Operating system: %s", utils.getOS())
+    }
+
+    local installInfo = table.concat(installInfoLines, "\n")
+
+    return installInfo
+end
+
+-- Show install information in log to help debug user issues
+print(getInstallInformation())
+
 require("lib.love_filesystem_unsandboxing")
 require("input_handler")
 
@@ -43,14 +59,7 @@ end
 local originalErrorHandler = love.errorhandler or love.errhand
 
 function love.errorhandler(message)
-    local major, minor, revision, codename = love.getVersion()
-    local installInfoLines = {
-        string.format("Editor version: %s", meta.version),
-        string.format("Love2d version: %d.%d.%d - %s", major, minor, revision, codename),
-        string.format("Operating system: %s", utils.getOS())
-    }
-
-    local installInfo = table.concat(installInfoLines, "\n")
+    local installInfo = getInstallInformation()
     local errorMessage = string.format("%s\n\n%s", installInfo, message)
 
     logging.error(debug.traceback(errorMessage))

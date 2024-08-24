@@ -1822,7 +1822,7 @@ settings.hotkeys.attribute.selectToolRectangle=Select Rectangle Tool
 settings.hotkeys.attribute.selectToolBucket=Select Bucket Tool
 settings.hotkeys.attribute.selectToolLine=Select Line Tool
 settings.hotkeys.attribute.selectToolCircle=Select Circle Tool
-settings.hotkeys.attribute.selectToolEllipse=Select Brush Tool
+settings.hotkeys.attribute.selectToolEllipse=Select Ellipse Tool
 
 settings.hotkeys.description.selectToolRoom=Switch to the room tool.
 settings.hotkeys.description.selectToolPlacement=Switch to the placement tool.

@@ -71,7 +71,7 @@ end
 
 local function placeItemWithHistory(room)
     local snapshot = snapshotUtils.roomLayerSnapshot(function()
-        placementUtils.placeItem(room, tool.layer, utils.deepcopy(placementTemplate.item))
+        placementUtils.placeItem(room, tool.layer, tool.subLayer, utils.deepcopy(placementTemplate.item))
     end, room, tool.layer, "Placement")
 
     history.addSnapshot(snapshot)
@@ -471,7 +471,7 @@ local function updatePlacements(layer, sendEvent)
     end
 end
 
-function tool.setLayer(layer)
+function tool.setLayer(layer, subLayer)
     local sameLayer = layer == tool.layer
 
     if state.map and (not sameLayer or not placementsAvailable) then
@@ -479,9 +479,10 @@ function tool.setLayer(layer)
     end
 
     tool.layer = layer
+    tool.subLayer = subLayer
 
-    toolUtils.sendLayerEvent(tool, layer)
-    state.setLayerForceRender(layer, true)
+    toolUtils.sendLayerEvent(tool, layer, subLayer)
+    state.setLayerForceRender(layer, true) -- TODO
 
     return false
 end
@@ -624,13 +625,13 @@ function tool.mouseclicked(x, y, button, istouch, presses)
     if cursorX and cursorY then
         if button == contextMenuButton then
             local room = state.getSelectedRoom()
-            local contextTargets, bestTarget = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY)
+            local contextTargets, bestTarget = selectionUtils.getContextSelections(room, tool.layer, tool.subLayer, cursorX, cursorY)
 
             selectionUtils.sendContextMenuEvent(contextTargets, bestTarget, room)
 
         elseif button == objectCloneButton then
             local room = state.getSelectedRoom()
-            local selections = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY)
+            local selections = selectionUtils.getContextSelections(room, tool.layer, tool.subLayer, cursorX, cursorY)
 
             cloneSelection(selections)
         end

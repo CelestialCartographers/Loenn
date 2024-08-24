@@ -476,7 +476,7 @@ function triggers.getRoomItems(room, layer)
     return room.triggers
 end
 
-local function selectionRenderFilterPredicate(room, layer, trigger)
+local function selectionRenderFilterPredicate(room, layer, subLayer,  trigger)
     local hiddenCategories = loadedState.getLayerInformation("triggers", "hiddenCategories")
 
     if hiddenCategories then
@@ -487,15 +487,21 @@ local function selectionRenderFilterPredicate(room, layer, trigger)
         end
     end
 
+    if subLayer and subLayer ~= -1 then
+        if subLayer ~= (trigger._editorLayer or 0) then
+            return false
+        end
+    end
+
     return true
 end
 
-function triggers.selectionFilterPredicate(room, layer, trigger)
-    return selectionRenderFilterPredicate(room, layer, trigger)
+function triggers.selectionFilterPredicate(room, layer, subLayer, trigger)
+    return selectionRenderFilterPredicate(room, layer, subLayer, trigger)
 end
 
 function triggers.renderFilterPredicate(room, trigger)
-    return selectionRenderFilterPredicate(room, nil, trigger)
+    return selectionRenderFilterPredicate(room, nil, nil, trigger)
 end
 
 local function getPlacements(handler)

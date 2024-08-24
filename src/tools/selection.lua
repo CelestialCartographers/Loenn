@@ -28,6 +28,7 @@ tool.group = "placement"
 tool.image = nil
 
 tool.layer = "entities"
+tool.subLayer = 0
 tool.validLayers = {
     "allLayers",
     "tilesFg",
@@ -119,7 +120,7 @@ function tool.setSelectionPreviews(previews)
     selectionPreviews = previews
 end
 
-function tool.setLayer(layer)
+function tool.setLayer(layer, subLayer)
     if layer == "allLayers" then
         tool.layer = allLayers
 
@@ -133,7 +134,9 @@ function tool.setLayer(layer)
         state.setLayerForceRender(layer, true)
     end
 
-    toolUtils.sendLayerEvent(tool, layer)
+    tool.subLayer = subLayer
+
+    toolUtils.sendLayerEvent(tool, layer, subLayer)
 
     return false
 end
@@ -146,7 +149,7 @@ local function selectionChanged(x, y, width, height, fromClick)
         selectionRectangle = utils.rectangle(x, y, width, height)
         selectionRectangle.fromClick = fromClick
 
-        local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, selectionRectangle)
+        local newSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, tool.subLayer, selectionRectangle)
 
         if fromClick then
             selectionUtils.orderSelectionsByScore(newSelections)
@@ -1186,7 +1189,7 @@ end
 local function getSimilarSelections(targetSelection, strict)
     local room = state.getSelectedRoom()
     local rectangle = utils.rectangle(-math.huge, -math.huge, math.huge, math.huge)
-    local allSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, rectangle)
+    local allSelections = selectionUtils.getSelectionsForRoomInRectangle(room, tool.layer, tool.subLayer, rectangle)
     local result = {}
 
     for _, selection in ipairs(allSelections) do
@@ -1469,7 +1472,7 @@ function tool.mouseclicked(x, y, button, istouch, presses)
 
         if cursorX and cursorY then
             local room = state.getSelectedRoom()
-            local contextSelections, bestTarget = selectionUtils.getContextSelections(room, tool.layer, cursorX, cursorY, selectionTargets)
+            local contextSelections, bestTarget = selectionUtils.getContextSelections(room, tool.layer, room.subLayer, cursorX, cursorY, selectionTargets)
 
             selectionUtils.sendContextMenuEvent(contextSelections, bestTarget, room)
         end

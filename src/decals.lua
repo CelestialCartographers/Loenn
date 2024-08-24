@@ -391,6 +391,24 @@ function decals.getRoomItems(room, layer)
     return layer == "decalsFg" and room.decalsFg or room.decalsBg
 end
 
+local function selectionRenderFilterPredicate(room, layer, subLayer,  decal)
+    if subLayer and subLayer ~= -1 then
+        if subLayer ~= (decal._editorLayer or 0) then
+            return false
+        end
+    end
+
+    return true
+end
+
+function decals.selectionFilterPredicate(room, layer, subLayer, decal)
+    return selectionRenderFilterPredicate(room, layer, subLayer, decal)
+end
+
+function decals.renderFilterPredicate(room, decal)
+    return selectionRenderFilterPredicate(room, nil, nil, decal)
+end
+
 function decals.ignoredFields(layer, decal)
     return {}
 end

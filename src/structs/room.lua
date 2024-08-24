@@ -156,6 +156,22 @@ function roomStruct.getSize(room)
     return room.width, room.height
 end
 
+function roomStruct.getSubLayers(room, seen)
+    seen = seen or {}
+
+    for _, layer in ipairs({"entities", "triggers", "decalsFg", "decalsBg"}) do
+        seen[layer] = seen[layer] or {}
+
+        for _, target in ipairs(room[layer]) do
+            if target._editorLayer then
+                seen[layer][target._editorLayer] = target._editorLayer
+            end
+        end
+    end
+
+    return seen
+end
+
 function roomStruct.encode(room)
     local res = {}
 

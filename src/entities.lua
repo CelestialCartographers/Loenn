@@ -1396,6 +1396,24 @@ function entities.getRoomItems(room, layer)
     return room.entities
 end
 
+local function selectionRenderFilterPredicate(room, layer, subLayer,  entity)
+    if subLayer and subLayer ~= -1 then
+        if subLayer ~= (entity._editorLayer or 0) then
+            return false
+        end
+    end
+
+    return true
+end
+
+function entities.selectionFilterPredicate(room, layer, subLayer, entity)
+    return selectionRenderFilterPredicate(room, layer, subLayer, entity)
+end
+
+function entities.renderFilterPredicate(room, entity)
+    return selectionRenderFilterPredicate(room, nil, nil, entity)
+end
+
 entities.initDefaultRegistry()
 
 modificationWarner.addModificationWarner(entities)
