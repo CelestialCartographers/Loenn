@@ -48,7 +48,7 @@ local layersWithSubLayers = {
 
 -- Parse layer name with sublayer baked in
 local function parseLayerName(layerName)
-    local layer, subLayerString = string.match(layerName, "(%w*)_(%d*)")
+    local layer, subLayerString = string.match(layerName, "(%w*)_(-?%d*)")
 
     if layer then
         return layer, tonumber(subLayerString)
@@ -392,9 +392,10 @@ local function getLayerItems(toolName)
         local displayName = getLanguageOrDefault(layersNames[layer], layer)
         local tooltipText = getLanguageOrDefault(layersDescriptions[layer])
 
+        -- Layer with -1 means all layers
         local item = uiElements.listItem({
             text = displayName,
-            data = formatLayerName(layer, 0)
+            data = formatLayerName(layer, -1)
         })
 
         table.insert(layerItems, item)
@@ -409,11 +410,11 @@ local function getLayerItems(toolName)
 
             table.sort(subLayers)
 
-            for _, subLayer in ipairs(subLayers) do
-                -- Skip 0, this is the same as the main layer
-                if subLayer ~= 0 then
+            -- No need to show sub layers if we only have one
+            if #subLayers > 1 then
+                for _, subLayer in ipairs(subLayers) do
                     local subItem = uiElements.listItem({
-                        text = displayName .. " " .. tostring(subLayer),
+                        text = string.format("%s %s", displayName, subLayer + 1),
                         data = formatLayerName(layer, subLayer)
                     })
 
