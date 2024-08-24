@@ -12,6 +12,7 @@ local saveSanitizers = require("save_sanitizers")
 local windowTitleUtils = require("window_title")
 
 local sideStruct = require("structs.side")
+local mapStruct = require("structs.map")
 
 local state = {}
 
@@ -55,6 +56,7 @@ local function updateSideState(side, roomName, filename, eventName)
     state.filename = filename
     state.side = side
     state.map = state.side.map
+    state.subLayers = mapStruct.getSubLayers(state.side.map)
 
     celesteRender.loadCustomTilesetAutotiler(state)
 

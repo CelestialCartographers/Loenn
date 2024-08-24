@@ -94,7 +94,7 @@ function selectionUtils.updateSelectionRectangles(room, selections)
     end
 end
 
-function selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
+function selectionUtils.getLayerSelectionsForRoom(room, layer, subLayer, rectangles)
     rectangles = rectangles or {}
 
     local handler = layerHandlers.getHandler(layer)
@@ -107,7 +107,7 @@ function selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
                 local processItem = true
 
                 if handler.selectionFilterPredicate then
-                    processItem = handler.selectionFilterPredicate(room, layer, item)
+                    processItem = handler.selectionFilterPredicate(room, layer, subLayer, item)
                 end
 
                 if processItem then
@@ -120,16 +120,18 @@ function selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
     return rectangles
 end
 
-function selectionUtils.getSelectionsForRoom(room, layer)
+function selectionUtils.getSelectionsForRoom(room, layer, subLayer)
     local rectangles = {}
 
     if type(layer) == "table" then
         for _, l in ipairs(layer) do
-            selectionUtils.getLayerSelectionsForRoom(room, l, rectangles)
+            -- TODO This sublayer is technically wrong, figure out a solution?
+            -- Using -1 for now, meaning all sublayers
+            selectionUtils.getLayerSelectionsForRoom(room, l, -1, rectangles)
         end
 
     else
-        selectionUtils.getLayerSelectionsForRoom(room, layer, rectangles)
+        selectionUtils.getLayerSelectionsForRoom(room, layer, subLayer, rectangles)
     end
 
     return rectangles
@@ -162,7 +164,7 @@ local function addTileSelection(layer, room, rectangle, selected)
     end
 end
 
-function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
+function selectionUtils.getSelectionsForRoomInRectangle(room, layer, subLayer, rectangle)
     local selected = {}
 
     if not room or not rectangle then
@@ -170,10 +172,10 @@ function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
     end
 
     -- Handle tile selections
-    utils.callIterateFirstIfTable(addTileSelection, layer, room, rectangle, selected)
+    utils.callIterateFirstIfTable(addTileSelection, layer, subLayer, room, rectangle, selected)
 
     -- All other selections
-    local rectangles = selectionUtils.getSelectionsForRoom(room, layer)
+    local rectangles = selectionUtils.getSelectionsForRoom(room, layer, subLayer)
 
     for _, selection in ipairs(rectangles) do
         if utils.aabbCheck(rectangle, selection) then
@@ -184,11 +186,11 @@ function selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
     return selected
 end
 
-function selectionUtils.getContextSelections(room, layer, x, y, selections)
+function selectionUtils.getContextSelections(room, layer, subLayer, x, y, selections)
     local selectionTargets
 
     local rectangle = utils.rectangle(x - 1, y - 1, 3, 3)
-    local hoveredSelections = selectionUtils.getSelectionsForRoomInRectangle(room, layer, rectangle)
+    local hoveredSelections = selectionUtils.getSelectionsForRoomInRectangle(room, layer, subLayer, rectangle)
     local bestSelection
 
     selectionUtils.orderSelectionsByScore(hoveredSelections)

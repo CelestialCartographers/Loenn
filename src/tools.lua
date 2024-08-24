@@ -64,7 +64,7 @@ function toolHandler.selectTool(name)
         end
 
         if layerValue then
-            toolHandler.setLayer(layerValue, name)
+            toolHandler.setLayer(layerValue, 0, name)
         end
     end
 
@@ -178,7 +178,7 @@ function toolHandler.getLayers(name)
     return {}
 end
 
-function toolHandler.setLayer(layer, name)
+function toolHandler.setLayer(layer, subLayer, name)
     local handler, toolName = getHandler(name)
 
     if handler then
@@ -192,7 +192,7 @@ function toolHandler.setLayer(layer, name)
         end
 
         if handler.setLayer then
-            result = handler.setLayer(layer, oldLayer)
+            result = handler.setLayer(layer, subLayer)
 
         elseif handler.layer then
             handler.layer = layer
@@ -205,8 +205,8 @@ function toolHandler.setLayer(layer, name)
         end
 
         if result ~= false then
-            toolUtils.sendLayerEvent(handler, layer)
-            loadedState.setLayerForceRender(layer)
+            toolUtils.sendLayerEvent(handler, layer, subLayer)
+            loadedState.setLayerForceRender(layer) -- TODO - Fix all of these
         end
 
         return result

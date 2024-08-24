@@ -113,4 +113,16 @@ function mapStruct.encode(map)
     return res
 end
 
+-- Return as a lookup table, there might be gaps
+function mapStruct.getSubLayers(map)
+    -- Layer 0 is considered the main layer
+    local seen = {}
+
+    for _, room in pairs(map.rooms or {}) do
+        roomStruct.getSubLayers(room, seen)
+    end
+
+    return seen
+end
+
 return mapStruct
