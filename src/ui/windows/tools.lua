@@ -18,6 +18,7 @@ local persistence = require("persistence")
 local textSearching = require("utils.text_search")
 local utils = require("utils")
 local hotkeyHandler = require("hotkey_handler")
+local loadedState = require("loaded_state")
 
 local toolWindow = {}
 
@@ -37,6 +38,32 @@ toolWindow.materialSearch = false
 toolWindow.materialPanel = false
 
 toolWindow.eventStates = {}
+
+local layersWithSubLayers = {
+    entities = true,
+    triggers = true,
+    decalsFg = true,
+    decalsBg = true,
+}
+
+-- Parse layer name with sublayer baked in
+local function parseLayerName(layerName)
+    local layer, subLayerString = string.match(layerName, "(%w*)_(%d*)")
+
+    if layer then
+        return layer, tonumber(subLayerString)
+    end
+
+    return layerName, 0
+end
+
+local function formatLayerName(layer, subLayer)
+    if subLayer and subLayer ~= 0 then
+        return string.format("%s_%s", layer, subLayer)
+    end
+
+    return layer
+end
 
 local function getLanguageOrDefault(languagePath, default)
     if languagePath._exists then
@@ -342,7 +369,7 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     toolWindow.eventStates.layer = layer
     toolWindow.eventStates.material = material
 
-    toolWindow.layerList:setSelection(layer, true)
+    toolWindow.layerList:setSelection(formatLayerName(layer, tool.subLayer), true)
 
     local selectedMaterial = toolWindow.materialList:setSelection(material, true)
 
@@ -359,13 +386,15 @@ local function getLayerItems(toolName)
     local layersNames = language.layers.name
     local layersDescriptions = language.layers.description
 
+    local allSubLayers = loadedState.subLayers or {}
+
     for _, layer in ipairs(layers) do
         local displayName = getLanguageOrDefault(layersNames[layer], layer)
         local tooltipText = getLanguageOrDefault(layersDescriptions[layer])
 
         local item = uiElements.listItem({
             text = displayName,
-            data = layer
+            data = formatLayerName(layer, 0)
         })
 
         table.insert(layerItems, item)
@@ -373,31 +402,58 @@ local function getLayerItems(toolName)
         if tooltipText then
             item.tooltipText = tooltipText
         end
+
+        if layersWithSubLayers[layer] then
+            -- Convert from lookup table into sorted list
+            local subLayers = table.keys(allSubLayers[layer] or {})
+
+            table.sort(subLayers)
+
+            for _, subLayer in ipairs(subLayers) do
+                -- Skip 0, this is the same as the main layer
+                if subLayer ~= 0 then
+                    local subItem = uiElements.listItem({
+                        text = displayName .. " " .. tostring(subLayer),
+                        data = formatLayerName(layer, subLayer)
+                    })
+
+                    table.insert(layerItems, subItem)
+                end
+            end
+        end
     end
 
     return layerItems
 end
 
-local function layerCallback(list, layer)
+local function layerCallback(list, layerName)
+    local layer, subLayer = parseLayerName(layerName)
+
     local sameTool = toolWindow.eventStates.tool == toolHandler.currentToolName
     local sameLayer = toolWindow.eventStates.layer == layer
+    local sameSubLayer = not sameLayer and toolWindow.eventStates.subLayer == subLayer
 
-    if not sameLayer or not sameTool then
-        local targetMaterial = toolUtils.getPersistenceMaterial(toolHandler.currentTool, layer) 
+    if not sameLayer or not sameTool or not sameSubLayer then
+        local targetMaterial = toolUtils.getPersistenceMaterial(toolHandler.currentTool, layer)
 
         toolWindow.eventStates.tool = toolHandler.currentToolName
         toolWindow.eventStates.layer = layer
+        toolWindow.eventStates.subLayer = subLayer
         toolWindow.eventStates.searchTerm = nil
         toolWindow.eventStates.material = nil
 
-        toolHandler.setLayer(layer)
-        toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial)
+        toolHandler.setLayer(layer, subLayer)
+
+        if not sameLayer then
+            toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial)
+        end
     end
 end
 
-local function toolLayerChangedCallback(self, tool, layer)
+local function toolLayerChangedCallback(self, tool, layer, subLayer)
     local searchText = toolUtils.getPersistenceSearch(tool, layer) or ""
     local sameLayer = toolWindow.eventStates.layer == layer
+    local sameSubLayer = not sameLayer and toolWindow.eventStates.subLayer == subLayer
     local sameSearch = toolWindow.eventStates.searchTerm == searchText
     local targetMaterial = nil
 
@@ -405,14 +461,17 @@ local function toolLayerChangedCallback(self, tool, layer)
         targetMaterial = toolUtils.getPersistenceMaterial(tool, layer)
     end
 
-    if not sameLayer or not sameSearch then
+    if not sameLayer or not sameSubLayer or not sameSearch then
         toolWindow.eventStates.searchTerm = searchText
         toolWindow.eventStates.layer = layer
+        toolWindow.eventStates.subLayer = subLayer
 
         toolWindow.materialList:setFilterText(searchText, true)
+        toolWindow.layerList:setSelection(formatLayerName(layer, subLayer), true)
 
-        toolWindow.layerList:setSelection(layer, true)
-        toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial)
+        if not sameLayer then
+            toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial)
+        end
     end
 end
 
@@ -569,12 +628,13 @@ end
 local function updateLayerAndPlacementsCallback(list, layer, value)
     -- We get the event before the main editor
     -- Placements for example will be out of date if we update now
-    if layer == toolWindow.eventStates.layer then
-        ui.runLate(function()
-            toolWindow.layerList:updateItems(getLayerItems())
+    ui.runLate(function()
+        toolWindow.layerList:updateItems(getLayerItems())
+
+        if layer == toolWindow.eventStates.layer then
             toolWindow.materialList:updateItems(getMaterialItems())
-        end)
-    end
+        end
+    end)
 end
 
 local function materialSearchFieldChanged(element, new, old)
