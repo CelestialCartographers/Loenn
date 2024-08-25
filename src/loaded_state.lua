@@ -196,11 +196,15 @@ local function resumeQueuedSave(filename)
 end
 
 local function mapSaveSuccess(filename)
+    local fromBackup = filename ~= state.filename
+
     state.currentSaves[filename] = nil
 
-    addToRecentFiles(filename)
+    if not fromBackup then
+        addToRecentFiles(filename)
+        sceneHandler.sendEvent("editorMapSaved", filename)
+    end
 
-    sceneHandler.sendEvent("editorMapSaved", filename)
     resumeQueuedSave(filename)
 end
 
