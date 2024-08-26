@@ -101,6 +101,15 @@ function roomStruct.decode(data)
         end
     end
 
+    -- Fill in blanks for any tile/object tile struct if missing
+    for _, handler in pairs(structTilesNames) do
+        local target, struct = handler[1], handler[2]
+
+        if not room[target] then
+            room[target] = struct.resize(struct.decode(""), roomTilesWidth, roomTilesHeight)
+        end
+    end
+
     return room
 end
 
