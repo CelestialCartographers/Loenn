@@ -101,7 +101,8 @@ local function dropdownChanged(formField, optionsFlattened)
             formField.currentText = value
 
             -- Manually handle for text field, dropdown handles itself
-            if utils.typeof(formField.field) == "field" then
+            -- Don't update if field is purely a dropdown
+            if formField.editable and utils.typeof(formField.field) == "field" then
                 local newText = formField.displayTransformer(value)
 
                 formField.field:setText(newText)
@@ -266,6 +267,7 @@ function stringField.getElement(name, value, options)
     formField.label = label
     formField.field = field
     formField.dropdown = dropdown
+    formField.editable = editable
     formField.options = options
     formField.name = name
     formField.initialValue = value
