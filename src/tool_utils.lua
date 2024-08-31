@@ -8,6 +8,8 @@ local configs = require("configs")
 
 local toolUtils = {}
 
+local fallbackLayer = "noLayer"
+
 function toolUtils.getCursorPositionInRoom(x, y)
     local room = state.getSelectedRoom()
     local px, py = nil, nil
@@ -75,15 +77,15 @@ function toolUtils.getPersistenceLayer(tool)
 end
 
 function toolUtils.getPersistenceMaterial(tool, layer)
-    return toolUtils.getPersistenceValue(toolUtils.getToolPersistenceIdentifier(tool), layer, "material")
+    return toolUtils.getPersistenceValue(toolUtils.getToolPersistenceIdentifier(tool), layer or fallbackLayer, "material")
 end
 
 function toolUtils.getPersistenceSearch(tool, layer)
-    return toolUtils.getPersistenceValue(toolUtils.getToolPersistenceIdentifier(tool), layer, "search")
+    return toolUtils.getPersistenceValue(toolUtils.getToolPersistenceIdentifier(tool), layer or fallbackLayer, "search")
 end
 
 function toolUtils.getPersistenceFavorites(tool, layer)
-    return toolUtils.getPersistenceValue(toolUtils.getToolPersistenceIdentifier(tool), layer, "favorites")
+    return toolUtils.getPersistenceValue(toolUtils.getToolPersistenceIdentifier(tool), layer or fallbackLayer, "favorites")
 end
 
 function toolUtils.setPersistenceMode(tool, mode)
@@ -95,15 +97,15 @@ function toolUtils.setPersistenceLayer(tool, layer)
 end
 
 function toolUtils.setPersistenceMaterial(tool, layer, material)
-    return toolUtils.setPersistenceValue(material, toolUtils.getToolPersistenceIdentifier(tool), layer, "material")
+    return toolUtils.setPersistenceValue(material, toolUtils.getToolPersistenceIdentifier(tool), layer or fallbackLayer, "material")
 end
 
 function toolUtils.setPersistenceSearch(tool, layer, search)
-    return toolUtils.setPersistenceValue(search, toolUtils.getToolPersistenceIdentifier(tool), layer, "search")
+    return toolUtils.setPersistenceValue(search, toolUtils.getToolPersistenceIdentifier(tool), layer or fallbackLayer, "search")
 end
 
 function toolUtils.setPersistenceFavorites(tool, layer, favorites)
-    return toolUtils.setPersistenceValue(favorites, toolUtils.getToolPersistenceIdentifier(tool), layer, "favorites")
+    return toolUtils.setPersistenceValue(favorites, toolUtils.getToolPersistenceIdentifier(tool), layer or fallbackLayer, "favorites")
 end
 
 function toolUtils.addPersistenceFavorites(tool, layer, material)
