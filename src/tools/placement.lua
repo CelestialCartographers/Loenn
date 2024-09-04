@@ -13,6 +13,7 @@ local nodeStruct = require("structs.node")
 local snapshotUtils = require("snapshot_utils")
 local selectionUtils = require("selections")
 local selectionItemUtils = require("selection_item_utils")
+local subLayers = require("sub_layers")
 
 local tool = {}
 
@@ -482,7 +483,7 @@ function tool.setLayer(layer, subLayer)
     tool.subLayer = subLayer
 
     toolUtils.sendLayerEvent(tool, layer, subLayer)
-    state.setLayerForceRender(layer, true) -- TODO
+    subLayers.setLayerForceRender(layer, subLayer, true)
 
     return false
 end
