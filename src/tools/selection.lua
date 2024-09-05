@@ -19,6 +19,7 @@ local cursorUtils = require("utils.cursor")
 local nodeStruct = require("structs.node")
 local tiles = require("tiles")
 local hotkeyHandler = require("hotkey_handler")
+local subLayers = require("sub_layers")
 
 local tool = {}
 
@@ -125,13 +126,13 @@ function tool.setLayer(layer, subLayer)
         tool.layer = allLayers
 
         -- Set all layers to forced visible
-        state.setLayerForceRender(layer, true, true)
+        subLayers.setLayerForceRender(layer, subLayer, true, true)
 
     else
         tool.layer = layer
 
         -- Set all layers to forced visible
-        state.setLayerForceRender(layer, true)
+        state.setLayerForceRender(layer, subLayer, true)
     end
 
     tool.subLayer = subLayer

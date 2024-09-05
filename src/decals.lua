@@ -3,6 +3,7 @@ local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
 local mods = require("mods")
 local modificationWarner = require("modification_warner")
+local subLayers = require("sub_layers")
 
 local languageRegistry = require("language_registry")
 
@@ -392,10 +393,20 @@ function decals.getRoomItems(room, layer)
 end
 
 local function selectionRenderFilterPredicate(room, layer, subLayer,  decal)
+    local decalSubLayer = decal._editorLayer or 0
+
     if subLayer and subLayer ~= -1 then
-        if subLayer ~= (decal._editorLayer or 0) then
+        if subLayer ~= decalSubLayer then
             return false
         end
+    end
+
+    -- Render check
+    if not subLayer then
+        local subLayerVisible = subLayers.getLayerVisible(layer, decalSubLayer)
+        local layerVisible = subLayers.getLayerVisible(layer, -1)
+
+        return subLayerVisible or layerVisible
     end
 
     return true
@@ -405,8 +416,8 @@ function decals.selectionFilterPredicate(room, layer, subLayer, decal)
     return selectionRenderFilterPredicate(room, layer, subLayer, decal)
 end
 
-function decals.renderFilterPredicate(room, decal)
-    return selectionRenderFilterPredicate(room, nil, nil, decal)
+function decals.renderFilterPredicate(room, decal, fg)
+    return selectionRenderFilterPredicate(room, fg and "decalsFg" or "decalsBg", nil, decal)
 end
 
 function decals.ignoredFields(layer, decal)

@@ -7,6 +7,7 @@ local logging = require("logging")
 local depths = require("consts.object_depths")
 local loadedState = require("loaded_state")
 local modificationWarner = require("modification_warner")
+local subLayers = require("sub_layers")
 
 local languageRegistry = require("language_registry")
 
@@ -487,10 +488,20 @@ local function selectionRenderFilterPredicate(room, layer, subLayer,  trigger)
         end
     end
 
+    local triggerSubLayer = trigger._editorLayer or 0
+
     if subLayer and subLayer ~= -1 then
-        if subLayer ~= (trigger._editorLayer or 0) then
+        if subLayer ~= triggerSubLayer then
             return false
         end
+    end
+
+    -- Render check
+    if not subLayer then
+        local subLayerVisible = subLayers.getLayerVisible(layer, triggerSubLayer)
+        local layerVisible = subLayers.getLayerVisible(layer, -1)
+
+        return subLayerVisible or layerVisible
     end
 
     return true
@@ -501,7 +512,7 @@ function triggers.selectionFilterPredicate(room, layer, subLayer, trigger)
 end
 
 function triggers.renderFilterPredicate(room, trigger)
-    return selectionRenderFilterPredicate(room, nil, nil, trigger)
+    return selectionRenderFilterPredicate(room, "triggers", nil, trigger)
 end
 
 local function getPlacements(handler)

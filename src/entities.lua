@@ -6,6 +6,7 @@ local drawing = require("utils.drawing")
 local nodeStruct = require("structs.node")
 local logging = require("logging")
 local modificationWarner = require("modification_warner")
+local subLayers = require("sub_layers")
 
 local languageRegistry = require("language_registry")
 
@@ -1397,10 +1398,20 @@ function entities.getRoomItems(room, layer)
 end
 
 local function selectionRenderFilterPredicate(room, layer, subLayer,  entity)
+    local entitySubLayer = entity._editorLayer or 0
+
     if subLayer and subLayer ~= -1 then
-        if subLayer ~= (entity._editorLayer or 0) then
+        if subLayer ~= entitySubLayer then
             return false
         end
+    end
+
+    -- Render check
+    if not subLayer then
+        local subLayerVisible = subLayers.getLayerVisible(layer, entitySubLayer)
+        local layerVisible = subLayers.getLayerVisible(layer, -1)
+
+        return subLayerVisible or layerVisible
     end
 
     return true
@@ -1411,7 +1422,7 @@ function entities.selectionFilterPredicate(room, layer, subLayer, entity)
 end
 
 function entities.renderFilterPredicate(room, entity)
-    return selectionRenderFilterPredicate(room, nil, nil, entity)
+    return selectionRenderFilterPredicate(room, "entities", nil, entity)
 end
 
 entities.initDefaultRegistry()

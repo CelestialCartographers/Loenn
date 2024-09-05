@@ -6,6 +6,7 @@ local modHandler = require("mods")
 local toolUtils = require("tool_utils")
 local logging = require("logging")
 local loadedState = require("loaded_state")
+local subLayers = require("sub_layers")
 
 local toolHandler = {}
 
@@ -206,7 +207,7 @@ function toolHandler.setLayer(layer, subLayer, name)
 
         if result ~= false then
             toolUtils.sendLayerEvent(handler, layer, subLayer)
-            loadedState.setLayerForceRender(layer) -- TODO - Fix all of these
+            loadedState.setLayerForceRender(subLayers.formatSubLayer(layer, subLayer))
         end
 
         return result

@@ -542,15 +542,19 @@ local function getDecalsBatchTaskFunc(decals, room, fg, viewport)
     local batches = {}
 
     for i, decal in ipairs(decals) do
-        local texture = decal.texture
-        local drawable, depth = decalHandler.getDrawable(texture, nil, room, decal, viewport)
+        local renderDecal = decalHandler.renderFilterPredicate(room, decal, fg)
 
-        if drawable then
-            local defaultDepth = fg and decalsFgDepth or decalsBgDepth
-            local batchDepth = depth or defaultDepth
-            local batch = getOrCreateSmartBatch(batches, batchDepth)
+        if renderDecal then
+            local texture = decal.texture
+            local drawable, depth = decalHandler.getDrawable(texture, nil, room, decal, viewport)
 
-            batch:addFromDrawable(drawable)
+            if drawable then
+                local defaultDepth = fg and decalsFgDepth or decalsBgDepth
+                local batchDepth = depth or defaultDepth
+                local batch = getOrCreateSmartBatch(batches, batchDepth)
+
+                batch:addFromDrawable(drawable)
+            end
         end
 
         if i % YIELD_RATE == 0 then
@@ -618,31 +622,35 @@ local function getEntityBatchTaskFunc(room, entities, viewport, registeredEntiti
         local handler = registeredEntities[name]
 
         if handler then
-            local drawable, depth = entityHandler.getDrawable(name, handler, room, entity, viewport)
+            local renderEntity = entityHandler.renderFilterPredicate(room, entity)
 
-            -- Special case for multiple drawable sprites
-            -- Maybe handle this better later
-            if drawable then
-                local drawableIsTable = utils.typeof(drawable) == "table"
+            if renderEntity then
+                local drawable, depth = entityHandler.getDrawable(name, handler, room, entity, viewport)
 
-                if not drawableIsTable then
-                    local batchDepth = drawable.depth or depth or 0
-                    local batch = getOrCreateSmartBatch(batches, batchDepth)
+                -- Special case for multiple drawable sprites
+                -- Maybe handle this better later
+                if drawable then
+                    local drawableIsTable = utils.typeof(drawable) == "table"
 
-                    batch:addFromDrawable(drawable)
-
-                else
-                    for _, drawableItem in ipairs(drawable) do
-                        local batchDepth = drawableItem.depth or depth or 0
+                    if not drawableIsTable then
+                        local batchDepth = drawable.depth or depth or 0
                         local batch = getOrCreateSmartBatch(batches, batchDepth)
 
-                        batch:addFromDrawable(drawableItem)
+                        batch:addFromDrawable(drawable)
+
+                    else
+                        for _, drawableItem in ipairs(drawable) do
+                            local batchDepth = drawableItem.depth or depth or 0
+                            local batch = getOrCreateSmartBatch(batches, batchDepth)
+
+                            batch:addFromDrawable(drawableItem)
+                        end
                     end
                 end
-            end
 
-            if i % YIELD_RATE == 0 then
-                tasks.yield()
+                if i % YIELD_RATE == 0 then
+                    tasks.yield()
+                end
             end
         end
     end
