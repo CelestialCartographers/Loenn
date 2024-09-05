@@ -19,6 +19,7 @@ local textSearching = require("utils.text_search")
 local utils = require("utils")
 local hotkeyHandler = require("hotkey_handler")
 local loadedState = require("loaded_state")
+local subLayers = require("sub_layers")
 
 local toolWindow = {}
 
@@ -45,25 +46,6 @@ local layersWithSubLayers = {
     decalsFg = true,
     decalsBg = true,
 }
-
--- Parse layer name with sublayer baked in
-local function parseLayerName(layerName)
-    local layer, subLayerString = string.match(layerName, "(%w*)_(-?%d*)")
-
-    if layer then
-        return layer, tonumber(subLayerString)
-    end
-
-    return layerName, 0
-end
-
-local function formatLayerName(layer, subLayer)
-    if subLayer and subLayer ~= 0 then
-        return string.format("%s_%s", layer, subLayer)
-    end
-
-    return layer
-end
 
 local function getLanguageOrDefault(languagePath, default)
     if languagePath._exists then
@@ -115,6 +97,63 @@ local function updateListItemFavoriteVisuals(listItem)
 
     table.insert(children, label)
     listItem:layout()
+end
+
+local function updateListItemVisibleVisuals(listItem)
+    local children = listItem.children
+
+    -- Padding elements does not have children, skip
+    if not children then
+        return
+    end
+
+    local visible = listItem.layerVisible
+    local text = listItem.text
+    local subLayer = listItem.subLayer
+
+    local indent = subLayer ~= -1
+    local iconOffsetX = listItem.style.padding
+
+    if indent then
+        local font = love.graphics.getFont()
+
+        iconOffsetX += font:getWidth(" ")
+    end
+
+    local label = uiElements.label(text)
+
+    listItem.label = label
+
+    for i = 1, #children do
+        children[i] = nil
+    end
+
+    local iconMaxSize = listItem.height - listItem.style.padding * 2
+    local listIcon, iconSize
+
+    if visible then
+        listIcon, iconSize = iconUtils.getIcon("visible", iconMaxSize)
+
+    else
+        listIcon, iconSize = iconUtils.getIcon("hidden", iconMaxSize)
+    end
+
+    if listIcon then
+        local centerOffset = math.floor((listItem.height - iconSize) / 2)
+        local imageElement = uiElements.image(listIcon)
+
+        imageElement = imageElement:with(uiUtils.at(iconOffsetX, centerOffset))
+
+        table.insert(children, imageElement)
+    end
+
+    table.insert(children, label)
+    listItem:layout()
+    listItem:layoutLate()
+
+    if listItem.parent then
+        listItem.parent:layoutLate()
+    end
 end
 
 local function materialSortFunction(lhs, rhs)
@@ -369,13 +408,62 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     toolWindow.eventStates.layer = layer
     toolWindow.eventStates.material = material
 
-    toolWindow.layerList:setSelection(formatLayerName(layer, tool.subLayer), true)
+    toolWindow.layerList:setSelection(subLayers.formatLayerName(layer, tool.subLayer), true)
 
     local selectedMaterial = toolWindow.materialList:setSelection(material, true)
 
     if not selectedMaterial then
         toolWindow.materialList:clearSelection()
     end
+end
+
+local function layerVisibilityOnPressHandler(tool, layer)
+    return function(orig, self, x, y, button, isDrag, presses)
+        -- sameTarget is a workaround for a OlympUI bug where presses is not reset when target changes
+        -- Causes some incorrect pressing behavor, but better than random favorites
+        -- TODO - Remove this workaround when its fixed in OlympUI
+
+        local sameTarget = self == ui.focusing
+        local leftDoubleClick = button == 1 and presses % 2 == 0
+
+        if sameTarget and leftDoubleClick then
+            local layerName = self.data
+            local newVisible = not loadedState.getLayerVisible(layerName)
+
+            self.layerVisible = newVisible
+
+            loadedState.setLayerVisible(layerName, newVisible)
+            updateListItemVisibleVisuals(self)
+
+        else
+            orig(self, x, y, button, isDrag, presses)
+        end
+    end
+end
+
+local function layerDataToElement(list, data, element)
+    if not element then
+        element = uiElements.listItem()
+
+        element:layout()
+    end
+
+    if data then
+        element.text = data.text
+        element.data = data.data
+        element.tooltipText = data.tooltip
+        element.layerVisible = data.layerVisible
+        element.itemData = data
+        element.subLayer = data.subLayer
+
+        updateListItemVisibleVisuals(element)
+
+        element:hook({
+            onPress = layerVisibilityOnPressHandler(data.currentTool, data.currentLayer)
+        })
+    end
+
+    return element
 end
 
 local function getLayerItems(toolName)
@@ -393,30 +481,33 @@ local function getLayerItems(toolName)
         local tooltipText = getLanguageOrDefault(layersDescriptions[layer])
 
         -- Layer with -1 means all layers
-        local item = uiElements.listItem({
+        local item = {
             text = displayName,
-            data = formatLayerName(layer, -1)
-        })
+            data = subLayers.formatLayerName(layer, -1),
+            layerVisible = loadedState.getLayerVisible(layer),
+            tooltipText = tooltipText,
+            subLayer = -1,
+        }
 
         table.insert(layerItems, item)
 
-        if tooltipText then
-            item.tooltipText = tooltipText
-        end
-
         if layersWithSubLayers[layer] then
             -- Convert from lookup table into sorted list
-            local subLayers = table.keys(allSubLayers[layer] or {})
+            local subLayerNames = table.keys(allSubLayers[layer] or {})
 
-            table.sort(subLayers)
+            table.sort(subLayerNames)
 
             -- No need to show sub layers if we only have one
-            if #subLayers > 1 then
-                for _, subLayer in ipairs(subLayers) do
-                    local subItem = uiElements.listItem({
-                        text = string.format("%s %s", displayName, subLayer + 1),
-                        data = formatLayerName(layer, subLayer)
-                    })
+            if #subLayerNames > 1 then
+                for _, subLayer in ipairs(subLayerNames) do
+                    local layerName = subLayers.formatLayerName(layer, subLayer)
+                    local subItem = {
+                        text = string.format(" %s %s", displayName, subLayer + 1),
+                        data = layerName,
+                        layerVisible = loadedState.getLayerVisible(layerName),
+                        tooltipText = tooltipText,
+                        subLayer = subLayer,
+                    }
 
                     table.insert(layerItems, subItem)
                 end
@@ -428,7 +519,7 @@ local function getLayerItems(toolName)
 end
 
 local function layerCallback(list, layerName)
-    local layer, subLayer = parseLayerName(layerName)
+    local layer, subLayer = subLayers.parseLayerName(layerName)
 
     local sameTool = toolWindow.eventStates.tool == toolHandler.currentToolName
     local sameLayer = toolWindow.eventStates.layer == layer
@@ -468,7 +559,7 @@ local function toolLayerChangedCallback(self, tool, layer, subLayer)
         toolWindow.eventStates.subLayer = subLayer
 
         toolWindow.materialList:setFilterText(searchText, true)
-        toolWindow.layerList:setSelection(formatLayerName(layer, subLayer), true)
+        toolWindow.layerList:setSelection(subLayers.formatLayerName(layer, subLayer), true)
 
         if not sameLayer then
             toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial)
@@ -661,7 +752,8 @@ function toolWindow.getWindow()
     }
 
     local layerListOptions = {
-        initialItem = toolHandler.getLayer()
+        initialItem = toolHandler.getLayer(),
+        dataToElement = layerDataToElement,
     }
 
     local materialListOptions = {
@@ -684,7 +776,7 @@ function toolWindow.getWindow()
     local scrolledModeList, modeList = lists.getList(modeCallback, modeItems, modeListOptions)
 
     local layerItems = getLayerItems()
-    local scrolledLayerList, layerList = lists.getList(layerCallback, layerItems, layerListOptions)
+    local scrolledLayerList, layerList = lists.getMagicList(layerCallback, layerItems, layerListOptions)
 
     local materialItems = getMaterialItems()
     local scrolledMaterialList, materialList, materialSearchField = lists.getMagicList(materialCallback, materialItems, materialListOptions)
