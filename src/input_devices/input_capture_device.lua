@@ -15,6 +15,9 @@ function inputCaptureDevice.update(dt)
 
         if inputCaptureDevice._captureTime == 0 then
             inputCaptureDevice._captureCallback(false)
+
+            inputCaptureDevice._captureMode = nil
+            inputCaptureDevice._captureCallback = nil
         end
     end
 
