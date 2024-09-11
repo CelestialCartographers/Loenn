@@ -329,8 +329,6 @@ local function materialDataToElement(list, data, element)
     end
 
     if data then
-        local language = languageRegistry.getLanguage()
-
         element.text = data.text
         element.data = data.data
         element.tooltipText = data.tooltip
@@ -340,12 +338,16 @@ local function materialDataToElement(list, data, element)
 
         updateListItemFavoriteVisuals(element)
 
-        -- TODO - Reimplement this, syncing checkbox state is more effort now
-        --addMaterialContextMenu(language, data.currentToolName, data.currentLayer, element)
+        if not element._addedHooks then
+            -- TODO - Reimplement this, syncing checkbox state is more effort now
+            --addMaterialContextMenu(language, data.currentToolName, data.currentLayer, element)
 
-        element:hook({
-            onPress = materialFavoriteOnPressHandler(data.currentTool, data.currentLayer)
-        })
+            element:hook({
+                onPress = materialFavoriteOnPressHandler(data.currentTool, data.currentLayer)
+            })
+
+            element._addedHooks = true
+        end
     end
 
     return element
@@ -417,7 +419,7 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     end
 end
 
-local function layerVisibilityOnPressHandler(tool, layer)
+local function layerVisibilityOnPressHandler()
     return function(orig, self, x, y, button, isDrag, presses)
         -- sameTarget is a workaround for a OlympUI bug where presses is not reset when target changes
         -- Causes some incorrect pressing behavor, but better than random favorites
@@ -433,7 +435,6 @@ local function layerVisibilityOnPressHandler(tool, layer)
             self.layerVisible = newVisible
 
             loadedState.setLayerVisible(layerName, newVisible)
-            updateListItemVisibleVisuals(self)
 
         else
             orig(self, x, y, button, isDrag, presses)
@@ -458,9 +459,13 @@ local function layerDataToElement(list, data, element)
 
         updateListItemVisibleVisuals(element)
 
-        element:hook({
-            onPress = layerVisibilityOnPressHandler(data.currentTool, data.currentLayer)
-        })
+        if not element._addedHooks then
+            element:hook({
+                onPress = layerVisibilityOnPressHandler()
+            })
+
+            element._addedHooks = true
+        end
     end
 
     return element
@@ -567,11 +572,14 @@ local function toolLayerChangedCallback(self, tool, layer, subLayer)
     end
 end
 
-local function updateLayerList(toolName, tool)
+local function updateLayerList(toolName, tool, targetLayer)
     local items = getLayerItems(toolName)
-    local targetLayer = nil
 
-    if tool then
+    if toolName and not tool then
+        tool = toolHandler.tools[toolName]
+    end
+
+    if tool and not targetLayer then
         targetLayer = toolUtils.getPersistenceLayer(tool)
     end
 
@@ -601,7 +609,12 @@ local function layerInformationChangedCallback(window, key, value)
         return
     end
 
-    updateLayerList()
+    local toolName = toolWindow.eventStates.tool
+    local layer = toolWindow.eventStates.layer
+    local subLayer = toolWindow.eventStates.subLayer
+    local layerName = subLayers.formatLayerName(layer, subLayer)
+
+    updateLayerList(toolName, toolHandler.tools[toolName], layerName)
 end
 
 local function getModeItems(toolName)
