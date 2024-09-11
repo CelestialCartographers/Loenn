@@ -404,9 +404,9 @@ function entities.getDrawableRectangle(drawables)
     return utils.rectangle(x, y, width, height)
 end
 
-function entities.getNodeRectangles(room, entity, viewport)
+function entities.getNodeRectangles(room, entity, viewport, handlerOverride)
     local name = entity._name
-    local handler = entities.registeredEntities[name]
+    local handler = handlerOverride or entities.registeredEntities[name]
     local nodes = entity.nodes
 
     if not nodes then
@@ -462,14 +462,14 @@ function entities.getSelectionUnsafe(room, entity, viewport, handlerOverride)
         return handler.selection(room, entity)
 
     elseif handler.rectangle then
-        return handler.rectangle(room, entity), entities.getNodeRectangles(room, entity)
+        return handler.rectangle(room, entity), entities.getNodeRectangles(room, entity, viewport, handlerOverride)
 
     elseif entity.width and entity.height then
-        return utils.rectangle(entity.x or 0, entity.y or 0, entity.width, entity.height), entities.getNodeRectangles(room, entity)
+        return utils.rectangle(entity.x or 0, entity.y or 0, entity.width, entity.height), entities.getNodeRectangles(room, entity, viewport, handlerOverride)
 
     else
         local drawable = entities.getEntityDrawable(name, handler, room, entity)
-        local nodeRectangles = entities.getNodeRectangles(room, entity)
+        local nodeRectangles = entities.getNodeRectangles(room, entity, viewport, handlerOverride)
 
         if drawable then
             return entities.getDrawableRectangle(drawable), nodeRectangles
