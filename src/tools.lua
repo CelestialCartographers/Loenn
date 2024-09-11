@@ -207,7 +207,7 @@ function toolHandler.setLayer(layer, subLayer, name)
 
         if result ~= false then
             toolUtils.sendLayerEvent(handler, layer, subLayer)
-            loadedState.setLayerForceRender(subLayers.formatSubLayer(layer, subLayer))
+            loadedState.setLayerForceRender(subLayers.formatLayerName(layer, subLayer))
         end
 
         return result

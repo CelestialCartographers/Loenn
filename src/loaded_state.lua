@@ -438,6 +438,10 @@ function state.setLayerInformation(layer, key, value)
 
     info[key] = value
 
+    if changed then
+        sceneHandler.sendEvent("editorLayerInformationChanged", key, value)
+    end
+
     return changed
 end
 
