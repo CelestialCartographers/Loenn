@@ -595,6 +595,15 @@ local function updateLayerList(toolName, tool)
     end
 end
 
+local function layerInformationChangedCallback(window, key, value)
+    -- Only update if its a visibility/render change
+    if key ~= "visible" and key ~= "forceRender" then
+        return
+    end
+
+    updateLayerList()
+end
+
 local function getModeItems(toolName)
     local language = languageRegistry.getLanguage()
     local modes = toolHandler.getModes(toolName) or {}
@@ -818,6 +827,7 @@ function toolWindow.getWindow()
         editorToolModeChanged = toolModeChangedCallback,
         editorMapLoaded = updateLayerAndPlacementsCallback,
         editorShownDependenciesChanged = updateLayerAndPlacementsCallback,
+        editorLayerInformationChanged = layerInformationChangedCallback,
 
         interactive = 0
     })
