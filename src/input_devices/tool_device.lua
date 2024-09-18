@@ -7,6 +7,7 @@ local utils = require("utils")
 local persistence = require("persistence")
 local configs = require("configs")
 local keyboardHelper = require("utils.keyboard")
+local subLayers = require("sub_layers")
 
 local toolProxyMt = {
     __index = function(self, event)
@@ -101,8 +102,10 @@ function device.editorToolModeChanged(tool, mode)
     toolUtils.setPersistenceMode(tool, mode)
 end
 
-function device.editorToolLayerChanged(tool, layer)
-    toolUtils.setPersistenceLayer(tool, layer)
+function device.editorToolLayerChanged(tool, layer, subLayer)
+    local layerName = subLayers.formatLayerName(layer, subLayer)
+
+    toolUtils.setPersistenceLayer(tool, layerName)
 end
 
 function device.editorToolMaterialChanged(tool, layer, material)

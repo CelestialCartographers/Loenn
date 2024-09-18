@@ -23,4 +23,8 @@ function missing.rectangle(room, entity)
     return utils.rectangle(drawX, drawY, drawWidth, drawHeight)
 end
 
+function missing.nodeRectangle(room, entity, node, i)
+    return missing.rectangle(room, node)
+end
+
 return missing

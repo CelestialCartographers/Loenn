@@ -92,8 +92,8 @@ function toolUtils.setPersistenceMode(tool, mode)
     return toolUtils.setPersistenceValue(mode, toolUtils.getToolPersistenceIdentifier(tool), "mode")
 end
 
-function toolUtils.setPersistenceLayer(tool, layer)
-    return toolUtils.setPersistenceValue(layer, toolUtils.getToolPersistenceIdentifier(tool), "layer")
+function toolUtils.setPersistenceLayer(tool, layerName)
+    return toolUtils.setPersistenceValue(layerName, toolUtils.getToolPersistenceIdentifier(tool), "layer")
 end
 
 function toolUtils.setPersistenceMaterial(tool, layer, material)
