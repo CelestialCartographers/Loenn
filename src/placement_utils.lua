@@ -58,6 +58,13 @@ local idLayers = {"entities", "triggers"}
 
 function placementUtils.addSubLayer(item, layer, subLayer)
     if layer ~= "tilesFg" or layer ~= "tilesBg" then
+        -- We consider sub layer -1 for "all sub layers" when selecting
+        -- Placement makes more sense to go to sub layer 0, the first one
+
+        if subLayer == -1 then
+            subLayer = 0
+        end
+
         item._editorLayer = subLayer
     end
 end
