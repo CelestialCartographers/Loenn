@@ -669,6 +669,7 @@ local function pasteItems(room, layer, targets)
             target.y += offsetGridY
 
             placementUtils.finalizePlacement(room, targetLayer, item)
+            placementUtils.addSubLayer(item, targetLayer, tool.subLayer)
 
             if type(item.nodes) == "table" then
                 for _, node in ipairs(item.nodes) do
