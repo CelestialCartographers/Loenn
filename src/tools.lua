@@ -65,7 +65,9 @@ function toolHandler.selectTool(name)
         end
 
         if layerValue then
-            toolHandler.setLayer(layerValue, 0, name)
+            local layer, subLayer = subLayers.parseLayerName(layerValue)
+
+            toolHandler.setLayer(layer, subLayer, name)
         end
     end
 
