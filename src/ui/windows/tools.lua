@@ -38,6 +38,8 @@ toolWindow.materialList = false
 toolWindow.materialSearch = false
 toolWindow.materialPanel = false
 
+toolWindow.subLayers = {}
+
 toolWindow.eventStates = {}
 
 local layersWithSubLayers = {
@@ -442,35 +444,6 @@ local function layerVisibilityOnPressHandler()
     end
 end
 
-local function layerDataToElement(list, data, element)
-    if not element then
-        element = uiElements.listItem()
-
-        element:layout()
-    end
-
-    if data then
-        element.text = data.text
-        element.data = data.data
-        element.tooltipText = data.tooltip
-        element.layerVisible = data.layerVisible
-        element.itemData = data
-        element.subLayer = data.subLayer
-
-        updateListItemVisibleVisuals(element)
-
-        if not element._addedHooks then
-            element:hook({
-                onPress = layerVisibilityOnPressHandler()
-            })
-
-            element._addedHooks = true
-        end
-    end
-
-    return element
-end
-
 local function getLayerItems(toolName)
     local language = languageRegistry.getLanguage()
     local layers = toolHandler.getLayers(toolName) or {}
@@ -479,7 +452,7 @@ local function getLayerItems(toolName)
     local layersNames = language.layers.name
     local layersDescriptions = language.layers.description
 
-    local allSubLayers = loadedState.subLayers or {}
+    local allSubLayers = toolWindow.subLayers
 
     for _, layer in ipairs(layers) do
         local displayName = getLanguageOrDefault(layersNames[layer], layer)
@@ -521,6 +494,90 @@ local function getLayerItems(toolName)
     end
 
     return layerItems
+end
+
+local function addSublayer(layer, subLayer)
+    if not layersWithSubLayers[layer] then
+        return
+    end
+
+    if not toolWindow.subLayers[layer] then
+        toolWindow.subLayers[layer] = {}
+    end
+
+    local targetLayer = toolWindow.subLayers[layer]
+    local layerCount = #targetLayer
+
+    -- Special case for when no editor layers are found at all
+    if layerCount == 0 then
+        targetLayer[0] = 0
+        targetLayer[1] = 1
+
+        return 1
+    end
+
+    targetLayer[layerCount + 1] = layerCount + 1
+
+    return layerCount + 1
+end
+
+local function addLayerContextMenu(listItem)
+    local function contentFunction()
+        local layerName = listItem.data
+
+        if not layerName then
+            return
+        end
+
+        local language = languageRegistry.getLanguage()
+        local layer, subLayer = subLayers.parseLayerName(layerName)
+        local addButton = uiElements.button(tostring(language.ui.tools_window.add_sub_layer), function()
+            local newSubLayer = addSublayer(layer, subLayer)
+
+            if newSubLayer then
+                toolWindow.layerList:updateItems(getLayerItems(), subLayers.formatLayerName(layer, newSubLayer))
+            end
+        end)
+
+        local content = uiElements.row({
+            addButton,
+        })
+
+        return content
+    end
+
+    return contextMenu.addContextMenu(listItem, contentFunction)
+end
+
+local function layerDataToElement(list, data, element)
+    if not element then
+        element = uiElements.listItem()
+
+        element:layout()
+    end
+
+    if data then
+        element.text = data.text
+        element.data = data.data
+        element.tooltipText = data.tooltip
+        element.layerVisible = data.layerVisible
+        element.itemData = data
+        element.subLayer = data.subLayer
+
+        updateListItemVisibleVisuals(element)
+
+        if not element._addedHooks then
+            element:hook({
+                onPress = layerVisibilityOnPressHandler()
+            })
+
+            addLayerContextMenu(element)
+
+            element._addedHooks = true
+        end
+    end
+
+    return element
 end
 
 local function layerCallback(list, layerName)
@@ -751,6 +808,11 @@ local function updateLayerAndPlacementsCallback(list, layer, value)
     end)
 end
 
+local function mapLoadedCallback(list)
+    toolWindow.subLayers = loadedState.subLayers or {}
+    updateLayerAndPlacementsCallback(list)
+end
+
 local function materialSearchFieldChanged(element, new, old)
     local tool = toolHandler.currentTool
     local layer = toolHandler.getLayer()
@@ -838,7 +900,7 @@ function toolWindow.getWindow()
         editorToolLayerChanged = toolLayerChangedCallback,
         editorToolMaterialChanged = toolMaterialChangedCallback,
         editorToolModeChanged = toolModeChangedCallback,
-        editorMapLoaded = updateLayerAndPlacementsCallback,
+        editorMapLoaded = mapLoadedCallback,
         editorShownDependenciesChanged = updateLayerAndPlacementsCallback,
         editorLayerInformationChanged = layerInformationChangedCallback,
 
