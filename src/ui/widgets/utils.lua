@@ -86,7 +86,7 @@ function widgetUtils.getSimpleOverlayWidget(widget, ...)
     end
 
     -- Make sure the processed widget is a table
-    if utils.typeof(widget) ~= "table" then
+    if widget and utils.typeof(widget) ~= "table" then
         widget = {widget}
     end
 

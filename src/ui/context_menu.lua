@@ -123,11 +123,15 @@ function contextMenuHandler.showContextMenu(widget, options)
         end
     end
 
-    local window = createContextMenu(targetElement, widgetUtils.getSimpleOverlayWidget(widget), options)
+    local windowContent = widgetUtils.getSimpleOverlayWidget(widget)
 
-    ui.focusing = window
+    if windowContent then
+        local window = createContextMenu(targetElement, windowContent, options)
 
-    return window
+        ui.focusing = window
+
+        return window
+    end
 end
 
 function contextMenuHandler.getContextMenu()

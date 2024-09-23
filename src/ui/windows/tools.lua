@@ -529,8 +529,13 @@ local function addLayerContextMenu(listItem)
             return
         end
 
-        local language = languageRegistry.getLanguage()
         local layer, subLayer = subLayers.parseLayerName(layerName)
+
+        if not layersWithSubLayers[layer] then
+            return false
+        end
+
+        local language = languageRegistry.getLanguage()
         local addButton = uiElements.button(tostring(language.ui.tools_window.add_sub_layer), function()
             local newSubLayer = addSublayer(layer, subLayer)
 
