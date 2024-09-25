@@ -26,10 +26,8 @@ function notificationHandlers:saveSanitizerDependenciesMissing(missingMods, used
                 uiElements.label(tostring(language.ui.notifications.saveSanitizerDependenciesMissing)),
                 uiElements.row({
                     uiElements.button(tostring(language.ui.button.yes), function()
-                        loadedState.saveCurrentMap(function(filename)
-                            dependencyEditor.editDependencies()
-                            popup:close()
-                        end)
+                        dependencyEditor.editDependencies()
+                        popup:close()
                     end),
                     uiElements.button(tostring(language.ui.button.no), function()
                         popup:close()
