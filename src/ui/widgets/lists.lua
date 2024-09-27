@@ -500,6 +500,29 @@ local function sortItems(list, items)
     return sortedItems
 end
 
+local function finishFade(list, listItem)
+    if utils.typeof(listItem) ~= "listItem" then
+        return
+    end
+
+    local fadeDuration = listItem.style.fadeDuration
+
+    -- Reset fade state
+    listItem:revive()
+
+    -- Update with the fade duration, might cause some weirdness, but finishes any fade
+    listItem.parent = list
+    listItem:update(fadeDuration)
+end
+
+function listWidgets.finishFade(list)
+    ui.runLate(function()
+        for _, item in ipairs(list.children) do
+            finishFade(list, item)
+        end
+    end)
+end
+
 function listWidgets.updateItems(list, items, target, fromFilter, preventCallback, callbackRequiresChange, forceSort)
     local options = list.options
     local filterItems = options.filterItems or defaultFilterItems
@@ -543,6 +566,7 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
 
     list:reflow()
     ui.root:recollect()
+    listWidgets.finishFade(list)
 
     if not fromFilter then
         list.unfilteredItems = items
