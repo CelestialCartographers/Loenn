@@ -677,6 +677,7 @@ local function layerInformationChangedCallback(window, key, value)
     local layerName = subLayers.formatLayerName(layer, subLayer)
 
     updateLayerList(toolName, toolHandler.tools[toolName], layerName)
+    widgetUtils.updateHoveredTarget()
 end
 
 local function getModeItems(toolName)

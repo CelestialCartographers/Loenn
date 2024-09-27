@@ -272,4 +272,8 @@ function widgetUtils.focusElement(element)
     end
 end
 
+function widgetUtils.updateHoveredTarget()
+    ui.mousemoved(0, 0)
+end
+
 return widgetUtils
