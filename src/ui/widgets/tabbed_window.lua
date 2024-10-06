@@ -6,8 +6,15 @@ local widgetUtils = require("ui.widgets.utils")
 
 local tabbedWindow = {}
 
-function tabbedWindow.createWindow(title, tabs, initialTab)
-    initialTab = initialTab or 1
+function tabbedWindow.createWindow(title, tabs, options)
+    options = options or {}
+
+    local initialTab = options.initialTab or 1
+    local respectSiblings = true
+
+    if options.respectSiblings == false then
+        respectSiblings = false
+    end
 
     local windowTabItems = {}
 
@@ -64,7 +71,7 @@ function tabbedWindow.createWindow(title, tabs, initialTab)
         tabsElement,
     }):with({
         minWidth = 600
-    }):with(uiUtils.fillHeight(true))
+    }):with(uiUtils.fillHeight(respectSiblings))
 
     ui.runLate(function()
         tabsCallback(tabsElement, initialTab)
