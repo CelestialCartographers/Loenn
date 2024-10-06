@@ -331,6 +331,10 @@ local function materialDataToElement(list, data, element)
     end
 
     if data then
+        -- Prevent crash the next render frame if interacted with
+        element.parent = list
+        element.owner = list
+
         element.text = data.text
         element.data = data.data
         element.tooltipText = data.tooltip
@@ -562,6 +566,10 @@ local function layerDataToElement(list, data, element)
     end
 
     if data then
+        -- Prevent crash the next render frame if interacted with
+        element.parent = list
+        element.owner = list
+
         element.text = data.text
         element.data = data.data
         element.tooltipText = data.tooltip
