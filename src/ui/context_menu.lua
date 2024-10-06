@@ -28,6 +28,7 @@ local function keyReleaseHook(orig, self, key, ...)
             end
 
             if found then
+                contextMenu:removed()
                 contextMenu:removeSelf()
 
                 contextStack[i] = nil
@@ -55,6 +56,7 @@ local function createContextMenu(spawnedFrom, widget, options)
 
     window.spawnedFrom = spawnedFrom
     window.visibilityMode = options.mode or "hovered"
+    window.removed = options.removed or function() end
 
     table.insert(contextStack, window)
     contextMenuRoot:layout()
@@ -94,6 +96,7 @@ function contextMenuHandler.contextWindowUpdate(orig, self, dt)
             target = target._parentProxy or target.parent
         end
 
+        contextStack[i]:removed()
         contextStack[i]:removeSelf()
         contextStack[i] = nil
     end
@@ -117,6 +120,7 @@ function contextMenuHandler.showContextMenu(widget, options)
         end
 
         if foundTarget then
+            contextMenu:removed()
             contextMenu:removeSelf()
 
             contextStack[i] = nil
