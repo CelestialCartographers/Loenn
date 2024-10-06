@@ -15,16 +15,22 @@ function tabbedWindow.createWindow(title, tabs, initialTab)
         table.insert(windowTabItems, {
             text = tab.title,
             data = i,
-            content = tab.content
+            content = tab.content,
+            callback = tab.callback
         })
     end
 
     local function tabsCallback(list, target)
         local parent = list.parent
-        local newChild = windowTabItems[target].content
+        local newTab = windowTabItems[target]
+        local newChild = newTab.content
 
         while #parent.children > 1 do
             parent:removeChild(parent.children[#parent.children])
+        end
+
+        if newTab.callback then
+            newTab.callback()
         end
 
         -- Check if new child is column, automatically use its children if it is
