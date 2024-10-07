@@ -42,6 +42,9 @@ ui.notifications.mapImageSaveFailed=Failed to save map image
 # Styleground Window
 ui.styleground_window.window_title=Stylegrounds
 
+ui.styleground_window.tab_foreground=Foreground
+ui.styleground_window.tab_background=Background
+
 ui.styleground_window.preview.unknown_texture=No preview available
 ui.styleground_window.preview.no_preview=No preview available
 

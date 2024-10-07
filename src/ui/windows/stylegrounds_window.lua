@@ -21,6 +21,7 @@ local parallaxStruct = require("structs.parallax")
 local effectStruct = require("structs.effect")
 local formUtils = require("ui.utils.forms")
 local atlases = require("atlases")
+local tabbedWindow = require("ui.widgets.tabbed_window")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "stylegrounds_window"
@@ -57,7 +58,7 @@ local function listItemCheckbox(text, value)
     return checkbox
 end
 
-local function getStylegroundItems(targets, fg, items, parent)
+local function getStylegroundItems(targets, items, parent)
     local language = languageRegistry.getLanguage()
 
     items = items or {}
@@ -67,27 +68,23 @@ local function getStylegroundItems(targets, fg, items, parent)
 
         if styleType == "parallax" then
             local displayName = parallax.displayName(language, style)
-            local listItem = listItemCheckbox(displayName, fg)
 
             table.insert(items, {
-                text = listItem,
+                text = displayName,
                 data = {
                     style = style,
                     parentStyle = parent,
-                    foreground = fg
                 }
             })
 
         elseif styleType == "effect" then
             local displayName = effects.displayName(language, style)
-            local listItem = listItemCheckbox(displayName, fg)
 
             table.insert(items, {
-                text = listItem,
+                text = displayName,
                 data = {
                     style = style,
                     parentStyle = parent,
-                    foreground = fg
                 }
             })
 
@@ -405,7 +402,8 @@ end
 
 local function changeStyleForeground(interactionData)
     local listTarget = interactionData.listTarget
-    local listElement = interactionData.stylegroundListElement
+    local currentListElement = interactionData.stylegroundListElement
+    local otherListElement = interactionData.stylegroundListElementOther
     local listItem, listIndex = findCurrentListItem(interactionData)
 
     local moveUpButton = interactionData.movementButtonElements.up
@@ -420,7 +418,7 @@ local function changeStyleForeground(interactionData)
     local movedStyle = listTarget.style
     local map = interactionData.map
 
-    local insertionIndex = foreground and #listElement.children or foregroundCount + 1
+    local insertionIndex = foreground and #currentListElement.children or foregroundCount + 1
     local firstIndex = listIndex
     local lastIndex = listIndex
 
@@ -431,23 +429,20 @@ local function changeStyleForeground(interactionData)
         lastIndex = firstIndex + #parent - 1
     end
 
-    -- Reorder list items
+    -- Update list items
     local fromIndex = firstIndex
 
-    for i = firstIndex, lastIndex do
-        local movedItem = listElement.children[fromIndex]
+    for i = lastIndex, firstIndex, -1 do
+        local movedItem = currentListElement.children[fromIndex]
+
+        table.remove(currentListElement.children, i)
 
         movedItem.label.value = not foreground
         movedItem.data.foreground = not foreground
 
-        moveIndex(listElement.children, fromIndex, insertionIndex)
+        table.insert(otherListElement.children, movedItem)
 
-        -- The list only shifts around when going from background -> foreground
-        if not foreground then
-            fromIndex += 1
-            insertionIndex += 1
-        end
-
+        otherListElement:layout()
     end
 
     -- Update map style data
@@ -464,7 +459,7 @@ local function changeStyleForeground(interactionData)
     end
 
     -- Update list and form fields
-    listElement:reflow()
+    currentListElement:reflow()
     listItem:onClick(0, 0, 1)
 end
 
@@ -799,11 +794,11 @@ local function listItemCanInsertHandler(interactionData)
     end
 end
 
-function stylegroundWindow.getStylegroundList(map, interactionData)
+function stylegroundWindow.getStylegroundList(map, interactionData, fg)
     local items = {}
+    local styles = fg and map.stylesFg or map.stylesBg
 
-    getStylegroundItems(map.stylesFg or {}, true, items)
-    getStylegroundItems(map.stylesBg or {}, false, items)
+    getStylegroundItems(styles or {}, items)
 
     local listOptions = {
         initialItem = 1,
@@ -825,6 +820,7 @@ end
 
 function stylegroundWindow.getWindowContent(map)
     local interactionData = {}
+    local language = languageRegistry.getLanguage()
 
     -- See TODO at top of file
     --cacheParallaxTextureOptions()
@@ -833,20 +829,46 @@ function stylegroundWindow.getWindowContent(map)
     interactionData.listTarget = getDefaultListTarget()
 
     local stylegroundFormGroup = uiElements.group({}):with(uiUtils.bottombound)
-    local stylegroundListColumn, stylegroundList = stylegroundWindow.getStylegroundList(map, interactionData)
     local stylegroundPreview = uiElements.group({
-        stylegroundWindow.getStylegroundPreview(interactionData)
+            stylegroundWindow.getStylegroundPreview(interactionData)
     })
     local stylegroundForm = stylegroundWindow.getStylegroundForm(interactionData)
 
     stylegroundFormGroup:addChild(stylegroundForm)
 
+    local listColumnForeground, listForeground = stylegroundWindow.getStylegroundList(map, interactionData, true)
+    local listColumnBackground, listBackground = stylegroundWindow.getStylegroundList(map, interactionData, false)
+
     interactionData.formContainerGroup = stylegroundFormGroup
     interactionData.stylegroundPreviewGroup = stylegroundPreview
-    interactionData.stylegroundListElement = stylegroundList
+    interactionData.stylegroundListElementFg = listForeground
+    interactionData.stylegroundListElementBg = listBackground
+
+    local tabs = {
+        {
+            title = tostring(language.ui.styleground_window.tab_foreground),
+            content = listColumnForeground,
+            callback = function()
+                interactionData.stylegroundListElement = listForeground
+                interactionData.stylegroundListElementOther = listBackground
+            end,
+        },
+        {
+            title = tostring(language.ui.styleground_window.tab_background),
+            content = listColumnBackground,
+            callback = function()
+                interactionData.stylegroundListElement = listBackground
+                interactionData.stylegroundListElementOther = listForeground
+            end,
+        },
+    }
+    local tabbedWindowOptions = {
+        respectSiblings = false
+    }
+    local _, tabbedContent = tabbedWindow.createWindow("", tabs, tabbedWindowOptions)
 
     local stylegroundListPreviewRow = uiElements.row({
-        stylegroundListColumn:with(uiUtils.fillHeight(false)),
+        tabbedContent,
         stylegroundPreview
     }):with(uiUtils.fillHeight(true))
 
