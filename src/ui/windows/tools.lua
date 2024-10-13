@@ -8,7 +8,7 @@ local widgetUtils = require("ui.widgets.utils")
 local lists = require("ui.widgets.lists")
 local simpleDocks = require("ui.widgets.simple_docks")
 local contextMenu = require("ui.context_menu")
-local iconUtils = require("ui.utils.icons")
+local listItemUtils = require("ui.utils.list_item")
 
 local configs = require("configs")
 local languageRegistry = require("language_registry")
@@ -58,104 +58,21 @@ local function getLanguageOrDefault(languagePath, default)
 end
 
 local function updateListItemFavoriteVisuals(listItem)
-    local children = listItem.children
-
-    -- Padding elements does not have children, skip
-    if not children then
-        return
-    end
-
     local favorite = listItem.itemFavorited
-    local text = listItem.originalText
-    local label = uiElements.label(text)
-
-    listItem.label = label
-
-    for i = 1, #children do
-        children[i] = nil
-    end
 
     if favorite then
-        local iconMaxSize = listItem.height - listItem.style.padding * 2
-        local favoriteIcon, iconSize = iconUtils.getIcon("favorite", iconMaxSize)
+        listItemUtils.setIcon(listItem, "favorite")
 
-        if favoriteIcon then
-            local centerOffset = math.floor((listItem.height - iconSize) / 2)
-            local imageElement = uiElements.image(favoriteIcon)
-
-            imageElement = imageElement:with(uiUtils.at(listItem.style.padding, centerOffset))
-
-            table.insert(children, imageElement)
-        end
+    else
+        listItemUtils.clearIcon(listItem)
     end
-
-    local favoriteCheckbox = listItem._favoriteCheckbox
-
-    if favoriteCheckbox and favoriteCheckbox:getValue() ~= favorite then
-        -- Prevent callback
-        favoriteCheckbox._value = favorite
-        favoriteCheckbox:updateIcon()
-    end
-
-    table.insert(children, label)
-    listItem:layout()
 end
 
 local function updateListItemVisibleVisuals(listItem)
-    local children = listItem.children
-
-    -- Padding elements does not have children, skip
-    if not children then
-        return
-    end
-
     local visible = listItem.layerVisible
-    local text = listItem.text
-    local subLayer = listItem.subLayer
+    local iconName = visible and "visible" or "hidden"
 
-    local indent = subLayer ~= -1
-    local iconOffsetX = listItem.style.padding
-
-    if indent then
-        local font = love.graphics.getFont()
-
-        iconOffsetX += font:getWidth(" ")
-    end
-
-    local label = uiElements.label(text)
-
-    listItem.label = label
-
-    for i = 1, #children do
-        children[i] = nil
-    end
-
-    local iconMaxSize = listItem.height - listItem.style.padding * 2
-    local listIcon, iconSize
-
-    if visible then
-        listIcon, iconSize = iconUtils.getIcon("visible", iconMaxSize)
-
-    else
-        listIcon, iconSize = iconUtils.getIcon("hidden", iconMaxSize)
-    end
-
-    if listIcon then
-        local centerOffset = math.floor((listItem.height - iconSize) / 2)
-        local imageElement = uiElements.image(listIcon)
-
-        imageElement = imageElement:with(uiUtils.at(iconOffsetX, centerOffset))
-
-        table.insert(children, imageElement)
-    end
-
-    table.insert(children, label)
-    listItem:layout()
-    listItem:layoutLate()
-
-    if listItem.parent then
-        listItem.parent:layoutLate()
-    end
+    listItemUtils.setIcon(listItem, iconName)
 end
 
 local function materialSortFunction(lhs, rhs)
