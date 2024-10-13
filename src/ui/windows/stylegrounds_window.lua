@@ -22,6 +22,7 @@ local effectStruct = require("structs.effect")
 local formUtils = require("ui.utils.forms")
 local atlases = require("atlases")
 local tabbedWindow = require("ui.widgets.tabbed_window")
+local listItemUtils = require("ui.utils.list_item")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "stylegrounds_window"
@@ -45,21 +46,9 @@ local function cacheParallaxTextureOptions()
     parallaxTextureOptions = options
 end
 
--- List icon to indicate foreground vs background
-local function listItemCheckbox(text, value)
-    local checkbox = uiElements.checkbox(text, value)
-
-    checkbox.checkbox.style.disabledBG = {0.0, 0.0, 0.0, 0.0}
-    checkbox.checkbox.style.disabledFG = {0.0, 0.0, 0.0, 0.0}
-    checkbox.checkbox.style.disabledBorder = {0.0, 0.0, 0.0, 0.0}
-
-    checkbox.enabled = false
-
-    return checkbox
-end
-
 local function getStylegroundItems(targets, items, parent)
     local language = languageRegistry.getLanguage()
+    local groupIndex = 1
 
     items = items or {}
 
@@ -89,15 +78,62 @@ local function getStylegroundItems(targets, items, parent)
             })
 
         elseif styleType == "apply" then
-            -- TODO - Better visuals later
             if style.children then
-                getStylegroundItems(style.children, fg, items, style)
+                local childItems = {}
+
+                getStylegroundItems(style.children, items, style)
+                getStylegroundItems(style.children, childItems, style)
+
+                -- TODO - Allow renaming
+                local groupText = string.format("Group %s", groupIndex)
+                local groupLabel = uiElements.label(groupText)
+                local listItemData = {
+                    style = style,
+                    parentStyle = parent,
+                }
+
+                -- Fake list item
+                local groupItem = uiElements.row({groupLabel}):with({
+                    label = groupLabel,
+                    style = {
+                        spacing = uiElements.listItem.style.spacing
+                    }
+                })
+
+                -- TODO - Get proper icons
+                listItemUtils.setIcon(groupItem, "favorite")
+
+                table.insert(items, {
+                    text = groupItem,
+                    data = listItemData,
+                })
+
+                for _, child in ipairs(childItems) do
+                    child.text = " - " .. child.text
+
+                    table.insert(items, child)
+                end
+
+                groupIndex += 1
             end
         end
     end
 
     return items
 end
+
+-- TODO - Implement, stubbed for now
+local applyHandler = {
+    defaultData = function()
+        return {}
+    end,
+    canForeground = function()
+        return true
+    end,
+    canBackground = function()
+        return true
+    end,
+}
 
 local function getHandler(style)
     local styleType = utils.typeof(style)
@@ -107,6 +143,9 @@ local function getHandler(style)
 
     elseif styleType == "effect" then
         return effects
+
+    elseif styleType == "apply" then
+        return applyHandler
     end
 end
 
@@ -814,6 +853,8 @@ function stylegroundWindow.getStylegroundList(map, interactionData, fg)
         stylegroundWindow.updateStylegroundForm(interactionData)
         stylegroundWindow.updateStylegroundPreview(interactionData)
     end, items, listOptions)
+
+    list:layout()
 
     return column, list
 end
