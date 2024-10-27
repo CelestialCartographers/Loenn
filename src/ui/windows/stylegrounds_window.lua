@@ -17,6 +17,7 @@ local widgetUtils = require("ui.widgets.utils")
 local formHelper = require("ui.forms.form")
 local parallax = require("parallax")
 local effects = require("effects")
+local apply = require("apply")
 local parallaxStruct = require("structs.parallax")
 local effectStruct = require("structs.effect")
 local formUtils = require("ui.utils.forms")
@@ -84,8 +85,7 @@ local function getStylegroundItems(targets, items, parent)
                 getStylegroundItems(style.children, items, style)
                 getStylegroundItems(style.children, childItems, style)
 
-                -- TODO - Allow renaming
-                local groupText = string.format("Group %s", groupIndex)
+                local groupText = apply.displayName(language, style, groupIndex)
                 local groupLabel = uiElements.label(groupText)
                 local listItemData = {
                     style = style,
@@ -122,19 +122,6 @@ local function getStylegroundItems(targets, items, parent)
     return items
 end
 
--- TODO - Implement, stubbed for now
-local applyHandler = {
-    defaultData = function()
-        return {}
-    end,
-    canForeground = function()
-        return true
-    end,
-    canBackground = function()
-        return true
-    end,
-}
-
 local function getHandler(style)
     local styleType = utils.typeof(style)
 
@@ -145,7 +132,7 @@ local function getHandler(style)
         return effects
 
     elseif styleType == "apply" then
-        return applyHandler
+        return apply
     end
 end
 
