@@ -10,7 +10,7 @@ function applyStruct.decode(data)
     }
 
     for k, v in pairs(data) do
-        if k ~= "__children" then
+        if not string.match(k, "^__") then
             res[k] = v
         end
     end
@@ -40,6 +40,11 @@ function applyStruct.encode(apply)
         if k:sub(1, 1) ~= "_" and k ~= "children" then
             res[k] = v
         end
+    end
+
+    -- Display name in editor
+    if apply._name and apply._name ~= "" then
+        res._name = apply._name
     end
 
     res.__children = {}
