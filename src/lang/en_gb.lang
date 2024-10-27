@@ -1537,6 +1537,9 @@ metadata.cassettemodifier.description.ActiveDuringTransitions=Whether cassette m
 metadata.cassettemodifier.description.OldBehavior=Activates old cassette music behaviour. Makes Tempo Multiplier override the Tempo attribute in cassette blocks, makes Max Beats ignore cassette block indices, and changes how initial cassette block states are calculated.
 
 
+# -- Apply --
+style.apply.groupName=Group %s
+
 # -- Parallax --
 # style.parallax.attribute.Attribute=Attribute Display Name
 # style.parallax.description.Attribute=Tooltip
