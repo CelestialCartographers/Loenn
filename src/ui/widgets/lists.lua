@@ -748,6 +748,8 @@ local function searchFieldKeyRelease(list, hookOptions)
 
         if key == exitClearKey then
             self:setText("")
+            self.index = 0
+
             widgetUtils.focusMainEditor()
 
         elseif key == exitKey then
