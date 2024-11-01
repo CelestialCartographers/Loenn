@@ -25,7 +25,7 @@ local function dataToElement(list, data, element)
         element = uiElements.listItem()
 
         element:hook({
-            onPress = function(orig, self, x, y, button, isDrag, presses)
+            onRelease = function(orig, self, x, y, button, isDrag, presses)
                 orig(self, x, y, button, isDrag, presses)
 
                 list.button:setText(element.text)
