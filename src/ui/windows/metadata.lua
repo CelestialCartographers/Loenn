@@ -137,6 +137,9 @@ local defaultFieldInformation = {
         editable = false
     },
     CassetteSong = {
+        fieldType = "string",
+        searchable = true,
+        editable = true,
         options = cassetteSongs
     },
     Wipe = {
@@ -157,13 +160,22 @@ local defaultFieldInformation = {
         options = enums.inventories
     },
     ["mode.StartLevel"] = {
+        fieldType = "string",
+        searchable = true,
+        editable = true,
         options = {} -- Dynamically added when window is opened
     },
 
     ["mode.audiostate.Music"] = {
+        fieldType = "string",
+        searchable = true,
+        editable = true,
         options = songs
     },
     ["mode.audiostate.Ambience"] = {
+        fieldType = "string",
+        searchable = true,
+        editable = true,
         options = ambientSounds
     },
 
