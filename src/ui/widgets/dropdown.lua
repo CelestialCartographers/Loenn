@@ -97,8 +97,15 @@ function dropdowns.fromList(callback, stringOptions, options)
     local initialText = selectedItem and selectedItem.text or ""
 
     local button = uiElements.button(initialText, function(self, x, y, button)
+        local dropdownListVisible = not not listColumn.parent
+
         if self.enabled and button == 1 then
-            self:revealDropdown(false)
+            if self:shouldReveal() then
+                self:revealDropdown(false)
+
+            else
+                self:closeDropdown()
+            end
         end
     end)
 
@@ -119,12 +126,23 @@ function dropdowns.fromList(callback, stringOptions, options)
     button.callback = callback
     button.submenuParent = button
 
-    function button.revealDropdown(self, fromSearchFilter)
+    function button.shouldReveal(self)
         local dropdownListVisible = not not listColumn.parent
+        local currentListItems = self.list._magicList and self.list.data or self.list.children
+        local revealedWithEmptyList = self.list.openedFromFilter and #currentListItems == 0
+
+        return not dropdownListVisible or revealedWithEmptyList
+    end
+
+    function button.closeDropdown(self)
+        closeDropdown(self.list)
+    end
+
+    function button.revealDropdown(self, fromSearchFilter)
         local spawnParent = options.spawnParent or self
         local spawnRoot = options.spawnRoot or ui.root
 
-        if not dropdownListVisible then
+        if self:shouldReveal() then
             local spawnX = spawnParent.screenX
             local spawnY = spawnParent.screenY + spawnParent.height
 
@@ -168,6 +186,7 @@ function dropdowns.fromList(callback, stringOptions, options)
                     listColumn.realY = spawnY
 
                     list.dropdownMenuVisible = true
+                    list.openedFromFilter = fromSearchFilter
                     list._parentProxy = options.parentProxy
                 end)
             end)
