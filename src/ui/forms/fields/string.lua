@@ -74,7 +74,17 @@ end
 
 local function fieldChanged(formField)
     return function(element, new, old)
-        formField.currentValue = formField.valueTransformer(new)
+        local setValue = true
+
+        -- Check for editable dropdown
+        if formField.dropdown then
+            setValue = formField.options.editable or false
+        end
+
+        if setValue then
+            formField.currentValue = formField.valueTransformer(new)
+        end
+
         formField.currentText = new
 
         local valid = formField:fieldValid()
