@@ -86,25 +86,28 @@ local function fieldChanged(formField)
 end
 
 local function dropdownChanged(formField, optionsFlattened)
-    return function(element, new)
-        local value
+    return function(element, newText)
         local old = formField.currentValue
+        local value
+        local foundOption = false
+
+        local editable = formField.editable
+        local searchable = formField.searchable
 
         for _, option in ipairs(optionsFlattened) do
-            if option[1] == new then
+            if option[1] == newText then
+                foundOption = true
                 value = option[2]
             end
         end
 
-        if value ~= old then
+        if foundOption and value ~= old then
             formField.currentValue = value
             formField.currentText = value
 
             -- Manually handle for text field, dropdown handles itself
             -- Don't update if field is purely a dropdown
-            if formField.editable and utils.typeof(formField.field) == "field" then
-                local newText = formField.displayTransformer(value)
-
+            if editable or searchable then
                 formField.field:setText(newText)
                 formField.field.index = #newText
             end
@@ -206,6 +209,7 @@ function stringField.getElement(name, value, options)
 
     local dropdownOptions = options.options
     local editable = options.editable
+    local searchable = options.searchable
     local dropdown
 
     local displayValue = getDisplayValue(displayTransformer, value)
@@ -268,6 +272,7 @@ function stringField.getElement(name, value, options)
     formField.field = field
     formField.dropdown = dropdown
     formField.editable = editable
+    formField.searchable = searchable
     formField.options = options
     formField.name = name
     formField.initialValue = value

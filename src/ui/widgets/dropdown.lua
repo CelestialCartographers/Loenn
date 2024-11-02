@@ -24,6 +24,10 @@ local function dataToElement(list, data, element)
     if not element then
         element = uiElements.listItem()
 
+        -- Prevent crash the next render frame if interacted with
+        element.parent = list
+        element.owner = list
+
         element:hook({
             onRelease = function(orig, self, x, y, button, isDrag, presses)
                 orig(self, x, y, button, isDrag, presses)
