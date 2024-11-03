@@ -3,6 +3,7 @@ local xml2lua = require("lib.xml2lua.xml2lua")
 local utils = require("utils")
 local matrix = require("utils.matrix")
 local bit = require("bit")
+local utf8 = require("utf8")
 
 local autotiler = {}
 
@@ -340,6 +341,11 @@ function autotiler.loadTilesetXML(filename)
 
     for i, element in ipairs(tilesetsRoot) do
         local id = element._attr.id
+
+        if utf8.len(id) ~= 1 then
+            error(string.format("Invalid ID '%s' for tileset, must be a single character", id))
+        end
+
         local copy = element._attr.copy
         local ignores = element._attr.ignores
         local ignoreExceptions = element._attr.ignoreExceptions
