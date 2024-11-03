@@ -65,9 +65,6 @@ local function listUpdate(orig, self, dt)
         end
 
         if not focused then
-            self.dropdownMenuVisible = false
-            self.column:removeSelf()
-
             closeDropdown(self)
         end
     end
@@ -97,8 +94,6 @@ function dropdowns.fromList(callback, stringOptions, options)
     local initialText = selectedItem and selectedItem.text or ""
 
     local button = uiElements.button(initialText, function(self, x, y, button)
-        local dropdownListVisible = not not listColumn.parent
-
         if self.enabled and button == 1 then
             if self:shouldReveal() then
                 self:revealDropdown(false)
