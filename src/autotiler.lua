@@ -38,7 +38,7 @@ end
 
 function autotiler.checkTile(value, target, ignore, air, wildcard)
     if ignore then
-        return not (target == air or ignore[target] or (ignore[wildcard] and value ~= target))
+        return not (target == air or ignore[target])
     end
 
     return target ~= air
@@ -75,7 +75,7 @@ local function checkPadding(tiles, x, y, tile, ignores, airTile, emptyTile, wild
     local down = getTile(tiles, x, y + 2, tile)
 
     -- Special case for tiles with ignores, should treat ignored tiles as "air"
-    if ignores and ignores.count and ignores.count > 0 then
+    if ignores and ignores.hasIgnores then
         return not autotiler.checkTile(tile, left, ignores, airTile, wildcard) or
             not autotiler.checkTile(tile, right, ignores, airTile, wildcard) or
             not autotiler.checkTile(tile, up, ignores, airTile, wildcard) or
@@ -342,12 +342,14 @@ function autotiler.loadTilesetXML(filename)
         local id = element._attr.id
         local copy = element._attr.copy
         local ignores = element._attr.ignores
+        local ignoreExceptions = element._attr.ignoreExceptions
         local path = element._attr.path
         local displayName = element._attr.displayName
         local tileset = getTilesetStructure(id)
 
         tileset.path = "tilesets/" .. path
         tileset.displayName = displayName
+        tileset.ignoreExceptions = {}
 
         readTilesetInfo(tileset, id, element)
 
@@ -363,11 +365,33 @@ function autotiler.loadTilesetXML(filename)
             local ignoredTiles = $(ignores):split(",")()
 
             tileset.ignores = table.flip(ignoredTiles)
-            tileset.ignores.count = #ignoredTiles
+            tileset.ignores.hasIgnores = #ignoredTiles > 0
+        end
+
+        if ignoreExceptions then
+            local exceptions = $(ignoreExceptions):split(",")()
+
+            tileset.ignoreExceptions = table.flip(exceptions)
         end
 
         tilesetsMeta[id] = tileset
         elementLookup[id] = element
+    end
+
+    -- Check for ignore wildcards
+    for id, tileset in pairs(tilesetsMeta) do
+        if tileset.ignores["*"] then
+            tileset.ignores["*"] = nil
+
+            -- Add all known tileset ids excluding self
+            for ignoreId, _ in pairs(tilesetsMeta) do
+                if id ~= ignoreId and not tileset.ignoreExceptions[ignoreId] then
+                    tileset.ignores[ignoreId] = true
+                end
+            end
+
+            tileset.ignores.hasIgnores = true
+        end
     end
 
     return tilesetsMeta
