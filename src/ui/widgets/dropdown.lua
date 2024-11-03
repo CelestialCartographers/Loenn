@@ -190,6 +190,10 @@ function dropdowns.fromList(callback, stringOptions, options)
                     list._parentProxy = options.parentProxy
                 end)
             end)
+
+            list.dropdownMenuVisible = true
+            list.openedFromFilter = fromSearchFilter
+            list._parentProxy = options.parentProxy
         end
     end
 
