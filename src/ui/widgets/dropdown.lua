@@ -121,6 +121,8 @@ function dropdowns.fromList(callback, stringOptions, options)
     button.callback = callback
     button.submenuParent = button
 
+    list.shownOnce = false
+
     function button.shouldReveal(self)
         local dropdownListVisible = not not listColumn.parent
         local currentListItems = self.list._magicList and self.list.data or self.list.children
@@ -165,10 +167,12 @@ function dropdowns.fromList(callback, stringOptions, options)
                     local listBottom = spawnY + listHeight
                     local rootBottom = spawnRoot.realY + spawnRoot.height
 
+                    listColumn.height = math.min(listHeight, spawnRoot.height)
+
                     if listBottom > rootBottom then
                         if fromSearchFilter then
-                            -- TODO - Fix, this removes the scrollbox it seems
-                            --list.height = rootBottom - spawnY
+                            list.height = rootBottom - spawnY
+                            listColumn.height = rootBottom - spawnY
 
                         else
                             local offsetY = listBottom - rootBottom
@@ -177,12 +181,19 @@ function dropdowns.fromList(callback, stringOptions, options)
                         end
                     end
 
-                    listColumn.realX = spawnX
-                    listColumn.realY = spawnY
+                    -- If the list has not been shown yet than running it later causes it to not be visible
+                    -- Running it late fixes flickering of the scrollbar
+                    if list.shownOnce then
+                        ui.runLate(function()
+                            listColumn.realX = spawnX
+                            listColumn.realY = spawnY
+                        end)
 
-                    list.dropdownMenuVisible = true
-                    list.openedFromFilter = fromSearchFilter
-                    list._parentProxy = options.parentProxy
+                    else
+                        listColumn.realX = spawnX
+                        listColumn.realY = spawnY
+                        list.shownOnce = true
+                    end
                 end)
             end)
 
