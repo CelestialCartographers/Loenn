@@ -26,7 +26,7 @@ function numberField.getElement(name, value, options)
 
     options.valueTransformer = tonumber
     options.displayTransformer = function(v)
-        if allowEmpty and value == nil then
+        if v == nil or type(v) ~= "number" then
             return ""
         end
 
