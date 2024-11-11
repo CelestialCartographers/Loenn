@@ -15,7 +15,7 @@ for _, texture in ipairs(textures) do
 end
 
 switchGate.name = "switchGate"
-switchGate.depth = 0
+switchGate.depth = -9000
 switchGate.nodeLimits = {1, 1}
 switchGate.nodeLineRenderType = "line"
 switchGate.warnBelowSize = {16, 16}
