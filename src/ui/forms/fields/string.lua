@@ -264,6 +264,14 @@ function stringField.getElement(name, value, options)
             element = dropdown
 
         else
+            -- Make sure the text field has the correct dropdown display value
+            -- Do not trigger a text callback
+            if currentText then
+                field._text = currentText
+                field.label.text = currentText
+                field.index = #currentText
+            end
+
             listOptions.parentProxy = field
             listOptions.spawnParent = field
             fieldDropdown.addDropdown(field, dropdown, options.searchable or false)
