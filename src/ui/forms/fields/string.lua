@@ -112,15 +112,14 @@ local function dropdownChanged(formField, optionsFlattened)
         end
 
         if foundOption and value ~= old then
-            formField.currentValue = value
-            formField.currentText = value
-
             -- Manually handle for text field, dropdown handles itself
             -- Don't update if field is purely a dropdown
             if editable or searchable then
                 formField.field:setText(newText)
                 formField.field.index = #newText
             end
+
+            formField.currentValue = value
 
             local valid = formField:fieldValid()
             local warningValid = formField:fieldWarning()
