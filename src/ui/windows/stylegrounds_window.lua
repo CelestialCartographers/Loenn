@@ -18,6 +18,7 @@ local formHelper = require("ui.forms.form")
 local parallax = require("parallax")
 local effects = require("effects")
 local apply = require("apply")
+local applyStruct = require("structs.apply")
 local parallaxStruct = require("structs.parallax")
 local effectStruct = require("structs.effect")
 local formUtils = require("ui.utils.forms")
@@ -47,7 +48,11 @@ local function cacheParallaxTextureOptions()
     parallaxTextureOptions = options
 end
 
-local function getStylegroundItems(targets, items, parent)
+local function addFolderIndent(text)
+    return " - " .. text
+end
+
+local function getStylegroundItems(targets, items, foreground, parent)
     local language = languageRegistry.getLanguage()
     local groupIndex = 1
 
@@ -64,6 +69,7 @@ local function getStylegroundItems(targets, items, parent)
                 data = {
                     style = style,
                     parentStyle = parent,
+                    foreground = foreground,
                 }
             })
 
@@ -75,6 +81,7 @@ local function getStylegroundItems(targets, items, parent)
                 data = {
                     style = style,
                     parentStyle = parent,
+                    foreground = foreground,
                 }
             })
 
@@ -82,14 +89,14 @@ local function getStylegroundItems(targets, items, parent)
             if style.children then
                 local childItems = {}
 
-                getStylegroundItems(style.children, items, style)
-                getStylegroundItems(style.children, childItems, style)
+                getStylegroundItems(style.children, childItems, foreground, style)
 
                 local groupText = apply.displayName(language, style, groupIndex)
                 local groupLabel = uiElements.label(groupText)
                 local listItemData = {
                     style = style,
                     parentStyle = parent,
+                    foreground = foreground,
                 }
 
                 -- Fake list item
@@ -106,10 +113,11 @@ local function getStylegroundItems(targets, items, parent)
                 table.insert(items, {
                     text = groupItem,
                     data = listItemData,
+                    foreground = foreground,
                 })
 
                 for _, child in ipairs(childItems) do
-                    child.text = " - " .. child.text
+                    child.text = addFolderIndent(child.text)
 
                     table.insert(items, child)
                 end
@@ -304,15 +312,20 @@ local function findStyleInStylegrounds(interactionData)
     return styles, styles, 1
 end
 
-local function findCurrentListItem(interactionData)
-    local listTarget = interactionData.listTarget
+local function findListItem(interactionData, targetStyle)
     local listElement = interactionData.stylegroundListElement
 
     for i, item in ipairs(listElement.children) do
-        if item.data == listTarget then
+        if item.data.style == targetStyle then
             return item, i
         end
     end
+end
+
+local function findCurrentListItem(interactionData)
+    local listTarget = interactionData.listTarget
+
+    return findListItem(interactionData, listTarget.style)
 end
 
 local function foregroundListItemCount(interactionData)
@@ -395,8 +408,19 @@ local function moveStyle(interactionData, offset)
     end
 end
 
+local function createApply()
+    local style = applyStruct.decode({})
+    local defaultData = apply.defaultData(style) or {}
+
+    for k, v in pairs(defaultData) do
+        style[k] = v
+    end
+
+    return style
+end
+
 local function createParallax()
-    local style = parallaxStruct.decode()
+    local style = parallaxStruct.decode({})
     local defaultData = parallax.defaultData(style) or {}
 
     for k, v in pairs(defaultData) do
@@ -496,9 +520,6 @@ local function addNewStyle(interactionData, formFields)
     local currentStyle = listTarget.style
     local parentStyle = listTarget.parentStyle
 
-    local moveUpButton = interactionData.movementButtonElements.up
-    local moveDownButton = interactionData.movementButtonElements.down
-
     local listElement = interactionData.stylegroundListElement
     local foreground = listTarget.foreground
     local map = interactionData.map
@@ -512,6 +533,9 @@ local function addNewStyle(interactionData, formFields)
             applyFormChanges(newStyle, form.getFormData(formFields))
         end
 
+    elseif method == "group" then
+        newStyle = createApply()
+
     elseif method == "parallax" then
         newStyle = createParallax()
 
@@ -524,7 +548,28 @@ local function addNewStyle(interactionData, formFields)
     if newStyle then
         local styles, parentTable, index = findStyleInStylegrounds(interactionData)
         local _, listIndex = findCurrentListItem(interactionData)
-        local listItems = getStylegroundItems({newStyle}, foreground, {}, nil)
+        local targetGroup
+        local newIsApply = utils.typeof(newStyle) == "apply"
+
+        if utils.typeof(currentStyle) == "apply" then
+            targetGroup = currentStyle
+
+            -- We are adding as first element of the group
+            if not newIsApply then
+                index = 0
+            end
+
+        elseif utils.typeof(parentStyle) == "apply" then
+            targetGroup = parentStyle
+        end
+
+        local addToGroup = targetGroup and not newIsApply
+
+        -- If we add a apply it should be added after the current group
+        if utils.typeof(newStyle) == "apply" and targetGroup and targetGroup.children then
+            _, listIndex = findListItem(interactionData, targetGroup)
+            listIndex += #targetGroup.children
+        end
 
         -- Fallback if we don't have any items in the list yet
         if #listElement.children == 0 then
@@ -533,18 +578,35 @@ local function addNewStyle(interactionData, formFields)
             index = 0
         end
 
+        if addToGroup then
+            if not targetGroup.children then
+                targetGroup.children = {}
+            end
+
+            table.insert(targetGroup.children, index + 1, newStyle)
+
+        else
+            table.insert(parentTable, index + 1, newStyle)
+        end
+
+        local listItems = getStylegroundItems({newStyle}, {}, foreground, targetGroup)
+
         for i, item in ipairs(listItems) do
-            local listItem = uiElements.listItem(item.text, item.data)
+            local text = item.text
+
+            if addToGroup then
+                text = addFolderIndent(text)
+            end
+
+            local listItem = uiElements.listItem(text, item.data)
 
             listItem.owner = listElement
 
             table.insert(listElement.children, listIndex + i, listItem)
         end
 
-        table.insert(parentTable, index + 1, newStyle)
-
         if #listItems > 0 then
-            local lastItem = listElement.children[listIndex + #listItems]
+            local lastItem = listElement.children[#listItems + listIndex]
 
             listElement:reflow()
             lastItem:onClick(0, 0, 1)
@@ -617,6 +679,13 @@ local function getNewDropdownOptions(style, foreground, usingDefault)
             }
         })
     end
+
+    table.insert(options, {
+        text = tostring(language.ui.styleground_window.new_options.apply),
+        data = {
+            method = "group"
+        }
+    })
 
     table.insert(options, {
         text = tostring(language.ui.styleground_window.new_options.parallax),
@@ -824,7 +893,7 @@ function stylegroundWindow.getStylegroundList(map, interactionData, fg)
     local items = {}
     local styles = fg and map.stylesFg or map.stylesBg
 
-    getStylegroundItems(styles or {}, items)
+    getStylegroundItems(styles or {}, items, fg)
 
     local listOptions = {
         initialItem = 1,
