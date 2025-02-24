@@ -459,7 +459,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
                 local tileMeta = meta[tile]
                 if tileMeta and tileMeta.path then
                     -- TODO - Render overlay sprites
-                    local quads, sprites = autotiler.getQuadsWithBitmask(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
                     if quadCount > 0 then

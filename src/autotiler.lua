@@ -8,8 +8,8 @@ local utf8 = require("utf8")
 local autotiler = {}
 
 -- True for same tile, false for air, nil for any tile
-local function convertMaskString(s)
-    local res = matrix.filled(0, 3, 3)
+local function convertMaskString(s, width, height)
+    local res = matrix.filled(0, width, height)
 
     local raw = s:gsub("x", "2")
     local rows = raw:split("-")
@@ -45,19 +45,22 @@ function autotiler.checkTile(value, target, ignore, air, wildcard)
     return target ~= air
 end
 
--- Unrolled
--- Never need to check index 5, it will always be fine
-local function checkMaskFromTiles(mask, a, b, c, d, e, f, g, h, i)
-    return not (
-        a ~= mask[1] and mask[1] ~= nil or
-        b ~= mask[2] and mask[2] ~= nil or
-        c ~= mask[3] and mask[3] ~= nil or
-        d ~= mask[4] and mask[4] ~= nil or
-        f ~= mask[6] and mask[6] ~= nil or
-        g ~= mask[7] and mask[7] ~= nil or
-        h ~= mask[8] and mask[8] ~= nil or
-        i ~= mask[9] and mask[9] ~= nil
-    )
+local function checkMaskFromTiles(mask, checks)
+    local halfChecks = math.floor(#checks / 2)
+
+    for i = 1, halfChecks do
+        if checks[i] ~= mask[i] and mask[i] ~= nil then
+            return false
+        end
+    end
+
+    for i = halfChecks + 1, #checks do
+        if checks[i] ~= mask[i] and mask[i] ~= nil then
+            return false
+        end
+    end
+
+    return true
 end
 
 -- Bitwise version of checkMaskFromTiles
@@ -101,18 +104,6 @@ local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTil
     end
 end
 
-local function getMaskQuads(masks, adjacent)
-    if masks then
-        for i, maskData in ipairs(masks) do
-            if checkMask(adjacent, maskData.mask) then
-                return true, maskData.quads, maskData.sprites
-            end
-        end
-    end
-
-    return false, nil, nil
-end
-
 local function getAdjacencyBitmask(x, y, tiles, tile, ignore, air, wildcard, checkTile, lshift)
     return
         lshift(checkTile(tile, tiles:get(x - 1, y - 1, tile), ignore, air, wildcard) and 1 or 0, 7) +
@@ -150,14 +141,21 @@ local function maskToIgnoreBitmask(mask, lshift)
 end
 
 
-local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wildcard, checkTile)
+local function getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, air, wildcard, checkTile, scanWidth, scanHeight)
     if masks then
-        local a, b, c = checkTile(tile, tiles:get(x - 1, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y - 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y - 1, tile), ignore, air, wildcard)
-        local d, f = checkTile(tile, tiles:get(x - 1, y + 0, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 0, tile), ignore, air, wildcard)
-        local g, h, i = checkTile(tile, tiles:get(x - 1, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 0, y + 1, tile), ignore, air, wildcard), checkTile(tile, tiles:get(x + 1, y + 1, tile), ignore, air, wildcard)
+        local checkedTiles = {}
 
-        for j, maskData in ipairs(masks) do
-            if checkMaskFromTiles(maskData.mask, a, b, c, d, nil, f, g, h, i) then
+        local halfWidth = math.floor(scanWidth / 2)
+        local halfHeight = math.floor(scanHeight / 2)
+
+        for offsetY = -halfHeight, halfHeight do
+            for offsetX = -halfWidth, halfWidth do
+                table.insert(checkedTiles, checkTile(tile, tiles:get(x + offsetX, y + offsetY, tile), ignore, air, wildcard))
+            end
+        end
+
+        for _, maskData in ipairs(masks) do
+            if checkMaskFromTiles(maskData.mask, checkedTiles) then
                 return true, maskData.quads, maskData.sprites
             end
         end
@@ -187,24 +185,21 @@ function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, def
     local masks = tileMeta.masks
     local ignore = tileMeta.ignores
 
-    local matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, airTile, wildcard, checkTile)
+    local scanWidth = tileMeta.scanWidth or 3
+    local scanHeight = tileMeta.scanHeight or 3
 
-    if matches then
-        return quads, sprites
+    local matches, quads, sprites
+
+    if scanWidth == 3 and scanHeight == 3 then
+        local lshift = bit.lshift
+        local band = bit.band
+        local bxor = bit.bxor
+
+        matches, quads, sprites = getMaskQuadsFromTilesWithBitmask(x, y, masks, tiles, tile, ignore, airTile, wildcard, checkTile, lshift, bxor, band)
 
     else
-        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+        matches, quads, sprites = getMaskQuadsFromTiles(x, y, masks, tiles, tile, ignore, airTile, wildcard, checkTile, scanWidth, scanHeight)
     end
-end
-
-function autotiler.getQuadsWithBitmask(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
-    local tile = tiles:get(x, y)
-    local tileMeta = meta[tile]
-
-    local masks = tileMeta.masks
-    local ignore = tileMeta.ignores
-
-    local matches, quads, sprites = getMaskQuadsFromTilesWithBitmask(x, y, masks, tiles, tile, ignore, airTile, wildcard, checkTile, lshift, bxor, band)
 
     if matches then
         return quads, sprites
@@ -274,8 +269,6 @@ local function getTilesetStructure(id)
 end
 
 local function readTilesetInfo(tileset, id, element)
-    local currentMasks = {}
-
     -- Doesn't store single child tags in list, pack it into a table for easier use
     local elementSets = element.set and (#element.set > 0 and element.set or {element.set}) or {}
 
@@ -305,7 +298,7 @@ local function readTilesetInfo(tileset, id, element)
             tileset.center = utils.unique(tileset.center, tileStringHashFunction)
 
         else
-            local maskMatrix = convertMaskString(mask)
+            local maskMatrix = convertMaskString(mask, tileset.scanWidth, tileset.scanHeight)
 
             table.insert(tileset.masks, {
                 mask = maskMatrix,
@@ -337,9 +330,7 @@ function autotiler.loadTilesetXML(filename)
     local elementLookup = {}
     local tilesetsRoot = handler.root.Data.Tileset
 
-    local lshift = bit.lshift
-
-    for i, element in ipairs(tilesetsRoot) do
+    for _, element in ipairs(tilesetsRoot) do
         local id = element._attr.id
 
         if utf8.len(id) ~= 1 then
@@ -352,12 +343,29 @@ function autotiler.loadTilesetXML(filename)
         local path = element._attr.path
         local displayName = element._attr.displayName
         local tileset = getTilesetStructure(id)
+        local scanWidth = tonumber(element._attr.scanWidth) or 3
+        local scanHeight = tonumber(element._attr.scanHeight) or 3
 
         tileset.path = "tilesets/" .. path
         tileset.displayName = displayName
         tileset.ignoreExceptions = {}
 
+        tileset.scanWidth = scanWidth
+        tileset.scanHeight = scanHeight
+
         readTilesetInfo(tileset, id, element)
+
+        if tileset.scanWidth then
+            if tileset.scanWidth <= 0 or tileset.scanWidth % 2 ~= 1 then
+                error("Custom scan width must be a positive odd number")
+            end
+        end
+
+        if tileset.scanHeight then
+            if tileset.scanHeight <= 0 or tileset.scanHeight % 2 ~= 1 then
+                error("Custom scan height must be a positive odd number")
+            end
+        end
 
         if copy then
             if not elementLookup[copy] then
