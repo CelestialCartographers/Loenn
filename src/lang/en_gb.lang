@@ -659,6 +659,7 @@ entities.fallingBlock.attributes.description.behind=Whether the block should vis
 # Fake Wall
 entities.fakeWall.placements.name.fake_wall=Fake Wall
 entities.fakeWall.attributes.description.tiletype=Changes the visual appearance of the wall.
+entities.fakeBlock.attributes.description.playTransitionReveal=Determines whether entering the wall should play the reveal jingle.
 
 # Spinner
 entities.spinner.attributes.description.color=Changes the colour of the spinner.

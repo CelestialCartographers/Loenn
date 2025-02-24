@@ -10,6 +10,7 @@ function fakeWall.placements()
         name = "fake_wall",
         data = {
             tiletype = fakeTilesHelper.getPlacementMaterial(),
+            playTransitionReveal = false,
             width = 8,
             height = 8
         }
