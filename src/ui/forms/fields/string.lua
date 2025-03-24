@@ -78,7 +78,7 @@ local function fieldChanged(formField)
 
         -- Check for editable dropdown
         if formField.dropdown then
-            setValue = formField.options.editable or false
+            setValue = formField.editable ~= false
         end
 
         if setValue then
@@ -101,7 +101,7 @@ local function dropdownChanged(formField, optionsFlattened)
         local value
         local foundOption = false
 
-        local editable = formField.editable
+        local editable = formField.editable ~= false
         local searchable = formField.searchable
 
         for _, option in ipairs(optionsFlattened) do
@@ -111,7 +111,7 @@ local function dropdownChanged(formField, optionsFlattened)
             end
         end
 
-        if foundOption and value ~= old then
+        if (editable or foundOption) and value ~= old then
             -- Manually handle for text field, dropdown handles itself
             -- Don't update if field is purely a dropdown
             if editable or searchable then
