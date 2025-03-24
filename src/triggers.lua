@@ -266,7 +266,7 @@ function triggers.areaFlipSelection(room, layer, selection, horizontal, vertical
     local height = trigger.height or 0
 
     if selection.node > 0 then
-        local nodes = entity.nodes
+        local nodes = trigger.nodes
 
         if nodes and node <= #nodes then
             target = nodes[node]

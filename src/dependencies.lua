@@ -11,9 +11,10 @@ local languageRegistry = require("language_registry")
 
 local dependencyFinder = {}
 
--- Bundled with Everest
+-- Bundled with Everest/not collisions
 local ignoredFilePaths = {
-    ["graphics/atlases/gameplay/tilesets/subfolder/bettertemplate.png"] = true
+    ["graphics/atlases/gameplay/tilesets/subfolder/bettertemplate.png"] = true,
+    ["decalregistry.xml"] = true
 }
 
 local analyzeLayers = {
