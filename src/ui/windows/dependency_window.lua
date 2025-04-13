@@ -55,7 +55,7 @@ local function prepareMetadataForSaving(metadata, newDependencies)
 
     -- Sort dependencies by name
     newDependencies = table.sortby(newDependencies, function(dependency)
-        return dependency.Name
+        return dependency.Name or ""
     end)()
 
     local firstMetadata = newMetadata[1] or {}
