@@ -964,6 +964,10 @@ function stylegroundWindow.getWindowContent(map)
             callback = function()
                 interactionData.stylegroundListElement = listForeground
                 interactionData.stylegroundListElementOther = listBackground
+
+                ui.runLate(function()
+                    widgetUtils.focusElement(listForeground.children[1])
+                end)
             end,
         },
         {
@@ -972,6 +976,10 @@ function stylegroundWindow.getWindowContent(map)
             callback = function()
                 interactionData.stylegroundListElement = listBackground
                 interactionData.stylegroundListElementOther = listForeground
+
+                ui.runLate(function()
+                    widgetUtils.focusElement(listBackground.children[1])
+                end)
             end,
         },
     }

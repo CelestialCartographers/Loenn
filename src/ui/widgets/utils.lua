@@ -264,6 +264,10 @@ end
 
 -- Focus element and do any extra logic to prevent them from crashing
 function widgetUtils.focusElement(element)
+    if not element then
+        return
+    end
+
     ui.focusing = element
 
     if utils.typeof(element) == "field" then
