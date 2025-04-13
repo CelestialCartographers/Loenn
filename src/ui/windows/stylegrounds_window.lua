@@ -324,8 +324,6 @@ local function findListIndex(interactionData, targetStyle)
     return listIndex
 end
 
--- TODO - Check if we ever use the item returned here
--- The new findListIndex most likely replaces this and is more stable to ui updates
 local function findListItem(interactionData, targetStyle)
     local listElement = interactionData.stylegroundListElement
 
@@ -340,20 +338,6 @@ local function findCurrentListItem(interactionData)
     local listTarget = interactionData.listTarget
 
     return findListItem(interactionData, listTarget.style)
-end
-
--- TODO - Check if still needed
-local function foregroundListItemCount(interactionData)
-    local listElement = interactionData.stylegroundListElement
-    local count = 0
-
-    for _, item in ipairs(listElement.children) do
-        if item.data.foreground then
-            count += 1
-        end
-    end
-
-    return count
 end
 
 local function setSelectionWithCallback(listElement, index)
@@ -484,7 +468,6 @@ local function changeStyleForeground(interactionData)
     local moveDownButton = interactionData.movementButtonElements.down
 
     local foreground = listTarget.foreground
-    local foregroundCount = foregroundListItemCount(interactionData)
 
     local styles, parent, index, parentStyle = findStyleInStylegrounds(interactionData)
     local parentType = utils.typeof(parentStyle)
@@ -492,7 +475,7 @@ local function changeStyleForeground(interactionData)
     local movedStyle = listTarget.style
     local map = interactionData.map
 
-    local insertionIndex = foreground and #currentListElement.children or foregroundCount + 1
+    local insertionIndex = #currentListElement.children
     local firstIndex = listIndex
     local lastIndex = listIndex
 
