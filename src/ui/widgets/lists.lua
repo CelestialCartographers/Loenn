@@ -557,6 +557,13 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
         list.data = processedItems
 
     else
+        -- Check if list items are listItem or just data
+        if #processedItems > 0 and utils.typeof(processedItems[1]) ~= "listItem" then
+            for i, item in ipairs(processedItems) do
+                processedItems[i] = uiElements.listItem(item)
+            end
+        end
+
         list.children = processedItems
     end
 
