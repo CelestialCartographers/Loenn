@@ -340,19 +340,6 @@ local function findCurrentListItem(interactionData)
     return findListItem(interactionData, listTarget.style)
 end
 
-local function setSelectionWithCallback(listElement, index)
-    listElement:setSelectedIndex(utils.clamp(index, 1, #listElement.children))
-
-    local newSelection = listElement.selected
-
-    if newSelection then
-        -- Trigger list item callback
-        newSelection:onClick(0, 0, 1)
-    end
-
-    return newSelection
-end
-
 local function moveIndex(t, before, after)
     local value = table.remove(t, before)
 
@@ -633,14 +620,22 @@ local function removeStyle(interactionData)
     if parent and index then
         local listElement = interactionData.stylegroundListElement
         local listItem, listIndex = findCurrentListItem(interactionData)
+        local removingGroup = styles == parent
 
         table.remove(parent, index)
-        listItem:removeSelf()
 
-        if #listElement.children > 0 then
-            setSelectionWithCallback(listElement, listIndex)
+        if removingGroup then
+            interactionData.rebuildListItems(listIndex or 1)
 
         else
+            listItem:removeSelf()
+
+            if #listElement.children > 0 then
+                listElement:setSelection(listIndex)
+            end
+        end
+
+        if #listElement.children == 0 then
             interactionData.listTarget = getDefaultListTarget()
 
             stylegroundWindow.updateStylegroundForm(interactionData)
@@ -956,6 +951,7 @@ function stylegroundWindow.getWindowContent(map)
 
     function interactionData.rebuildListItems(index)
         local list = interactionData.stylegroundListElement
+        local fg = list == interactionData.stylegroundListElementFg
         local newItems = stylegroundWindow.getStylegroundListItems(map, fg)
 
         list:updateItems(newItems, index)

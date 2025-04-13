@@ -58,6 +58,7 @@ ui.styleground_window.form.move_to_background=Move to background
 
 ui.styleground_window.new_options.based_on_current=Based on current
 ui.styleground_window.new_options.parallax=Parallax
+ui.styleground_window.new_options.apply=Group
 
 
 # Metadata Window
