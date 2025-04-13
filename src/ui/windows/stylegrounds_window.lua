@@ -281,8 +281,10 @@ end
 -- Second is the actual parent of the style (styles table or an apply)
 -- Third is the index in that parent
 -- Fourth is the parent style, if it exists
-local function findStyleInStylegrounds(interactionData)
-    local listTarget = interactionData.listTarget
+-- Fifth is the index the target would have in the visual list
+local function findStyleInStylegrounds(interactionData, target)
+    local listIndex = 0
+    local listTarget = target or interactionData.listTarget
 
     if not listTarget then
         return
@@ -296,22 +298,34 @@ local function findStyleInStylegrounds(interactionData)
     for i, s in ipairs(styles) do
         local styleType = utils.typeof(s)
 
+        listIndex += 1
+
         if style == s then
-            return styles, styles, i
+            return styles, styles, i, nil, listIndex
         end
 
         if styleType == "apply" then
             for j, c in ipairs(s.children or {}) do
+                listIndex += 1
+
                 if style == c then
-                    return styles, s.children, j, s
+                    return styles, s.children, j, s, listIndex
                 end
             end
         end
     end
 
-    return styles, styles, 1
+    return styles, styles, 1, nil, 1
 end
 
+local function findListIndex(interactionData, targetStyle)
+    local _, _, _, _, listIndex = findStyleInStylegrounds(interactionData, targetStyle)
+
+    return listIndex
+end
+
+-- TODO - Check if we ever use the item returned here
+-- The new findListIndex most likely replaces this and is more stable to ui updates
 local function findListItem(interactionData, targetStyle)
     local listElement = interactionData.stylegroundListElement
 
@@ -328,6 +342,7 @@ local function findCurrentListItem(interactionData)
     return findListItem(interactionData, listTarget.style)
 end
 
+-- TODO - Check if still needed
 local function foregroundListItemCount(interactionData)
     local listElement = interactionData.stylegroundListElement
     local count = 0
@@ -397,9 +412,18 @@ local function moveStyle(interactionData, offset)
         if index ~= newIndex then
             local listElement = interactionData.stylegroundListElement
             local listItem, listIndex = findCurrentListItem(interactionData)
+            local movingGroup = styles == parent
 
             moveIndex(parent, index, newIndex)
-            moveIndex(listElement.children, listIndex, listIndex + offset)
+
+            if movingGroup then
+                local newListIndex = findListIndex(interactionData, style)
+
+                interactionData.rebuildListItems(newListIndex)
+
+            else
+                moveIndex(listElement.children, listIndex, listIndex + offset)
+            end
 
             listElement:reflow()
 
@@ -889,11 +913,17 @@ local function listItemCanInsertHandler(interactionData)
     end
 end
 
-function stylegroundWindow.getStylegroundList(map, interactionData, fg)
+function stylegroundWindow.getStylegroundListItems(map, fg)
     local items = {}
     local styles = fg and map.stylesFg or map.stylesBg
 
     getStylegroundItems(styles or {}, items, fg)
+
+    return items
+end
+
+function stylegroundWindow.getStylegroundList(map, interactionData, fg)
+    local items = stylegroundWindow.getStylegroundListItems(map, fg)
 
     local listOptions = {
         initialItem = 1,
@@ -912,7 +942,7 @@ function stylegroundWindow.getStylegroundList(map, interactionData, fg)
 
     list:layout()
 
-    return column, list
+    return column, list, items
 end
 
 function stylegroundWindow.getWindowContent(map)
@@ -927,7 +957,7 @@ function stylegroundWindow.getWindowContent(map)
 
     local stylegroundFormGroup = uiElements.group({}):with(uiUtils.bottombound)
     local stylegroundPreview = uiElements.group({
-            stylegroundWindow.getStylegroundPreview(interactionData)
+        stylegroundWindow.getStylegroundPreview(interactionData)
     })
     local stylegroundForm = stylegroundWindow.getStylegroundForm(interactionData)
 
@@ -940,6 +970,13 @@ function stylegroundWindow.getWindowContent(map)
     interactionData.stylegroundPreviewGroup = stylegroundPreview
     interactionData.stylegroundListElementFg = listForeground
     interactionData.stylegroundListElementBg = listBackground
+
+    function interactionData.rebuildListItems(index)
+        local list = interactionData.stylegroundListElement
+        local newItems = stylegroundWindow.getStylegroundListItems(map, fg)
+
+        list:updateItems(newItems, index)
+    end
 
     local tabs = {
         {
