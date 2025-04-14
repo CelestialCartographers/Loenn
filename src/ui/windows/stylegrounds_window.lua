@@ -626,28 +626,9 @@ local function removeStyle(interactionData)
     end
 end
 
-local function updateListItemText(listItem, style)
-    if not listItem then
-        return
-    end
-
-    local styleType = utils.typeof(style)
-    local language = languageRegistry.getLanguage()
-
-    if styleType == "parallax" then
-        listItem.text = parallax.displayName(language, style)
-
-    elseif styleType == "effect" then
-        listItem.text = effects.displayName(language, style)
-    end
-end
-
 local function updateStyle(interactionData, style, newData)
-    local listElement = interactionData.stylegroundListElement
-    local listItem = listElement and listElement.selected
-
     applyFormChanges(style, newData)
-    updateListItemText(listItem, style)
+    interactionData.rebuildListItems()
 end
 
 local function getNewDropdownOptions(style, foreground, usingDefault, showIncorrect)
@@ -938,12 +919,17 @@ function stylegroundWindow.getWindowContent(map)
     interactionData.stylegroundListElementFg = listForeground
     interactionData.stylegroundListElementBg = listBackground
 
-    function interactionData.rebuildListItems(index)
+    function interactionData.rebuildListItems(listTarget)
         local list = interactionData.stylegroundListElement
         local fg = list == interactionData.stylegroundListElementFg
         local newItems = stylegroundWindow.getStylegroundListItems(map, fg)
 
-        list:updateItems(newItems, index)
+        -- Use current target if none specified
+        if not listTarget then
+            listTarget = list:getSelectedIndex()
+        end
+
+        list:updateItems(newItems, listTarget)
     end
 
     local tabs = {
