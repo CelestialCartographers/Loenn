@@ -284,25 +284,27 @@ end
 -- Fifth is the index the target would have in the visual list
 local function findStyleInStylegrounds(interactionData, target)
     local listIndex = 0
-    local listTarget = target or interactionData.listTarget
+    local listTarget = interactionData.listTarget
+    local style = target
 
     if not listTarget then
         return
     end
 
+    style = style or interactionData.listTarget.style
+
     local map = interactionData.map
-    local style = interactionData.listTarget.style
     local foreground = interactionData.listTarget.foreground
     local styles = foreground and map.stylesFg or map.stylesBg
 
     for i, s in ipairs(styles) do
-        local styleType = utils.typeof(s)
-
         listIndex += 1
 
         if style == s then
             return styles, styles, i, nil, listIndex
         end
+
+        local styleType = utils.typeof(s)
 
         if styleType == "apply" then
             for j, c in ipairs(s.children or {}) do
@@ -518,11 +520,12 @@ local function addNewStyle(interactionData, formFields)
     local foreground = listTarget.foreground
     local map = interactionData.map
     local method = interactionData.addNewMethod.method
+    -- TODO - Figure out how this works with groups / in general
     local correctForegroundValue = interactionData.addNewMethod.correctForegroundValue
 
     if method == "basedOnCurrent" then
         if currentStyle then
-            newStyle = table.shallowcopy(currentStyle)
+            newStyle = utils.deepcopy(currentStyle)
 
             applyFormChanges(newStyle, form.getFormData(formFields))
         end
@@ -540,28 +543,29 @@ local function addNewStyle(interactionData, formFields)
     end
 
     if newStyle then
-        local styles, parentTable, index = findStyleInStylegrounds(interactionData)
+        local _, parentTable, index = findStyleInStylegrounds(interactionData)
         local _, listIndex = findCurrentListItem(interactionData)
         local targetGroup
         local newIsApply = utils.typeof(newStyle) == "apply"
+        local currentIsApply = utils.typeof(currentStyle) == "apply"
+        local parentIsApply = utils.typeof(parentStyle) == "apply"
 
-        if utils.typeof(currentStyle) == "apply" then
+        if currentIsApply then
             targetGroup = currentStyle
 
             -- We are adding as first element of the group
-            if not newIsApply then
-                index = 0
-            end
+            index = 0
 
-        elseif utils.typeof(parentStyle) == "apply" then
+        elseif parentIsApply then
             targetGroup = parentStyle
         end
 
         local addToGroup = targetGroup and not newIsApply
 
         -- If we add a apply it should be added after the current group
-        if utils.typeof(newStyle) == "apply" and targetGroup and targetGroup.children then
-            _, listIndex = findListItem(interactionData, targetGroup)
+        if newIsApply and targetGroup then
+            parentTable = foreground and map.stylesFg or map.stylesBg
+            _, _, index, _, listIndex = findStyleInStylegrounds(interactionData, targetGroup)
             listIndex += #targetGroup.children
         end
 
@@ -583,32 +587,12 @@ local function addNewStyle(interactionData, formFields)
             table.insert(parentTable, index + 1, newStyle)
         end
 
-        local listItems = getStylegroundItems({newStyle}, {}, foreground, targetGroup)
-
-        for i, item in ipairs(listItems) do
-            local text = item.text
-
-            if addToGroup then
-                text = addFolderIndent(text)
-            end
-
-            local listItem = uiElements.listItem(text, item.data)
-
-            listItem.owner = listElement
-
-            table.insert(listElement.children, listIndex + i, listItem)
+        -- Update list index after adding group
+        if newIsApply and parentIsApply then
+            listIndex = findListIndex(interactionData, newStyle) - 1
         end
 
-        if #listItems > 0 then
-            local lastItem = listElement.children[#listItems + listIndex]
-
-            listElement:reflow()
-            lastItem:onClick(0, 0, 1)
-
-            if correctForegroundValue == false then
-                changeStyleForeground(interactionData)
-            end
-        end
+        interactionData.rebuildListItems(listIndex + 1)
     end
 
     return not not newStyle
