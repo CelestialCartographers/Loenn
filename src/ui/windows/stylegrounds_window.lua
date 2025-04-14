@@ -520,8 +520,6 @@ local function addNewStyle(interactionData, formFields)
     local foreground = listTarget.foreground
     local map = interactionData.map
     local method = interactionData.addNewMethod.method
-    -- TODO - Figure out how this works with groups / in general
-    local correctForegroundValue = interactionData.addNewMethod.correctForegroundValue
 
     if method == "basedOnCurrent" then
         if currentStyle then
@@ -652,7 +650,7 @@ local function updateStyle(interactionData, style, newData)
     updateListItemText(listItem, style)
 end
 
-local function getNewDropdownOptions(style, foreground, usingDefault)
+local function getNewDropdownOptions(style, foreground, usingDefault, showIncorrect)
     local language = languageRegistry.getLanguage()
     local knownEffects = effects.registeredEffects
     local options = {}
@@ -688,15 +686,21 @@ local function getNewDropdownOptions(style, foreground, usingDefault)
         local displayName = effects.displayName(language, fakeEffect)
         local canForeground = effects.canForeground(fakeEffect)
         local canBackground = effects.canBackground(fakeEffect)
+        local correctForegroundValue = foreground and canForeground or not foreground and canBackground
 
-        table.insert(effectOptions, {
+        local option = {
             text = displayName,
             data = {
                 method = "effect",
                 name = name,
-                correctForegroundValue = foreground and canForeground or not foreground and canBackground
+                correctForegroundValue = correctForegroundValue
             }
-        })
+        }
+
+        -- Remove invalid options that does not match current foreground/background
+        if showIncorrect or correctForegroundValue then
+            table.insert(effectOptions, option)
+        end
     end
 
     effectOptions = table.sortby(effectOptions, function(option)
@@ -925,8 +929,9 @@ function stylegroundWindow.getWindowContent(map)
 
     stylegroundFormGroup:addChild(stylegroundForm)
 
-    local listColumnForeground, listForeground = stylegroundWindow.getStylegroundList(map, interactionData, true)
+    -- Create foreground last because of list callbacks
     local listColumnBackground, listBackground = stylegroundWindow.getStylegroundList(map, interactionData, false)
+    local listColumnForeground, listForeground = stylegroundWindow.getStylegroundList(map, interactionData, true)
 
     interactionData.formContainerGroup = stylegroundFormGroup
     interactionData.stylegroundPreviewGroup = stylegroundPreview
@@ -951,6 +956,7 @@ function stylegroundWindow.getWindowContent(map)
 
                 ui.runLate(function()
                     widgetUtils.focusElement(listForeground.children[1])
+                    listForeground:setSelection(listForeground:getSelectedData(), false, false)
                 end)
             end,
         },
@@ -963,6 +969,7 @@ function stylegroundWindow.getWindowContent(map)
 
                 ui.runLate(function()
                     widgetUtils.focusElement(listBackground.children[1])
+                    listBackground:setSelection(listBackground:getSelectedData(), false, false)
                 end)
             end,
         },
