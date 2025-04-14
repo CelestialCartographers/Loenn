@@ -597,27 +597,16 @@ local function addNewStyle(interactionData, formFields)
 end
 
 local function removeStyle(interactionData)
-    local styles, parent, index = findStyleInStylegrounds(interactionData)
+    local _, parent, index = findStyleInStylegrounds(interactionData)
 
     if parent and index then
-        local listElement = interactionData.stylegroundListElement
-        local listItem, listIndex = findCurrentListItem(interactionData)
-        local removingGroup = styles == parent
+        local _, listIndex = findCurrentListItem(interactionData)
 
         table.remove(parent, index)
 
-        if removingGroup then
-            interactionData.rebuildListItems(listIndex or 1)
+        local newItems = interactionData.rebuildListItems(listIndex or 1)
 
-        else
-            listItem:removeSelf()
-
-            if #listElement.children > 0 then
-                listElement:setSelection(listIndex)
-            end
-        end
-
-        if #listElement.children == 0 then
+        if #newItems == 0 then
             interactionData.listTarget = getDefaultListTarget()
 
             stylegroundWindow.updateStylegroundForm(interactionData)
@@ -930,6 +919,8 @@ function stylegroundWindow.getWindowContent(map)
         end
 
         list:updateItems(newItems, listTarget)
+
+        return newItems
     end
 
     local tabs = {
