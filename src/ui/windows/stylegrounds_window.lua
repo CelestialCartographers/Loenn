@@ -517,7 +517,7 @@ local function addNewStyle(interactionData, formFields)
     local parentStyle = listTarget.parentStyle
 
     local listElement = interactionData.stylegroundListElement
-    local foreground = listTarget.foreground
+    local foreground = listElement == interactionData.stylegroundListElementFg
     local map = interactionData.map
     local method = interactionData.addNewMethod.method
 
@@ -569,6 +569,7 @@ local function addNewStyle(interactionData, formFields)
 
         -- Fallback if we don't have any items in the list yet
         if #listElement.children == 0 then
+            addToGroup = false
             parentTable = foreground and map.stylesFg or map.stylesBg
             listIndex = 0
             index = 0
