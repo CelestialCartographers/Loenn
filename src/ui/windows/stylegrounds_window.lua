@@ -5,8 +5,10 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
-local languageRegistry = require("language_registry")
 local utils = require("utils")
+local configs = require("configs")
+local keyboardHelper = require("utils.keyboard")
+local languageRegistry = require("language_registry")
 local form = require("ui.forms.form")
 local stylegroundEditor = require("ui.styleground_editor")
 local listWidgets = require("ui.widgets.lists")
@@ -22,6 +24,7 @@ local formUtils = require("ui.utils.forms")
 local atlases = require("atlases")
 local tabbedWindow = require("ui.widgets.tabbed_window")
 local listItemUtils = require("ui.utils.list_item")
+local notifications = require("ui.notification")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "stylegrounds_window"
@@ -709,6 +712,26 @@ local function getNewDropdownOptions(style, foreground, usingDefault, showIncorr
     return options
 end
 
+local function notifyRemoveStyle(language, interactionData)
+    notifications.notify(
+        function(popup)
+            return uiElements.column({
+                uiElements.label(tostring(language.ui.stylegrounds_window.delete_style_warning)),
+                uiElements.row({
+                    uiElements.button(tostring(language.ui.button.yes), function()
+                        removeStyle(interactionData)
+                        popup:close()
+                    end),
+                    uiElements.button(tostring(language.ui.button.no), function()
+                        popup:close()
+                    end),
+                })
+            })
+        end,
+        -1
+    )
+end
+
 local function getStylegroundFormButtons(interactionData, formFields, formOptions)
     local listTarget = interactionData.listTarget or {}
     local listHasElements = false
@@ -767,7 +790,15 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
             text = tostring(language.ui.styleground_window.form.remove),
             enabled = listHasElements,
             callback = function()
-                removeStyle(interactionData)
+                -- Prompt user for deletion, unless they are holding the bypass modifier
+                local bypassPrompt = keyboardHelper.modifierHeld(configs.ui.hotkeys.bypassDangerousActionWarningModifier)
+
+                if bypassPrompt then
+                    removeStyle(interactionData)
+
+                else
+                    notifyRemoveStyle(language, interactionData)
+                end
             end
         },
         {
