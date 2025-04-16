@@ -582,6 +582,7 @@ local function addNode(room, layer, targets)
         local newTargets = {}
 
         local relevantSelections = getRelevantNodeAddSelections(layer, targets)
+        local addSelections = keyboardHelper.modifierHeld(configs.editor.selectionAddModifier)
 
         for _, selection in ipairs(relevantSelections) do
             local added = selectionItemUtils.addNodeToSelection(room, selection.layer, selection)
@@ -599,17 +600,19 @@ local function addNode(room, layer, targets)
                     end
                 end
 
-                -- Add new node to selections
-                local rectangles = selectionUtils.getSelectionsForItem(room, selection.layer, item)
+                if addSelections then
+                    -- Add new node to selections
+                    local rectangles = selectionUtils.getSelectionsForItem(room, selection.layer, item)
 
-                -- Nodes are off by one here since the main entity would be the first rectangle
-                -- We also insert after the target node, meaning the total offset is two
-                local nodeRectangle = rectangles[node + 2]
+                    -- Nodes are off by one here since the main entity would be the first rectangle
+                    -- We also insert after the target node, meaning the total offset is two
+                    local nodeRectangle = rectangles[node + 2]
 
-                nodeRectangle.item = item
-                nodeRectangle.node = node + 1
+                    nodeRectangle.item = item
+                    nodeRectangle.node = node + 1
 
-                table.insert(newTargets, nodeRectangle)
+                    table.insert(newTargets, nodeRectangle)
+                end
 
                 redraw = true
             end

@@ -1,4 +1,6 @@
 local parallax = require("parallax")
+local effects = require("effects")
+local utils = require("utils")
 
 local apply = {}
 
@@ -23,12 +25,28 @@ function apply.fieldInformation(style)
     return fieldInformation
 end
 
-function apply.canForeground(style)
+local function canForegroundBackgroundCommon(style, fg)
+    local funcKey = fg and "canForeground" or "canBackground"
+
+    for _, child in ipairs(style.children) do
+        local handler = utils.typeof(child) == "parallax" and parallax or effects
+
+        if not handler[funcKey](child) then
+            return false
+        end
+    end
+
     return true
 end
 
+-- Check that all children can foreground
+function apply.canForeground(style)
+    return canForegroundBackgroundCommon(style, true)
+end
+
+-- Check that all children can background
 function apply.canBackground(style)
-    return true
+    return canForegroundBackgroundCommon(style, false)
 end
 
 function apply.languageData(language, style)
