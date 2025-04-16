@@ -583,6 +583,68 @@ local function updateStyle(interactionData, style, newData)
     interactionData.rebuildListItems()
 end
 
+local function findBestGroupParent(interactionData)
+    local listTarget = interactionData.listTarget
+    local currentStyle = listTarget.style
+    local closestGroup
+    local seenCurrent = false
+
+    local styles = findStyleInStylegrounds(interactionData)
+
+    -- Try to find the closest group, prefer inserting into group above
+    for _, style in ipairs(styles) do
+        if style == currentStyle then
+            seenCurrent = true
+
+            if closestGroup then
+                return closestGroup
+            end
+        end
+
+        if utils.typeof(style) == "apply" then
+            closestGroup = style
+
+            if seenCurrent then
+                return style
+            end
+        end
+    end
+end
+
+local function addStyleToGroup(interactionData)
+    local listTarget = interactionData.listTarget
+    local currentStyle = listTarget.style
+    local parentGroup = findBestGroupParent(interactionData)
+    local styles, _, index = findStyleInStylegrounds(interactionData)
+
+    -- If no groups exist create one and insert it there instead
+    if not parentGroup then
+        parentGroup = createApply()
+
+        table.insert(styles, index + 1, parentGroup)
+    end
+
+    table.insert(parentGroup.children, currentStyle)
+    table.remove(styles, index)
+
+    interactionData.rebuildListItems()
+end
+
+local function removeStyleFromGroup(interactionData)
+    local listTarget = interactionData.listTarget
+    local style = listTarget.style
+    local parentStyle = listTarget.parentStyle
+    local styles, _, index = findStyleInStylegrounds(interactionData)
+    local _, _, parentIndex = findStyleInStylegrounds(interactionData, parentStyle)
+
+    if parentStyle and parentStyle.children and styles and parentIndex then
+        table.remove(parentStyle.children, index)
+        table.insert(styles, parentIndex + 1, style)
+
+        interactionData.rebuildListItems()
+    end
+end
+
 local function getNewDropdownOptions(style, foreground, usingDefault, showIncorrect)
     local language = languageRegistry.getLanguage()
     local knownEffects = effects.registeredEffects
@@ -660,6 +722,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     local foreground = listTarget.foreground
     local isDefaultTarget = listTarget.defaultTarget
     local inGroup = not not listTarget.parentStyle
+    local isGroup = utils.typeof(style) == "apply"
 
     local handler = getHandler(style)
 
@@ -671,10 +734,23 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     local moveToBackgroundText = tostring(language.ui.styleground_window.form.move_to_background)
 
     local movementButtonElements = {}
+
     local changeForegroundButton = {
         text = foreground and moveToBackgroundText or moveToForegroundText,
         callback = function()
             changeStyleForeground(interactionData)
+        end
+    }
+    local addToGroupButton = {
+        text = tostring(language.ui.styleground_window.form.add_to_group),
+        callback = function()
+            addStyleToGroup(interactionData)
+        end
+    }
+    local removeFromGroupButton = {
+        text = tostring(language.ui.styleground_window.form.remove_from_group),
+        callback = function()
+            removeStyleFromGroup(interactionData)
         end
     }
 
@@ -715,11 +791,20 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
             callback = function()
                 moveStyle(interactionData, 1)
             end
-        }
+        },
     }
 
     if canChangeForeground and listHasElements then
         table.insert(buttons, changeForegroundButton)
+    end
+
+    if not isGroup then
+        if inGroup then
+            table.insert(buttons, removeFromGroupButton)
+
+        else
+            table.insert(buttons, addToGroupButton)
+        end
     end
 
     local buttonRow = formHelper.getFormButtonRow(buttons, formFields, formOptions)

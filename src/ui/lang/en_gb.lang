@@ -55,6 +55,8 @@ ui.styleground_window.form.move_up=Move up
 ui.styleground_window.form.move_down=Move down
 ui.styleground_window.form.move_to_foreground=Move to foreground
 ui.styleground_window.form.move_to_background=Move to background
+ui.styleground_window.form.add_to_group=Add to group
+ui.styleground_window.form.remove_from_group=Remove from group
 
 ui.styleground_window.new_options.based_on_current=Based on current
 ui.styleground_window.new_options.parallax=Parallax
