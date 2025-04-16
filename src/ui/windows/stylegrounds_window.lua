@@ -5,12 +5,9 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
-local loadedState = require("loaded_state")
 local languageRegistry = require("language_registry")
 local utils = require("utils")
 local form = require("ui.forms.form")
-local configs = require("configs")
-local enums = require("consts.celeste_enums")
 local stylegroundEditor = require("ui.styleground_editor")
 local listWidgets = require("ui.widgets.lists")
 local widgetUtils = require("ui.widgets.utils")
@@ -355,7 +352,7 @@ local function canMoveStyle(interactionData, offset)
         return false
     end
 
-    local styles, parent, index = findStyleInStylegrounds(interactionData)
+    local _, parent, index = findStyleInStylegrounds(interactionData)
 
     if parent and index then
         local newIndex = index + offset
@@ -384,7 +381,7 @@ local function moveStyle(interactionData, offset)
 
         if index ~= newIndex then
             local listElement = interactionData.stylegroundListElement
-            local listItem, listIndex = findCurrentListItem(interactionData)
+            local _, listIndex = findCurrentListItem(interactionData)
             local movingGroup = styles == parent
 
             moveIndex(parent, index, newIndex)
@@ -617,7 +614,7 @@ local function getNewDropdownOptions(style, foreground, usingDefault, showIncorr
     -- Find all effects and add them in sorted order (by display name)
     local effectOptions = {}
 
-    for name, handler in pairs(knownEffects) do
+    for name, _ in pairs(knownEffects) do
         local fakeEffect = {_name = name}
         local displayName = effects.displayName(language, fakeEffect)
         local canForeground = effects.canForeground(fakeEffect)
@@ -676,7 +673,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     local movementButtonElements = {}
     local changeForegroundButton = {
         text = foreground and moveToBackgroundText or moveToForegroundText,
-        callback = function(formFields)
+        callback = function()
             changeStyleForeground(interactionData)
         end
     }
@@ -686,14 +683,14 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     local buttons = {
         {
             text = tostring(language.ui.styleground_window.form.new),
-            callback = function(formFields)
+            callback = function()
                 addNewStyle(interactionData, formFields)
             end
         },
         {
             text = tostring(language.ui.styleground_window.form.remove),
             enabled = listHasElements,
-            callback = function(formFields)
+            callback = function()
                 removeStyle(interactionData)
             end
         },
@@ -701,21 +698,21 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
             text = tostring(language.ui.styleground_window.form.update),
             formMustBeValid = true,
             enabled = listHasElements,
-            callback = function(formFields)
+            callback = function()
                 updateStyle(interactionData, style, form.getFormData(formFields))
             end
         },
         {
             text = tostring(language.ui.styleground_window.form.move_up),
             enabled = canMoveStyle(interactionData, -1),
-            callback = function(formFields)
+            callback = function()
                 moveStyle(interactionData, -1)
             end
         },
         {
             text = tostring(language.ui.styleground_window.form.move_down),
             enabled = canMoveStyle(interactionData, 1),
-            callback = function(formFields)
+            callback = function()
                 moveStyle(interactionData, 1)
             end
         }
@@ -727,7 +724,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
 
     local buttonRow = formHelper.getFormButtonRow(buttons, formFields, formOptions)
     local newDropdownItems = getNewDropdownOptions(style, foreground, isDefaultTarget)
-    local newDropdown = uiElements.dropdown(newDropdownItems, function(item, data)
+    local newDropdown = uiElements.dropdown(newDropdownItems, function(_, data)
         interactionData.addNewMethod = data
     end)
 
@@ -748,7 +745,7 @@ function stylegroundWindow.getStylegroundForm(interactionData)
 
     -- TODO - Add to config file?
     formOptions.columns = 8
-    formOptions.formFieldChanged = function(formFields, field)
+    formOptions.formFieldChanged = function(formFields)
         local newData = form.getFormData(formFields)
 
         interactionData.formData = newData
@@ -756,7 +753,7 @@ function stylegroundWindow.getStylegroundForm(interactionData)
         stylegroundWindow.updateStylegroundPreview(interactionData)
     end
 
-    local formBody, formFields = formHelper.getFormBody(dummyData, formOptions, buttons)
+    local formBody, formFields = formHelper.getFormBody(dummyData, formOptions)
     local buttonRow = getStylegroundFormButtons(interactionData, formFields, formOptions)
 
     return uiElements.column({formBody, buttonRow})
@@ -774,7 +771,7 @@ function stylegroundWindow.updateStylegroundForm(interactionData)
 end
 
 -- Check if movement is allowed and return prepared offset and interactionData
-local function listItemDragAllowed(interactionData, fromList, fromListItem, toList, toListItem, fromIndex, toIndex)
+local function listItemDragAllowed(interactionData, fromList, fromListItem, _, _, fromIndex, toIndex)
     local offset = toIndex - fromIndex
 
     if toIndex > fromIndex then
@@ -947,7 +944,7 @@ function stylegroundWindow.editStylegrounds(map)
     end
 
     local window
-    local layout, interactionData = stylegroundWindow.getWindowContent(map)
+    local layout = stylegroundWindow.getWindowContent(map)
 
     local language = languageRegistry.getLanguage()
     local windowTitle = tostring(language.ui.styleground_window.window_title)
