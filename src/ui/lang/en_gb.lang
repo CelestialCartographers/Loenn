@@ -126,6 +126,11 @@ settings.ui.searching.description.searchCaseSensitive=When search should be case
 settings.ui.searching.description.searchFuzzy=Force search to always do fuzzy matching.\nFuzzy search does not need entries to exactly match the search term, other closely matching results will be shown as well.\nIf disabled, fuzzy search may still be performed by starting the search with a ~ tilde sign.
 settings.ui.searching.description.sortByScore=Order search results such that the closest matches show up at the top.\nIf disabled, search results are sorted alphabetically.
 
+# Settings - Hotkeys - General
+settings.ui.hotkeys.attribute.bypassDangerousActionWarningModifier=Skip Confirmation (Modifier)
+
+settings.ui.hotkeys.description.bypassDangerousActionWarningModifier=While held, skip confirmation messages and apply changes immediately.
+
 # Settings - Hotkeys - Lists
 settings.ui.searching.attribute.searchPreviousResultKey=Previous Element
 settings.ui.searching.attribute.searchNextResultKey=Next Element

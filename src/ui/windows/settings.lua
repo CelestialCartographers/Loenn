@@ -108,7 +108,8 @@ local defaultTabForms = {
                     "hotkeys.saveAs",
                     "hotkeys.undo",
                     "hotkeys.redo",
-                    "hotkeys.toggleFullscreen"
+                    "hotkeys.toggleFullscreen",
+                    "ui.hotkeys.bypassDangerousActionWarningModifier",
                 }
             },
             {
@@ -555,6 +556,9 @@ local defaultFieldInformation = {
         fieldType = "string",
         editable = false,
         options = themeOptions
+    },
+    ["ui.hotkeys.bypassDangerousActionWarningModifier"] = {
+        fieldType = "keyboard_modifier"
     },
 
     ["ui.hotkeys.focusMaterialSearch"] = {
