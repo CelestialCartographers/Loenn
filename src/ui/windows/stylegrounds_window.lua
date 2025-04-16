@@ -451,45 +451,11 @@ local function changeStyleForeground(interactionData)
     local listTarget = interactionData.listTarget
     local currentListElement = interactionData.stylegroundListElement
     local otherListElement = interactionData.stylegroundListElementOther
-    local listItem, listIndex = findCurrentListItem(interactionData)
-
-    local moveUpButton = interactionData.movementButtonElements.up
-    local moveDownButton = interactionData.movementButtonElements.down
 
     local foreground = listTarget.foreground
 
-    local styles, parent, index, parentStyle = findStyleInStylegrounds(interactionData)
-    local parentType = utils.typeof(parentStyle)
-
     local movedStyle = listTarget.style
     local map = interactionData.map
-
-    local insertionIndex = #currentListElement.children
-    local firstIndex = listIndex
-    local lastIndex = listIndex
-
-    -- Move all related menu items
-    if parentType == "apply" then
-        movedStyle = parentStyle
-        firstIndex = listIndex - index + 1
-        lastIndex = firstIndex + #parent - 1
-    end
-
-    -- Update list items
-    local fromIndex = firstIndex
-
-    for i = lastIndex, firstIndex, -1 do
-        local movedItem = currentListElement.children[fromIndex]
-
-        table.remove(currentListElement.children, i)
-
-        movedItem.label.value = not foreground
-        movedItem.data.foreground = not foreground
-
-        table.insert(otherListElement.children, movedItem)
-
-        otherListElement:layout()
-    end
 
     -- Update map style data
     local fromStyles = foreground and map.stylesFg or map.stylesBg
@@ -504,9 +470,8 @@ local function changeStyleForeground(interactionData)
         end
     end
 
-    -- Update list and form fields
-    currentListElement:reflow()
-    listItem:onClick(0, 0, 1)
+    interactionData.rebuildListItems(nil, otherListElement)
+    interactionData.rebuildListItems(nil, currentListElement)
 end
 
 local function addNewStyle(interactionData, formFields)
@@ -697,12 +662,13 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
     local style = listTarget.style
     local foreground = listTarget.foreground
     local isDefaultTarget = listTarget.defaultTarget
+    local inGroup = not not listTarget.parentStyle
 
     local handler = getHandler(style)
 
     local canForeground = handler and handler.canForeground(style)
     local canBackground = handler and handler.canBackground(style)
-    local canChangeForeground = canForeground and canBackground
+    local canChangeForeground = canForeground and canBackground and not inGroup
 
     local moveToForegroundText = tostring(language.ui.styleground_window.form.move_to_foreground)
     local moveToBackgroundText = tostring(language.ui.styleground_window.form.move_to_background)
@@ -909,8 +875,11 @@ function stylegroundWindow.getWindowContent(map)
     interactionData.stylegroundListElementFg = listForeground
     interactionData.stylegroundListElementBg = listBackground
 
-    function interactionData.rebuildListItems(listTarget)
-        local list = interactionData.stylegroundListElement
+    function interactionData.rebuildListItems(listTarget, list)
+        if not list then
+            list = interactionData.stylegroundListElement
+        end
+
         local fg = list == interactionData.stylegroundListElementFg
         local newItems = stylegroundWindow.getStylegroundListItems(map, fg)
 
