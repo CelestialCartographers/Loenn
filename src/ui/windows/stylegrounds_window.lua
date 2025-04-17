@@ -87,9 +87,7 @@ local function getStylegroundItems(targets, items, foreground, parent)
 
         elseif styleType == "apply" then
             if style.children then
-                local childItems = {}
-
-                getStylegroundItems(style.children, childItems, foreground, style)
+                local childItems = getStylegroundItems(style.children, {}, foreground, style)
 
                 local groupText = apply.displayName(language, style, groupIndex)
                 local groupLabel = uiElements.label(groupText)
@@ -107,19 +105,23 @@ local function getStylegroundItems(targets, items, foreground, parent)
                     }
                 })
 
+                local collapsed = style._collapsed
+                local iconName = collapsed and "favorite" or "visible"
+
                 -- TODO - Get proper icons
-                listItemUtils.setIcon(groupItem, "favorite")
+                listItemUtils.setIcon(groupItem, iconName)
 
                 table.insert(items, {
                     text = groupItem,
                     data = listItemData,
-                    foreground = foreground,
                 })
 
-                for _, child in ipairs(childItems) do
-                    child.text = addFolderIndent(child.text)
+                if not collapsed then
+                    for _, child in ipairs(childItems) do
+                        child.text = addFolderIndent(child.text)
 
-                    table.insert(items, child)
+                        table.insert(items, child)
+                    end
                 end
 
                 groupIndex += 1
@@ -308,7 +310,9 @@ local function findStyleInStylegrounds(interactionData, target)
 
         if styleType == "apply" then
             for j, c in ipairs(s.children or {}) do
-                listIndex += 1
+                if not style._collapsed then
+                    listIndex += 1
+                end
 
                 if style == c then
                     return styles, s.children, j, s, listIndex
@@ -408,6 +412,9 @@ end
 local function createApply()
     local style = applyStruct.decode({})
     local defaultData = apply.defaultData(style) or {}
+
+    -- Used for visuals, not saved to map bin
+    style._collapsed = false
 
     for k, v in pairs(defaultData) do
         style[k] = v
@@ -930,13 +937,28 @@ local function listItemCanInsertHandler(interactionData)
     end
 end
 
+local function listItemDoubleClickedHandler(interactionData)
+    return function(_, button)
+        if button ~= 1 then
+            return
+        end
+
+        local listTarget = interactionData.listTarget
+        local style = listTarget.style
+        local isGroup = utils.typeof(style) == "apply"
+
+        if isGroup then
+            style._collapsed = not style._collapsed
+
+            interactionData.rebuildListItems()
+        end
+    end
+end
+
 function stylegroundWindow.getStylegroundListItems(map, fg)
-    local items = {}
     local styles = fg and map.stylesFg or map.stylesBg
 
-    getStylegroundItems(styles or {}, items, fg)
-
-    return items
+    return getStylegroundItems(styles or {}, {}, fg)
 end
 
 function stylegroundWindow.getStylegroundList(map, interactionData, fg)
@@ -946,7 +968,8 @@ function stylegroundWindow.getStylegroundList(map, interactionData, fg)
         initialItem = 1,
         draggable = true,
         listItemDragged = listItemDraggedHandler(interactionData),
-        listItemCanInsert = listItemCanInsertHandler(interactionData)
+        listItemCanInsert = listItemCanInsertHandler(interactionData),
+        listItemDoubleClicked = listItemDoubleClickedHandler(interactionData),
     }
 
     local column, list = listWidgets.getList(function(element, listItem)
