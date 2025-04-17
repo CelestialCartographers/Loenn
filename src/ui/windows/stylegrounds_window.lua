@@ -878,12 +878,13 @@ end
 function stylegroundWindow.updateStylegroundForm(interactionData)
     local formContainer = interactionData.formContainerGroup
     local newForm = stylegroundWindow.getStylegroundForm(interactionData)
-
-    if formContainer.children[1] then
-        formContainer:removeChild(formContainer.children[1])
-    end
+    local previousForm = formContainer.children[1]
 
     formContainer:addChild(newForm)
+
+    if previousForm then
+        previousForm:removeSelf()
+    end
 end
 
 -- Check if movement is allowed and return prepared offset and interactionData
@@ -975,9 +976,6 @@ function stylegroundWindow.getWindowContent(map)
     local stylegroundPreview = uiElements.group({
         stylegroundWindow.getStylegroundPreview(interactionData)
     })
-    local stylegroundForm = stylegroundWindow.getStylegroundForm(interactionData)
-
-    stylegroundFormGroup:addChild(stylegroundForm)
 
     -- Create foreground last because of list callbacks
     local listColumnBackground, listBackground = stylegroundWindow.getStylegroundList(map, interactionData, false)
@@ -1006,6 +1004,7 @@ function stylegroundWindow.getWindowContent(map)
         return newItems
     end
 
+    local initialTabSelect = true
     local tabs = {
         {
             title = tostring(language.ui.styleground_window.tab_foreground),
@@ -1014,10 +1013,14 @@ function stylegroundWindow.getWindowContent(map)
                 interactionData.stylegroundListElement = listForeground
                 interactionData.stylegroundListElementOther = listBackground
 
-                ui.runLate(function()
-                    widgetUtils.focusElement(listForeground.children[1])
-                    listForeground:setSelection(listForeground:getSelectedData(), false, false)
-                end)
+                if not initialTabSelect then
+                    ui.runLate(function()
+                        widgetUtils.focusElement(listForeground.children[1])
+                        listForeground:setSelection(listForeground:getSelectedData(), false, false)
+                    end)
+                end
+
+                initialTabSelect = false
             end,
         },
         {
@@ -1048,8 +1051,6 @@ function stylegroundWindow.getWindowContent(map)
         stylegroundListPreviewRow,
         stylegroundFormGroup
     }):with(uiUtils.fillHeight(true))
-
-    layout:reflow()
 
     return layout, interactionData
 end
