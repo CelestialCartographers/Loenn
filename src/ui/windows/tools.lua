@@ -202,25 +202,18 @@ local function updateFavorite(materialList, itemData, tool, layer, material, fav
     materialList:sort()
 end
 
-local function materialFavoriteOnPressHandler(tool, layer)
-    return function(orig, self, x, y, button, isDrag, presses)
-        -- sameTarget is a workaround for a OlympUI bug where presses is not reset when target changes
-        -- Causes some incorrect pressing behavor, but better than random favorites
-        -- TODO - Remove this workaround when its fixed in OlympUI
-
-        local sameTarget = self == ui.focusing
-        local leftDoubleClick = button == 1 and presses % 2 == 0
-
-        if sameTarget and leftDoubleClick then
-            local material = self.data
-            local favorited = self.itemFavorited
-
-            updateFavorite(self.parent, self.itemData, tool, layer, material, not favorited)
-
-        else
-            orig(self, x, y, button, isDrag, presses)
-        end
+local function materialFavoriteDoubleClickedCallback(self, button)
+    if button ~= 1 then
+        return
     end
+
+    local tool = toolHandler.currentTool
+    local layer = toolHandler.getLayer()
+
+    local material = self.data
+    local favorited = self.itemFavorited
+
+    updateFavorite(self.parent, self.itemData, tool, layer, material, not favorited)
 end
 
 local function addMaterialContextMenu(language, tool, layer, listItem)
@@ -264,10 +257,6 @@ local function materialDataToElement(list, data, element)
         if not element._addedHooks then
             -- TODO - Reimplement this, syncing checkbox state is more effort now
             --addMaterialContextMenu(language, data.currentToolName, data.currentLayer, element)
-
-            element:hook({
-                onPress = materialFavoriteOnPressHandler(data.currentTool, data.currentLayer)
-            })
 
             element._addedHooks = true
         end
@@ -342,27 +331,17 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     end
 end
 
-local function layerVisibilityOnPressHandler()
-    return function(orig, self, x, y, button, isDrag, presses)
-        -- sameTarget is a workaround for a OlympUI bug where presses is not reset when target changes
-        -- Causes some incorrect pressing behavor, but better than random favorites
-        -- TODO - Remove this workaround when its fixed in OlympUI
-
-        local sameTarget = self == ui.focusing
-        local leftDoubleClick = button == 1 and presses % 2 == 0
-
-        if sameTarget and leftDoubleClick then
-            local layerName = self.data
-            local newVisible = not loadedState.getLayerVisible(layerName)
-
-            self.layerVisible = newVisible
-
-            loadedState.setLayerVisible(layerName, newVisible)
-
-        else
-            orig(self, x, y, button, isDrag, presses)
-        end
+local function layerVisbilityDoubleClickCallback(self, button)
+    if button ~= 1 then
+        return
     end
+
+    local layerName = self.data
+    local newVisible = not loadedState.getLayerVisible(layerName)
+
+    self.layerVisible = newVisible
+
+    loadedState.setLayerVisible(layerName, newVisible)
 end
 
 local function getLayerItems(toolName)
@@ -497,10 +476,6 @@ local function layerDataToElement(list, data, element)
         updateListItemVisibleVisuals(element)
 
         if not element._addedHooks then
-            element:hook({
-                onPress = layerVisibilityOnPressHandler()
-            })
-
             addLayerContextMenu(element)
 
             element._addedHooks = true
@@ -769,13 +744,18 @@ function toolWindow.getWindow()
     local layerListOptions = {
         initialItem = toolHandler.getLayer(),
         dataToElement = layerDataToElement,
+        listItemDoubleClicked = layerVisbilityDoubleClickCallback
     }
+
+    local currentTool = toolHandler.currentTool
+    local currentLayer = toolHandler.getLayer()
 
     local materialListOptions = {
         searchBarLocation = "below",
         searchBarCallback = materialSearchFieldChanged,
-        initialSearch = toolUtils.getPersistenceSearch(toolHandler.currentTool, toolHandler.getLayer()),
+        initialSearch = toolUtils.getPersistenceSearch(currentTool, currentLayer),
         initialItem = toolHandler.getMaterial(),
+        listItemDoubleClicked = materialFavoriteDoubleClickedCallback,
         dataToElement = materialDataToElement,
         sortingFunction = materialSortFunction,
         searchScore = getMaterialScore,
