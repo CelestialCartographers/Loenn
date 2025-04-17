@@ -481,6 +481,40 @@ function listWidgets.addDraggableHooks(list)
     end
 end
 
+local function prepareItemDoubleClickHook(callback)
+    return {
+        onPress = function(orig, self, x, y, button, isDrag, presses)
+            -- sameTarget is a workaround for a OlympUI bug where presses is not reset when target changes
+            -- Causes some incorrect pressing behavor, but better than this triggering too often
+            -- TODO - Remove this workaround when its fixed in OlympUI
+
+            local sameTarget = self == ui.focusing
+            local doubleClick = presses % 2 == 0
+
+            if sameTarget and doubleClick then
+                callback(self, button)
+
+            else
+                orig(self, x, y, button, isDrag, presses)
+            end
+        end
+    }
+end
+
+function listWidgets.addDoubleClickHooks(list)
+    local doubleClickCallback = list.listItemDoubleClicked
+
+    if doubleClickCallback then
+        for _, item in ipairs(list.children or {}) do
+            if not item._addedDoubleClickHook then
+                item:hook(prepareItemDoubleClickHook(doubleClickCallback))
+
+                item._addedDoubleClickHook = true
+            end
+        end
+    end
+end
+
 local function defaultItemSort(lhs, rhs)
     if configs.ui.searching.sortByScore and lhs._filterScore and rhs._filterScore then
         if lhs._filterScore ~= rhs._filterScore then
@@ -580,6 +614,7 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
     end
 
     listWidgets.addDraggableHooks(list)
+    listWidgets.addDoubleClickHooks(list)
 end
 
 function listWidgets.sortList(list)
@@ -604,6 +639,7 @@ local function getSearchFieldChanged(onChange)
     return function(element, new, old)
         listWidgets.filterList(element.list, new)
         listWidgets.addDraggableHooks(element.list)
+        listWidgets.addDoubleClickHooks(element.list)
 
         if onChange then
             onChange(element, new, old)
@@ -855,6 +891,7 @@ local function getListCommon(magicList, callback, items, options)
         draggableTag = options.draggableTag or false,
         listItemDragged = options.listItemDragged,
         listItemCanInsert = options.listItemCanInsert,
+        listItemDoubleClicked = options.listItemDoubleClicked,
     }
 
     if magicList then
@@ -872,6 +909,7 @@ local function getListCommon(magicList, callback, items, options)
         calcWidth = calculateWidthList
     }))
     listWidgets.addDraggableHooks(list)
+    listWidgets.addDoubleClickHooks(list)
 
     ui.runLate(function()
         listWidgets.setSelection(list, list.options.initialItem)
