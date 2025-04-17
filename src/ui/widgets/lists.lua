@@ -501,17 +501,20 @@ local function prepareItemDoubleClickHook(callback)
     }
 end
 
+local function addItemDoubleClickHook(list, item)
+    local callback = list.listItemDoubleClicked
+
+    if callback and not item._addedDoubleClickHook then
+        item:hook(prepareItemDoubleClickHook(callback))
+
+        item._addedDoubleClickHook = true
+    end
+end
+
 function listWidgets.addDoubleClickHooks(list)
-    local doubleClickCallback = list.listItemDoubleClicked
 
-    if doubleClickCallback then
-        for _, item in ipairs(list.children or {}) do
-            if not item._addedDoubleClickHook then
-                item:hook(prepareItemDoubleClickHook(doubleClickCallback))
-
-                item._addedDoubleClickHook = true
-            end
-        end
+    for _, item in ipairs(list.children or {}) do
+        addItemDoubleClickHook(list, item)
     end
 end
 
@@ -861,6 +864,16 @@ local function getColumnForList(searchField, scrolledList, mode)
     return uiElements.column(columnItems):with(uiUtils.fillHeight(false))
 end
 
+local function magicListDataToElementWrapper(dataToElement)
+    return function(list, data, element)
+        element = dataToElement(list, data, element)
+
+        addItemDoubleClickHook(list, element)
+
+        return element
+    end
+end
+
 -- Magic lists return the item rather than item.data by default
 -- Wrap it such that it is consistent with normal lists, but provide the item as 3rd argument
 local function magicListCallbackWrapper(callback)
@@ -897,7 +910,7 @@ local function getListCommon(magicList, callback, items, options)
     if magicList then
         list = uiElements.magicList(
             filteredItems,
-            options.dataToElement,
+            magicListDataToElementWrapper(options.dataToElement),
             magicListCallbackWrapper(callback)
         ):with(listData)
 
