@@ -403,10 +403,7 @@ local function selectionRenderFilterPredicate(room, layer, subLayer,  decal)
 
     -- Render check
     if not subLayer then
-        local subLayerVisible = subLayers.getLayerVisible(layer, decalSubLayer)
-        local layerVisible = subLayers.getLayerVisible(layer, -1)
-
-        return subLayerVisible or layerVisible
+        return subLayers.getShouldLayerRender(layer, decalSubLayer)
     end
 
     return true

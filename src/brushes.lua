@@ -165,7 +165,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         if tilesMatrix:inbounds(x, y) then
             local rng = random:getInbounds(x, y)
             local tile = tilesMatrix:getInbounds(x, y)
-            local sceneryTile = sceneryMatrix:getInbounds(x, y)
+            local sceneryTile = sceneryMatrix:getInbounds(x, y) or -1
 
             if sceneryTile > -1 then
                 local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)

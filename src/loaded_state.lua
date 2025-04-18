@@ -426,12 +426,24 @@ function state.getLayerInformation(layer, key, default)
     return default
 end
 
-function state.setLayerInformation(layer, key, value)
+function state.initLayerInformation(layer)
     local info = state.layerInformation[layer]
 
     if not info then
         info = {}
         state.layerInformation[layer] = info
+
+        return info, true
+    end
+
+    return info, false
+end
+
+function state.setLayerInformation(layer, key, value, onlyIfMissing)
+    local info = state.initLayerInformation(layer)
+
+    if info[key] and onlyIfMissing then
+        return false
     end
 
     local changed = info[key] ~= value
@@ -460,26 +472,53 @@ function state.clearRoomRenderCache()
     celesteRender.forceRedrawVisibleRooms(rooms, state, selectedItem, selectedItemType)
 end
 
+function state.getLayerForceRendered(layer)
+    return state.getLayerInformation(layer, "forceRender", false)
+end
+
 function state.getLayerShouldRender(layer)
     return state.getLayerInformation(layer, "visible", true) or state.getLayerInformation(layer, "forceRender", false)
 end
 
-function state.setLayerForceRender(layer, currentValue, otherValue)
+-- Check if layers is same as target, or target is part of layers
+local function layerNameCheck(target, layers)
+    if target == layers then
+        return true
+    end
+
+    if type(layers) == "table" then
+        for _, layer in ipairs(layers) do
+            if target == layer then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+-- Layer can be a single layer or a table of layers
+function state.setLayerForceRender(baseLayer, layer, currentValue, otherValue, silent)
+    otherValue = otherValue or false
+
     local changesVisibility = false
+    local baseLayerVisible = state.getLayerVisible(baseLayer)
+
+    -- Initialize the layer information if it does not exist
+    utils.callIterateFirstIfTable(state.initLayerInformation, layer)
 
     for target in pairs(state.layerInformation) do
         local layerVisibleBefore = state.getLayerShouldRender(target)
+        local targetValue = otherValue or false
 
-        if target == layer then
-            state.setLayerInformation(target, "forceRender", currentValue)
-
-        else
-            state.setLayerInformation(target, "forceRender", otherValue or false)
+        if layerNameCheck(target, layer) then
+            targetValue = currentValue
         end
 
+        local infoChanged = state.setLayerInformation(target, "forceRender", targetValue)
         local layerVisibleAfter = state.getLayerShouldRender(target)
 
-        if layerVisibleBefore ~= layerVisibleAfter then
+        if layerVisibleBefore ~= layerVisibleAfter or not baseLayerVisible and infoChanged then
             changesVisibility = true
         end
     end
