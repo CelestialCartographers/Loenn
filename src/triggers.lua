@@ -498,10 +498,7 @@ local function selectionRenderFilterPredicate(room, layer, subLayer,  trigger)
 
     -- Render check
     if not subLayer then
-        local subLayerVisible = subLayers.getLayerVisible(layer, triggerSubLayer)
-        local layerVisible = subLayers.getLayerVisible(layer, -1)
-
-        return subLayerVisible or layerVisible
+        return subLayers.getShouldLayerRender(layer, triggerSubLayer)
     end
 
     return true

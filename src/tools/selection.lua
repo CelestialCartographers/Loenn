@@ -131,8 +131,7 @@ function tool.setLayer(layer, subLayer)
     else
         tool.layer = layer
 
-        -- Set all layers to forced visible
-        state.setLayerForceRender(layer, subLayer, true)
+        subLayers.setLayerForceRender(layer, subLayer, true)
     end
 
     tool.subLayer = subLayer

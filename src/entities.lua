@@ -1400,6 +1400,7 @@ end
 local function selectionRenderFilterPredicate(room, layer, subLayer,  entity)
     local entitySubLayer = entity._editorLayer or 0
 
+    -- Selection check
     if subLayer and subLayer ~= -1 then
         if subLayer ~= entitySubLayer then
             return false
@@ -1408,10 +1409,7 @@ local function selectionRenderFilterPredicate(room, layer, subLayer,  entity)
 
     -- Render check
     if not subLayer then
-        local subLayerVisible = subLayers.getLayerVisible(layer, entitySubLayer)
-        local layerVisible = subLayers.getLayerVisible(layer, -1)
-
-        return subLayerVisible or layerVisible
+        return subLayers.getShouldLayerRender(layer, entitySubLayer)
     end
 
     return true
