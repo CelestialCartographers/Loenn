@@ -47,24 +47,23 @@ local function handleContextListClickHandler(roomName)
         if roomContextActions[action] then
             roomContextActions[action](room)
         end
-
-        element:removeSelf()
     end
 end
 
-local function roomListItemContexthandler(roomName, language)
-    return function()
-        return uiElements.list({
-            uiElements.listItem({
-                text = tostring(language.ui.room_list.action.edit),
-                data = "edit"
-            }),
-            uiElements.listItem({
-                text = tostring(language.ui.room_list.action.delete),
-                data = "delete"
-            })
-        }, handleContextListClickHandler(roomName))
-    end
+local function roomListItemContext(listItem)
+    local roomName = listItem.data
+    local language = languageRegistry.getLanguage()
+
+    return uiElements.list({
+        uiElements.listItem({
+            text = tostring(language.ui.room_list.action.edit),
+            data = "edit"
+        }),
+        uiElements.listItem({
+            text = tostring(language.ui.room_list.action.delete),
+            data = "delete"
+        })
+    }, handleContextListClickHandler(roomName))
 end
 
 local function roomDataToElement(list, data, element)
@@ -73,18 +72,8 @@ local function roomDataToElement(list, data, element)
     end
 
     if data then
-        local language = languageRegistry.getLanguage()
-
         element.text = data.text
         element.data = data.data
-
-        contextMenu.addContextMenu(
-            element,
-            roomListItemContexthandler(data.data, language),
-            {
-                mode = "focused",
-            }
-        )
     end
 
     return element
@@ -221,7 +210,11 @@ function roomList.getWindow()
     local listOptions = {
         initialSearch = search,
         searchBarLocation = "below",
-        dataToElement = roomDataToElement
+        dataToElement = roomDataToElement,
+        listItemContextMenu = roomListItemContext,
+        listItemContextMenuOptions = {
+            mode = "focused"
+        }
     }
     local column, list = lists.getMagicList(roomList.roomSelectedCallback, roomItems, listOptions)
 

@@ -253,13 +253,6 @@ local function materialDataToElement(list, data, element)
         element.itemData = data
 
         updateListItemFavoriteVisuals(element)
-
-        if not element._addedHooks then
-            -- TODO - Reimplement this, syncing checkbox state is more effort now
-            --addMaterialContextMenu(language, data.currentToolName, data.currentLayer, element)
-
-            element._addedHooks = true
-        end
     end
 
     return element
@@ -421,37 +414,33 @@ local function addSublayer(layer, subLayer)
     return layerCount + 1
 end
 
-local function addLayerContextMenu(listItem)
-    local function contentFunction()
-        local layerName = listItem.data
+local function layerContextMenu(listItem)
+    local layerName = listItem.data
 
-        if not layerName then
-            return
-        end
-
-        local layer, subLayer = subLayers.parseLayerName(layerName)
-
-        if not layersWithSubLayers[layer] then
-            return false
-        end
-
-        local language = languageRegistry.getLanguage()
-        local addButton = uiElements.button(tostring(language.ui.tools_window.add_sub_layer), function()
-            local newSubLayer = addSublayer(layer, subLayer)
-
-            if newSubLayer then
-                toolWindow.layerList:updateItems(getLayerItems(), subLayers.formatLayerName(layer, newSubLayer))
-            end
-        end)
-
-        local content = uiElements.row({
-            addButton,
-        })
-
-        return content
+    if not layerName then
+        return
     end
 
-    return contextMenu.addContextMenu(listItem, contentFunction)
+    local layer, subLayer = subLayers.parseLayerName(layerName)
+
+    if not layersWithSubLayers[layer] then
+        return false
+    end
+
+    local language = languageRegistry.getLanguage()
+    local addButton = uiElements.button(tostring(language.ui.tools_window.add_sub_layer), function()
+        local newSubLayer = addSublayer(layer, subLayer)
+
+        if newSubLayer then
+            toolWindow.layerList:updateItems(getLayerItems(), subLayers.formatLayerName(layer, newSubLayer))
+        end
+    end)
+
+    local content = uiElements.row({
+        addButton,
+    })
+
+    return content
 end
 
 local function layerDataToElement(list, data, element)
@@ -475,11 +464,11 @@ local function layerDataToElement(list, data, element)
 
         updateListItemVisibleVisuals(element)
 
-        if not element._addedHooks then
-            addLayerContextMenu(element)
+        -- if not element._addedHooks then
+        --     layerContextMenu(element)
 
-            element._addedHooks = true
-        end
+        --     element._addedHooks = true
+        -- end
     end
 
     return element
@@ -744,7 +733,8 @@ function toolWindow.getWindow()
     local layerListOptions = {
         initialItem = toolHandler.getLayer(),
         dataToElement = layerDataToElement,
-        listItemDoubleClicked = layerVisbilityDoubleClickCallback
+        listItemDoubleClicked = layerVisbilityDoubleClickCallback,
+        listItemContextMenu = layerContextMenu
     }
 
     local currentTool = toolHandler.currentTool
