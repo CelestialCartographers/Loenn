@@ -3,6 +3,7 @@ local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
 local widgetUtils = require("ui.widgets.utils")
+local contextMenu = require("ui.context_menu")
 
 local textSearching = require("utils.text_search")
 local configs = require("configs")
@@ -512,9 +513,29 @@ local function addItemDoubleClickHook(list, item)
 end
 
 function listWidgets.addDoubleClickHooks(list)
-
     for _, item in ipairs(list.children or {}) do
         addItemDoubleClickHook(list, item)
+    end
+end
+
+local function addItemContextMenu(list, item)
+    local callback = list.listItemContextMenu
+    local options = list.listItemContextMenuOptions
+
+    if callback and not item._addedContextMenuHook then
+        local function wrapper()
+            return callback(item)
+        end
+
+        contextMenu.addContextMenu(item, wrapper, options)
+
+        item._addedContextMenuHook = true
+    end
+end
+
+function listWidgets.addContextMenuHooks(list)
+    for _, item in ipairs(list.children or {}) do
+        addItemContextMenu(list, item)
     end
 end
 
@@ -616,8 +637,7 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
         list.unfilteredItems = items
     end
 
-    listWidgets.addDraggableHooks(list)
-    listWidgets.addDoubleClickHooks(list)
+    listWidgets.addListHooks(list)
 end
 
 function listWidgets.sortList(list)
@@ -641,8 +661,7 @@ end
 local function getSearchFieldChanged(onChange)
     return function(element, new, old)
         listWidgets.filterList(element.list, new)
-        listWidgets.addDraggableHooks(element.list)
-        listWidgets.addDoubleClickHooks(element.list)
+        listWidgets.addListHooks(element.list)
 
         if onChange then
             onChange(element, new, old)
@@ -834,12 +853,23 @@ function listWidgets.addSearchFieldHooks(list, searchField, hookOptions)
     })
 end
 
-local function addListHooks(list)
+function listWidgets.addKeyboardHooks(list)
     list.interactive = 1
 
-    list:hook({
-        onKeyPress = listCommonKeyPress(list, false)
-    })
+    if not list._addedKeyboardHooks then
+        list:hook({
+            onKeyPress = listCommonKeyPress(list, false)
+        })
+
+        list._addedKeyboardHooks = true
+    end
+end
+
+function listWidgets.addListHooks(list)
+    listWidgets.addKeyboardHooks(list)
+    listWidgets.addDraggableHooks(list)
+    listWidgets.addDoubleClickHooks(list)
+    listWidgets.addContextMenuHooks(list)
 end
 
 local function getColumnForList(searchField, scrolledList, mode)
@@ -869,6 +899,7 @@ local function magicListDataToElementWrapper(dataToElement)
         element = dataToElement(list, data, element)
 
         addItemDoubleClickHook(list, element)
+        addItemContextMenu(list, element)
 
         return element
     end
@@ -905,6 +936,8 @@ local function getListCommon(magicList, callback, items, options)
         listItemDragged = options.listItemDragged,
         listItemCanInsert = options.listItemCanInsert,
         listItemDoubleClicked = options.listItemDoubleClicked,
+        listItemContextMenu = options.listItemContextMenu,
+        listItemContextMenuOptions = options.listItemContextMenuOptions,
     }
 
     if magicList then
@@ -921,8 +954,6 @@ local function getListCommon(magicList, callback, items, options)
     list:with(uiUtils.hook({
         calcWidth = calculateWidthList
     }))
-    listWidgets.addDraggableHooks(list)
-    listWidgets.addDoubleClickHooks(list)
 
     ui.runLate(function()
         listWidgets.setSelection(list, list.options.initialItem)
@@ -952,7 +983,7 @@ local function getListCommon(magicList, callback, items, options)
     list.setSelection = listWidgets.setSelection
     list.clearSelection = listWidgets.clearSelection
 
-    addListHooks(list)
+    listWidgets.addListHooks(list)
 
     local column = getColumnForList(searchField, scrolledList, options.searchBarLocation)
 
