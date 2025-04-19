@@ -106,7 +106,7 @@ local function getStylegroundItems(targets, items, foreground, parent)
                 })
 
                 local collapsed = style._collapsed
-                local iconName = collapsed and "favorite" or "visible"
+                local iconName = collapsed and "hidden" or "visible"
 
                 -- TODO - Get proper icons
                 listItemUtils.setIcon(groupItem, iconName)
