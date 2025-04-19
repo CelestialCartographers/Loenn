@@ -523,7 +523,11 @@ local function toolLayerChangedCallback(self, tool, layer, subLayer)
     end
 end
 
-local function updateLayerList(toolName, tool, targetLayer)
+local function updateLayerList(toolName, tool, targetLayer, preventCallback)
+    if not toolName then
+        toolName = toolHandler.currentToolName
+    end
+
     local items = getLayerItems(toolName)
 
     if toolName and not tool then
@@ -534,7 +538,7 @@ local function updateLayerList(toolName, tool, targetLayer)
         targetLayer = toolUtils.getPersistenceLayer(tool)
     end
 
-    toolWindow.layerList:updateItems(items, targetLayer)
+    toolWindow.layerList:updateItems(items, targetLayer, nil, preventCallback)
 
     local newVisible = #items > 0
 
@@ -565,7 +569,7 @@ local function layerInformationChangedCallback(window, key, value)
     local subLayer = toolWindow.eventStates.subLayer
     local layerName = subLayers.formatLayerName(layer, subLayer)
 
-    updateLayerList(toolName, toolHandler.tools[toolName], layerName)
+    updateLayerList(toolName, toolHandler.tools[toolName], layerName, true)
     widgetUtils.updateHoveredTarget()
 end
 
@@ -730,15 +734,16 @@ function toolWindow.getWindow()
         initialItem = toolHandler.getMode()
     }
 
+    local currentTool = toolHandler.currentTool
+    local currentLayer = toolHandler.getLayer()
+    local currentSubLayer = currentTool.subLayer
+    local initialLayer = subLayers.formatLayerName(currentLayer, currentSubLayer)
     local layerListOptions = {
-        initialItem = toolHandler.getLayer(),
+        initialItem = initialLayer,
         dataToElement = layerDataToElement,
         listItemDoubleClicked = layerVisbilityDoubleClickCallback,
         listItemContextMenu = layerContextMenu
     }
-
-    local currentTool = toolHandler.currentTool
-    local currentLayer = toolHandler.getLayer()
 
     local materialListOptions = {
         searchBarLocation = "below",
