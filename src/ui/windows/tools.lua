@@ -725,7 +725,10 @@ function toolWindow.getWindow()
         initialItem = initialLayer,
         dataToElement = layerDataToElement,
         listItemDoubleClicked = layerItemToggleVisibilityHandler,
-        listItemContextMenu = layerContextMenu
+        listItemContextMenu = layerContextMenu,
+        listItemContextMenuOptions = {
+            mode = "focused"
+        }
     }
 
     local materialListOptions = {
