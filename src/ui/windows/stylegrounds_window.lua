@@ -52,7 +52,7 @@ local function addFolderIndent(text)
     return " - " .. text
 end
 
-local function applyItemIconClick(listItem, _, _, button)
+local function applyItemIconClick(listItem, button)
     if button ~= 1 then
         return false
     end

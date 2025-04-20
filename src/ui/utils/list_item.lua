@@ -51,12 +51,12 @@ function listItemUtils.setIcon(listItem, iconName, callback, newText)
         if callback then
             listIconImage.interactive = 1
             listIconImage:hook({
-                onPress = function(orig, self, ...)
+                onPress = function(orig, self, x, y, button, ...)
                     -- Use the list item instead of icon
-                    local consume = callback(listItem, ...)
+                    local consume = callback(listItem, button)
 
                     if consume == false then
-                        orig(self, ...)
+                        orig(self, x, y, button, ...)
                     end
                 end
             })
