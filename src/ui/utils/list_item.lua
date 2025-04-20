@@ -27,7 +27,7 @@ function listItemUtils.getIcon(listItem, iconName)
 end
 
 -- Add icon to the list item, override text as well if provided
-function listItemUtils.setIcon(listItem, iconName, newText)
+function listItemUtils.setIcon(listItem, iconName, callback, newText)
     local previousLabel = listItem.label
     local children = listItem.children
 
@@ -47,6 +47,20 @@ function listItemUtils.setIcon(listItem, iconName, newText)
 
     if listIconImage then
         table.insert(children, listIconImage)
+
+        if callback then
+            listIconImage.interactive = 1
+            listIconImage:hook({
+                onPress = function(orig, self, ...)
+                    -- Use the list item instead of icon
+                    local consume = callback(listItem, ...)
+
+                    if consume == false then
+                        orig(self, ...)
+                    end
+                end
+            })
+        end
     end
 
     table.insert(children, previousLabel)
@@ -57,6 +71,8 @@ function listItemUtils.setIcon(listItem, iconName, newText)
     if listItem.parent then
         listItem.parent:layoutLate()
     end
+
+    return listIconImage
 end
 
 -- Clear icon on list item

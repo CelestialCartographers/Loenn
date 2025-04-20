@@ -6,6 +6,7 @@ local widgetUtils = require("ui.widgets.utils")
 local contextMenu = require("ui.context_menu")
 
 local textSearching = require("utils.text_search")
+local listItemUtils = require("ui.utils.list_item")
 local configs = require("configs")
 local keyboard = require("utils.keyboard")
 local utils = require("utils")
@@ -581,6 +582,12 @@ function listWidgets.finishFade(list)
     end)
 end
 
+-- Add list item data to non magic list item
+local function addListItemData(listItem, item)
+    listItem.icon = item.icon
+    listItem.iconClicked = item.iconClicked
+end
+
 function listWidgets.updateItems(list, items, target, fromFilter, preventCallback, callbackRequiresChange, forceSort)
     local options = list.options
     local filterItems = options.filterItems or defaultFilterItems
@@ -618,7 +625,11 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
         -- Check if list items are listItem or just data
         if #processedItems > 0 and utils.typeof(processedItems[1]) ~= "listItem" then
             for i, item in ipairs(processedItems) do
-                processedItems[i] = uiElements.listItem(item)
+                local listItem = uiElements.listItem(item)
+
+                addListItemData(listItem, item)
+
+                processedItems[i] = listItem
             end
         end
 
@@ -637,7 +648,7 @@ function listWidgets.updateItems(list, items, target, fromFilter, preventCallbac
         list.unfilteredItems = items
     end
 
-    listWidgets.addListHooks(list)
+    listWidgets.prepareList(list)
 end
 
 function listWidgets.sortList(list)
@@ -661,7 +672,7 @@ end
 local function getSearchFieldChanged(onChange)
     return function(element, new, old)
         listWidgets.filterList(element.list, new)
-        listWidgets.addListHooks(element.list)
+        listWidgets.prepareList(element.list)
 
         if onChange then
             onChange(element, new, old)
@@ -865,11 +876,32 @@ function listWidgets.addKeyboardHooks(list)
     end
 end
 
-function listWidgets.addListHooks(list)
+function listWidgets.addListIcon(listItem)
+    if not listItem._addedIcon and listItem.icon then
+        listItemUtils.setIcon(listItem, listItem.icon, listItem.iconClicked)
+
+        listItem._addedIcon = true
+    end
+end
+
+function listWidgets.addListIcons(list)
+    -- Added in dataToElement instead
+    if list._magicList then
+        return
+    end
+
+    for _, listItem in ipairs(list.children) do
+        listWidgets.addListIcon(listItem)
+    end
+end
+
+-- Set up hooks etc
+function listWidgets.prepareList(list)
     listWidgets.addKeyboardHooks(list)
     listWidgets.addDraggableHooks(list)
     listWidgets.addDoubleClickHooks(list)
     listWidgets.addContextMenuHooks(list)
+    listWidgets.addListIcons(list)
 end
 
 local function getColumnForList(searchField, scrolledList, mode)
@@ -906,6 +938,7 @@ local function magicListDataToElementWrapper(dataToElement)
 
         addItemDoubleClickHook(list, element)
         addItemContextMenu(list, element)
+        listWidgets.addListIcon(element)
 
         return element
     end
@@ -955,6 +988,13 @@ local function getListCommon(magicList, callback, items, options)
 
     else
         list = uiElements.list(filteredItems, callback):with(listData)
+
+        -- Add extra data to all items
+        for i, listItem in ipairs(list.children) do
+            local item = filteredItems[i]
+
+            addListItemData(listItem, item)
+        end
     end
 
     list:with(uiUtils.hook({
@@ -989,7 +1029,7 @@ local function getListCommon(magicList, callback, items, options)
     list.setSelection = listWidgets.setSelection
     list.clearSelection = listWidgets.clearSelection
 
-    listWidgets.addListHooks(list)
+    listWidgets.prepareList(list)
 
     local column = getColumnForList(searchField, scrolledList, options.searchBarLocation)
 
