@@ -68,10 +68,6 @@ function listItemUtils.setIcon(listItem, iconName, callback, newText)
     listItem:layout()
     listItem:layoutLate()
 
-    if listItem.parent then
-        listItem.parent:layoutLate()
-    end
-
     return listIconImage
 end
 
