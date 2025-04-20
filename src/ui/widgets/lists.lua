@@ -898,6 +898,12 @@ local function magicListDataToElementWrapper(dataToElement)
     return function(list, data, element)
         element = dataToElement(list, data, element)
 
+        -- Prevent crash the next render frame if interacted with
+        if not element.parent or not element.owner then
+            element.parent = list
+            element.owner = list
+        end
+
         addItemDoubleClickHook(list, element)
         addItemContextMenu(list, element)
 
