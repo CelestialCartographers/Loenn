@@ -68,11 +68,16 @@ local function updateListItemFavoriteVisuals(listItem)
     end
 end
 
-local function updateListItemVisibleVisuals(listItem)
-    local visible = listItem.layerVisible
-    local iconName = visible and "visible" or "hidden"
+-- Used for layer icon click and double click
+local function layerItemToggleVisibilityHandler(listItem, button)
+    if button ~= 1 then
+        return false
+    end
 
-    listItemUtils.setIcon(listItem, iconName)
+    local layerName = listItem.data
+    local newVisible = not loadedState.getLayerVisible(layerName)
+
+    loadedState.setLayerVisible(layerName, newVisible)
 end
 
 local function materialSortFunction(lhs, rhs)
@@ -320,19 +325,6 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     end
 end
 
-local function layerVisbilityDoubleClickCallback(self, button)
-    if button ~= 1 then
-        return
-    end
-
-    local layerName = self.data
-    local newVisible = not loadedState.getLayerVisible(layerName)
-
-    self.layerVisible = newVisible
-
-    loadedState.setLayerVisible(layerName, newVisible)
-end
-
 local function getLayerItems(toolName)
     local language = languageRegistry.getLanguage()
     local layers = toolHandler.getLayers(toolName) or {}
@@ -347,13 +339,17 @@ local function getLayerItems(toolName)
         local displayName = getLanguageOrDefault(layersNames[layer], layer)
         local tooltipText = getLanguageOrDefault(layersDescriptions[layer])
 
+        local layerVisible = loadedState.getLayerVisible(layer)
+
         -- Layer with -1 means all layers
         local item = {
             text = displayName,
             data = subLayers.formatLayerName(layer, -1),
-            layerVisible = loadedState.getLayerVisible(layer),
+            layerVisible = layerVisible,
             tooltipText = tooltipText,
             subLayer = -1,
+            icon = layerVisible and "visible" or "hidden",
+            iconClicked = layerItemToggleVisibilityHandler,
         }
 
         table.insert(layerItems, item)
@@ -368,12 +364,15 @@ local function getLayerItems(toolName)
             if #subLayerNames > 1 then
                 for _, subLayer in ipairs(subLayerNames) do
                     local layerName = subLayers.formatLayerName(layer, subLayer)
+                    local subLayerVisible = loadedState.getLayerVisible(layerName)
                     local subItem = {
                         text = string.format(" %s %s", displayName, subLayer + 1),
                         data = layerName,
-                        layerVisible = loadedState.getLayerVisible(layerName),
+                        layerVisible = subLayerVisible,
                         tooltipText = tooltipText,
                         subLayer = subLayer,
+                        icon = subLayerVisible and "visible" or "hidden",
+                        iconClicked = layerItemToggleVisibilityHandler,
                     }
 
                     table.insert(layerItems, subItem)
@@ -453,9 +452,6 @@ local function layerDataToElement(list, data, element)
         element.layerVisible = data.layerVisible
         element.itemData = data
         element.subLayer = data.subLayer
-
-        updateListItemVisibleVisuals(element)
-
     end
 
     return element
@@ -728,7 +724,7 @@ function toolWindow.getWindow()
     local layerListOptions = {
         initialItem = initialLayer,
         dataToElement = layerDataToElement,
-        listItemDoubleClicked = layerVisbilityDoubleClickCallback,
+        listItemDoubleClicked = layerItemToggleVisibilityHandler,
         listItemContextMenu = layerContextMenu
     }
 
