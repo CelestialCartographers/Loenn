@@ -52,6 +52,19 @@ local function addFolderIndent(text)
     return " - " .. text
 end
 
+local function applyItemIconClick(listItem, _, _, button)
+    if button ~= 1 then
+        return false
+    end
+
+    local interactionData = listItem.parent.interactionData
+    local style = listItem.data.style
+
+    style._collapsed = not style._collapsed
+
+    interactionData.rebuildListItems()
+end
+
 local function getStylegroundItems(targets, items, foreground, parent)
     local language = languageRegistry.getLanguage()
     local groupIndex = 1
@@ -97,23 +110,14 @@ local function getStylegroundItems(targets, items, foreground, parent)
                     foreground = foreground,
                 }
 
-                -- Fake list item
-                local groupItem = uiElements.row({groupLabel}):with({
-                    label = groupLabel,
-                    style = {
-                        spacing = uiElements.listItem.style.spacing
-                    }
-                })
-
                 local collapsed = style._collapsed
                 local iconName = collapsed and "hidden" or "visible"
 
-                -- TODO - Get proper icons
-                listItemUtils.setIcon(groupItem, iconName)
-
                 table.insert(items, {
-                    text = groupItem,
+                    text = groupLabel,
                     data = listItemData,
+                    icon = iconName,
+                    iconClicked = applyItemIconClick
                 })
 
                 if not collapsed then
@@ -1003,6 +1007,9 @@ function stylegroundWindow.getWindowContent(map)
     -- Create foreground last because of list callbacks
     local listColumnBackground, listBackground = stylegroundWindow.getStylegroundList(map, interactionData, false)
     local listColumnForeground, listForeground = stylegroundWindow.getStylegroundList(map, interactionData, true)
+
+    listForeground.interactionData = interactionData
+    listBackground.interactionData = interactionData
 
     interactionData.formContainerGroup = stylegroundFormGroup
     interactionData.stylegroundPreviewGroup = stylegroundPreview
