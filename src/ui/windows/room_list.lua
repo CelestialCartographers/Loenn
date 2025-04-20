@@ -11,6 +11,8 @@ local sceneHandler = require("scene_handler")
 local languageRegistry = require("language_registry")
 local mapItemUtils = require("map_item_utils")
 local utils = require("utils")
+local configs = require("configs")
+local keyboardHelper = require("utils.keyboard")
 
 local state = require("loaded_state")
 local viewportHandler = require("viewport_handler")
@@ -30,9 +32,17 @@ local function roomContextEditAction(room)
 end
 
 local function roomContextDeleteAction(room)
+    -- Prompt user for deletion, unless they are holding the bypass modifier
+    local bypassPrompt = keyboardHelper.modifierHeld(configs.ui.hotkeys.bypassDangerousActionWarningModifier)
     local map = state.map
 
-    sceneHandler.sendEvent("editorRoomDelete", map, room)
+    if bypassPrompt then
+        mapItemUtils.deleteItem(map, room)
+        state.selectItem(nil)
+
+    else
+        sceneHandler.sendEvent("editorRoomDelete", map, room, bypassPrompt)
+    end
 end
 
 local roomContextActions = {
@@ -47,6 +57,8 @@ local function handleContextListClickHandler(roomName)
         if roomContextActions[action] then
             roomContextActions[action](room)
         end
+
+        element:removeSelf()
     end
 end
 
