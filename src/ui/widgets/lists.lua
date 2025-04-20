@@ -876,11 +876,26 @@ function listWidgets.addKeyboardHooks(list)
     end
 end
 
-function listWidgets.addListIcon(listItem)
-    if not listItem._addedIcon and listItem.icon then
-        listItemUtils.setIcon(listItem, listItem.icon, listItem.iconClicked)
+function listWidgets.addListIcon(listItem, data)
+    if not data then
+        data = listItem
+    end
 
-        listItem._addedIcon = true
+    local addedIcon = listItem._addedIcon
+
+    -- Add icon if it should be there, update if icon is wrong
+    if addedIcon ~= data.icon then
+        listItemUtils.setIcon(listItem, data.icon, data.iconClicked)
+
+        listItem._addedIcon = data.icon
+    end
+
+    -- Remove icon if it shouldn't be there
+    -- This is important for magic lists
+    if addedIcon and not data.icon then
+        listItemUtils.clearIcon(listItem)
+
+        listItem._addedIcon = false
     end
 end
 
@@ -938,7 +953,7 @@ local function magicListDataToElementWrapper(dataToElement)
 
         addItemDoubleClickHook(list, element)
         addItemContextMenu(list, element)
-        listWidgets.addListIcon(element)
+        listWidgets.addListIcon(element, data)
 
         return element
     end
