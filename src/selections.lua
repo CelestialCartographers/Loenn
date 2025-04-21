@@ -3,6 +3,8 @@ local utils = require("utils")
 local sceneHandler = require("scene_handler")
 local toolUtils = require("tool_utils")
 local tiles = require("tiles")
+local snapshotUtils = require("snapshot_utils")
+local selectionItemUtils = require("selection_item_utils")
 
 local selectionUtils = {}
 
@@ -233,6 +235,48 @@ end
 function selectionUtils.sendContextMenuEvent(selections, bestSelection, room)
     if selections and #selections > 0 then
         sceneHandler.sendEvent("editorSelectionContextMenu", selections, bestSelection, room)
+    end
+end
+
+function selectionUtils.deleteItems(room, targets)
+    local relevantLayers = selectionUtils.selectionTargetLayers(targets)
+    local snapshot, madeChanges, selectionsBefore = snapshotUtils.roomLayersSnapshot(function()
+        local madeChanges = false
+        local selectionsBefore = utils.deepcopy(targets)
+
+        for i = #targets, 1, -1 do
+            local item = targets[i]
+            local deleted = selectionItemUtils.deleteSelection(room, item.layer, item)
+
+            if deleted then
+                madeChanges = true
+
+                table.remove(targets, i)
+            end
+        end
+
+        return madeChanges, selectionsBefore
+    end, room, relevantLayers, "Selection Deleted")
+
+    return snapshot, madeChanges
+end
+
+function selectionUtils.deleteSubLayer(map, layer, subLayer)
+    local snapshots = {}
+    local relevantRooms = {}
+
+    for _, room in ipairs(map.rooms) do
+        local relevantItems = selectionUtils.getLayerSelectionsForRoom(room, layer, subLayer)
+        local snapshot, madeChanges = selectionUtils.deleteItems(room, relevantItems)
+
+        if madeChanges then
+            table.insert(relevantRooms, room)
+            table.insert(snapshots, snapshot)
+        end
+    end
+
+    if #snapshots > 0 then
+        return snapshotUtils.multiSnapshot("Deleted Group", snapshots), relevantRooms
     end
 end
 
