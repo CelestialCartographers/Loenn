@@ -328,25 +328,44 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     end
 end
 
+local function getLayerItemName(language, layer, subLayer, noIndent)
+    local layersNames = language.layers.name
+    local displayName = getLanguageOrDefault(layersNames[layer], layer)
+
+    if not subLayer or subLayer == -1 then
+        return displayName
+    end
+
+    local layerDisplayName = subLayers.getLayerName(layer, subLayer)
+
+    if not layerDisplayName or utils.trim(layerDisplayName) == "" then
+        layerDisplayName = string.format("%s %s", displayName, subLayer + 1)
+    end
+
+    if noIndent then
+        return layerDisplayName
+    end
+
+    return string.format("  %s", layerDisplayName)
+end
+
 local function getLayerItems(toolName)
     local language = languageRegistry.getLanguage()
     local layers = toolHandler.getLayers(toolName) or {}
     local layerItems = {}
 
-    local layersNames = language.layers.name
     local layersDescriptions = language.layers.description
 
     local allSubLayers = toolWindow.subLayers
 
     for _, layer in ipairs(layers) do
-        local displayName = getLanguageOrDefault(layersNames[layer], layer)
         local tooltipText = getLanguageOrDefault(layersDescriptions[layer])
 
         local layerVisible = loadedState.getLayerVisible(layer)
 
         -- Layer with -1 means all layers
         local item = {
-            text = displayName,
+            text = getLayerItemName(language, layer),
             data = subLayers.formatLayerName(layer, -1),
             layerVisible = layerVisible,
             tooltipText = tooltipText,
@@ -369,7 +388,7 @@ local function getLayerItems(toolName)
                     local layerName = subLayers.formatLayerName(layer, subLayer)
                     local subLayerVisible = loadedState.getLayerVisible(layerName)
                     local subItem = {
-                        text = string.format(" %s %s", displayName, subLayer + 1),
+                        text = getLayerItemName(language, layer, subLayer),
                         data = layerName,
                         layerVisible = subLayerVisible,
                         tooltipText = tooltipText,
@@ -392,7 +411,7 @@ local function deleteSubLayerInfo(layer, subLayer)
         toolWindow.subLayers[layer][subLayer] = nil
     end
 
-    -- TODO - Clear layer name once we support that
+    subLayers.setLayerName(layer, subLayer, nil)
 end
 
 local function deleteSubLayer(layer, subLayer)
@@ -493,7 +512,33 @@ local function layerContextMenu(listItem)
         }))
     end
 
-    return uiElements.list(listItems, layerContextMenuClickHandler(layer, subLayer))
+    local content = uiElements.column({
+        uiElements.list(
+            listItems,
+            layerContextMenuClickHandler(layer, subLayer)
+        ):with(uiUtils.fillWidth)
+    }):with({
+        width = 160,
+    })
+
+    if subLayer ~= -1 then
+        local field = uiElements.field(
+            getLayerItemName(language, layer, subLayer, true),
+            function(_, text)
+                subLayers.setLayerName(layer, subLayer, text)
+
+                listItem.text = getLayerItemName(language, layer, subLayer)
+
+                listItem:repaint()
+                listItem.parent:layout()
+                listItem.parent:layoutLate()
+            end
+        ):with(uiUtils.fillWidth)
+
+        content:addChild(field)
+    end
+
+    return content
 end
 
 local function layerDataToElement(list, data, element)
