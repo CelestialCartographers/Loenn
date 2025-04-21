@@ -70,4 +70,16 @@ function subLayers.setLayerForceRender(layer, subLayer, currentValue, otherValue
     return loadedState.setLayerForceRender(layer, layerName, currentValue, otherValue)
 end
 
+function subLayers.getLayerName(layer, subLayer)
+    local layerName = subLayers.formatLayerName(layer, subLayer)
+
+    return loadedState.getLayerName(layerName)
+end
+
+function subLayers.setLayerName(layer, subLayer, name)
+    local layerName = subLayers.formatLayerName(layer, subLayer)
+
+    return loadedState.setLayerName(layerName, name)
+end
+
 return subLayers

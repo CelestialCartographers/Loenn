@@ -85,6 +85,43 @@ local function updateSideState(side, roomName, filename, eventName)
     sceneHandler.sendEvent(eventName, filename)
 end
 
+function state.getLayerName(layer)
+    local side = state.side
+
+    if side and side.editorInformation and side.editorInformation.layerNames then
+        local name = state.side.editorInformation.layerNames[layer]
+
+        if name then
+            return utils.trim(name)
+        end
+    end
+end
+
+function state.setLayerName(layer, name)
+    local side = state.side
+
+    name = name and utils.trim(name)
+
+    -- Clear data if empty string
+    if name == "" then
+        name = nil
+    end
+
+    if not side then
+        return
+    end
+
+    if not side.editorInformation then
+        side.editorInformation = {}
+    end
+
+    if not side.editorInformation.layerNames then
+        side.editorInformation.layerNames = {}
+    end
+
+    side.editorInformation.layerNames[layer] = name
+end
+
 -- Calls before save functions
 function state.defaultBeforeSaveCallback(filename, state)
     return saveSanitizers.beforeSave(filename, state)
