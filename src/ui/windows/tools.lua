@@ -20,6 +20,9 @@ local utils = require("utils")
 local hotkeyHandler = require("hotkey_handler")
 local loadedState = require("loaded_state")
 local subLayers = require("sub_layers")
+local history = require("history")
+local selectionUtils = require("selections")
+local celesteRender = require("celeste_render")
 
 local toolWindow = {}
 
@@ -384,7 +387,32 @@ local function getLayerItems(toolName)
     return layerItems
 end
 
-local function addSublayer(layer, subLayer)
+local function deleteSubLayerInfo(layer, subLayer)
+    if toolWindow.subLayers[layer] then
+        toolWindow.subLayers[layer][subLayer] = nil
+    end
+
+    -- TODO - Clear layer name once we support that
+end
+
+local function deleteSubLayer(layer, subLayer)
+    local map = loadedState.map
+    local snapshot, relevantRooms = selectionUtils.deleteSubLayer(map, layer, subLayer)
+
+    if snapshot then
+        history.addSnapshot(snapshot)
+
+        for _, room in ipairs(relevantRooms) do
+            toolUtils.redrawTargetLayer(room, layer)
+            celesteRender.invalidateRoomCache(room, {"canvas", "complete"})
+        end
+
+        return true
+    end
+end
+
+-- TODO - Check that this works properly when layers can get gaps after deletion
+local function addSubLayerInfo(layer, subLayer)
     if not layersWithSubLayers[layer] then
         return
     end
@@ -409,6 +437,34 @@ local function addSublayer(layer, subLayer)
     return layerCount + 1
 end
 
+local function layerContextMenuClickHandler(layer, subLayer)
+    return function (element, action)
+        local updateList = false
+        local listTarget
+
+        if action == "add" then
+            local newSubLayer = addSubLayerInfo(layer, subLayer)
+
+            if newSubLayer then
+                listTarget = subLayers.formatLayerName(layer, newSubLayer)
+                updateList = true
+            end
+
+        elseif action == "delete" then
+            updateList = deleteSubLayer(layer, subLayer)
+            listTarget = layer
+
+            deleteSubLayerInfo(layer, subLayer)
+        end
+
+        if updateList then
+            toolWindow.layerList:updateItems(getLayerItems(), listTarget)
+        end
+
+        element:removeSelf()
+    end
+end
+
 local function layerContextMenu(listItem)
     local layerName = listItem.data
 
@@ -423,19 +479,21 @@ local function layerContextMenu(listItem)
     end
 
     local language = languageRegistry.getLanguage()
-    local addButton = uiElements.button(tostring(language.ui.tools_window.add_sub_layer), function()
-        local newSubLayer = addSublayer(layer, subLayer)
+    local listItems = {
+        uiElements.listItem({
+            text = tostring(language.ui.tools_window.add_sub_layer),
+            data = "add"
+        })
+    }
 
-        if newSubLayer then
-            toolWindow.layerList:updateItems(getLayerItems(), subLayers.formatLayerName(layer, newSubLayer))
-        end
-    end)
+    if subLayer ~= -1 then
+        table.insert(listItems, uiElements.listItem({
+            text = tostring(language.ui.tools_window.delete_sub_layer),
+            data = "delete"
+        }))
+    end
 
-    local content = uiElements.row({
-        addButton,
-    })
-
-    return content
+    return uiElements.list(listItems, layerContextMenuClickHandler(layer, subLayer))
 end
 
 local function layerDataToElement(list, data, element)
