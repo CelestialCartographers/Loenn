@@ -52,6 +52,10 @@ local layersWithSubLayers = {
     decalsBg = true,
 }
 
+local layersWithBlankIcon = {
+    allLayers = true,
+}
+
 local function getLanguageOrDefault(languagePath, default)
     if languagePath._exists then
         return tostring(languagePath)
@@ -361,7 +365,13 @@ local function getLayerItems(toolName)
     for _, layer in ipairs(layers) do
         local tooltipText = getLanguageOrDefault(layersDescriptions[layer])
 
+        local layerBlank = layersWithBlankIcon[layer]
         local layerVisible = loadedState.getLayerVisible(layer)
+        local icon = layerVisible and "visible" or "hidden"
+
+        if layerBlank then
+            icon = "blank"
+        end
 
         -- Layer with -1 means all layers
         local item = {
@@ -370,7 +380,7 @@ local function getLayerItems(toolName)
             layerVisible = layerVisible,
             tooltipText = tooltipText,
             subLayer = -1,
-            icon = layerVisible and "visible" or "hidden",
+            icon = icon,
             iconClicked = layerItemToggleVisibilityHandler,
         }
 
