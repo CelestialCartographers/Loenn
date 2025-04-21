@@ -430,7 +430,6 @@ local function deleteSubLayer(layer, subLayer)
     end
 end
 
--- TODO - Check that this works properly when layers can get gaps after deletion
 local function addSubLayerInfo(layer, subLayer)
     if not layersWithSubLayers[layer] then
         return
@@ -470,10 +469,11 @@ local function layerContextMenuClickHandler(layer, subLayer)
             end
 
         elseif action == "delete" then
-            updateList = deleteSubLayer(layer, subLayer)
-            listTarget = layer
-
+            deleteSubLayer(layer, subLayer)
             deleteSubLayerInfo(layer, subLayer)
+
+            listTarget = layer
+            updateList = true
         end
 
         if updateList then
