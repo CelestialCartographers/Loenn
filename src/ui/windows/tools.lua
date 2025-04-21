@@ -455,8 +455,65 @@ local function addSubLayerInfo(layer, subLayer)
     return layerCount + 1
 end
 
-local function layerContextMenuClickHandler(layer, subLayer)
-    return function (element, action)
+local function layerListInlineRename(layer, subLayer, layerListItem)
+    -- Remove the label and insert a textfield in its place
+    local oldLabel = layerListItem.label
+    local icon = layerListItem.children[1]
+
+    local language = languageRegistry.getLanguage()
+    local initialText = getLayerItemName(language, layer, subLayer, true)
+
+    local function layout()
+        layerListItem:layout()
+        layerListItem:layoutLate()
+        layerListItem.parent:layout()
+        layerListItem.parent:layoutLate()
+    end
+
+    local function unfocusCleanup(field)
+        -- Remove field and readd the label
+        field:removeSelf()
+        layerListItem:addChild(oldLabel)
+
+        layout()
+    end
+
+    -- Fill width doesn't work, do some rough calculations
+    local fieldWidth = layerListItem.width - icon.width - layerListItem.style.spacing * 3
+    local field = uiElements.field(initialText, function(_, text)
+        oldLabel.text = text
+        subLayers.setLayerName(layer, subLayer, text)
+    end):with({
+        style = {
+            padding = 0,
+            spacing = 0,
+        }
+    }):hook({
+        onKeyRelease = function(orig, self, key, ...)
+            if key == "return" or key == "escape" then
+                return unfocusCleanup(self)
+            end
+
+            return orig(self, key, ...)
+        end,
+        onUnfocus = function(_, self)
+            unfocusCleanup(self)
+        end,
+    }):with({
+        width = fieldWidth
+    })
+
+    table.remove(layerListItem.children)
+    table.insert(layerListItem.children, field)
+
+    widgetUtils.focusElement(field)
+    field.index = #initialText
+
+    layout()
+end
+
+local function layerContextMenuClickHandler(layer, subLayer, layerListItem)
+    return function(element, action)
         local updateList = false
         local listTarget
 
@@ -474,13 +531,16 @@ local function layerContextMenuClickHandler(layer, subLayer)
 
             listTarget = layer
             updateList = true
+
+        elseif action == "rename" then
+            layerListInlineRename(layer, subLayer, layerListItem)
         end
 
         if updateList then
             toolWindow.layerList:updateItems(getLayerItems(), listTarget)
         end
 
-        element:removeSelf()
+        element.parent.parent:removeSelf()
     end
 end
 
@@ -510,33 +570,19 @@ local function layerContextMenu(listItem)
             text = tostring(language.ui.tools_window.delete_sub_layer),
             data = "delete"
         }))
+
+        table.insert(listItems, uiElements.listItem({
+            text = tostring(language.ui.tools_window.rename_sub_layer),
+            data = "rename"
+        }))
     end
 
     local content = uiElements.column({
         uiElements.list(
             listItems,
-            layerContextMenuClickHandler(layer, subLayer)
-        ):with(uiUtils.fillWidth)
-    }):with({
-        width = 160,
+            layerContextMenuClickHandler(layer, subLayer, listItem)
+        )
     })
-
-    if subLayer ~= -1 then
-        local field = uiElements.field(
-            getLayerItemName(language, layer, subLayer, true),
-            function(_, text)
-                subLayers.setLayerName(layer, subLayer, text)
-
-                listItem.text = getLayerItemName(language, layer, subLayer)
-
-                listItem:repaint()
-                listItem.parent:layout()
-                listItem.parent:layoutLate()
-            end
-        ):with(uiUtils.fillWidth)
-
-        content:addChild(field)
-    end
 
     return content
 end

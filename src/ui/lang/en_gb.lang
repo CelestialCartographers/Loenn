@@ -167,6 +167,7 @@ ui.dependency_window.no_everest_yaml=No everest.yaml found.\nWould you like to c
 ui.tools_window.favorite=Favorite
 ui.tools_window.add_sub_layer=Add group
 ui.tools_window.delete_sub_layer=Delete group
+ui.tools_window.rename_sub_layer=Rename group
 
 
 # Room Window
