@@ -524,29 +524,6 @@ local function areaFlipItems(room, layer, targets, horizontal, vertical, callFor
     return snapshot, redraw
 end
 
-local function deleteItems(room, layer, targets)
-    local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
-    local snapshot, redraw, selectionsBefore = snapshotUtils.roomLayersSnapshot(function()
-        local redraw = false
-        local selectionsBefore = utils.deepcopy(selectionTargets)
-
-        for i = #targets, 1, -1 do
-            local item = targets[i]
-            local deleted = selectionItemUtils.deleteSelection(room, item.layer, item)
-
-            if deleted then
-                redraw = true
-
-                table.remove(selectionTargets, i)
-            end
-        end
-
-        return redraw, selectionsBefore
-    end, room, relevantLayers, "Selection Deleted")
-
-    return snapshot, redraw
-end
-
 local function getRelevantNodeAddSelections(layer, selections)
     -- If a entity/trigger has multiple selections
     -- Then we add the one with the highest node value
@@ -814,7 +791,7 @@ local function handleItemDeletionKey(room, key, scancode, isrepeat)
 
     if targetKey == key then
         local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
-        local snapshot, redraw = deleteItems(room, tool.layer, selectionTargets)
+        local snapshot, redraw = selectionUtils.deleteItems(room, selectionTargets)
 
         if redraw then
             history.addSnapshot(snapshot)
@@ -946,7 +923,7 @@ local function copyCommon(cut)
 
     if cut then
         local relevantLayers = selectionUtils.selectionTargetLayers(selectionTargets)
-        local snapshot, redraw = deleteItems(room, tool.layer, selectionTargets)
+        local snapshot, redraw = selectionUtils.deleteItems(room, selectionTargets)
 
         if redraw then
             history.addSnapshot(snapshot)

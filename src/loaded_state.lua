@@ -487,11 +487,7 @@ local function layerNameCheck(target, layers)
     end
 
     if type(layers) == "table" then
-        for _, layer in ipairs(layers) do
-            if target == layer then
-                return true
-            end
-        end
+        return utils.contains(target, layers)
     end
 
     return false
