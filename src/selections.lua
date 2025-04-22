@@ -3,8 +3,11 @@ local utils = require("utils")
 local sceneHandler = require("scene_handler")
 local toolUtils = require("tool_utils")
 local tiles = require("tiles")
+local subLayers = require("sub_layers")
+local snapshot = require("structs.snapshot")
 local snapshotUtils = require("snapshot_utils")
 local selectionItemUtils = require("selection_item_utils")
+local toolHandler = require("tools")
 
 local selectionUtils = {}
 
@@ -261,6 +264,24 @@ function selectionUtils.deleteItems(room, targets)
     return snapshot, madeChanges
 end
 
+local function subLayerInfoSnapshot(layer, subLayer)
+    local originalName = subLayers.getLayerName(layer, subLayer)
+
+    local function forward()
+        subLayers.setLayerName(layer, subLayer, nil)
+        sceneHandler.sendEvent("editorLayerDeleted", layer, subLayer)
+        toolHandler.setLayer(layer, -1)
+    end
+
+    local function backward()
+        subLayers.setLayerName(layer, subLayer, originalName)
+        sceneHandler.sendEvent("editorLayerAdded", layer, subLayer)
+        toolHandler.setLayer(layer, subLayer)
+    end
+
+    return snapshot.create("Delete sub layer", {}, backward, forward)
+end
+
 function selectionUtils.deleteSubLayer(map, layer, subLayer)
     local snapshots = {}
     local relevantRooms = {}
@@ -276,6 +297,11 @@ function selectionUtils.deleteSubLayer(map, layer, subLayer)
     end
 
     if #snapshots > 0 then
+        -- We also need a snapshot to remove/restore the layer information
+        local layerInfoSnapshot = subLayerInfoSnapshot(layer, subLayer)
+
+        table.insert(snapshots, layerInfoSnapshot)
+
         return snapshotUtils.multiSnapshot("Deleted Group", snapshots), relevantRooms
     end
 end
