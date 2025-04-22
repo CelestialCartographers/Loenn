@@ -420,8 +420,6 @@ local function deleteSubLayerInfo(layer, subLayer)
     if toolWindow.subLayers[layer] then
         toolWindow.subLayers[layer][subLayer] = nil
     end
-
-    subLayers.setLayerName(layer, subLayer, nil)
 end
 
 local function deleteSubLayer(layer, subLayer)
@@ -652,12 +650,14 @@ local function toolLayerChangedCallback(self, tool, layer, subLayer)
     end
 
     if not sameLayer or not sameSubLayer or not sameSearch then
+        local targetLayerName = subLayers.formatLayerName(layer, subLayer)
+
         toolWindow.eventStates.searchTerm = searchText
         toolWindow.eventStates.layer = layer
         toolWindow.eventStates.subLayer = subLayer
 
         toolWindow.materialList:setFilterText(searchText, true)
-        toolWindow.layerList:setSelection(subLayers.formatLayerName(layer, subLayer), true)
+        toolWindow.layerList:updateItems(getLayerItems(), targetLayerName, nil, true)
 
         if not sameLayer then
             toolWindow.materialList:updateItems(getMaterialItems(layer), targetMaterial)
@@ -713,6 +713,20 @@ local function layerInformationChangedCallback(window, key, value)
 
     updateLayerList(toolName, toolHandler.tools[toolName], layerName, true)
     widgetUtils.updateHoveredTarget()
+end
+
+local function layerAddedCallback(_, layer, subLayer)
+    if not toolWindow.subLayers[layer] then
+        toolWindow.subLayers[layer] = {}
+    end
+
+    toolWindow.subLayers[layer][subLayer] = subLayer
+end
+
+local function layerDeletedCallback(_, layer, subLayer)
+    if toolWindow.subLayers[layer] then
+        toolWindow.subLayers[layer][subLayer] = nil
+    end
 end
 
 local function getModeItems(toolName)
@@ -954,6 +968,8 @@ function toolWindow.getWindow()
         editorMapLoaded = mapLoadedCallback,
         editorShownDependenciesChanged = updateLayerAndPlacementsCallback,
         editorLayerInformationChanged = layerInformationChangedCallback,
+        editorLayerAdded = layerAddedCallback,
+        editorLayerDeleted = layerDeletedCallback,
 
         interactive = 0
     })
