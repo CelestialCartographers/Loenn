@@ -62,6 +62,11 @@ function ui.initializeDevice()
     ui.init(uiRootElement, false)
     ui.features.eventProxies = true
     ui.features.megacanvas = false
+
+    -- Do not enable Olympui debug inspector hotkey if user does not have debug options enabled
+    if not configs.debug.enableDebugOptions then
+        ui.features.inspector = false
+    end
 end
 
 return ui
