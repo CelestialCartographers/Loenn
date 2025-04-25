@@ -1279,15 +1279,20 @@ function entities.nodeVisibility(layer, entity)
     return "selected"
 end
 
+local alwaysIgnoredFields = {"_name", "_id", "originX", "originY", "_fromLayer", "_editorLayer"}
+local alwaysIgnoredFieldsMultiple = utils.concat(alwaysIgnoredFields, {"width", "height", "nodes"})
+
 function entities.ignoredFields(layer, entity)
     local handler = entities.getHandler(entity)
     local ignoredFields = handler and handler.ignoredFields
 
     if ignoredFields then
-        return utils.callIfFunction(ignoredFields, entity)
+        local ignored = utils.callIfFunction(ignoredFields, entity)
+
+        return utils.concat(ignored, alwaysIgnoredFields)
     end
 
-    return {"_name", "_id", "originX", "originY"}
+    return alwaysIgnoredFields
 end
 
 function entities.ignoredFieldsMultiple(layer, entity)
@@ -1295,10 +1300,12 @@ function entities.ignoredFieldsMultiple(layer, entity)
     local ignoredFieldsMultiple = handler and handler.ignoredFieldsMultiple
 
     if ignoredFieldsMultiple then
-        return utils.callIfFunction(ignoredFieldsMultiple, entity)
+        local ignored = utils.callIfFunction(ignoredFieldsMultiple, entity)
+
+        return utils.concat(ignored, alwaysIgnoredFieldsMultiple)
     end
 
-    return {"x", "y", "width", "height", "nodes"}
+    return alwaysIgnoredFieldsMultiple
 end
 
 function entities.fieldOrder(layer, entity)
