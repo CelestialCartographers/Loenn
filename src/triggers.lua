@@ -763,15 +763,20 @@ function triggers.nodeVisibility(layer, trigger)
     return "selected"
 end
 
+local alwaysIgnoredFields = {"_name", "_id", "originX", "originY", "_fromLayer", "_editorLayer"}
+local alwaysIgnoredFieldsMultiple = utils.concat(alwaysIgnoredFields, {"width", "height", "nodes"})
+
 function triggers.ignoredFields(layer, trigger)
     local handler = triggers.getHandler(trigger)
     local ignoredFields = handler and handler.ignoredFields
 
     if ignoredFields then
-        return utils.callIfFunction(ignoredFields, trigger)
+        local ignored = utils.callIfFunction(ignoredFields, trigger)
+
+        return utils.concat(ignored, alwaysIgnoredFields)
     end
 
-    return {"_name", "_id", "originX", "originY"}
+    return alwaysIgnoredFields
 end
 
 function triggers.ignoredFieldsMultiple(layer, trigger)
@@ -779,10 +784,12 @@ function triggers.ignoredFieldsMultiple(layer, trigger)
     local ignoredFieldsMultiple = handler and handler.ignoredFieldsMultiple
 
     if ignoredFieldsMultiple then
-        return utils.callIfFunction(ignoredFieldsMultiple, trigger)
+        local ignored = utils.callIfFunction(ignoredFieldsMultiple, trigger)
+
+        return utils.concat(ignored, alwaysIgnoredFieldsMultiple)
     end
 
-    return {"x", "y", "width", "height", "nodes"}
+    return alwaysIgnoredFieldsMultiple
 end
 
 function triggers.fieldOrder(layer, trigger)
