@@ -9,6 +9,7 @@ local lists = require("ui.widgets.lists")
 local simpleDocks = require("ui.widgets.simple_docks")
 local contextMenu = require("ui.context_menu")
 local listItemUtils = require("ui.utils.list_item")
+local notifications = require("ui.notification")
 
 local configs = require("configs")
 local languageRegistry = require("language_registry")
@@ -417,8 +418,21 @@ local function getLayerItems(toolName)
 end
 
 local function deleteSubLayerInfo(layer, subLayer)
-    if toolWindow.subLayers[layer] then
-        toolWindow.subLayers[layer][subLayer] = nil
+    local layerInfo = toolWindow.subLayers[layer]
+
+    if layerInfo and layerInfo[subLayer] then
+        layerInfo[subLayer] = nil
+
+        -- Check if we only have a single layer left and notify the user
+        local layerCount = utils.countKeys(layerInfo)
+
+        if layerCount == 0 or layerCount == 1 then
+            local language = languageRegistry.getLanguage()
+            local existingLayerIndex = next(layerInfo)
+            local layerName = getLayerItemName(language, layer, existingLayerIndex, true)
+
+            notifications.notify(string.format(tostring(language.ui.tools_window.remove_last_sub_layer), layerName))
+        end
     end
 end
 
@@ -447,20 +461,35 @@ local function addSubLayerInfo(layer, subLayer)
         toolWindow.subLayers[layer] = {}
     end
 
-    local targetLayer = toolWindow.subLayers[layer]
-    local layerCount = #targetLayer
+    local layerInfo = toolWindow.subLayers[layer]
+    local layerCount = #layerInfo
+    local layerKeysCount = utils.countKeys(layerInfo)
+    local shouldNotifyUser = layerKeysCount == 0 or layerKeysCount == 1
+
+    if shouldNotifyUser then
+        local language = languageRegistry.getLanguage()
+        local existingLayerIndex = next(layerInfo)
+        local layerName = getLayerItemName(language, layer, existingLayerIndex, true)
+
+        notifications.notify(string.format(tostring(language.ui.tools_window.add_first_sub_layer), layerName))
+    end
 
     -- Special case for when no editor layers are found at all
     if layerCount == 0 then
-        targetLayer[0] = 0
-        targetLayer[1] = 1
+        layerInfo[0] = 0
+        layerInfo[1] = 1
 
         return 1
     end
 
-    targetLayer[layerCount + 1] = layerCount + 1
+    -- Find first empty layer index
+    for i = 0, layerCount + 1 do
+        if not layerInfo[i] then
+            layerInfo[i] = i
 
-    return layerCount + 1
+            return i
+        end
+    end
 end
 
 local function layerListInlineRename(layer, subLayer, layerListItem)

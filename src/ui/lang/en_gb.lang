@@ -168,6 +168,8 @@ ui.tools_window.favorite=Favorite
 ui.tools_window.add_sub_layer=Add group
 ui.tools_window.delete_sub_layer=Delete group
 ui.tools_window.rename_sub_layer=Rename group
+ui.tools_window.add_first_sub_layer=Objects moved from base group to '%s'.
+ui.tools_window.remove_last_sub_layer=Objects moved from '%s' to base group.
 
 
 # Room Window
