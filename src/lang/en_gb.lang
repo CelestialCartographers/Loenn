@@ -235,6 +235,7 @@ entities.spikesUp.placements.name.up_cliffside=Spikes (Up, Cliffside)
 entities.spikesUp.placements.name.up_reflection=Spikes (Up, Reflection)
 entities.spikesUp.placements.name.up_tentacles=Spikes (Up, Tentacles)
 entities.spikesUp.attributes.description.type=Determines the visual appearance of the spike.
+entities.spikesUp.attributes.description.attachToSolid=Whether the spikes attach to entities or blocks, and can be moved by them.
 
 # Spikes Right
 entities.spikesRight.placements.name.right_default=Spikes (Right, Default)
@@ -243,6 +244,7 @@ entities.spikesRight.placements.name.right_cliffside=Spikes (Right, Cliffside)
 entities.spikesRight.placements.name.right_reflection=Spikes (Right, Reflection)
 entities.spikesRight.placements.name.right_tentacles=Spikes (Right, Tentacles)
 entities.spikesRight.attributes.description.type=Determines the visual appearance of the spike.
+entities.spikesRight.attributes.description.attachToSolid=Whether the spikes attach to entities or blocks, and can be moved by them.
 
 # Spikes Down
 entities.spikesDown.placements.name.down_default=Spikes (Down, Default)
@@ -251,6 +253,7 @@ entities.spikesDown.placements.name.down_cliffside=Spikes (Down, Cliffside)
 entities.spikesDown.placements.name.down_reflection=Spikes (Down, Reflection)
 entities.spikesDown.placements.name.down_tentacles=Spikes (Down, Tentacles)
 entities.spikesDown.attributes.description.type=Determines the visual appearance of the spike.
+entities.spikesDown.attributes.description.attachToSolid=Whether the spikes attach to entities or blocks, and can be moved by them.
 
 # Spikes Left
 entities.spikesLeft.placements.name.left_default=Spikes (Left, Default)
@@ -259,6 +262,7 @@ entities.spikesLeft.placements.name.left_cliffside=Spikes (Left, Cliffside)
 entities.spikesLeft.placements.name.left_reflection=Spikes (Left, Reflection)
 entities.spikesLeft.placements.name.left_tentacles=Spikes (Left, Tentacles)
 entities.spikesLeft.attributes.description.type=Determines the visual appearance of the spike.
+entities.spikesLeft.attributes.description.attachToSolid=Whether the spikes attach to entities or blocks, and can be moved by them.
 
 # Resort Lantern
 entities.resortLantern.placements.name.lantern=Resort Lantern
@@ -1158,6 +1162,7 @@ triggers.musicFadeTrigger.placements.name.music_fade=Music Fade
 triggers.musicFadeTrigger.attributes.description.direction=Determines the direction of the fade across the trigger area.\nThe parameter fades between the "From" and the "To" value as the player moves through the trigger.
 triggers.musicFadeTrigger.attributes.description.fadeB=Determines the parameter value at the end of the trigger area.
 triggers.musicFadeTrigger.attributes.description.fadeA=Determines the parameter value at the start of the trigger area.
+triggers.bloomFadeTrigger.attributes.description.positionMode=Determines which direction the music fades towards.
 triggers.musicFadeTrigger.attributes.description.parameter=The music parameter to change. Uses the fade properties if left blank.
 
 # No Refill

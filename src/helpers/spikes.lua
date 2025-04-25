@@ -58,6 +58,12 @@ spikeHelper.triggerSpikeVariants = {
     "reflection"
 }
 
+spikeHelper.spikeDefaultOptions = {
+    attachToSolid = true
+}
+
+spikeHelper.triggerSpikeDefaultOptions = {}
+
 local triggerSpikeColors = {
     {242 / 255, 90 / 255, 16 / 255},
     {255 / 255, 0 / 255, 0 / 255},
@@ -466,7 +472,8 @@ function spikeHelper.createEntityHandler(name, direction, ...)
     local variants = options.variants or (originalTriggerSpike and spikeHelper.triggerSpikeVariants) or spikeHelper.spikeVariants
     local variantKey = options.variantKey or "type"
     local defaultFieldInformation = options.fieldInformation or {}
-    local defaultPlacementData = options.placementData or {}
+    local fallbackPlacementData = triggerSpike and spikeHelper.triggerSpikeDefaultOptions or spikeHelper.spikeDefaultOptions
+    local defaultPlacementData = options.placementData or fallbackPlacementData
     local placementName = options.placementName
     local handlerDirectionNames = options.directionNames
 
