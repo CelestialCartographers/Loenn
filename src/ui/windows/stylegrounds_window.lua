@@ -1072,6 +1072,9 @@ function stylegroundWindow.getWindowContent(map)
     }
     local _, tabbedContent = tabbedWindow.createWindow("", tabs, tabbedWindowOptions)
 
+    stylegroundWindow.updateStylegroundForm(interactionData)
+    stylegroundWindow.updateStylegroundPreview(interactionData)
+
     local stylegroundListPreviewRow = uiElements.row({
         tabbedContent,
         stylegroundPreview
