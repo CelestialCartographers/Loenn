@@ -352,6 +352,7 @@ entities.seekerStatue.attributes.description.hatch=Determines whether the statue
 
 # Seeker Barrier
 entities.seekerBarrier.placements.name.seeker_barrier=Seeker Barrier
+entities.seekerBarrier.placements.name.jellyfish_barrier=Jellyfish Barrier
 
 # Player Seeker
 entities.playerSeeker.placements.name.player_seeker=Player Seeker
