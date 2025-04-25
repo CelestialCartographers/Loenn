@@ -1158,6 +1158,7 @@ triggers.musicFadeTrigger.placements.name.music_fade=Music Fade
 triggers.musicFadeTrigger.attributes.description.direction=Determines the direction of the fade across the trigger area.\nThe parameter fades between the "From" and the "To" value as the player moves through the trigger.
 triggers.musicFadeTrigger.attributes.description.fadeB=Determines the parameter value at the end of the trigger area.
 triggers.musicFadeTrigger.attributes.description.fadeA=Determines the parameter value at the start of the trigger area.
+triggers.bloomFadeTrigger.attributes.description.positionMode=Determines which direction the music fades towards.
 triggers.musicFadeTrigger.attributes.description.parameter=The music parameter to change. Uses the fade properties if left blank.
 
 # No Refill
