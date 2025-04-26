@@ -369,7 +369,7 @@ function autotiler.loadTilesetXML(filename)
 
         if copy then
             if not elementLookup[copy] then
-                error(string.format("Copied tilesets must be defined before the tileset coping from them: %s copies %s", id, copy))
+                error(string.format("Copied tilesets must be defined before the tileset copying from them: %s copies %s", id, copy))
             end
 
             readTilesetInfo(tileset, id, elementLookup[copy])
