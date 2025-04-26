@@ -333,17 +333,19 @@ local function toolMaterialChangedCallback(self, tool, layer, material)
     end
 end
 
-local function getLayerItemName(language, layer, subLayer, noIndent)
+local function getLayerItemName(language, layer, subLayer, noIndent, forceSubLayer)
     local layersNames = language.layers.name
     local displayName = getLanguageOrDefault(layersNames[layer], layer)
+    local defaultSubLayer = not subLayer or subLayer == -1
 
-    if not subLayer or subLayer == -1 then
+    if not forceSubLayer and defaultSubLayer then
         return displayName
     end
 
     local layerDisplayName = subLayers.getLayerName(layer, subLayer)
 
     if not layerDisplayName or utils.trim(layerDisplayName) == "" then
+        subLayer = subLayer or 0
         layerDisplayName = string.format("%s %s", displayName, subLayer + 1)
     end
 
@@ -429,7 +431,7 @@ local function deleteSubLayerInfo(layer, subLayer)
         if layerCount == 0 or layerCount == 1 then
             local language = languageRegistry.getLanguage()
             local existingLayerIndex = next(layerInfo)
-            local layerName = getLayerItemName(language, layer, existingLayerIndex, true)
+            local layerName = getLayerItemName(language, layer, existingLayerIndex, true, true)
 
             notifications.notify(string.format(tostring(language.ui.tools_window.remove_last_sub_layer), layerName))
         end
@@ -469,7 +471,7 @@ local function addSubLayerInfo(layer, subLayer)
     if shouldNotifyUser then
         local language = languageRegistry.getLanguage()
         local existingLayerIndex = next(layerInfo)
-        local layerName = getLayerItemName(language, layer, existingLayerIndex, true)
+        local layerName = getLayerItemName(language, layer, existingLayerIndex, true, true)
 
         notifications.notify(string.format(tostring(language.ui.tools_window.add_first_sub_layer), layerName))
     end
