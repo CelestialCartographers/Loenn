@@ -997,6 +997,7 @@ function toolWindow.getWindow()
         editorToolMaterialChanged = toolMaterialChangedCallback,
         editorToolModeChanged = toolModeChangedCallback,
         editorMapLoaded = mapLoadedCallback,
+        editorMapNew = mapLoadedCallback,
         editorShownDependenciesChanged = updateLayerAndPlacementsCallback,
         editorLayerInformationChanged = layerInformationChangedCallback,
         editorLayerAdded = layerAddedCallback,
