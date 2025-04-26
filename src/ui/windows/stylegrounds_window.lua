@@ -739,7 +739,8 @@ local function notifyRemoveStyle(language, interactionData)
                 })
             })
         end,
-        -1
+        -1,
+        {clearSameTag = true, tag = "stylegroundDelete"}
     )
 end
 
