@@ -434,7 +434,11 @@ local function deleteSubLayerInfo(layer, subLayer)
             local existingLayerIndex = next(layerInfo)
             local layerName = getLayerItemName(language, layer, existingLayerIndex, true, true)
 
-            notifications.notify(string.format(tostring(language.ui.tools_window.remove_last_sub_layer), layerName))
+            notifications.notify(
+                string.format(tostring(language.ui.tools_window.remove_last_sub_layer), layerName),
+                nil,
+                {clickToClose = true}
+            )
         end
     end
 end
@@ -474,7 +478,11 @@ local function addSubLayerInfo(layer, subLayer)
         local existingLayerIndex = next(layerInfo)
         local layerName = getLayerItemName(language, layer, existingLayerIndex, true, true)
 
-        notifications.notify(string.format(tostring(language.ui.tools_window.add_first_sub_layer), layerName))
+        notifications.notify(
+            string.format(tostring(language.ui.tools_window.add_first_sub_layer), layerName),
+            nil,
+            {clickToClose = true}
+        )
     end
 
     -- Special case for when no editor layers are found at all
