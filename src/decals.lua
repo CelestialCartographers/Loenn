@@ -16,6 +16,8 @@ local decalsPrefix = "decals/"
 local gameplayPath = "Graphics/Atlases/Gameplay"
 local decalsPath = "Graphics/Atlases/Gameplay/decals"
 
+local missingTextureName = mods.internalModContent .. "/missing_image"
+
 -- A frame should only be kept if it has no trailing number
 -- Or if the trailing number is 0, 00, 000, ... etc
 -- Using manual byte checks for performance reasons
@@ -171,9 +173,6 @@ end
 function decals.getDrawable(texture, handler, room, decal, viewport)
     local meta = atlases.gameplay[texture]
 
-    local x = decal.x or 0
-    local y = decal.y or 0
-
     local scaleX = decal.scaleX or 1
     local scaleY = decal.scaleY or 1
 
@@ -189,6 +188,13 @@ function decals.getDrawable(texture, handler, room, decal, viewport)
 
         return drawable, depth
     end
+
+    -- Texture not found, use fallback missing png
+    local drawable = drawableSprite.fromTexture(missingTextureName, {x = decal.x, y = decal.y})
+
+    drawable:setJustification(0.5, 0.5)
+
+    return drawable, depth
 end
 
 function decals.getSelection(room, decal)
