@@ -16,7 +16,7 @@
 Lönn is a visual level maker and editor for the game Celeste. It allows editing map binaries, creating new ones, adding rooms, and filling the rooms with anything your heart desires (as long as what your heart desires is possible within the realms of the game).
 The generated map binaries can be loaded in the stock game or using [Everest](https://everestapi.github.io/), although the use of Everest is highly recommended. For use without Everest, you can replace a map in `Content/Maps` (remember backups), otherwise, you can place it in `Mods/<yourmodname>/Maps` with Everest and use the custom chapter loading (refer to the [Mod Structure guide](https://github.com/EverestAPI/Resources/wiki/Mod-Structure)).
 
-The program is still in an early state, some things are still missing and it is under active development. If you spot something that is missing, it will most likely be added some time in the near future. If you spot a bug or the program crashes, please report it.
+The program is still under active development. If you find something that you would like to see in the program, please let us know so that it may be added some time in the future. If you spot a bug or the program crashes, please report it.
 
 Lönn is a successor to [Ahorn][ahorn], a visual level maker based on [Maple][maple]. If you want to be able to generate and edit maps using code, give Maple a try.
 
@@ -39,6 +39,8 @@ Download the [latest release][latest-release] for MacOS and extract the `.zip` f
 First, [install love2d](https://love2d.org/). Lönn requires love2d version 11.3 or later; make sure to download love2d from the official website. Also make sure that the `love` command is in your `PATH`.
 
 Download the [latest release][latest-release] for your operating system and extract the `.zip` file you get into an empty directory. Launch `Lönn.sh` to start the program, or run it directly using `love Lönn.love`.
+
+On systems that support AppImage, download the AppImage file in the [latest release][latest-release]. Execute the file to launch Lönn.
 
 ## Usage
 
@@ -141,17 +143,9 @@ Close-up of a room
 
 ## Frequently Asked Questions
 
-**When will I be able to do [thing you can do in Ahorn]?**
-
-Whenever we add it. Celeste has a lot of things which support for has to be individually added. This takes time, so please be patient. However, if more people complain about the lack of a particular thing, we might add it sooner. For a (currently) more complete set of features, just keep using [Ahorn][ahorn] for now.
-
-**Why do my mods not show up in Lönn?**
-
-Lönn does not support the Ahorn plugins that mods contain. Mod developers will have to add compatible Lönn plugins to their mods separately.
-
 **Why do so many things in the program have weird names?**
 
-Most of these are the names internally used by the game, so blame the devs. Most of them do not have any official names, but we might make the names in Lönn a bit more descriptive later on.
+Most of these are the names internally used by the game, so blame the devs. Most of them do not have any official names, but we tried to make the names in Lönn as descriptive as possible.
 
 **Is it safe to resave maps from the base Celeste game?**
 
@@ -163,7 +157,11 @@ A player is able to move from one room to another if the rooms are directly adja
 
 **So, I made a map. What now? How do I load it?**
 
-While you can load maps without, it is _highly_ recommended to install [Everest](https://github.com/EverestAPI/Everest). Once Everest is installed, place your map binary in `Mods/<yourmodname>/Maps` in your Celeste installation directory. It should now be accessible from inside the game.
+While you can load maps without, it is _highly_ recommended to install [Everest](https://github.com/EverestAPI/Everest). Once Everest is installed, place your map binary in `Mods/<yourmodname>/Maps` in your Celeste installation directory. It should now be accessible from inside the game. Refer to the [Mod Structure guide](https://github.com/EverestAPI/Resources/wiki/Mod-Structure) for details.
+
+**I am a mod developer. Why does my mod not show up in Lönn?**
+
+Mod developers will have to add compatible Lönn plugins to their mods. Refer to [the Lönn wiki](https://github.com/CelestialCartographers/Loenn/wiki) for details.
 
 **Something is broken!**
 
