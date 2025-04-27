@@ -9,6 +9,7 @@ local atlases = require("atlases")
 local stringField = require("ui.forms.fields.string")
 local iconUtils = require("ui.utils.icons")
 local fileLocations = require("file_locations")
+local utf8 = require("utf8")
 
 local pathField = {}
 
@@ -53,7 +54,7 @@ local function getDialogCallback(textField, options)
         end
 
         textField:setText(filename)
-        textField.index = #filename
+        textField.index = utf8.len(filename)
     end
 end
 

@@ -10,6 +10,7 @@ local listItemUtils = require("ui.utils.list_item")
 local configs = require("configs")
 local keyboard = require("utils.keyboard")
 local utils = require("utils")
+local utf8 = require("utf8")
 
 local listWidgets = {}
 
@@ -693,7 +694,7 @@ function listWidgets.setFilterText(list, text, preventCallback)
         end
 
         searchField:setText(text)
-        searchField.index = #text
+        searchField.index = utf8.len(text)
 
         if preventCallback then
             searchField.cb = searchCallback

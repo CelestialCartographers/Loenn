@@ -24,6 +24,7 @@ local subLayers = require("sub_layers")
 local history = require("history")
 local selectionUtils = require("selections")
 local celesteRender = require("celeste_render")
+local utf8 = require("utf8")
 
 local toolWindow = {}
 
@@ -546,7 +547,7 @@ local function layerListInlineRename(layer, subLayer, layerListItem)
     table.insert(layerListItem.children, field)
 
     widgetUtils.focusElement(field)
-    field.index = #initialText
+    field.index = utf8.len(initialText)
 
     layout()
 end

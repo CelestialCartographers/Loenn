@@ -1,11 +1,13 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
+
 local contextMenu = require("ui.context_menu")
 local utils = require("utils")
 local colorPicker = require("ui.widgets.color_picker")
 local configs = require("configs")
 local xnaColors = require("consts.xna_colors")
+local utf8 = require("utf8")
 
 local colorField = {}
 
@@ -34,7 +36,7 @@ end
 function colorField._MT.__index:setValue(value)
     self.currentValue = fixNumberColor(value) or fallbackHexColor
     self.field:setText(self.currentValue)
-    self.field.index = #self.currentValue
+    self.field.index = utf8.len(self.currentValue)
 end
 
 function colorField._MT.__index:getValue()
@@ -182,7 +184,7 @@ function colorField.getElement(name, value, options)
             local pickerOptions = {
                 callback = function(data)
                     field:setText(data.hexColor)
-                    field.index = #data.hexColor
+                    field.index = utf8.len(data.hexColor)
                 end,
                 showAlpha = options.showAlpha or options.useAlpha,
                 showHex = options.showHex,

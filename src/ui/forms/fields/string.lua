@@ -6,6 +6,7 @@ local fieldDropdown = require("ui.widgets.field_dropdown")
 local dropdowns = require("ui.widgets.dropdown")
 
 local utils = require("utils")
+local utf8 = require("utf8")
 
 local stringField = {}
 
@@ -116,7 +117,7 @@ local function dropdownChanged(formField, optionsFlattened)
             -- Don't update if field is purely a dropdown
             if editable or searchable then
                 formField.field:setText(newText)
-                formField.field.index = #newText
+                formField.field.index = utf8.len(newText)
             end
 
             formField.currentValue = value
@@ -269,7 +270,7 @@ function stringField.getElement(name, value, options)
             if currentText then
                 field._text = currentText
                 field.label.text = currentText
-                field.index = #currentText
+                field.index = utf8.len(currentText)
             end
 
             listOptions.parentProxy = field
