@@ -24,6 +24,12 @@ local function calculateWidthList(orig, element)
     if not configs.ui.lists.shrinkToFit then
         element._largestWidth = math.max(element._largestWidth or width, width)
 
+        for _, child in ipairs(element.children) do
+            if child.width > element._largestWidth then
+                element._largestWidth = child.width
+            end
+        end
+
         return element._largestWidth
     end
 
