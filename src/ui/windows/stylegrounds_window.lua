@@ -7,6 +7,7 @@ local uiUtils = require("ui.utils")
 
 local utils = require("utils")
 local configs = require("configs")
+local persistence = require("persistence")
 local keyboardHelper = require("utils.keyboard")
 local languageRegistry = require("language_registry")
 local stylegroundEditor = require("ui.styleground_editor")
@@ -1006,9 +1007,8 @@ function stylegroundWindow.getWindowContent(map)
         stylegroundWindow.getStylegroundPreview(interactionData)
     })
 
-    -- Create foreground last because of list callbacks
-    local listColumnBackground, listBackground = stylegroundWindow.getStylegroundList(map, interactionData, false)
     local listColumnForeground, listForeground = stylegroundWindow.getStylegroundList(map, interactionData, true)
+    local listColumnBackground, listBackground = stylegroundWindow.getStylegroundList(map, interactionData, false)
 
     listForeground.interactionData = interactionData
     listBackground.interactionData = interactionData
@@ -1037,40 +1037,43 @@ function stylegroundWindow.getWindowContent(map)
     end
 
     local initialTabSelect = true
+
+    local function tabCallbackHandler(fg)
+        return function()
+            local currentList = fg and listForeground or listBackground
+            local otherList = fg and listBackground or listForeground
+
+            persistence.stylegroundWindowPreviousTab = fg and "foreground" or "background"
+            interactionData.stylegroundListElement = currentList
+            interactionData.stylegroundListElementOther = otherList
+
+            if not initialTabSelect then
+                ui.runLate(function()
+                    widgetUtils.focusElement(currentList.children[1])
+                    listForeground:setSelection(currentList:getSelectedData(), false, false)
+                end)
+            end
+
+            initialTabSelect = false
+        end
+    end
+
     local tabs = {
         {
             title = tostring(language.ui.styleground_window.tab_foreground),
             content = listColumnForeground,
-            callback = function()
-                interactionData.stylegroundListElement = listForeground
-                interactionData.stylegroundListElementOther = listBackground
-
-                if not initialTabSelect then
-                    ui.runLate(function()
-                        widgetUtils.focusElement(listForeground.children[1])
-                        listForeground:setSelection(listForeground:getSelectedData(), false, false)
-                    end)
-                end
-
-                initialTabSelect = false
-            end,
+            callback = tabCallbackHandler(true)
         },
         {
             title = tostring(language.ui.styleground_window.tab_background),
             content = listColumnBackground,
-            callback = function()
-                interactionData.stylegroundListElement = listBackground
-                interactionData.stylegroundListElementOther = listForeground
-
-                ui.runLate(function()
-                    widgetUtils.focusElement(listBackground.children[1])
-                    listBackground:setSelection(listBackground:getSelectedData(), false, false)
-                end)
-            end,
+            callback = tabCallbackHandler(false)
         },
     }
+    local initialTab = persistence.stylegroundWindowPreviousTab == "background" and 2 or 1
     local tabbedWindowOptions = {
-        respectSiblings = false
+        respectSiblings = false,
+        initialTab = initialTab
     }
     local _, tabbedContent = tabbedWindow.createWindow("", tabs, tabbedWindowOptions)
 
