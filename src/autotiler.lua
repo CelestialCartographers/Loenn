@@ -352,6 +352,7 @@ function autotiler.loadTilesetXML(filename)
 
         tileset.scanWidth = scanWidth
         tileset.scanHeight = scanHeight
+        tileset.customScanSize = scanWidth ~= 3 or scanHeight ~= 3
 
         readTilesetInfo(tileset, id, element)
 
