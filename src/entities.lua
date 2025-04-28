@@ -1280,7 +1280,7 @@ function entities.nodeVisibility(layer, entity)
 end
 
 local alwaysIgnoredFields = {"_name", "_id", "originX", "originY", "_fromLayer", "_editorLayer"}
-local alwaysIgnoredFieldsMultiple = utils.concat(alwaysIgnoredFields, {"width", "height", "nodes"})
+local alwaysIgnoredFieldsMultiple = utils.concat(alwaysIgnoredFields, {"x", "y", "width", "height", "nodes"})
 
 function entities.ignoredFields(layer, entity)
     local handler = entities.getHandler(entity)
