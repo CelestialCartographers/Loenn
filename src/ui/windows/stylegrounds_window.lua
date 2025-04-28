@@ -9,7 +9,6 @@ local utils = require("utils")
 local configs = require("configs")
 local keyboardHelper = require("utils.keyboard")
 local languageRegistry = require("language_registry")
-local form = require("ui.forms.form")
 local stylegroundEditor = require("ui.styleground_editor")
 local listWidgets = require("ui.widgets.lists")
 local widgetUtils = require("ui.widgets.utils")
@@ -22,9 +21,11 @@ local parallaxStruct = require("structs.parallax")
 local effectStruct = require("structs.effect")
 local formUtils = require("ui.utils.forms")
 local atlases = require("atlases")
+
+local form = require("ui.forms.form")
 local tabbedWindow = require("ui.widgets.tabbed_window")
-local listItemUtils = require("ui.utils.list_item")
 local notifications = require("ui.notification")
+local dropdowns = require("ui.widgets.dropdown")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "stylegrounds_window"
@@ -852,9 +853,9 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
 
     local buttonRow = formHelper.getFormButtonRow(buttons, formFields, formOptions)
     local newDropdownItems = getNewDropdownOptions(style, foreground, isDefaultTarget)
-    local newDropdown = uiElements.dropdown(newDropdownItems, function(_, data)
+    local newDropdown = dropdowns.fromList(function(_, data)
         interactionData.addNewMethod = data
-    end)
+    end, newDropdownItems)
 
     -- Reference for movement button "enable" updates
     movementButtonElements.up = buttonRow.children[4]
