@@ -55,6 +55,7 @@ local function addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
     end
 end
 
+-- Inlined for 3x3 tilesets
 local function addMissingNeighbors(x, y, needsUpdate, addedUpdate)
     -- Around the target tile
     addNeighborIfMissing(x - 1, y - 1, needsUpdate, addedUpdate)
@@ -74,6 +75,25 @@ local function addMissingNeighbors(x, y, needsUpdate, addedUpdate)
 
     addNeighborIfMissing(x, y + 2, needsUpdate, addedUpdate)
     addNeighborIfMissing(x, y - 2, needsUpdate, addedUpdate)
+end
+
+local function addMissingNeighborsCustomSize(x, y, tileMeta, needsUpdate, addedUpdate)
+    local scanWidth, scanHeight = tileMeta.scanWidth, tileMeta.scanHeight
+    local offsetX, offsetY = math.floor(scanWidth / 2), math.floor(scanHeight / 2)
+
+    -- Around the target tile
+    for tx = x - offsetX, x + offsetX do
+        for ty = y - offsetY, y + offsetY do
+            addNeighborIfMissing(tx, ty, needsUpdate, addedUpdate)
+        end
+    end
+
+    -- Tiles used to check for center/padding
+    addNeighborIfMissing(x + offsetX + 1, y, needsUpdate, addedUpdate)
+    addNeighborIfMissing(x - offsetX - 1, y, needsUpdate, addedUpdate)
+
+    addNeighborIfMissing(x, y + offsetY + 1, needsUpdate, addedUpdate)
+    addNeighborIfMissing(x, y - offsetY - 1, needsUpdate, addedUpdate)
 end
 
 -- Has some duplication from celesteRender getTilesBatch for performance reasons
@@ -137,8 +157,14 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
                         tilesMatrix:set(tx, ty, mat)
 
                         -- Add the current tile and nearby tiles for redraw
-                        addNeighborIfMissing(tx, ty, needsUpdate, addedUpdate)
-                        addMissingNeighbors(tx, ty, needsUpdate, addedUpdate)
+                        -- Use inlined for 3x3 tilesets
+                        if not meta[mat] or not meta[mat].customScanSize then
+                            addNeighborIfMissing(tx, ty, needsUpdate, addedUpdate)
+                            addMissingNeighbors(tx, ty, needsUpdate, addedUpdate)
+
+                        else
+                            addMissingNeighborsCustomSize(tx, ty, meta[mat], needsUpdate, addedUpdate)
+                        end
                     end
                 end
             end
@@ -151,8 +177,14 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
             tilesMatrix:set(x, y, material)
 
             -- Add the current tile and nearby tiles for redraw
-            addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
-            addMissingNeighbors(x, y, needsUpdate, addedUpdate)
+            -- Use inlined for 3x3 tilesets
+            if not meta[material] or not meta[material].customScanSize then
+                addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
+                addMissingNeighbors(x, y, needsUpdate, addedUpdate)
+
+            else
+                addMissingNeighborsCustomSize(x, y, meta[material], needsUpdate, addedUpdate)
+            end
         end
     end
 

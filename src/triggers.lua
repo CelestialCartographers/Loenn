@@ -764,7 +764,7 @@ function triggers.nodeVisibility(layer, trigger)
 end
 
 local alwaysIgnoredFields = {"_name", "_id", "originX", "originY", "_fromLayer", "_editorLayer"}
-local alwaysIgnoredFieldsMultiple = utils.concat(alwaysIgnoredFields, {"width", "height", "nodes"})
+local alwaysIgnoredFieldsMultiple = utils.concat(alwaysIgnoredFields, {"x", "y", "width", "height", "nodes"})
 
 function triggers.ignoredFields(layer, trigger)
     local handler = triggers.getHandler(trigger)
