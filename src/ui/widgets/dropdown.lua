@@ -107,14 +107,12 @@ function dropdowns.fromList(callback, stringOptions, options)
     list.options = options
     list.options.spawnParent = options.spawnParent or button
 
-    list.callback = callback
     list.button = button
     list.column = listColumn
     list._parentProxy = options.parentProxy
 
     button.list = list
     button:addChild(uiElements.icon("ui:icons/drop"):with(uiUtils.at(0.999 + 1, 0.5 + 5)))
-    button.callback = callback
     button.submenuParent = button
 
     list.shownOnce = false
