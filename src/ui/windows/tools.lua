@@ -529,7 +529,7 @@ local function layerListInlineRename(layer, subLayer, layerListItem)
     -- Fill width doesn't work, do some rough calculations
     local fieldWidth = layerListItem.width - icon.width - layerListItem.style.spacing * 3
     local field = uiElements.field(initialText, function(_, text)
-        oldLabel.text = text
+        oldLabel.text = getLayerItemName(language, layer, subLayer)
         subLayers.setLayerName(layer, subLayer, text)
     end):with({
         style = {
