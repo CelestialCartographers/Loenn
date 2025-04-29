@@ -922,6 +922,9 @@ local function focusMaterialSearchHandler()
 end
 
 function toolWindow.getWindow()
+    -- Update known sub layers
+    toolWindow.subLayers = loadedState.subLayers or {}
+
     local toolListOptions = {
         initialItem = toolHandler.currentToolName
     }
