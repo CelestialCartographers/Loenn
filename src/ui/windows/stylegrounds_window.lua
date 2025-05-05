@@ -1050,7 +1050,7 @@ function stylegroundWindow.getWindowContent(map)
             if not initialTabSelect then
                 ui.runLate(function()
                     widgetUtils.focusElement(currentList.children[1])
-                    listForeground:setSelection(currentList:getSelectedData(), false, false)
+                    currentList:setSelection(currentList:getSelectedData(), false, false)
                 end)
             end
 
