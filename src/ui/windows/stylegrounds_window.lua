@@ -886,19 +886,30 @@ function stylegroundWindow.getStylegroundForm(interactionData)
     local formBody, formFields = formHelper.getFormBody(dummyData, formOptions)
     local buttonRow = getStylegroundFormButtons(interactionData, formFields, formOptions)
 
+    -- Finish all fade effects
+    for _, field in ipairs(formFields) do
+        for _, element in ipairs(field.elements) do
+            widgetUtils.finishElementFade(element)
+        end
+    end
+
+    for _, button in ipairs(buttonRow.children) do
+        widgetUtils.finishElementFade(button)
+    end
+
     return uiElements.column({formBody, buttonRow})
 end
 
 function stylegroundWindow.updateStylegroundForm(interactionData)
     local formContainer = interactionData.formContainerGroup
     local newForm = stylegroundWindow.getStylegroundForm(interactionData)
-    local previousForm = formContainer.children[1]
+    local children = formContainer.children or {}
+
+    while #children > 0 do
+        children[1]:removeSelf()
+    end
 
     formContainer:addChild(newForm)
-
-    if previousForm then
-        previousForm:removeSelf()
-    end
 end
 
 -- Check if movement is allowed and return prepared offset and interactionData

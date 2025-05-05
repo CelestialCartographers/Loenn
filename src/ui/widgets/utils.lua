@@ -276,6 +276,28 @@ function widgetUtils.focusElement(element)
     end
 end
 
+-- Add support for different types when needed
+function widgetUtils.finishElementFade(element)
+    local elementType = utils.typeof(element)
+
+    if elementType == "listItem" or elementType == "field" or elementType == "button" then
+        local fadeDuration = element.style.fadeDuration
+
+        -- Reset fade state
+        element:revive()
+
+        if element._fadeTime then
+            element._fadeTime = 0
+        end
+
+        -- Update with the fade duration, use small steps for a "normal" update cycle
+        element:update(fadeDuration)
+
+    elseif elementType == "checkbox" then
+        widgetUtils.finishElementFade(element.checkbox)
+    end
+end
+
 function widgetUtils.updateHoveredTarget()
     ui.mousemoved(0, 0)
 end
