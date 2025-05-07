@@ -1453,7 +1453,7 @@ function tool.mouseclicked(x, y, button, istouch, presses)
 
         if cursorX and cursorY then
             local room = state.getSelectedRoom()
-            local contextSelections, bestTarget = selectionUtils.getContextSelections(room, tool.layer, room.subLayer, cursorX, cursorY, selectionTargets)
+            local contextSelections, bestTarget = selectionUtils.getContextSelections(room, tool.layer, tool.subLayer, cursorX, cursorY, selectionTargets)
 
             selectionUtils.sendContextMenuEvent(contextSelections, bestTarget, room)
         end

@@ -56,9 +56,14 @@ function entityStruct.encode(entity)
     if entity.nodes then
         res.__children = {}
 
-        for i, node in ipairs(entity.nodes) do
+        for _, node in ipairs(entity.nodes) do
             table.insert(res.__children, nodeStruct.encode(node))
         end
+    end
+
+    -- Do not save editor layer 0, it is the fallback
+    if entity._editorLayer == 0 then
+        entity._editorLayer = nil
     end
 
     return res
