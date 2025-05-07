@@ -83,7 +83,9 @@ local function layerItemToggleVisibilityHandler(listItem, button)
         return false
     end
 
-    local layerName = listItem.data
+    local layer = listItem.baseLayer
+    local subLayer = listItem.subLayer
+    local layerName = subLayers.formatLayerName(layer, subLayer)
     local newVisible = not loadedState.getLayerVisible(layerName)
 
     loadedState.setLayerVisible(layerName, newVisible)
@@ -378,17 +380,18 @@ local function getLayerItems(toolName)
         end
 
         -- Layer with -1 means all layers
-        local item = {
+        local baseLayerItem = {
             text = getLayerItemName(language, layer),
             data = subLayers.formatLayerName(layer, -1),
             layerVisible = layerVisible,
             tooltipText = tooltipText,
+            baseLayer = layer,
             subLayer = -1,
             icon = icon,
             iconClicked = layerItemToggleVisibilityHandler,
         }
 
-        table.insert(layerItems, item)
+        table.insert(layerItems, baseLayerItem)
 
         if layersWithSubLayers[layer] then
             -- Convert from lookup table into sorted list
@@ -396,8 +399,7 @@ local function getLayerItems(toolName)
 
             table.sort(subLayerNames)
 
-            -- No need to show sub layers if we only have one
-            if #subLayerNames > 1 then
+            if #subLayerNames > 0 then
                 for _, subLayer in ipairs(subLayerNames) do
                     local layerName = subLayers.formatLayerName(layer, subLayer)
                     local subLayerVisible = loadedState.getLayerVisible(layerName)
@@ -406,12 +408,22 @@ local function getLayerItems(toolName)
                         data = layerName,
                         layerVisible = subLayerVisible,
                         tooltipText = tooltipText,
+                        baseLayer = layer,
                         subLayer = subLayer,
                         icon = subLayerVisible and "visible" or "hidden",
                         iconClicked = layerItemToggleVisibilityHandler,
                     }
 
                     table.insert(layerItems, subItem)
+                end
+
+                -- Base group and one sub layer, remove the base layer but keep its base text
+                if #subLayerNames == 1 then
+                    local currentItem = layerItems[#layerItems]
+
+                    currentItem.text = getLayerItemName(language, layer)
+
+                    table.remove(layerItems, #layerItems - 1)
                 end
             end
         end
@@ -648,6 +660,7 @@ local function layerDataToElement(list, data, element)
         element.tooltipText = data.tooltip
         element.layerVisible = data.layerVisible
         element.itemData = data
+        element.baseLayer = data.baseLayer
         element.subLayer = data.subLayer
     end
 
