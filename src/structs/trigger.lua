@@ -60,8 +60,8 @@ function triggerStruct.encode(trigger)
     end
 
     -- Do not save editor layer 0, it is the fallback
-    if trigger._editorLayer == 0 then
-        trigger._editorLayer = nil
+    if res._editorLayer == 0 then
+        res._editorLayer = nil
     end
 
     return res
