@@ -54,9 +54,14 @@ function triggerStruct.encode(trigger)
     if trigger.nodes then
         res.__children = {}
 
-        for i, node in ipairs(trigger.nodes) do
+        for _, node in ipairs(trigger.nodes) do
             table.insert(res.__children, nodeStruct.encode(node))
         end
+    end
+
+    -- Do not save editor layer 0, it is the fallback
+    if trigger._editorLayer == 0 then
+        trigger._editorLayer = nil
     end
 
     return res
