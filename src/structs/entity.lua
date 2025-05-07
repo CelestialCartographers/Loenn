@@ -62,8 +62,8 @@ function entityStruct.encode(entity)
     end
 
     -- Do not save editor layer 0, it is the fallback
-    if entity._editorLayer == 0 then
-        entity._editorLayer = nil
+    if res._editorLayer == 0 then
+        res._editorLayer = nil
     end
 
     return res
