@@ -47,7 +47,7 @@ On systems that support AppImage, download the AppImage file in the [latest rele
 The tools in Lönn are shown on the right, just select one to use it.
 Hold right click to move around the map. Left click is your main way of placing objects or selecting things. Tools like rectangle placement require holding left click while moving across the screen. Scroll to zoom.
 
-In any menu, you can hover over the name of an option or field for a detailed tooltip explaining its meaning and usage.
+In any menu, you can hover over the name of an option or field for a detailed tooltip explaining its meaning and usage. Some objects you can right click to open menus for further options.
 
 Lönn supports a couple of keybinds and special mouse functionality, with more to come. The following list might not be comprehensive. Note that you can change all keybinds in the settings window or the configuration file.
 
@@ -72,6 +72,15 @@ Lönn supports a couple of keybinds and special mouse functionality, with more t
  - Double middle click: Zoom to map extents
  - F11: Toggle fullscreen
  - Arrow keys: Navigate lists
+
+ #### Tools
+
+ - Left click: Select tool, material, or object
+ - Double Left click material or object: Add material or object to favourites
+ - Left click layer or group: Select active layer or group
+ - Double Left click layer or group: Toggle visibility
+ - Right click layer or group: Add, rename, or delete groups
+ - Left click visibility icon on layer or group: Toggle visibility
 
  #### Placements
 
