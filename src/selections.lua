@@ -279,12 +279,16 @@ local function subLayerInfoSnapshot(layer, subLayer)
         toolHandler.setLayer(layer, subLayer)
     end
 
+    forward()
+
     return snapshot.create("Delete sub layer", {}, backward, forward)
 end
 
 function selectionUtils.deleteSubLayer(map, layer, subLayer)
     local snapshots = {}
     local relevantRooms = {}
+
+    local customLayerName = subLayers.getLayerName(layer, subLayer)
 
     for _, room in ipairs(map.rooms) do
         local relevantItems = selectionUtils.getLayerSelectionsForRoom(room, layer, subLayer)
@@ -296,7 +300,7 @@ function selectionUtils.deleteSubLayer(map, layer, subLayer)
         end
     end
 
-    if #snapshots > 0 then
+    if #snapshots > 0 or customLayerName then
         -- We also need a snapshot to remove/restore the layer information
         local layerInfoSnapshot = subLayerInfoSnapshot(layer, subLayer)
 
