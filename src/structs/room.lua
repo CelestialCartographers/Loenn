@@ -169,13 +169,12 @@ function roomStruct.getSubLayers(room, seen)
     seen = seen or {}
 
     for _, layer in ipairs({"entities", "triggers", "decalsFg", "decalsBg"}) do
-        -- Make sure we always have the base sub layer
-        seen[layer] = seen[layer] or {[0] = 0}
+        seen[layer] = {}
 
         for _, target in ipairs(room[layer]) do
-            if target._editorLayer then
-                seen[layer][target._editorLayer] = target._editorLayer
-            end
+            local editorLayer = target._editorLayer or 0
+
+            seen[layer][editorLayer] = editorLayer
         end
     end
 
