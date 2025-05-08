@@ -120,6 +120,7 @@ local function dropdownChanged(formField, optionsFlattened)
                 formField.field.index = utf8.len(newText)
             end
 
+            formField.currentText = newText
             formField.currentValue = value
 
             local valid = formField:fieldValid()
