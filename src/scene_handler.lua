@@ -66,8 +66,8 @@ function sceneHandler.update(dt)
     return sceneHandler.sendEvent("update", dt)
 end
 
-function sceneHandler.quit()
-    local handled, preventQuit = sceneHandler.sendEvent("quit")
+function sceneHandler.quit(arg)
+    local handled, preventQuit = sceneHandler.sendEvent("quit", arg)
 
     if not preventQuit then
         local scene = sceneHandler.getCurrentScene()
