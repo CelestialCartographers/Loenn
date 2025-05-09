@@ -199,11 +199,19 @@ local function getModSection(modName, localizedModName, reasons, groupName, inte
         modContent = uiElements.label(localizedModName)
     end
 
+    local localizedEverestName = localizeModName(everestModName)
+    local isEverest = modName == everestModName or modName == localizedEverestName
+
     local actionButton = uiElements.button(buttonText, buttonCallback)
     local column = uiElements.column({
         modContent,
-        actionButton
     })
+
+    -- Everest should not be removable as a dependency
+    -- All other mods should have the action button
+    if not isEverest then
+        column:addChild(actionButton)
+    end
 
     return column
 end
