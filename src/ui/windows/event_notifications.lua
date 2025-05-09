@@ -124,7 +124,7 @@ function notificationHandlers:editorHistoryRedoEmpty()
 end
 
 -- TODO - Move over to modal when those are implemented
-function notificationHandlers:editorQuitWithChanges()
+function notificationHandlers:editorQuitWithChanges(quitArg)
     local language = languageRegistry.getLanguage()
 
     notifications.notify(function(popup)
@@ -133,16 +133,16 @@ function notificationHandlers:editorQuitWithChanges()
             uiElements.row({
                 uiElements.button(tostring(language.ui.notifications.editorSaveAndQuit), function()
                     loadedState.saveCurrentMap(function(filename)
-                        loadedState.defaultAfterSaveCallback(previousFilename, loadedState)
+                        loadedState.defaultAfterSaveCallback(filename, loadedState)
 
-                        love.event.quit()
+                        love.event.quit(quitArg)
                     end)
                 end),
                 uiElements.button(tostring(language.ui.button.quit), function()
                     -- Update history to think we have no changes
                     history.madeChanges = false
 
-                    love.event.quit()
+                    love.event.quit(quitArg)
                 end),
                 uiElements.button(tostring(language.ui.button.cancel), function()
                     popup:close()
