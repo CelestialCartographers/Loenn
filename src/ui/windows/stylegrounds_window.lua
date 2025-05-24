@@ -676,16 +676,16 @@ local function getNewDropdownOptions(style, foreground, usingDefault, showIncorr
     end
 
     table.insert(options, {
-        text = tostring(language.ui.styleground_window.new_options.apply),
+        text = tostring(language.ui.styleground_window.new_options.parallax),
         data = {
-            method = "group"
+            method = "parallax"
         }
     })
 
     table.insert(options, {
-        text = tostring(language.ui.styleground_window.new_options.parallax),
+        text = tostring(language.ui.styleground_window.new_options.apply),
         data = {
-            method = "parallax"
+            method = "group"
         }
     })
 
