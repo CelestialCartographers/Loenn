@@ -1047,8 +1047,6 @@ function stylegroundWindow.getWindowContent(map)
         return newItems
     end
 
-    local initialTabSelect = true
-
     local function tabCallbackHandler(fg)
         return function()
             local currentList = fg and listForeground or listBackground
@@ -1058,14 +1056,10 @@ function stylegroundWindow.getWindowContent(map)
             interactionData.stylegroundListElement = currentList
             interactionData.stylegroundListElementOther = otherList
 
-            if not initialTabSelect then
-                ui.runLate(function()
-                    widgetUtils.focusElement(currentList.children[1])
-                    currentList:setSelection(currentList:getSelectedData(), false, false)
-                end)
-            end
-
-            initialTabSelect = false
+            ui.runLate(function()
+                widgetUtils.focusElement(currentList.children[1])
+                currentList:setSelection(currentList:getSelectedData(), false, false)
+            end)
         end
     end
 
