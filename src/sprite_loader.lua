@@ -85,7 +85,7 @@ function spriteLoader.saveCachedDataImage(dataFile, image, imageData)
     local storageDir = fileLocations.getStorageDir()
     local path = utils.joinpath(storageDir, "Cache", "Data", dataFile .. ".png")
 
-    local fh = io.open(path, "wb")
+    local fh = utils.getFileHandle(path, "wb")
 
     if fh then
         fh:write(imageData:encode("png"):getString())
@@ -296,12 +296,18 @@ function spriteLoader.loadSpriteAtlas(metaFn, atlasDir, useCache)
 end
 
 local imageCachingCode = [[
+-- We need selene to load utils
+require("selene").load()
+require("selene/selene/wrappers/searcher/love2d/searcher").load()
+
+require("utils")
+
 require("love.image")
 
 local args = {...}
 local channelName, filename, imageData = unpack(args)
 
-local fh = io.open(filename, "wb")
+local fh = utils.getFileHandle(filename, "wb")
 
 if fh then
     fh:write(imageData:encode("png"):getString())
@@ -329,7 +335,7 @@ function spriteLoader.getCacheOrLoadSpriteAtlas(metaFn, atlasDir)
             for _, dataName in ipairs(metaData.filenames) do
                 local filename = utils.joinpath(storageCacheDataDir, dataName .. ".png")
 
-                os.remove(filename)
+                filesystem.remove(filename)
             end
         end
 

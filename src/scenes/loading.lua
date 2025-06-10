@@ -35,6 +35,7 @@ function loadingScene:firstEnter()
     local tasks = require("utils.tasks")
 
     local sandboxUtils = require("utils.sandbox")
+    local language = languageRegistry.getLanguage()
 
     local sceneHandler = require("scene_handler")
     local toolHandler = require("tools")
@@ -56,8 +57,6 @@ function loadingScene:firstEnter()
 
     local userInterfaceDevice = require("ui.ui_device")
 
-    local language = languageRegistry.getLanguage()
-
     self:setText(language.scenes.loading.loading)
 
     -- Microbenchmark to estimate instructions per second
@@ -66,6 +65,8 @@ function loadingScene:firstEnter()
     -- Load assets and entity, trigger, effect etc modules
     tasks.newTask(
         function()
+            atlases.loadCelesteAtlases()
+
             mods.mountMods()
 
             -- Internal scenes are already loaded, how else would we be here
@@ -84,8 +85,6 @@ function loadingScene:firstEnter()
 
             effects.loadInternalEffects()
             effects.loadExternalEffects()
-
-            atlases.loadCelesteAtlases()
 
             toolHandler.loadInternalTools()
             toolHandler.loadExternalTools()

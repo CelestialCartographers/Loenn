@@ -1,4 +1,5 @@
 local utils = require("utils")
+local filesystem = require("utils.filesystem")
 
 local config = {}
 local configMt = {}
@@ -22,7 +23,7 @@ function config.readConfigData(filename)
         os.remove(tempFilename)
     end
 
-    local fh = io.open(filename, "rb")
+    local fh = utils.getFileHandle(filename, "rb")
 
     if fh then
         local content = fh:read("*a")
@@ -55,15 +56,15 @@ function config.writeConfigData(filename, data, pretty)
 
         if success then
             utils.mkpath(utils.dirname(filename))
-            local fh = io.open(tempFilename, "wb")
+            local fh = utils.getFileHandle(tempFilename, "wb")
 
             if fh then
                 fh:write(content)
                 fh:close()
 
-                os.remove(filename)
-                os.rename(tempFilename, filename)
-                os.remove(tempFilename)
+                filesystem.remove(filename)
+                filesystem.rename(tempFilename, filename)
+                filesystem.remove(tempFilename)
 
             else
                 success = false
@@ -141,7 +142,7 @@ function configMt:__index(key)
 end
 
 function configMt:__newindex(key, value)
-    local valueChanged = value ~= self[key]
+    local valueChanged = not utils.equals(value, self[key])
 
     self.data[key] = value
 

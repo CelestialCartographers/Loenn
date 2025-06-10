@@ -191,7 +191,9 @@ function utils.getFileHandle(path, mode, internal)
         return love.filesystem.newFile(path, mode:gsub("b", ""))
 
     else
-        return io.open(path, mode)
+        return filesystem.changeDirectoryThenCallback(function(filename)
+            return io.open(filename, mode)
+        end, path)
     end
 end
 

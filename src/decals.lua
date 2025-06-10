@@ -67,7 +67,7 @@ function decals.getDecalNamesFromMod(modFolder, removeAnimationFrames, yield, na
         local cachedNames = cacheTarget[modFolder]
 
         for _, name in ipairs(cachedNames) do
-            if not added[resourceName] then
+            if not added[name] then
                 added[name] = true
 
                 table.insert(names, name)
@@ -84,25 +84,22 @@ function decals.getDecalNamesFromMod(modFolder, removeAnimationFrames, yield, na
 
     for i, name in ipairs(filenames) do
         if not added[name] then
-            local nameNoExt, ext = utils.splitExtension(name)
+            local nameNoExt = utils.splitExtension(name)
+            local shouldKeepFrame = keepFrame(nameNoExt, removeAnimationFrames)
 
-            if ext == "png" then
-                local shouldKeepFrame = keepFrame(nameNoExt, removeAnimationFrames)
+            if shouldKeepFrame then
+                -- Remove mod specific path, keep decals/ prefix
+                local firstSlashIndex = utils.findCharacter(nameNoExt, "/")
+                local resourceName = nameNoExt:sub(firstSlashIndex + decalPathLength - 5)
 
-                if shouldKeepFrame then
-                    -- Remove mod specific path, keep decals/ prefix
-                    local firstSlashIndex = utils.findCharacter(nameNoExt, "/")
-                    local resourceName = nameNoExt:sub(firstSlashIndex + decalPathLength - 5)
+                if not added[resourceName] then
+                    added[resourceName] = true
 
-                    if not added[resourceName] then
-                        added[resourceName] = true
+                    table.insert(names, resourceName)
+                    table.insert(associatedMods, modAssociatedMods)
 
-                        table.insert(names, resourceName)
-                        table.insert(associatedMods, modAssociatedMods)
-
-                        if canCache then
-                            table.insert(cachableNames, resourceName)
-                        end
+                    if canCache then
+                        table.insert(cachableNames, resourceName)
                     end
                 end
             end

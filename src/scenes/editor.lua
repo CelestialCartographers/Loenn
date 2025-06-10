@@ -80,9 +80,9 @@ function editorScene:firstEnter()
     updateRunningStatus(true)
 end
 
-function editorScene:quit()
+function editorScene:quit(arg)
     if history.madeChanges then
-        sceneHandler.sendEvent("editorQuitWithChanges")
+        sceneHandler.sendEvent("editorQuitWithChanges", arg)
 
         return true
     end

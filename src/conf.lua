@@ -57,7 +57,7 @@ function love.conf(t)
     local windowX, windowY = getWindowPosition()
     local windowDisplay = getWindowDisplay()
 
-    t.console = configs.debug.displayConsole
+    t.console = true
     t.version = "11.0"
 
     t.window.resizable = true

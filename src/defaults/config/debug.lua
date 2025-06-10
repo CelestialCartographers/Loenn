@@ -1,4 +1,7 @@
 return {
+    -- Caching
+    logModFilenamesCache = false,
+
     -- Plugins / Scenes
     logPluginLoading = false,
 

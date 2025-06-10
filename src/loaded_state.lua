@@ -10,6 +10,7 @@ local persistence = require("persistence")
 local configs = require("configs")
 local saveSanitizers = require("save_sanitizers")
 local windowTitleUtils = require("window_title")
+local modHandler = require("mods")
 
 local sideStruct = require("structs.side")
 local mapStruct = require("structs.map")
@@ -49,6 +50,8 @@ local function updateSideState(side, roomName, filename, eventName)
     local celesteRender = require("celeste_render")
 
     eventName = eventName or "editorMapLoaded"
+
+    modHandler.invalidateFilenamesCacheFromPath(filename)
 
     celesteRender.invalidateRoomCache()
     celesteRender.clearBatchingTasks()

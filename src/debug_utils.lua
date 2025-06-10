@@ -25,6 +25,12 @@ function debugUtils.restartProcess()
     love.event.quit("restart")
 end
 
+function debugUtils.reloadKnownModFilenames()
+    logging.info("Reloading filenames for current mod")
+
+    modHandler.invalidateFilenamesCacheFromPath(loadedState.filename)
+end
+
 function debugUtils.reloadMods()
     logging.info("Reloading mods")
 
@@ -135,6 +141,9 @@ end
 function debugUtils.redrawMap()
     logging.info("Redrawing map")
 
+    -- TODO - Do not clear Celeste atlases
+    runtimeAtlas.clear()
+    atlases.loadCelesteAtlases()
     celesteRender.loadCustomTilesetAutotiler(loadedState)
     celesteRender.invalidateRoomCache()
     celesteRender.clearBatchingTasks()
@@ -152,6 +161,7 @@ function debugUtils.reloadEverything()
     debugUtils.reloadLibraries()
     debugUtils.reloadSaveSanitizers()
     debugUtils.reloadMods()
+    debugUtils.reloadKnownModFilenames()
     debugUtils.reloadEntities()
     debugUtils.reloadTriggers()
     debugUtils.reloadEffects()

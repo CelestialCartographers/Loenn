@@ -37,7 +37,16 @@ function filesystem.joinpath(...)
         paths = paths[1]
     end
 
-    local result = table.concat(paths, sep)
+    local result = ""
+
+    -- table.concat fails for unknown reasons, manually build
+    for i, part in pairs(paths) do
+        result ..= part
+
+        if i ~= #paths then
+            result ..= sep
+        end
+    end
 
     -- Replace unix separator with Windows ones
     -- This is just to aid double separator removal, and because Windows accepts both
@@ -183,8 +192,33 @@ filesystem.chdir = lfs.chdir
 filesystem.dir = lfs.dir
 filesystem.rmdir = lfs.rmdir
 
-filesystem.remove = os.remove
-filesystem.rename = os.rename
+-- Remove and rename must cd to correct path to prevent issues with non ascii characters in path
+function filesystem.changeDirectoryThenCallback(func, path, ...)
+    local previousCwd = filesystem.currentDirectory()
+    local dirname = filesystem.dirname(path)
+    local filename = filesystem.filename(path)
+
+    filesystem.chdir(dirname)
+
+    local result = func(filename, ...)
+
+    filesystem.chdir(previousCwd)
+
+    return result
+end
+
+function filesystem.remove(path)
+    filesystem.changeDirectoryThenCallback(function(filename)
+        os.remove(filename)
+    end, path)
+end
+
+-- Only works if both files are in same directory
+function filesystem.rename(from, to)
+    filesystem.changeDirectoryThenCallback(function(filename)
+        os.rename(filename, filesystem.filename(to))
+    end, from)
+end
 
 -- Use Unix paths
 local function findRecursive(filenames, path, recursive, predicate, useYields, counter)

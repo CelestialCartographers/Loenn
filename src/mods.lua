@@ -2,6 +2,7 @@ local utils = require("utils")
 local fileLocations = require("file_locations")
 local yaml = require("lib.yaml")
 local config = require("utils.config")
+local configs = require("configs")
 local filesystem = require("utils.filesystem")
 local logging = require("logging")
 
@@ -33,25 +34,20 @@ modHandler.modNamesSeparator = " + "
 
 modHandler.persistenceBufferTime = 300
 
--- Finds files in all folders that are recognized as plugin folders
-function modHandler.findPluginFiletype(startFolder, filetype)
-    local filenames = {}
+function modHandler.getModFilenames(modFolderName, path, filenames, predicate)
+    filenames = filenames or {}
 
-    for _, folderName in ipairs(modHandler.pluginFolderNames) do
-        for modFolderName, _ in pairs(modHandler.loadedMods) do
-            local path = utils.convertToUnixPath(utils.joinpath(
-                string.format(modHandler.specificModContent, modFolderName),
-                folderName,
-                startFolder
-            ))
+    local modFilenames = modHandler.getOrCacheFilenames(modFolderName)
 
-            if filetype then
-                utils.getFilenames(path, true, filenames, function(filename)
-                    return utils.fileExtension(filename) == filetype
-                end)
+    for _, filename in ipairs(modFilenames) do
+        if utils.startsWith(filename, path) then
+            if predicate then
+                if predicate(filename) then
+                    table.insert(filenames, filename)
+                end
 
             else
-                utils.getFilenames(path, true, filenames)
+                table.insert(filenames, filename)
             end
         end
     end
@@ -59,20 +55,38 @@ function modHandler.findPluginFiletype(startFolder, filetype)
     return filenames
 end
 
+-- Finds files in all folders that are recognized as plugin folders
+function modHandler.findPluginFiletype(startFolder, filetype)
+    local filenames = {}
+
+    for _, folderName in ipairs(modHandler.pluginFolderNames) do
+        for modFolderName, _ in pairs(modHandler.loadedMods) do
+            local pluginStartFolder = utils.convertToUnixPath(utils.joinpath(
+                folderName,
+                startFolder
+            ))
+
+            modHandler.findModFolderFiletype(modFolderName, filenames, pluginStartFolder, filetype)
+        end
+    end
+
+    return filenames
+end
+
 -- Fine tuned search for exactly one mod folder
-function modHandler.findModFolderFiletype(modFolderName, filenames, startFolder, fileType)
+function modHandler.findModFolderFiletype(modFolderName, filenames, startFolder, filetype)
     local path = utils.convertToUnixPath(utils.joinpath(
         string.format(modHandler.specificModContent, modFolderName),
         startFolder
     ))
 
     if filetype then
-        return utils.getFilenames(path, true, filenames, function(filename)
+        return modHandler.getModFilenames(modFolderName, path, filenames, function(filename)
             return utils.fileExtension(filename) == filetype
         end)
 
     else
-        return utils.getFilenames(path, true, filenames)
+        return modHandler.getModFilenames(modFolderName, path, filenames)
     end
 end
 
@@ -176,7 +190,7 @@ end
 
 local function getbuildNumber(filename)
     local fullFilename = utils.joinpath(fileLocations.getCelesteDir(), filename)
-    local fh = io.open(fullFilename, "rb")
+    local fh = utils.getFileHandle(fullFilename, "rb")
 
     if fh then
         local data = fh:read("*a")
@@ -425,6 +439,67 @@ function modHandler.writeModPersistences()
     end
 end
 
+function modHandler.invalidateFilenamesCacheFromPath(path)
+    local modPath = modHandler.getFilenameModPath(path)
+
+    if modPath then
+        local metadata = modHandler.getModMetadataFromPath(modPath)
+
+        if metadata then
+            modHandler.invalidateFilenamesCache(metadata._folderName)
+        end
+    end
+end
+
+function modHandler.invalidateFilenamesCache(modFolderName)
+    modHandler.getOrCacheFilenames(modFolderName, true, true)
+end
+
+function modHandler.getOrCacheFilenames(modFolderName, useYield, force)
+    local storageDir = fileLocations.getStorageDir()
+    local storageCacheDir = utils.joinpath(storageDir, "Cache", "ModFilenames")
+    local modCacheConfig = utils.joinpath(storageCacheDir, modFolderName .. ".conf")
+    local cacheConfig = config.readConfig(modCacheConfig)
+
+    if not filesystem.isDirectory(storageCacheDir) then
+        filesystem.mkpath(modCacheConfig)
+    end
+
+    local modInfo = modHandler.loadedMods[modFolderName]
+
+    if not modInfo then
+        return
+    end
+
+    local isZip = modInfo.zipFile
+    local mtime = modInfo.mtime
+
+    local updateCache = force or not cacheConfig.filenames
+
+    -- Invalidate cache if zip file is newer than our cache
+    if cacheConfig.createdAt and isZip then
+        updateCache = updateCache or mtime > cacheConfig.createdAt
+    end
+
+    if updateCache then
+        if configs.debug.logModFilenamesCache then
+            local message = string.format("Updated filename cache for '%s'", modFolderName)
+
+            logging.info(message)
+        end
+
+        local specificMountPoint = string.format(modHandler.specificModContent, modFolderName)
+        local modFilenames = utils.getFilenames(specificMountPoint, true, {}, nil, useYield)
+
+        local madeChanges = false
+
+        cacheConfig.createdAt = mtime
+        cacheConfig.filenames = modFilenames
+    end
+
+    return cacheConfig.filenames
+end
+
 function modHandler.mountMod(path, force)
     if not path then
         return false
@@ -447,10 +522,12 @@ function modHandler.mountMod(path, force)
 
             local modMetadata = modHandler.readModMetadata(path, specificMountPoint, modFolderName)
 
+            modHandler.getOrCacheFilenames(modFolderName, true)
             modHandler.modMetadata[modFolderName] = modMetadata
             modHandler.loadedMods[modFolderName] = {
                 zipFile = filesystem.isFile(path),
-                metadata = modMetadata
+                mtime = filesystem.mtime(path),
+                metadata = modMetadata,
             }
         end
     end
