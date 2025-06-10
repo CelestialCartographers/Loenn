@@ -190,7 +190,7 @@ end
 
 local function getbuildNumber(filename)
     local fullFilename = utils.joinpath(fileLocations.getCelesteDir(), filename)
-    local fh = io.open(fullFilename, "rb")
+    local fh = utils.getFileHandle(fullFilename, "rb")
 
     if fh then
         local data = fh:read("*a")
