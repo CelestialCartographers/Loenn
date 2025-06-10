@@ -25,6 +25,12 @@ function debugUtils.restartProcess()
     love.event.quit("restart")
 end
 
+function debugUtils.reloadKnownModFilenames()
+    logging.info("Reloading filenames for current mod")
+
+    modHandler.invalidateFilenamesCacheFromPath(loadedState.filename)
+end
+
 function debugUtils.reloadMods()
     logging.info("Reloading mods")
 
@@ -152,6 +158,7 @@ function debugUtils.reloadEverything()
     debugUtils.reloadLibraries()
     debugUtils.reloadSaveSanitizers()
     debugUtils.reloadMods()
+    debugUtils.reloadKnownModFilenames()
     debugUtils.reloadEntities()
     debugUtils.reloadTriggers()
     debugUtils.reloadEffects()
