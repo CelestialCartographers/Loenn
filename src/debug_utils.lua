@@ -141,6 +141,9 @@ end
 function debugUtils.redrawMap()
     logging.info("Redrawing map")
 
+    -- TODO - Do not clear Celeste atlases
+    runtimeAtlas.clear()
+    atlases.loadCelesteAtlases()
     celesteRender.loadCustomTilesetAutotiler(loadedState)
     celesteRender.invalidateRoomCache()
     celesteRender.clearBatchingTasks()
