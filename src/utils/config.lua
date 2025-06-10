@@ -141,7 +141,7 @@ function configMt:__index(key)
 end
 
 function configMt:__newindex(key, value)
-    local valueChanged = value ~= self[key]
+    local valueChanged = not utils.equals(value, self[key])
 
     self.data[key] = value
 
