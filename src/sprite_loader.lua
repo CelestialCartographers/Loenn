@@ -300,7 +300,7 @@ local imageCachingCode = [[
 require("selene").load()
 require("selene/selene/wrappers/searcher/love2d/searcher").load()
 
-require("utils")
+local utils = require("utils")
 
 require("love.image")
 
