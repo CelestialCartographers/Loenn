@@ -462,7 +462,7 @@ function modHandler.getOrCacheFilenames(modFolderName, useYield, force)
     local cacheConfig = config.readConfig(modCacheConfig)
 
     if not filesystem.isDirectory(storageCacheDir) then
-        filesystem.mkpath(modCacheConfig)
+        filesystem.mkpath(storageCacheDir)
     end
 
     local modInfo = modHandler.loadedMods[modFolderName]
@@ -490,8 +490,6 @@ function modHandler.getOrCacheFilenames(modFolderName, useYield, force)
 
         local specificMountPoint = string.format(modHandler.specificModContent, modFolderName)
         local modFilenames = utils.getFilenames(specificMountPoint, true, {}, nil, useYield)
-
-        local madeChanges = false
 
         cacheConfig.createdAt = mtime
         cacheConfig.filenames = modFilenames
