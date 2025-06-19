@@ -272,7 +272,7 @@ function drawableSpriteStruct.fromMeta(meta, data)
     drawableSprite.scaleY = data.sy or data.scaleY or 1
 
     drawableSprite.renderOffsetX = data.renderOffsetX or 0
-    drawableSprite.renderOffsetY = data.renderOffsetX or 0
+    drawableSprite.renderOffsetY = data.renderOffsetY or 0
 
     drawableSprite.rotation = data.r or data.rotation or 0
 
