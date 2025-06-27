@@ -433,7 +433,7 @@ celesteEnums.alt_music = {
     music_levelselect = "event:/music/menu/level_select",
     music_complete_area = "event:/music/menu/complete_area",
     music_complete_summit = "event:/music/menu/complete_summit",
-    music_complete_bside = "event:/music/menu/complete_bside",
+    music_complete_bside = "event:/music/menu/complete_bside"
 }
 
 -- "Display Name" => "Expected Value"
