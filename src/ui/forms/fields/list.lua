@@ -19,7 +19,7 @@ local function getValueParts(value, options)
     end
 
     local separator = options.elementSeparator
-    local parts = string.split(value, separator)()
+    local parts = utils.splitUTF8(value, separator)
 
     -- Special case for empty string and empty default
     -- Otherwise we will never be able to add when the field is empty
@@ -280,7 +280,7 @@ function listField.getElement(name, value, options)
         local parts = {}
 
         if type(value) == "string" then
-            parts = string.split(value, options.elementSeparator)()
+            parts = utils.splitUTF8(value, options.elementSeparator)
         end
 
         if #parts < options.minimumElements or #parts > options.maximumElements then
