@@ -961,7 +961,7 @@ function toolWindow.getWindow()
     }
 
     local materialListOptions = {
-        searchBarLocation = "below",
+        searchBarLocation = configs.ui.lists.searchBarLocation,
         searchBarCallback = materialSearchFieldChanged,
         initialSearch = toolUtils.getPersistenceSearch(currentTool, currentLayer),
         initialItem = toolHandler.getMaterial(),

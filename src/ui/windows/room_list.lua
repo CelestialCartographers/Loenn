@@ -221,7 +221,7 @@ function roomList.getWindow()
     local roomItems = getRoomItems()
     local listOptions = {
         initialSearch = search,
-        searchBarLocation = "below",
+        searchBarLocation = configs.ui.lists.searchBarLocation,
         dataToElement = roomDataToElement,
         listItemContextMenu = roomListItemContext,
         listItemContextMenuOptions = {
