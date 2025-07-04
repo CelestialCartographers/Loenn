@@ -280,7 +280,11 @@ function serialize.unserialize(s, safe, timeout)
     end
 
     if safe ~= false then
-        setfenv(func, {})
+        setfenv(func, {
+            math = {
+                huge = math.huge
+            }
+        })
     end
 
     return sandboxUtils.pcallWithTimeout(func, timeout)
