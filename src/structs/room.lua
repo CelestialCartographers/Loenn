@@ -117,16 +117,20 @@ end
 -- Also cuts off background tiles
 -- Amount in tiles
 function roomStruct.directionalResize(room, side, amount)
+    local offsetX = side == "left" and amount * 8 or 0
+    local offsetY = side == "up" and amount * 8 or 0
+    local offsetWidth = (side == "left" or side == "right") and amount * 8 or 0
+    local offsetHeight = (side == "up" or side == "down") and amount * 8 or 0
+
+    if room.width + offsetWidth < 8 or room.height + offsetHeight < 8 then
+        return false
+    end
+
     room.tilesFg = tilesStruct.directionalResize(room.tilesFg, side, amount)
     room.tilesBg = tilesStruct.directionalResize(room.tilesBg, side, amount)
     room.sceneryObj = objectTilesStruct.directionalResize(room.sceneryObj, side, amount)
     room.sceneryFg = objectTilesStruct.directionalResize(room.sceneryFg, side, amount)
     room.sceneryBg = objectTilesStruct.directionalResize(room.sceneryBg, side, amount)
-
-    local offsetX = side == "left" and amount * 8 or 0
-    local offsetY = side == "up" and amount * 8 or 0
-    local offsetWidth = (side == "left" or side == "right") and amount * 8 or 0
-    local offsetHeight = (side == "up" or side == "down") and amount * 8 or 0
 
     room.x -= offsetX
     room.y -= offsetY
@@ -146,6 +150,8 @@ function roomStruct.directionalResize(room, side, amount)
             end
         end
     end
+
+    return true
 end
 
 -- Moves amount * step in the direction
