@@ -28,7 +28,7 @@ local historyRelevantFields = {
             "x",
             "y"
         },
-        directionResize = {
+        directionalResize = {
             "x",
             "y",
             "width",
@@ -40,7 +40,7 @@ local historyRelevantFields = {
             "x",
             "y"
         },
-        directionResize = {
+        directionalResize = {
             "x",
             "y",
             "width",
