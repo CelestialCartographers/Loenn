@@ -39,10 +39,16 @@ function fillerStruct.directionalResize(filler, side, amount)
     local offsetWidth = (side == "left" or side == "right") and amount or 0
     local offsetHeight = (side == "up" or side == "down") and amount or 0
 
+    if filler.width + offsetWidth <= 0 or filler.height + offsetHeight <= 0 then
+        return false
+    end
+
     filler.x -= offsetX
     filler.y -= offsetY
     filler.width += offsetWidth
     filler.height += offsetHeight
+
+    return true
 end
 
 -- Moves amount * step in the direction

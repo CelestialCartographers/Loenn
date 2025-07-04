@@ -256,6 +256,10 @@ end
 function utils.splitUTF8(s, separator)
     separator = separator or 1
 
+    if separator == "" then
+        separator = 1
+    end
+
     local res = {}
     local separatorType = type(separator)
 

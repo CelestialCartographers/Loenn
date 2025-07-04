@@ -9,6 +9,7 @@ local history = require("history")
 local sceneHandler = require("scene_handler")
 local celesteRender = require("celeste_render")
 local configs = require("configs")
+local loadedState = require("loaded_state")
 
 local mapItemUtils = {}
 
@@ -28,7 +29,7 @@ local historyRelevantFields = {
             "x",
             "y"
         },
-        directionResize = {
+        directionalResize = {
             "x",
             "y",
             "width",
@@ -40,7 +41,7 @@ local historyRelevantFields = {
             "x",
             "y"
         },
-        directionResize = {
+        directionalResize = {
             "x",
             "y",
             "width",
@@ -207,6 +208,14 @@ local function prepareItemHistoryData(functionName, itemType, item)
     return result
 end
 
+-- TODO - See if there is a cheaper way to do this?
+local function redrawItemIfNeeded(functionName, itemType, item)
+    if functionName == "directionalResize" and itemType == "room" then
+        celesteRender.invalidateRoomCache(item)
+        celesteRender.forceRoomBatchRender(item, loadedState)
+    end
+end
+
 local function callStructFunction(functionName, itemType, item, ...)
     local itemStruct = itemStructs[itemType]
 
@@ -215,8 +224,13 @@ local function callStructFunction(functionName, itemType, item, ...)
     end
 
     local func = itemStruct[functionName]
+    local result = func(item, ...)
 
-    return func(item, ...)
+    if result then
+        redrawItemIfNeeded(functionName, itemType, item)
+    end
+
+    return result
 end
 
 local function callWithoutHistory(functionName, item, ...)
@@ -239,12 +253,11 @@ local function callWithSnapshot(functionName, itemType, item, ...)
         return
     end
 
-    local func = itemStruct[functionName]
     local snapshotFunction = snapshotFunctions[itemType]
 
     if item then
         local itemBefore = prepareItemHistoryData(functionName, itemType, item)
-        local res = func(item, ...)
+        local res = callStructFunction(functionName, itemType, item, ...)
         local itemAfter = prepareItemHistoryData(functionName, itemType, item)
 
         local snapshot = snapshotFunction(item, "Room movement", itemBefore, itemAfter)
