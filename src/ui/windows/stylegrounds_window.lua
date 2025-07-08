@@ -756,7 +756,7 @@ local function getStylegroundFormButtons(interactionData, formFields, formOption
 
     local language = languageRegistry.getLanguage()
     local style = listTarget.style
-    local foreground = listTarget.foreground
+    local foreground = interactionData.stylegroundListElement == interactionData.stylegroundListElementFg
     local isDefaultTarget = listTarget.defaultTarget
     local inGroup = not not listTarget.parentStyle
     local isGroup = utils.typeof(style) == "apply"
@@ -1057,8 +1057,16 @@ function stylegroundWindow.getWindowContent(map)
             interactionData.stylegroundListElementOther = otherList
 
             ui.runLate(function()
-                widgetUtils.focusElement(currentList.children[1])
-                currentList:setSelection(currentList:getSelectedData(), false, false)
+                if #currentList.children > 0 then
+                    widgetUtils.focusElement(currentList.children[1])
+                    currentList:setSelection(currentList:getSelectedData(), false, false)
+
+                else
+                    interactionData.listTarget = getDefaultListTarget()
+
+                    stylegroundWindow.updateStylegroundForm(interactionData)
+                    stylegroundWindow.updateStylegroundPreview(interactionData)
+                end
             end)
         end
     end
