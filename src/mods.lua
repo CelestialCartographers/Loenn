@@ -34,10 +34,28 @@ modHandler.modNamesSeparator = " + "
 
 modHandler.persistenceBufferTime = 300
 
-function modHandler.getModFilenames(modFolderName, path, filenames, predicate)
+modHandler.cacheableFiletypes = {
+    zip = {
+        png = true,
+        lang = true,
+        lua = true
+    },
+    folder = {
+        png = true
+    }
+}
+
+function modHandler.getModFilenames(modFolderName, path, filenames, predicate, useCache)
     filenames = filenames or {}
 
-    local modFilenames = modHandler.getOrCacheFilenames(modFolderName)
+    local modFilenames = {}
+
+    if useCache then
+        modFilenames = modHandler.getOrCacheFilenames(modFolderName)
+
+    else
+        modFilenames = utils.getFilenames(path, true, {}, nil, true)
+    end
 
     for _, filename in ipairs(modFilenames) do
         if utils.startsWith(filename, path) then
@@ -73,6 +91,23 @@ function modHandler.findPluginFiletype(startFolder, filetype)
     return filenames
 end
 
+function modHandler.canCacheFiletype(modFolderName, filetype)
+    if not filetype then
+        return false
+    end
+
+    local modInfo = modHandler.loadedMods[modFolderName]
+
+    if not modInfo then
+        return false
+    end
+
+    local isZip = modInfo.zipFile
+    local cacheKey = isZip and "zip" or "folder"
+
+    return modHandler.cacheableFiletypes[cacheKey][filetype] or false
+end
+
 -- Fine tuned search for exactly one mod folder
 function modHandler.findModFolderFiletype(modFolderName, filenames, startFolder, filetype)
     local path = utils.convertToUnixPath(utils.joinpath(
@@ -81,9 +116,13 @@ function modHandler.findModFolderFiletype(modFolderName, filenames, startFolder,
     ))
 
     if filetype then
-        return modHandler.getModFilenames(modFolderName, path, filenames, function(filename)
+        local filetypePredicate = function(filename)
             return utils.fileExtension(filename) == filetype
-        end)
+        end
+
+        local canCache = modHandler.canCacheFiletype(modFolderName, filetype)
+
+        return modHandler.getModFilenames(modFolderName, path, filenames, filetypePredicate, canCache)
 
     else
         return modHandler.getModFilenames(modFolderName, path, filenames)
