@@ -9,8 +9,8 @@ local languageRegistry = require("language_registry")
 
 local decals = {}
 
-local zipFileNamesCache = {}
-local zipFileNamesNoAnimationsCache = {}
+local filenamesCache = {}
+local filenamesNoAnimationsCache = {}
 
 local decalsPrefix = "decals/"
 local gameplayPath = "Graphics/Atlases/Gameplay"
@@ -47,10 +47,10 @@ function decals.getDecalNamesFromMod(modFolder, removeAnimationFrames, yield, na
     names = names or {}
     associatedMods = associatedMods or {}
 
-    local loadedModInfo = mods.loadedMods[modFolder]
-    local canCache = loadedModInfo.zipFile
+    local modInfo = mods.loadedMods[modFolder]
+    local canCache = modInfo.zipFile and mods.canCacheFiletype(modFolder, "png")
     local cachableNames = {}
-    local cacheTarget = removeAnimationFrames and zipFileNamesCache or zipFileNamesNoAnimationsCache
+    local cacheTarget = removeAnimationFrames and filenamesCache or filenamesNoAnimationsCache
 
     local filenames = mods.findModFolderFiletype(modFolder, {}, decalsPath, "png")
     local decalPathLength = #decalsPath
