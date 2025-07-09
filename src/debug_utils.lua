@@ -98,6 +98,7 @@ function debugUtils.reloadLanguageFiles()
     languageRegistry.loadExternalFiles()
 
     languageRegistry.setLanguage(languageRegistry.currentLanguageName)
+    languageRegistry.setFallbackLanguage(languageRegistry.fallbackLanguageName)
 end
 
 function debugUtils.reloadLibraries()

@@ -9,6 +9,8 @@ local languageRegistry = {}
 languageRegistry.languages = {}
 languageRegistry.language = {}
 languageRegistry.currentLanguageName = nil
+languageRegistry.fallbackLanguage = {}
+languageRegistry.fallbackLanguageName = nil
 
 function languageRegistry.setLanguage(name)
     languageRegistry.currentLanguageName = name
@@ -17,6 +19,13 @@ end
 
 function languageRegistry.getLanguage()
     return languageRegistry.language
+end
+
+function languageRegistry.setFallbackLanguage(name)
+    languageRegistry.fallbackLanguageName = name
+    languageRegistry.fallbackLanguage = languageRegistry.languages[name] or {}
+
+    language.setFallback(languageRegistry.fallbackLanguage)
 end
 
 function languageRegistry.loadLanguageFile(filename)

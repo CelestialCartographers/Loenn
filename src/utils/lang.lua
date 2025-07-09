@@ -6,6 +6,8 @@ local commentPrefix = "^#"
 local assignment = "="
 local separator = "."
 
+local reservedKeys = table.flip({"_exists", "_path", "_value"})
+
 local nil_lang = {
     _exists = false
 }
@@ -17,12 +19,43 @@ setmetatable(nil_lang, {
     end
 })
 
-local lang_mt = {
+local fallback_lang = nil_lang
+
+local fallback_lang_mt = {
     __tostring = (l -> l._value),
     __index = function(l, i)
         return nil_lang[i]
     end
 }
+
+local lang_mt = {
+    __tostring = (l -> l._value),
+    __index = function(l, i)
+        local target = fallback_lang
+        if rawget(l, "_path") then
+            for _, part in ipairs(rawget(l, "_path")) do
+                target = target[part]
+            end
+        end
+        return target[i]
+    end
+}
+
+local function deepmetatable(tbl, mt)
+    setmetatable(tbl, mt)
+
+    for key, value in pairs(tbl) do
+        if not reservedKeys[key] and type(value) == "table" then
+          deepmetatable(value, mt)
+        end
+    end
+end
+
+local function getPath(parentPath, part)
+    local path = parentPath and table.shallowcopy(parentPath) or {}
+    table.insert(path, part)
+    return path
+end
 
 function lang.parse(str, languageData)
     local res = languageData or {}
@@ -34,7 +67,7 @@ function lang.parse(str, languageData)
             if #key > 0 and #value > 0 then
                 local target = res
                 for _, part <- key:split(separator, nil, false) do
-                    target[part] = rawget(target, part) or setmetatable({_exists = true}, lang_mt)
+                    target[part] = rawget(target, part) or setmetatable({_exists = true, _path = getPath(rawget(target, "_path"), part)}, lang_mt)
                     target = target[part]
                 end
 
@@ -50,6 +83,18 @@ function lang.loadFile(filename, languageData, internal)
     local content = utils.readAll(filename, "rb", internal)
 
     return lang.parse(content, languageData)
+end
+
+function lang.setFallback(languageData)
+    if fallback_lang ~= nil_lang then
+        deepmetatable(fallback_lang, lang_mt)
+    end
+
+    fallback_lang = languageData or nil_lang
+
+    if fallback_lang ~= nil_lang then
+        deepmetatable(fallback_lang, fallback_lang_mt)
+    end
 end
 
 return lang

@@ -48,6 +48,7 @@ function loadingScene:firstEnter()
     local atlases = require("atlases")
 
     local configs = require("configs")
+    local defaultConfig = require("default_config")
     local mods = require("mods")
 
     local launchArguments = require("launch_arguments")
@@ -73,6 +74,7 @@ function loadingScene:firstEnter()
             sceneHandler.loadExternalScenes()
 
             languageRegistry.loadExternalFiles()
+            languageRegistry.setFallbackLanguage(defaultConfig.general.language)
 
             libraries.loadInternalLibraries()
             libraries.loadExternalLibraries()
