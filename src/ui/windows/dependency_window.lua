@@ -353,24 +353,44 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     return scrollableColumn, column
 end
 
-local function createStartingEverestYaml(filename, side, metadata)
-    local modName = metadata._folderName or side.map.package
+local function addEverestDependency(metadata)
+    local dependencies = metadata[1].Dependencies or {}
     local everestVersion = mods.getEverestVersion()
+
+    if not everestVersion then
+        return false
+    end
+
+    -- Update version if it is missing
+    for _, dependency in ipairs(dependencies) do
+        if dependency.Name == everestModName and not dependency.Version then
+            dependency.Version = everestVersion
+        end
+
+        return true, dependencies
+    end
+
+    -- Add Everest as dependency if missing
+    table.insert(dependencies, {
+        Name = everestModName,
+        Version = everestVersion
+    })
+
+    return true, dependencies
+end
+
+local function createStartingEverestYaml(side, metadata)
+    local modName = metadata._folderName or side.map.package
 
     local newMetadata = utils.deepcopy(metadata)
     local dependencies = {}
-
-    if everestVersion then
-        table.insert(dependencies, {
-            Name = everestModName,
-            Version = everestVersion
-        })
-    end
 
     newMetadata[1] = {
         Name = modName,
         Version = "0.0.1"
     }
+
+    addEverestDependency(newMetadata)
 
     updateMetadataFile(newMetadata, dependencies)
 end
@@ -381,7 +401,7 @@ local function showMissingEverestYamlNotification(language, filename, side, meta
             uiElements.label(tostring(language.ui.dependency_window.no_everest_yaml)),
             uiElements.row({
                 uiElements.button(tostring(language.ui.button.yes), function()
-                    createStartingEverestYaml(filename, side, metadata)
+                    createStartingEverestYaml(side, metadata)
                     dependencyWindow.editDependencies(filename, side)
                     popup:close()
                 end),
@@ -416,6 +436,13 @@ function dependencyWindow.editDependencies(filename, side)
         showMissingEverestYamlNotification(language, filename, side, currentModMetadata)
 
         return
+    end
+
+    -- Make sure Everest is in the metadata and has a version
+    local changedMetadata, newDependencies = addEverestDependency(currentModMetadata)
+
+    if changedMetadata then
+        updateMetadataFile(currentModMetadata, newDependencies)
     end
 
     local window
