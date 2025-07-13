@@ -11,9 +11,17 @@ local widgetUtils = require("ui.widgets.utils")
 
 local dropdowns = {}
 
+-- For styling
+uiElements.add("magicDropdown", {
+    style = {
+        padding = 4,
+        spacing = 0,
+    }
+})
+
 local function closeDropdown(list)
     list.dropdownMenuVisible = false
-    list.column:removeSelf()
+    list.container:removeSelf()
 
     ui.runLate(function()
         widgetUtils.focusElement(list.options.spawnParent)
@@ -85,6 +93,7 @@ function dropdowns.fromList(callback, stringOptions, options)
     end
 
     local listColumn, list = lists.getMagicList(callback, listItems, options)
+    local listPanel = uiElements.panel({listColumn})
     local selectedIndex = options.initialItem or 1
     local selectedItem = listItems[selectedIndex]
     local initialText = selectedItem and selectedItem.text or ""
@@ -100,6 +109,16 @@ function dropdowns.fromList(callback, stringOptions, options)
         end
     end)
 
+    local dropdownStyle = uiElements.magicDropdown.__default.style or {}
+
+    -- Panel handles the padding
+    listColumn.style.padding = 0
+    listColumn.style.spacing = 0
+
+    listPanel.style.padding = dropdownStyle.padding
+    listPanel.style.spacing = dropdownStyle.spacing
+
+
     list:hook({
         update = listUpdate
     })
@@ -108,7 +127,7 @@ function dropdowns.fromList(callback, stringOptions, options)
     list.options.spawnParent = options.spawnParent or button
 
     list.button = button
-    list.column = listColumn
+    list.container = listPanel
     list._parentProxy = options.parentProxy
 
     button.list = list
@@ -118,7 +137,7 @@ function dropdowns.fromList(callback, stringOptions, options)
     list.shownOnce = false
 
     function button.shouldReveal(self)
-        local dropdownListVisible = not not listColumn.parent
+        local dropdownListVisible = not not list.container.parent
         local currentListItems = self.list._magicList and self.list.data or self.list.children
         local revealedWithEmptyList = self.list.openedFromFilter and #currentListItems == 0
 
@@ -146,10 +165,10 @@ function dropdowns.fromList(callback, stringOptions, options)
                 list:filter("", true)
             end
 
-            spawnRoot:addChild(listColumn)
+            spawnRoot:addChild(list.container)
 
-            listColumn.realX = -4096
-            listColumn.realY = -4096
+            list.container.realX = -4096
+            list.container.realY = -4096
 
             list:layout()
 
@@ -161,12 +180,12 @@ function dropdowns.fromList(callback, stringOptions, options)
                     local listBottom = spawnY + listHeight
                     local rootBottom = spawnRoot.realY + spawnRoot.height
 
-                    listColumn.height = math.min(listHeight, spawnRoot.height)
+                    list.container.height = math.min(listHeight, spawnRoot.height)
 
                     if listBottom > rootBottom then
                         if fromSearchFilter then
                             list.height = rootBottom - spawnY
-                            listColumn.height = rootBottom - spawnY
+                            list.container.height = rootBottom - spawnY
 
                         else
                             local offsetY = listBottom - rootBottom
@@ -179,13 +198,13 @@ function dropdowns.fromList(callback, stringOptions, options)
                     -- Running it late fixes flickering of the scrollbar
                     if list.shownOnce then
                         ui.runLate(function()
-                            listColumn.realX = spawnX
-                            listColumn.realY = spawnY
+                            list.container.realX = spawnX
+                            list.container.realY = spawnY
                         end)
 
                     else
-                        listColumn.realX = spawnX
-                        listColumn.realY = spawnY
+                        list.container.realX = spawnX
+                        list.container.realY = spawnY
                         list.shownOnce = true
                     end
                 end)
