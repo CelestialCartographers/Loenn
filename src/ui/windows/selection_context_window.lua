@@ -148,7 +148,7 @@ function contextWindow.createContextMenu(selections, bestSelection, room)
         return
     end
 
-    local dummyData, fieldInformation, fieldOrder = prepareFormData(selections, bestSelection, language)
+    local dummyData, fieldInformation, fieldOrder, fieldGroups = prepareFormData(selections, bestSelection, language)
     local keyCount = utils.countKeys
 
     -- Window would be empty, nothing to show
@@ -167,6 +167,7 @@ function contextWindow.createContextMenu(selections, bestSelection, room)
     local windowTitle = getWindowTitle(language, selections, bestSelection)
     local selectionForm, formFields = form.getForm(buttons, dummyData, {
         fields = fieldInformation,
+        groups = groups,
         fieldOrder = fieldOrder,
         fieldMetadata = {
             formData = dummyData,

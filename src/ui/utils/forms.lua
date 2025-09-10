@@ -17,6 +17,12 @@ local function getLanguageKey(key, language, default)
     return default
 end
 
+local function getItemGroups(handler, ...)
+    local fieldOrder = utils.callIfFunction(handler and handler.groups, ...)
+
+    return fieldOrder and utils.deepcopy(fieldOrder) or nil
+end
+
 local function getItemFieldOrder(handler, ...)
     local fieldOrder = utils.callIfFunction(handler and handler.fieldOrder, ...) or {}
 
@@ -73,6 +79,7 @@ function formUtils.prepareFormData(handler, data, options, handlerArguments)
     local addMissingToFieldOrder = options.addMissingToFieldOrder
 
     local fieldsAdded = {}
+    local fieldGroups = getItemGroups(handler, unpack(handlerArguments))
     local fieldInformation = getItemFieldInformation(handler, unpack(handlerArguments))
     local fieldOrderOriginal = getItemFieldOrder(handler, unpack(handlerArguments))
     local fieldIgnored = getItemIgnoredFields(handler, options.multiple, unpack(handlerArguments))
@@ -160,7 +167,7 @@ function formUtils.prepareFormData(handler, data, options, handlerArguments)
         fieldInformation[field].tooltipText = tooltip
     end
 
-    return dummyData, fieldInformation, fieldOrder
+    return dummyData, fieldInformation, fieldOrder, fieldGroups
 end
 
 return formUtils
