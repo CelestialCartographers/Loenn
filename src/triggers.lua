@@ -792,6 +792,16 @@ function triggers.ignoredFieldsMultiple(layer, trigger)
     return alwaysIgnoredFieldsMultiple
 end
 
+function triggers.groups(layer, trigger)
+    local handler = triggers.getHandler(trigger)
+    
+    if handler and handler.groups then
+        return utils.callIfFunction(handler.groups, trigger)
+    end
+
+    return nil
+end
+
 function triggers.fieldOrder(layer, trigger)
     local defaultFieldOrder = {"x", "y", "width", "height"}
     local handler = triggers.getHandler(trigger)

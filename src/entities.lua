@@ -1308,6 +1308,16 @@ function entities.ignoredFieldsMultiple(layer, entity)
     return alwaysIgnoredFieldsMultiple
 end
 
+function entities.groups(layer, entity)
+    local handler = entities.getHandler(entity)
+
+    if handler and handler.groups then
+        return utils.callIfFunction(handler.groups, entity)
+    end
+
+    return nil
+end
+
 function entities.fieldOrder(layer, entity)
     local handler = entities.getHandler(entity)
 
