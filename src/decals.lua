@@ -429,7 +429,7 @@ function decals.ignoredFieldsMultiple(layer, decal)
 end
 
 function decals.fieldOrder(layer, decal)
-    return {"x", "y", "scaleX", "scaleY", "texture", "depth", "rotation", "color"}
+    return {"x", "y", "scaleX", "scaleY", "texture", "depth", "rotation", "color", "parallax"}
 end
 
 function decals.fieldInformation(layer, decal)
@@ -443,6 +443,10 @@ function decals.fieldInformation(layer, decal)
         },
         depth = {
             fieldType = "integer",
+            allowEmpty = true
+        },
+        parallax = {
+            fieldType = "number",
             allowEmpty = true
         }
     }

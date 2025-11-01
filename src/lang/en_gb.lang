@@ -85,6 +85,7 @@ decals.attribute.texture=Texture
 decals.attribute.rotation=Rotation
 decals.attribute.color=Colour
 decals.attribute.depth=Depth
+decals.attribute.parallax=Parallax
 decals.description.x=X position of the decal.
 decals.description.y=Y position of the decal.
 decals.description.scaleX=Horizontal scale of the decal.
@@ -93,6 +94,7 @@ decals.description.texture=Texture path of the decal.
 decals.description.rotation=Rotation of the decal in degrees.
 decals.description.color=Colour of the decal.
 decals.description.depth=Depth of the decal. Determines render order.\nLeave this empty to use the default depth of this decal.\nLower values put the decal further into the foreground.
+decals.description.parallax=Determines the parallax scrolling of the decal along both X and Y axes equally.\nLeave this empty to use the default parallax of this decal.
 
 
 # -- Entities --
