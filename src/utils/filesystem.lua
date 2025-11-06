@@ -208,8 +208,8 @@ function filesystem.changeDirectoryThenCallback(func, path, ...)
 end
 
 function filesystem.remove(path)
-    filesystem.changeDirectoryThenCallback(function(filename)
-        os.remove(filename)
+    return filesystem.changeDirectoryThenCallback(function(filename)
+        return os.remove(filename)
     end, path)
 end
 
