@@ -215,8 +215,8 @@ end
 
 -- Only works if both files are in same directory
 function filesystem.rename(from, to)
-    filesystem.changeDirectoryThenCallback(function(filename)
-        os.rename(filename, filesystem.filename(to))
+    return filesystem.changeDirectoryThenCallback(function(filename)
+        return os.rename(filename, filesystem.filename(to))
     end, from)
 end
 
