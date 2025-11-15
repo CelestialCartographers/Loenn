@@ -43,6 +43,14 @@ function startup.cleanupPath(path)
         end
     end
 
+    -- Check for Everest orig folder, we want the base game directory
+    local oneFolderUp = filesystem.dirname(path)
+    local inOrigFolder = filesystem.isDirectory(filesystem.joinpath(oneFolderUp, "orig"))
+
+    if inOrigFolder then
+        path = oneFolderUp
+    end
+
     return path
 end
 
@@ -55,7 +63,7 @@ function startup.verifyCelesteDir(path)
 
     local hasCelesteExe = filesystem.isFile(filesystem.joinpath(path, "Celeste.exe"))
     local hasCelesteDll = filesystem.isFile(filesystem.joinpath(path, "Celeste.dll"))
-    local hasGameplayMeta = filesystem.isFile(filesystem.joinpath(path, "Content/Graphics/Atlases/Gameplay.meta"))
+    local hasGameplayMeta = filesystem.isFile(filesystem.joinpath(path, "Content", "Graphics", "Atlases", "Gameplay.meta"))
 
     if (hasCelesteExe or hasCelesteDll) and hasGameplayMeta then
         return true
@@ -68,7 +76,15 @@ function startup.requiresInit()
     local data = config.readConfig(settingsPath)
 
     if data and data.celesteGameDirectory then
-        return not startup.verifyCelesteDir(data.celesteGameDirectory)
+        local verified = startup.verifyCelesteDir(data.celesteGameDirectory)
+
+        -- Attempt to save changes if path is valid
+        -- Fixes issue with Everest orig folder
+        if verified then
+            startup.savePath(data.celesteGameDirectory, data)
+        end
+
+        return not verified
     end
 
     return true
@@ -121,13 +137,17 @@ function startup.findCelesteDirectory()
     return false, ""
 end
 
-function startup.savePath(path)
+function startup.savePath(path, conf)
     path = startup.cleanupPath(path)
+    conf = conf or config.readConfig(settingsPath) or {}
 
-    local conf = config.readConfig(settingsPath) or {}
-    conf.celesteGameDirectory = path
+    local current = conf.celesteGameDirectory
 
-    config.writeConfig(conf)
+    if not current or path ~= current then
+        conf.celesteGameDirectory = path
+
+        config.writeConfig(conf)
+    end
 end
 
 return startup
