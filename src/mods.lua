@@ -572,13 +572,39 @@ function modHandler.mountMod(path, force)
     return not loaded
 end
 
+function modHandler.readEverestBlacklist(filename)
+    filename = filename or utils.joinpath(fileLocations.getCelesteDir(), "Mods", "blacklist.txt")
+
+    local content = utils.readAll(filename)
+    local lines = string.split(content, "\n")()
+
+    local ignored = {}
+
+    for _, line in ipairs(lines) do
+        if not utils.startsWith(line, "#") and line ~= "" then
+            ignored[line] = true
+        end
+    end
+
+    return ignored
+end
+
 function modHandler.mountMods(directory, force)
     directory = directory or utils.joinpath(fileLocations.getCelesteDir(), "Mods")
+
+    local ignored = modHandler.readEverestBlacklist(utils.joinpath(directory, "blacklist.txt"))
 
     if utils.isDirectory(directory) then
         for filename, dir in utils.listDir(directory) do
             if filename ~= "." and filename ~= ".." then
-                modHandler.mountMod(utils.joinpath(directory, filename), force)
+                if ignored[filename] then
+                    local message = string.format("Skipping loading '%s' due to Everest blacklist", filename)
+
+                    logging.info(message)
+
+                else
+                    modHandler.mountMod(utils.joinpath(directory, filename), force)
+                end
 
                 coroutine.yield()
             end
