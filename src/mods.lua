@@ -542,15 +542,15 @@ function modHandler.mountMod(path, force)
         return false
     end
 
+    local startTime = love.timer.getTime()
+
+    -- Replace "." in ".zip" to prevent require from getting confused
     local directory, filename = utils.dirname(path), utils.filename(path)
     local modFolderName = filename:gsub("%.", "_")
-    local loaded = modHandler.loadedMods[modFolderName]
+    local loaded = not not modHandler.loadedMods[modFolderName]
 
     if not loaded or force then
         if modHandler.mountable(path) then
-            -- Replace "." in ".zip" to prevent require from getting confused
-            local directory, filename = utils.dirname(path), utils.filename(path)
-            local modFolderName = filename:gsub("%.", "_")
             local specificMountPoint = string.format(modHandler.specificModContent, modFolderName)
 
             -- Can't mount the same path twice, trick physfs into loading both
@@ -566,10 +566,20 @@ function modHandler.mountMod(path, force)
                 mtime = filesystem.mtime(path),
                 metadata = modMetadata,
             }
+
+            loaded = true
         end
     end
 
-    return not loaded
+    local endTime = love.timer.getTime()
+
+    if loaded and configs.debug.logModLoading then
+        local message = string.format("Loaded '%s' in %.2fms", modFolderName, (endTime - startTime) * 1000)
+
+        logging.info(message)
+    end
+
+    return loaded
 end
 
 function modHandler.readEverestBlacklist(filename)
@@ -598,9 +608,11 @@ function modHandler.mountMods(directory, force)
         for filename, dir in utils.listDir(directory) do
             if filename ~= "." and filename ~= ".." then
                 if ignored[filename] then
-                    local message = string.format("Skipping loading '%s' due to Everest blacklist", filename)
+                    if configs.debug.logModLoading then
+                        local message = string.format("Skipped '%s' due to Everest blacklist", filename)
 
-                    logging.info(message)
+                        logging.info(message)
+                    end
 
                 else
                     modHandler.mountMod(utils.joinpath(directory, filename), force)
