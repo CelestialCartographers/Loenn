@@ -421,7 +421,7 @@ function decals.renderFilterPredicate(room, decal, fg)
 end
 
 function decals.ignoredFields(layer, decal)
-    return {}
+    return {"_editorLayer"}
 end
 
 function decals.ignoredFieldsMultiple(layer, decal)
