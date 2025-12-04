@@ -36,9 +36,6 @@ local function dataToElement(list, data, element)
             onClick = function(orig, self, x, y, button, isDrag, presses)
                 orig(self, x, y, button, isDrag, presses)
 
-                list.button:setText(element.text)
-                list:setSelection(element.data)
-
                 closeDropdown(list)
             end
         })
@@ -74,6 +71,14 @@ local function listUpdate(orig, self, dt)
     end
 end
 
+local function listOnKeyRelease(orig, self, key, ...)
+    if key == "space" or key == "return" or key == "escape" then
+        closeDropdown(self)
+    end
+
+    orig(self, key, ...)
+end
+
 function dropdowns.fromList(callback, stringOptions, options)
     options = options or {}
     options.dataToElement = options.dataToElement or dataToElement
@@ -92,8 +97,6 @@ function dropdowns.fromList(callback, stringOptions, options)
         end
     end
 
-    local listColumn, list = lists.getMagicList(callback, listItems, options)
-    local listPanel = uiElements.panel({listColumn})
     local selectedIndex = options.initialItem or 1
     local selectedItem = listItems[selectedIndex]
     local initialText = selectedItem and selectedItem.text or ""
@@ -109,6 +112,14 @@ function dropdowns.fromList(callback, stringOptions, options)
         end
     end)
 
+    local wrappedCallback = function(list, target)
+        callback(list, target)
+        button:setText(target)
+    end
+
+    local listColumn, list = lists.getMagicList(wrappedCallback, listItems, options)
+    local listPanel = uiElements.panel({listColumn})
+
     local dropdownStyle = uiElements.magicDropdown.__default.style or {}
 
     -- Panel handles the padding
@@ -118,9 +129,9 @@ function dropdowns.fromList(callback, stringOptions, options)
     listPanel.style.padding = dropdownStyle.padding
     listPanel.style.spacing = dropdownStyle.spacing
 
-
     list:hook({
-        update = listUpdate
+        update = listUpdate,
+        onKeyRelease = listOnKeyRelease,
     })
 
     list.options = options
@@ -207,6 +218,8 @@ function dropdowns.fromList(callback, stringOptions, options)
                         list.container.realY = spawnY
                         list.shownOnce = true
                     end
+
+                    widgetUtils.focusElement(list.children[1])
                 end)
             end)
 
