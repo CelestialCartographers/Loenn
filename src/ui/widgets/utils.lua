@@ -269,12 +269,18 @@ function widgetUtils.focusElement(element)
         return
     end
 
+    local elementType = utils.typeof(element)
+
     ui.focusing = element
 
-    if utils.typeof(element) == "field" then
+    if elementType == "field" then
         element.blinkTime = 0
         element.__wasKeyRepeat = love.keyboard.hasKeyRepeat()
         element.index = utf8.len(element.text or "")
+
+    elseif elementType == "checkbox" then
+        -- Focus the button part of the checkbox instead
+        ui.focusing = element.checkbox
     end
 end
 
