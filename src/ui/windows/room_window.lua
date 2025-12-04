@@ -416,6 +416,7 @@ function roomWindow.createRoomWindow(room, editing)
     widgetUtils.preventOutOfBoundsMovement(window)
     form.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, formFields)
+    form.focusFirstElement(roomForm)
 
     return window
 end

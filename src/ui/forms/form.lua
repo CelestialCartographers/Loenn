@@ -488,6 +488,12 @@ function forms.addTitleChangeHandler(window, baseTitle, formFields)
     end
 end
 
+function forms.focusFirstElement(form)
+    ui.runLate(function()
+        widgetUtils.focusElement(form._interactiveElements[1])
+    end)
+end
+
 function forms.loadFieldType(filename, registerAt, verbose)
     -- Use verbose flag or default to logPluginLoading from config
     verbose = verbose or verbose == nil and configs.debug.logPluginLoading

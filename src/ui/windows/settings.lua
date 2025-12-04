@@ -733,6 +733,7 @@ function settingsWindow.editSettings()
     widgetUtils.preventOutOfBoundsMovement(window)
     tabbedWindow.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, allFields)
+    form.focusFirstElement(tabs[1].content)
 
     return window
 end

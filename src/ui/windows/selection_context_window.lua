@@ -183,6 +183,7 @@ function contextWindow.createContextMenu(selections, bestSelection, room)
     widgetUtils.preventOutOfBoundsMovement(window)
     form.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, formFields)
+    form.focusFirstElement(selectionForm)
 
     return window
 end

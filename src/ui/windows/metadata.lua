@@ -370,6 +370,7 @@ function metadataWindow.editMetadata(side)
     widgetUtils.preventOutOfBoundsMovement(window)
     form.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, formFields)
+    form.focusFirstElement(metadataForm)
 
     return window
 end
