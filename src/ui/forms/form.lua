@@ -237,6 +237,34 @@ local fieldChangedCallback = function(formFields, options)
     end
 end
 
+function forms.addTabFocusing(formFields, buttonElements, options)
+    if options.addTabFocus == false then
+        return
+    end
+
+    local interactiveElements = {}
+
+    for _, field in ipairs(formFields) do
+        for _, element in ipairs(field.elements) do
+            local elementType = utils.typeof(element)
+
+            if element.interactive ~= 0 and elementType ~= "label"  then
+                table.insert(interactiveElements, element)
+            end
+        end
+    end
+
+    for _, button in ipairs(buttonElements) do
+        table.insert(interactiveElements, button)
+    end
+
+    for i, element in ipairs(interactiveElements) do
+        widgetUtils.addTabCycleHook(element, interactiveElements[i + 1], interactiveElements[i - 1])
+    end
+
+    return interactiveElements
+end
+
 function forms.prepareFormFields(formFields, options)
     -- Add extra fields for validation
     for _, field in ipairs(formFields) do
@@ -388,7 +416,7 @@ function forms.getFormButtonRow(buttons, formFields, options)
         }
     })
 
-    return buttonRow
+    return buttonRow, buttonElements
 end
 
 function forms.getForm(buttons, data, options)
@@ -398,8 +426,10 @@ function forms.getForm(buttons, data, options)
 
     local body, formFields = forms.getFormBody(data, options)
 
-    local buttonRow = forms.getFormButtonRow(buttons, formFields, options)
+    local buttonRow, buttonElements = forms.getFormButtonRow(buttons, formFields, options)
     local scrollableBody = uiElements.scrollbox(body)
+
+    local interactiveElements = forms.addTabFocusing(formFields, buttonElements, options)
 
     if options.scrollable ~= false then
         buttonRow:with(uiUtils.bottombound):with(uiUtils.fillWidth)
@@ -410,7 +440,12 @@ function forms.getForm(buttons, data, options)
         }):with(uiUtils.fillHeight(true))
     end
 
-    return uiElements.column({scrollableBody, buttonRow}):with(uiUtils.fillHeight(true)), formFields
+    local form = uiElements.column({scrollableBody, buttonRow}):with(uiUtils.fillHeight(true))
+
+    form._formFields = form
+    form._interactiveElements = interactiveElements
+
+    return form, formFields
 end
 
 function forms.prepareScrollableWindow(window, maxHeight)

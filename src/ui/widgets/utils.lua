@@ -2,6 +2,7 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
+local utf8 = require("utf8")
 local utils = require("utils")
 
 local widgetUtils = {}
@@ -273,7 +274,37 @@ function widgetUtils.focusElement(element)
     if utils.typeof(element) == "field" then
         element.blinkTime = 0
         element.__wasKeyRepeat = love.keyboard.hasKeyRepeat()
+        element.index = utf8.len(element.text or "")
     end
+end
+
+function widgetUtils.addTabCycleHook(element, nextElement, previousElement)
+    if element._addedTabHooks then
+        return
+    end
+
+    element:hook({
+        onKeyPress = function(orig, self, key, ...)
+            if key == "tab" then
+                local reverse = love.keyboard.isDown("lshift", "rshift")
+
+                if reverse then
+                    widgetUtils.focusElement(self._tabPreviousElement)
+
+                else
+                    widgetUtils.focusElement(self._tabNextElement)
+                end
+
+                return
+            end
+
+            orig(self, key, ...)
+        end
+    })
+
+    element._tabPreviousElement = previousElement
+    element._tabNextElement = nextElement
+    element._addedTabHooks = true
 end
 
 -- Add support for different types when needed
