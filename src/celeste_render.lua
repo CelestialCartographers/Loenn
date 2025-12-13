@@ -228,7 +228,9 @@ function celesteRender.getRoomRandomMatrix(room, key)
     if regen then
         utils.setRandomSeed(roomName)
 
-        local m = matrix.fromFunction(math.random, tileWidth, tileHeight)
+        local m = matrix.fromFunction(function()
+            return math.random()
+        end, tileWidth, tileHeight)
 
         roomRandomMatrixCache[roomName] = roomRandomMatrixCache[roomName] or {}
         roomRandomMatrixCache[roomName][key] = m
@@ -424,7 +426,6 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
     local wildcard = "*"
 
     local defaultQuad = {{0, 0}}
-    local defaultSprite = ""
 
     local width, height = tilesMatrix:size()
     local batch = getTilesBatchFromMode(width, height, batchMode)
@@ -463,7 +464,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
                     local quadCount = #quads
 
                     if quadCount > 0 then
-                        local randQuad = quads[utils.mod1(rng, quadCount)]
+                        local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
                         local texture = tileMeta.path or emptyTile
 
                         local spriteMeta = atlases.gameplay[texture]
