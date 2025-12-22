@@ -11,7 +11,7 @@ loadingScene.name = "Loading"
 function loadingScene:setText(text)
     self.text = tostring(text)
     self.alignment = "left"
-    self.textScale = fonts.fontScale * 2
+    self.textScale = fonts.fontScale * 8
     self.textOffsetX = (fonts.font:getWidth(self.text .. "..") * self.textScale) / 2
     self.textOffsetY = self.quadSize / 2
 end

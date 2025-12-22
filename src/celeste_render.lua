@@ -47,6 +47,7 @@ local YIELD_RATE = 100
 local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = configs.editor.alwaysRedrawUnselectedRooms
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = configs.editor.prepareRoomRenderInBackground
+local HI_RES_FONT = configs.editor.fontType ~= "pico8"
 
 local SCENERY_GAMEPLAY_PATH = "tilesets/scenery"
 
@@ -899,19 +900,32 @@ local function getRoomCanvas(room, state, selected)
 
     if not cache then
         cache = {}
-        roomCache[roomName] = cache
+         roomCache[roomName] = cache
     end
 
     if orderedBatches and not cache.canvas then
         cache.canvas = tasks.newTask(
             function(task)
-                local canvas = love.graphics.newCanvas(room.width or 0, room.height or 0)
+                local scale = HI_RES_FONT and 2 or 1
+                local width = (room.width or 0) * scale
+                local height = (room.height or 0) * scale
+
+                local canvas = love.graphics.newCanvas(width, height)
 
                 canvas:renderTo(function()
-                    for depth, batch in ipairs(orderedBatches) do
+                    if scale ~= 1 then
+                        love.graphics.push()
+                        love.graphics.scale(scale, scale)
+                    end
+
+                    for _, batch in ipairs(orderedBatches) do
                         for _, drawable in ipairs(batch) do
                             drawable:draw()
                         end
+                    end
+
+                    if scale ~= 1 then
+                        love.graphics.pop()
                     end
                 end)
 
@@ -919,9 +933,10 @@ local function getRoomCanvas(room, state, selected)
             end,
             nil,
             batchingTasks,
-            {room = room}
+            { room = room }
         )
     end
+
 
     return cache.canvas and cache.canvas.result, cache.canvas
 end
@@ -1014,7 +1029,8 @@ function celesteRender.drawRoom(room, state, selected, visible)
                 if canvas then
                     -- No need to draw the canvas if we can only see the border
                     if roomVisibleWidth > 2 and roomVisibleHeight > 2 then
-                        love.graphics.draw(canvas)
+                        local size = HI_RES_FONT and 0.5 or 1
+                        love.graphics.draw(canvas, 0, 0, 0, size, size)
                     end
                 end
             end

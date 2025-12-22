@@ -1959,6 +1959,7 @@ settings.hotkeys.description.debugReloadLuaInstance=Restart the editor.
 
 # Graphics
 settings.editor.attribute.displayFPS=Display FPS
+settings.editor.attribute.fontType=FontType
 settings.editor.attribute.alwaysRedrawUnselectedRooms=Always Redraw Unselected Rooms
 settings.editor.attribute.lazyLoadExternalAtlases=Lazy Load External Atlases
 settings.editor.attribute.prepareRoomRenderInBackground=Pre-Render Rooms In Background
@@ -1971,6 +1972,7 @@ settings.graphics.attribute.unfocusedMainLoopSleep=Unfocused Main Loop Sleep
 settings.graphics.attribute.unfocusedUpdateRate=Unfocused Update Rate
 
 settings.editor.description.displayFPS=Show an FPS display for the program.
+settings.editor.description.fontType=Font typs:\n1. Pico8\n2. Hi-res-pixel
 settings.editor.description.alwaysRedrawUnselectedRooms=Force reloading unselected rooms whenever something in the selected room changes.\nReduces memory usage at the cost of performance.
 settings.editor.description.lazyLoadExternalAtlases=Load external texture atlases only when needed.\nSlightly reduces performance but can reduce memory usage and drastically reduces load times.
 settings.editor.description.prepareRoomRenderInBackground=Prepare out-of-view rooms for display in the background on map load.\nMakes map loading feel smoother.
@@ -1981,6 +1983,7 @@ settings.graphics.description.focusedUpdateRate=Delay in seconds between logic u
 settings.graphics.description.unfocusedDrawRate=Delay in seconds between visual updates while the window is unfocused.\nDisable to make visual updates not framerate-defining.
 settings.graphics.description.unfocusedMainLoopSleep=Delay in seconds between frames while the window is unfocused.\nDisable to run logic and visual updates at maximum speed.
 settings.graphics.description.unfocusedUpdateRate=Delay in seconds between logic updates while the window is unfocused.\nDisable to make logic updates not framerate-defining.
+
 
 # Debug
 settings.debug.attribute.enableDebugOptions=Enable Debug Menu

@@ -43,6 +43,7 @@ return {
     -- Rendering
     prepareRoomRenderInBackground = true,
     alwaysRedrawUnselectedRooms = false,
+    fontType = "pico8",
 
     -- Triggers
     triggersTrimModName = true,

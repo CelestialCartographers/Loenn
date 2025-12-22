@@ -1,5 +1,6 @@
 local drawing = require("utils.drawing")
 local utils = require("utils")
+local fonts = require("fonts")
 
 local drawableText = {}
 local drawableTextMt = {}
@@ -69,7 +70,7 @@ function drawableText.fromText(text, x, y, width, height, font, fontSize, color)
     drawable.height = height
 
     drawable.font = font or love.graphics.getFont()
-    drawable.fontSize = fontSize
+    drawable.fontSize = fontSize * fonts.fontScale
 
     if color then
         setColor(drawable, color)

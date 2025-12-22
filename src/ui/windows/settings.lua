@@ -231,6 +231,7 @@ local defaultTabForms = {
             "editor.alwaysRedrawUnselectedRooms",
             "editor.lazyLoadExternalAtlases",
             "editor.prepareRoomRenderInBackground",
+            "editor.fontType",
             -- TODO - Implement these options as a dropdown
             -- "graphics.focusedDrawRate",
             -- "graphics.focusedMainLoopSleep",
@@ -259,6 +260,7 @@ local themeOptions = {}
 for themeName, theme in pairs(themes.themes) do
     table.insert(themeOptions, themeName)
 end
+
 
 local defaultFieldInformation = {
     ["spacer"] = {
@@ -516,6 +518,14 @@ local defaultFieldInformation = {
     ["editor.itemRotateRight"] = {
         fieldType = "keyboard_hotkey"
     },
+    ["editor.fontType"] = {
+        fieldType = "string",
+        editable = false,
+        options = {
+            {"Pico8", "pico8"},
+            {"Hi-res-pixel-font", "hi-res-pixel-font"},
+        }
+    },
 
     ["debug.loggingFlushImmediatelyLevel"] = {
         fieldType = "integer"
@@ -563,7 +573,7 @@ local defaultFieldInformation = {
 
     ["ui.hotkeys.focusMaterialSearch"] = {
         fieldType = "keyboard_hotkey"
-    },
+    }
 }
 
 local settingsWindowGroup = uiElements.group({}):with({
