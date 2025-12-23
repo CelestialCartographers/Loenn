@@ -10,7 +10,7 @@ function font:useFont(fontName)
         self.fontString =
         [=[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/():;%&`'*#=[]"_{}<>^~ ]=]
         self.font = love.graphics.newImageFont("fonts/hi-res_pixel_font.png", self.fontString, 1)
-        -- 以 pico8 的 scale 为 基准
+        -- based on fontScale of pico8 font
         self.fontScale = 0.5
     else
         self.fontString =

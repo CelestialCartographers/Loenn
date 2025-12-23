@@ -942,7 +942,7 @@ local function getRoomCanvas(room, state, selected)
 end
 
 fonts.onChanged:add(function()
-    -- task 需要的数据都已固定, 所以单单清除 triggers 的 cache 没用, 得清除房间的
+    -- clear cache to rebuild batch with new font
     roomCache = {}
 end)
 
