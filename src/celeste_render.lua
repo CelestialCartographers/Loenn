@@ -15,6 +15,7 @@ local modHandler = require("mods")
 local depths = require("consts.object_depths")
 local logging = require("logging")
 local modificationWarner = require("modification_warner")
+local fonts = require("fonts")
 
 local entityHandler = require("entities")
 local triggerHandler = require("triggers")
@@ -47,7 +48,6 @@ local YIELD_RATE = 100
 local PRINT_BATCHING_DURATION = false
 local ALWAYS_REDRAW_UNSELECTED_ROOMS = configs.editor.alwaysRedrawUnselectedRooms
 local ALLOW_NON_VISIBLE_BACKGROUND_DRAWING = configs.editor.prepareRoomRenderInBackground
-local HI_RES_FONT = configs.editor.fontType ~= "pico8"
 
 local SCENERY_GAMEPLAY_PATH = "tilesets/scenery"
 
@@ -906,7 +906,7 @@ local function getRoomCanvas(room, state, selected)
     if orderedBatches and not cache.canvas then
         cache.canvas = tasks.newTask(
             function(task)
-                local scale = HI_RES_FONT and 2 or 1
+                local scale = 1 / fonts.fontScale
                 local width = (room.width or 0) * scale
                 local height = (room.height or 0) * scale
 
@@ -940,6 +940,11 @@ local function getRoomCanvas(room, state, selected)
 
     return cache.canvas and cache.canvas.result, cache.canvas
 end
+
+fonts.onChanged:add(function()
+    -- task 需要的数据都已固定, 所以单单清除 triggers 的 cache 没用, 得清除房间的
+    roomCache = {}
+end)
 
 -- Force the rooms canvas cache to be rendered
 function celesteRender.forceRoomCanvasRender(room, state, selected)
@@ -1029,8 +1034,7 @@ function celesteRender.drawRoom(room, state, selected, visible)
                 if canvas then
                     -- No need to draw the canvas if we can only see the border
                     if roomVisibleWidth > 2 and roomVisibleHeight > 2 then
-                        local size = HI_RES_FONT and 0.5 or 1
-                        love.graphics.draw(canvas, 0, 0, 0, size, size)
+                        love.graphics.draw(canvas, 0, 0, 0, fonts.fontScale, fonts.fontScale)
                     end
                 end
             end

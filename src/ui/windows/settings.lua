@@ -14,6 +14,7 @@ local tabbedWindow = require("ui.widgets.tabbed_window")
 local startup = require("initial_startup")
 local themes = require("ui.themes")
 local debugUtils = require("debug_utils")
+local fonts = require("fonts")
 
 local windowPersister = require("ui.window_position_persister")
 local windowPersisterName = "settings_window"
@@ -599,6 +600,10 @@ local function applyNewSettings(newSettings, oldSettings)
 
     if settingChanged("editor.triggersTrimModName") or settingChanged("editor.triggersUseCategoryColors") then
         debugUtils.redrawMap()
+    end
+
+    if settingChanged("editor.fontType") then
+        fonts:useFont(newSettings.editor.fontType)
     end
 
     -- Reload hotkeys, tools and libraries
