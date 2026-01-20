@@ -152,22 +152,28 @@ function celesteRender.clearBatchingTasks()
     batchingTasks = {}
 end
 
-function celesteRender.releaseBatch(roomName, key)
-    if roomCache[roomName] and roomCache[roomName][key] and roomCache[roomName][key].result then
-        local target = roomCache[roomName][key].result
+function celesteRender.clearBatchTask(roomName, key)
+    if roomCache[roomName] and roomCache[roomName][key] then
+        local task = roomCache[roomName][key]
+        local target = task.result
 
-        if utils.typeof(target) == "table" then
-            for depth, depthTarget in pairs(target) do
-                if depthTarget.release then
-                    depthTarget:release()
+        if target then
+            if utils.typeof(target) == "table" then
+                for _, depthTarget in pairs(target) do
+                    if depthTarget.release then
+                        depthTarget:release()
+                    end
+                end
+
+            else
+                if target.release then
+                    target:release()
                 end
             end
-
-        else
-            if target.release then
-                target:release()
-            end
         end
+
+        task.done = true
+        roomCache[roomName][key] = nil
     end
 end
 
@@ -181,23 +187,17 @@ function celesteRender.invalidateRoomCache(roomName, key)
             if key then
                 if type(key) == "table" then
                     for _, k in ipairs(key) do
-                        celesteRender.releaseBatch(roomName, k)
-
-                        roomCache[roomName][k] = nil
+                        celesteRender.clearBatchTask(roomName, k)
                     end
 
                 else
-                    celesteRender.releaseBatch(roomName, key)
-
-                    roomCache[roomName][key] = nil
+                    celesteRender.clearBatchTask(roomName, key)
                 end
 
             else
-                for name, task in pairs(roomCache[roomName]) do
-                    celesteRender.releaseBatch(roomName, name)
+                for name, _ in pairs(roomCache[roomName]) do
+                    celesteRender.clearBatchTask(roomName, name)
                 end
-
-                roomCache[roomName] = nil
             end
         end
 
