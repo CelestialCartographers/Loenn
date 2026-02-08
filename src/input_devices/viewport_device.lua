@@ -59,8 +59,8 @@ function viewportDevice.mouseclicked(x, y, button, istouch, presses)
     end
 end
 
-function viewportDevice.resize(width, height)
-    viewportHandler.updateSize(width, height)
+function viewportDevice.resize()
+    viewportHandler.updateSize()
 end
 
 function viewportDevice.wheelmoved(dx, dy)
