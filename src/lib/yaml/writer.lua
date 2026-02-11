@@ -29,6 +29,7 @@ function writer.write(filename, data, options)
     return false, serialized
 end
 
+local indicators = "[-?:,%[%]{}#&*!|>'\"%%@`]" --A pattern that matches all yaml characters listed as indicators in the most recent standard, which could cause problems if simply blindly written in strings
 function writer.serialize(data, options, depth, firstDepth)
     options = options or {}
     depth = depth or 0
@@ -39,7 +40,12 @@ function writer.serialize(data, options, depth, firstDepth)
     local dataType = type(data)
 
     if dataType == "string" then
-        -- TODO - Use quotes when needed
+        --use quotes as needed
+        if string.match(data, indicators) then
+            local out = string.gsub(data, "\\", "\\\\") --escape backslashes
+            out = string.gsub(out, "\"", "\\\"") --escape quotes. Not sure if the reader can correctly deal with escape sequences
+            return "\"" .. out .. "\""
+        end
         return data
 
     elseif dataType == "boolean" then
