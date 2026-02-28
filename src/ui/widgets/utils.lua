@@ -247,6 +247,23 @@ function widgetUtils.focusMainEditor()
     ui.focusing = false
 end
 
+function widgetUtils.consumeKeyboardEvents(window)
+    if not window._consumingKeyboardEvents then
+        window.interactive = 1
+
+        window:hook({
+            onKeyPress = function()
+                return true
+            end,
+            onKeyRelease = function()
+                return true
+            end
+        })
+
+        window._consumingKeyboardEvents = true
+    end
+end
+
 function widgetUtils.cursorDeltaFromElementCenter(element, x, y)
     local elementX, elementY = element.screenX, element.screenY
     local elementWidth, elementHeight = element.width, element.height

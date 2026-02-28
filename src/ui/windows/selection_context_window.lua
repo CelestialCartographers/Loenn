@@ -2,17 +2,13 @@ local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
 
-local loadedState = require("loaded_state")
 local languageRegistry = require("language_registry")
 local utils = require("utils")
 local widgetUtils = require("ui.widgets.utils")
 local form = require("ui.forms.form")
 local snapshotUtils = require("snapshot_utils")
 local history = require("history")
-local viewportHandler = require("viewport_handler")
 local layerHandlers = require("layer_handlers")
-local toolUtils = require("tool_utils")
-local notifications = require("ui.notification")
 local formUtils = require("ui.utils.forms")
 local tiles = require("tiles")
 local selectionUtils = require("selections")
@@ -149,7 +145,6 @@ function contextWindow.createContextMenu(selections, bestSelection, room)
     end
 
     local dummyData, fieldInformation, fieldOrder = prepareFormData(selections, bestSelection, language)
-    local keyCount = utils.countKeys
 
     -- Window would be empty, nothing to show
     if utils.countKeys(dummyData) == 0 then
@@ -181,6 +176,7 @@ function contextWindow.createContextMenu(selections, bestSelection, room)
     contextGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     widgetUtils.preventOutOfBoundsMovement(window)
+    widgetUtils.consumeKeyboardEvents(window)
     form.prepareScrollableWindow(window)
     form.addTitleChangeHandler(window, windowTitle, formFields)
     form.focusFirstElement(selectionForm)

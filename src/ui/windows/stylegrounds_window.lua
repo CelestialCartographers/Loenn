@@ -1129,6 +1129,7 @@ function stylegroundWindow.editStylegrounds(map)
     stylegroundWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     widgetUtils.preventOutOfBoundsMovement(window)
+    widgetUtils.consumeKeyboardEvents(window)
 
     return window
 end

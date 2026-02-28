@@ -463,6 +463,7 @@ function dependencyWindow.editDependencies(filename, side)
     dependencyWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     widgetUtils.preventOutOfBoundsMovement(window)
+    widgetUtils.consumeKeyboardEvents(window)
     window:with(widgetUtils.fillHeightIfNeeded())
 
     return window

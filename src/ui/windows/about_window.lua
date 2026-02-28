@@ -82,6 +82,7 @@ function aboutWindow.showAboutWindow()
     aboutWindowGroup.parent:addChild(window)
     widgetUtils.addWindowCloseButton(window, windowCloseCallback)
     widgetUtils.preventOutOfBoundsMovement(window)
+    widgetUtils.consumeKeyboardEvents(window)
     form.prepareScrollableWindow(window)
 
     return window
