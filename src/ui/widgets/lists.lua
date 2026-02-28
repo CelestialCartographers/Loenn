@@ -799,6 +799,8 @@ local function handleListKeyboardNavigation(list, key, hookOptions)
         else
             listWidgets.setSelection(list, list.selectedIndex + direction, preventCallback)
             listWidgets.scrollSelectionVisible(list)
+
+            handled = true
         end
     end
 
@@ -816,6 +818,7 @@ local function searchFieldKeyRelease(list, hookOptions)
         local exitKey = configs.ui.searching.searchExitKey
         local exitClearKey = configs.ui.searching.searchExitAndClearKey
         local selectKey = configs.ui.searching.searchSelectKey
+        local handled = false
 
         if key == exitClearKey then
             self:setText("")
@@ -823,16 +826,24 @@ local function searchFieldKeyRelease(list, hookOptions)
 
             widgetUtils.focusMainEditor()
 
+            handled = true
+
         elseif key == exitKey then
             widgetUtils.focusMainEditor()
+
+            handled = true
 
         elseif key == selectKey then
             listWidgets.setSelection(list, list.selectedIndex)
             widgetUtils.focusMainEditor()
 
+            handled = true
+
         else
-            orig(self, key, ...)
+            handled = orig(self, key, ...)
         end
+
+        return handled
     end
 end
 
@@ -849,6 +860,8 @@ local function listCommonKeyPress(list, isSearchField, hookOptions)
         if not handled then
             return orig(self, key, ...) or isSearchField
         end
+
+        return handled
     end
 end
 
@@ -860,9 +873,9 @@ function listWidgets.addSearchFieldHooks(list, searchField, hookOptions)
 end
 
 function listWidgets.addKeyboardHooks(list)
-    list.interactive = 1
-
     if not list._addedKeyboardHooks then
+        list.interactive = 1
+
         list:hook({
             onKeyPress = listCommonKeyPress(list, false)
         })

@@ -301,7 +301,7 @@ function widgetUtils.addTabCycleHook(element, nextElement, previousElement)
                     widgetUtils.focusElement(self._tabNextElement)
                 end
 
-                return
+                return true
             end
 
             orig(self, key, ...)

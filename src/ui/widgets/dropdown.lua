@@ -34,9 +34,11 @@ local function dataToElement(list, data, element)
 
         element:hook({
             onClick = function(orig, self, x, y, button, isDrag, presses)
-                orig(self, x, y, button, isDrag, presses)
+                local result = orig(self, x, y, button, isDrag, presses)
 
                 closeDropdown(list)
+
+                return result
             end
         })
     end
@@ -74,9 +76,11 @@ end
 local function listOnKeyRelease(orig, self, key, ...)
     if key == "space" or key == "return" or key == "escape" then
         closeDropdown(self)
+
+        return true
     end
 
-    orig(self, key, ...)
+    return orig(self, key, ...)
 end
 
 function dropdowns.fromList(callback, stringOptions, options)
@@ -219,7 +223,7 @@ function dropdowns.fromList(callback, stringOptions, options)
                         list.shownOnce = true
                     end
 
-                    widgetUtils.focusElement(list.children[1])
+                    widgetUtils.focusElement(list)
                 end)
             end)
 
