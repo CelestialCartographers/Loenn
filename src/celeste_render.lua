@@ -421,6 +421,9 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
     local bxor = bit.bxor
     local band = bit.band
 
+    local canvasOrMatrixBatch = batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch"
+    local tableBatch = batchMode == "table"
+
     local airTile = "0"
     local emptyTile = " "
     local wildcard = "*"
@@ -440,30 +443,30 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
 
     for x = 1, width do
         for y = 1, height do
-            local rng = random:getInbounds(x, y)
-            local tile = tilesMatrix:getInbounds(x, y) or airTile
+            local tile = tilesMatrix:getInbounds(x, y)
             local sceneryTile = sceneryMatrix:getInbounds(x, y) or -1
 
             if sceneryTile > -1 then
                 local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
 
                 if quad then
-                    if batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch" then
+                    if canvasOrMatrixBatch then
                         batch:set(x, y, sceneryMeta, quad, x * 8 - 8, y * 8 - 8)
 
-                    elseif batchMode == "table" then
+                    elseif tableBatch then
                         table.insert(batch, {sceneryMeta, quad, x * 8 - 8, y * 8 - 8})
                     end
                 end
 
-            elseif tile ~= airTile then
+            elseif tile and tile ~= airTile then
                 local tileMeta = meta[tile]
                 if tileMeta and tileMeta.path then
                     -- TODO - Render overlay sprites
-                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
                     if quadCount > 0 then
+                        local rng = random:getInbounds(x, y)
                         local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
                         local texture = tileMeta.path or emptyTile
 
@@ -472,10 +475,10 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
                         if spriteMeta then
                             local quad = celesteRender.getOrCacheTileSpriteQuad(tileCache, tile, texture, randQuad, fg)
 
-                            if batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch" then
+                            if canvasOrMatrixBatch then
                                 batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
 
-                            elseif batchMode == "table" then
+                            elseif tableBatch then
                                 table.insert(batch, {spriteMeta, quad, x * 8 - 8, y * 8 - 8})
                             end
 
