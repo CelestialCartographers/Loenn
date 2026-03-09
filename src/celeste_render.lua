@@ -439,6 +439,8 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
     local sceneryMeta = celesteRender.getSceneryMeta()
     local sceneryWidth, sceneryHeight = sceneryMeta.realWidth, sceneryMeta.realHeight
 
+    local gameplayAtlas = atlases.gameplay
+
     local missingTiles = {}
 
     for x = 1, width do
@@ -460,7 +462,8 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
 
             elseif tile and tile ~= airTile then
                 local tileMeta = meta[tile]
-                if tileMeta and tileMeta.path then
+                local texture = tileMeta.path
+                if tileMeta and texture then
                     -- TODO - Render overlay sprites
                     local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
@@ -468,9 +471,8 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
                     if quadCount > 0 then
                         local rng = random:getInbounds(x, y)
                         local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
-                        local texture = tileMeta.path or emptyTile
 
-                        local spriteMeta = atlases.gameplay[texture]
+                        local spriteMeta = gameplayAtlas[texture]
 
                         if spriteMeta then
                             local quad = celesteRender.getOrCacheTileSpriteQuad(tileCache, tile, texture, randQuad, fg)
