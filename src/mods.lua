@@ -542,15 +542,15 @@ function modHandler.mountMod(path, force)
         return false
     end
 
+    local startTime = love.timer.getTime()
+
+    -- Replace "." in ".zip" to prevent require from getting confused
     local directory, filename = utils.dirname(path), utils.filename(path)
     local modFolderName = filename:gsub("%.", "_")
-    local loaded = modHandler.loadedMods[modFolderName]
+    local loaded = not not modHandler.loadedMods[modFolderName]
 
     if not loaded or force then
         if modHandler.mountable(path) then
-            -- Replace "." in ".zip" to prevent require from getting confused
-            local directory, filename = utils.dirname(path), utils.filename(path)
-            local modFolderName = filename:gsub("%.", "_")
             local specificMountPoint = string.format(modHandler.specificModContent, modFolderName)
 
             -- Can't mount the same path twice, trick physfs into loading both
@@ -566,19 +566,57 @@ function modHandler.mountMod(path, force)
                 mtime = filesystem.mtime(path),
                 metadata = modMetadata,
             }
+
+            loaded = true
         end
     end
 
-    return not loaded
+    local endTime = love.timer.getTime()
+
+    if loaded and configs.debug.logModLoading then
+        local message = string.format("Loaded '%s' in %.2fms", modFolderName, (endTime - startTime) * 1000)
+
+        logging.info(message)
+    end
+
+    return loaded
+end
+
+function modHandler.readEverestBlacklist(filename)
+    filename = filename or utils.joinpath(fileLocations.getCelesteDir(), "Mods", "blacklist.txt")
+
+    local content = utils.readAll(filename)
+    local lines = string.split(content, "\n")()
+
+    local ignored = {}
+
+    for _, line in ipairs(lines) do
+        if not utils.startsWith(line, "#") and line ~= "" then
+            ignored[line] = true
+        end
+    end
+
+    return ignored
 end
 
 function modHandler.mountMods(directory, force)
     directory = directory or utils.joinpath(fileLocations.getCelesteDir(), "Mods")
 
+    local ignored = modHandler.readEverestBlacklist(utils.joinpath(directory, "blacklist.txt"))
+
     if utils.isDirectory(directory) then
         for filename, dir in utils.listDir(directory) do
             if filename ~= "." and filename ~= ".." then
-                modHandler.mountMod(utils.joinpath(directory, filename), force)
+                if ignored[filename] then
+                    if configs.debug.logModLoading then
+                        local message = string.format("Skipped '%s' due to Everest blacklist", filename)
+
+                        logging.info(message)
+                    end
+
+                else
+                    modHandler.mountMod(utils.joinpath(directory, filename), force)
+                end
 
                 coroutine.yield()
             end

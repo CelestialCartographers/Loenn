@@ -54,8 +54,13 @@ function logging.bufferWrite(filename)
     end
 end
 
-function logging.log(status, message, filename)
-    local formattedMessage = string.format("[%s] %s", status, message)
+function logging.log(status, message, filename, force)
+    local formattedMessage = message
+
+    if status and message then
+        formattedMessage = string.format("[%s] %s", status, message)
+    end
+
     local shouldLog = true
     local shouldFlush = true
 
@@ -72,13 +77,13 @@ function logging.log(status, message, filename)
     if configs then
         local levelThreshold = configs.debug.loggingLevel
         local flushImmediatelyLevel = configs.debug.loggingFlushImmediatelyLevel
-        local level = logging.logLevels[status]
+        local level = logging.logLevels[status] or logging.logLevels.INFO
 
         shouldLog = level >= levelThreshold
         shouldFlush = level >= flushImmediatelyLevel
     end
 
-    if shouldLog then
+    if shouldLog or force then
         -- Both print the message and add it to the queue
         print(formattedMessage)
 
@@ -86,27 +91,27 @@ function logging.log(status, message, filename)
             logging.bufferAddMessage(filename, formattedMessage)
 
             -- In case of errors the log must be flushed immediately
-            if shouldFlush then
+            if shouldFlush or force then
                 logging.bufferWrite(filename)
             end
         end
     end
 end
 
-function logging.debug(message, filename)
-    return logging.log("DEBUG", message, filename)
+function logging.debug(...)
+    return logging.log("DEBUG", ...)
 end
 
-function logging.info(message, filename)
-    return logging.log("INFO", message, filename)
+function logging.info(...)
+    return logging.log("INFO", ...)
 end
 
-function logging.warning(message, filename)
-    return logging.log("WARNING", message, filename)
+function logging.warning(...)
+    return logging.log("WARNING", ...)
 end
 
-function logging.error(message, filename)
-    return logging.log("ERROR", message, filename)
+function logging.error(...)
+    return logging.log("ERROR", ...)
 end
 
 return logging

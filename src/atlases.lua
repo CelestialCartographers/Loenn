@@ -35,7 +35,7 @@ local function addAtlasMetatable(name)
     local atlas = atlases[name] or {}
     local atlasMt = {
         __index = function(self, key)
-            return atlases.getResource(key, name)
+            return atlases.getResource(key, name, self)
         end
     }
 
@@ -115,34 +115,40 @@ function atlases.getInternalResource(resource, name)
 end
 
 -- TODO - Make it possible to refetch the resource
-function atlases.getResource(resource, name)
-    name = name or "Gameplay"
-
-    if not atlases[name] then
-        atlases.createAtlas(name)
+function atlases.getResource(resource, name, atlas)
+    if not resource then
+        return
     end
 
-    if resource then
-        local targetResource = rawget(atlases[name], resource)
+    if not atlas then
+        name = name or "Gameplay"
 
-        -- First attempt to see if this is an external resource
-        -- Then check if it is an internal one
-        if not targetResource then
-            local filename = string.format("%s/Graphics/Atlases/%s/%s.png", modHandler.commonModContent, name, resource)
-            local sprite = spriteLoader.loadExternalSprite(filename)
-
-            if sprite then
-                atlases[name][resource] = sprite
-
-                return sprite
-
-            else
-                return atlases.getInternalResource(resource, name)
-            end
+        if not atlases[name] then
+            atlases.createAtlas(name)
         end
 
-        return targetResource
+        atlas = atlases[name]
     end
+
+    local targetResource = rawget(atlas, resource)
+
+    -- First attempt to see if this is an external resource
+    -- Then check if it is an internal one
+    if not targetResource then
+        local filename = string.format("%s/Graphics/Atlases/%s/%s.png", modHandler.commonModContent, name, resource)
+        local sprite = spriteLoader.loadExternalSprite(filename)
+
+        if sprite then
+            atlases[name][resource] = sprite
+
+            return sprite
+
+        else
+            return atlases.getInternalResource(resource, name)
+        end
+    end
+
+    return targetResource
 end
 
 function atlases.loadExternalAtlases()

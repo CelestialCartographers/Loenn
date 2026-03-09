@@ -64,7 +64,7 @@ function taskUtils.processTask(task, time)
     local timeSpent = 0
     local calcTime = time or math.huge
 
-    while coroutine.status(task.coroutine) ~= "dead" do
+    while not task.done and coroutine.status(task.coroutine) ~= "dead" do
         local waiting = waitingForResume[task] and waitingForResume[task] > 0
 
         -- Can't process if we are over the time limit, or waiting for another task

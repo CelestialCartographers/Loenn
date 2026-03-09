@@ -29,6 +29,7 @@ function decalStruct.decode(data)
     decal._editorLayer = data._editorLayer or 0
 
     decal.depth = data.depth
+    decal.parallax = data.parallax
 
     return decal
 end
@@ -54,6 +55,10 @@ function decalStruct.encode(decal)
 
     if tonumber(decal.depth) then
         res.depth = decal.depth
+    end
+
+    if tonumber(decal.parallax) then
+        res.parallax = decal.parallax
     end
 
     if tonumber(decal._editorLayer) and decal._editorLayer ~= 0 then

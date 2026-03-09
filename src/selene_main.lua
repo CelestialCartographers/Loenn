@@ -36,7 +36,7 @@ local function getInstallInformation()
 end
 
 -- Show install information in log to help debug user issues
-print(getInstallInformation())
+logging.log(nil, getInstallInformation(), nil, true)
 
 require("lib.love_filesystem_unsandboxing")
 require("input_handler")

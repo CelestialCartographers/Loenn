@@ -214,11 +214,11 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
                 local tileMeta = meta[tile]
 
                 if tileMeta and tileMeta.path then
-                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
                     if quadCount > 0 then
-                        local randQuad = quads[utils.mod1(rng, quadCount)]
+                        local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
                         local texture = meta[tile].path or emptyTile
 
                         local spriteMeta = atlases.gameplay[texture]

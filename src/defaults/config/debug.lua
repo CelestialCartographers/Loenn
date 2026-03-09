@@ -2,6 +2,9 @@ return {
     -- Caching
     logModFilenamesCache = false,
 
+    -- Mods
+    logModLoading = false,
+
     -- Plugins / Scenes
     logPluginLoading = false,
 

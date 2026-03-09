@@ -89,16 +89,16 @@ local function checkPadding(tiles, x, y, tile, ignores, airTile, emptyTile, wild
     return left == airTile or right == airTile or up == airTile or down == airTile
 end
 
-local function getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
-    local ignores = meta[tile].ignores
+local function getPaddingOrCenterQuad(x, y, tile, tiles, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+    local ignores = tileMeta.ignores
 
     if checkPadding(tiles, x, y, tile, ignores, airTile, emptyTile, wildcard) then
-        local padding = meta[tile].padding
+        local padding = tileMeta.padding
 
         return padding and #padding > 0 and padding or defaultQuad, defaultSprite
 
     else
-        local center = meta[tile].center
+        local center = tileMeta.center
 
         return center and #center > 0 and center or defaultQuad, defaultSprite
     end
@@ -178,9 +178,8 @@ local function getMaskQuadsFromTilesWithBitmask(x, y, masks, tiles, tile, ignore
     return false, nil, nil
 end
 
-function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
+function autotiler.getQuads(x, y, tiles, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile)
     local tile = tiles:get(x, y)
-    local tileMeta = meta[tile]
 
     local masks = tileMeta.masks
     local ignore = tileMeta.ignores
@@ -205,7 +204,7 @@ function autotiler.getQuads(x, y, tiles, meta, airTile, emptyTile, wildcard, def
         return quads, sprites
 
     else
-        return getPaddingOrCenterQuad(x, y, tile, tiles, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
+        return getPaddingOrCenterQuad(x, y, tile, tiles, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite)
     end
 end
 

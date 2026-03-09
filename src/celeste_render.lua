@@ -152,22 +152,28 @@ function celesteRender.clearBatchingTasks()
     batchingTasks = {}
 end
 
-function celesteRender.releaseBatch(roomName, key)
-    if roomCache[roomName] and roomCache[roomName][key] and roomCache[roomName][key].result then
-        local target = roomCache[roomName][key].result
+function celesteRender.clearBatchTask(roomName, key)
+    if roomCache[roomName] and roomCache[roomName][key] then
+        local task = roomCache[roomName][key]
+        local target = task.result
 
-        if utils.typeof(target) == "table" then
-            for depth, depthTarget in pairs(target) do
-                if depthTarget.release then
-                    depthTarget:release()
+        if target then
+            if utils.typeof(target) == "table" then
+                for _, depthTarget in pairs(target) do
+                    if depthTarget.release then
+                        depthTarget:release()
+                    end
+                end
+
+            else
+                if target.release then
+                    target:release()
                 end
             end
-
-        else
-            if target.release then
-                target:release()
-            end
         end
+
+        task.done = true
+        roomCache[roomName][key] = nil
     end
 end
 
@@ -181,23 +187,17 @@ function celesteRender.invalidateRoomCache(roomName, key)
             if key then
                 if type(key) == "table" then
                     for _, k in ipairs(key) do
-                        celesteRender.releaseBatch(roomName, k)
-
-                        roomCache[roomName][k] = nil
+                        celesteRender.clearBatchTask(roomName, k)
                     end
 
                 else
-                    celesteRender.releaseBatch(roomName, key)
-
-                    roomCache[roomName][key] = nil
+                    celesteRender.clearBatchTask(roomName, key)
                 end
 
             else
-                for name, task in pairs(roomCache[roomName]) do
-                    celesteRender.releaseBatch(roomName, name)
+                for name, _ in pairs(roomCache[roomName]) do
+                    celesteRender.clearBatchTask(roomName, name)
                 end
-
-                roomCache[roomName] = nil
             end
         end
 
@@ -228,7 +228,9 @@ function celesteRender.getRoomRandomMatrix(room, key)
     if regen then
         utils.setRandomSeed(roomName)
 
-        local m = matrix.fromFunction(math.random, tileWidth, tileHeight)
+        local m = matrix.fromFunction(function()
+            return math.random()
+        end, tileWidth, tileHeight)
 
         roomRandomMatrixCache[roomName] = roomRandomMatrixCache[roomName] or {}
         roomRandomMatrixCache[roomName][key] = m
@@ -419,12 +421,14 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
     local bxor = bit.bxor
     local band = bit.band
 
+    local canvasOrMatrixBatch = batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch"
+    local tableBatch = batchMode == "table"
+
     local airTile = "0"
     local emptyTile = " "
     local wildcard = "*"
 
     local defaultQuad = {{0, 0}}
-    local defaultSprite = ""
 
     local width, height = tilesMatrix:size()
     local batch = getTilesBatchFromMode(width, height, batchMode)
@@ -435,46 +439,48 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
     local sceneryMeta = celesteRender.getSceneryMeta()
     local sceneryWidth, sceneryHeight = sceneryMeta.realWidth, sceneryMeta.realHeight
 
+    local gameplayAtlas = atlases.gameplay
+
     local missingTiles = {}
 
     for x = 1, width do
         for y = 1, height do
-            local rng = random:getInbounds(x, y)
-            local tile = tilesMatrix:getInbounds(x, y) or airTile
+            local tile = tilesMatrix:getInbounds(x, y)
             local sceneryTile = sceneryMatrix:getInbounds(x, y) or -1
 
             if sceneryTile > -1 then
                 local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
 
                 if quad then
-                    if batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch" then
+                    if canvasOrMatrixBatch then
                         batch:set(x, y, sceneryMeta, quad, x * 8 - 8, y * 8 - 8)
 
-                    elseif batchMode == "table" then
+                    elseif tableBatch then
                         table.insert(batch, {sceneryMeta, quad, x * 8 - 8, y * 8 - 8})
                     end
                 end
 
-            elseif tile ~= airTile then
+            elseif tile and tile ~= airTile then
                 local tileMeta = meta[tile]
-                if tileMeta and tileMeta.path then
+                local texture = tileMeta.path
+                if tileMeta and texture then
                     -- TODO - Render overlay sprites
-                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, meta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
+                    local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
                     if quadCount > 0 then
-                        local randQuad = quads[utils.mod1(rng, quadCount)]
-                        local texture = tileMeta.path or emptyTile
+                        local rng = random:getInbounds(x, y)
+                        local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
 
-                        local spriteMeta = atlases.gameplay[texture]
+                        local spriteMeta = gameplayAtlas[texture]
 
                         if spriteMeta then
                             local quad = celesteRender.getOrCacheTileSpriteQuad(tileCache, tile, texture, randQuad, fg)
 
-                            if batchMode == "gridCanvasDrawingBatch" or batchMode == "matrixDrawingBatch" then
+                            if canvasOrMatrixBatch then
                                 batch:set(x, y, spriteMeta, quad, x * 8 - 8, y * 8 - 8)
 
-                            elseif batchMode == "table" then
+                            elseif tableBatch then
                                 table.insert(batch, {spriteMeta, quad, x * 8 - 8, y * 8 - 8})
                             end
 
