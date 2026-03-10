@@ -373,7 +373,7 @@ function smartDrawingBatch.createMatrixBatch(default, width, height, cellWidth, 
     res._matrix = matrix.filled(default, width, height)
 
     -- Track where the cells are drawn
-    res._idMatrix = matrix.filled(false, width, height)
+    res._idMatrix = matrix.filled(nil, width, height)
     res._batch = smartDrawingBatch.createUnorderedBatch()
 
     return setmetatable(res, matrixDrawingBatchMt)
