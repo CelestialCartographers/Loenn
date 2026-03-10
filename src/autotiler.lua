@@ -38,11 +38,11 @@ local function checkMask(adjacent, mask)
 end
 
 function autotiler.checkTile(value, target, ignore, air, wildcard)
-    if ignore then
-        return not (target == air or ignore[target])
+    if target == air then
+        return false
     end
 
-    return target ~= air
+    return not (ignore and ignore[target])
 end
 
 local function checkMaskFromTiles(mask, checks)
@@ -68,15 +68,11 @@ local function checkMaskFromTilesWithBitmask(tilemask, bitmask, ignoremask, bxor
     return band(bxor(tilemask, bitmask), ignoremask) == 0
 end
 
-local function getTile(tiles, x, y, emptyTile)
-    return tiles:get(x, y, emptyTile)
-end
-
 local function checkPadding(tiles, x, y, tile, ignores, airTile, emptyTile, wildcard)
-    local left = getTile(tiles, x - 2, y, tile)
-    local right = getTile(tiles, x + 2, y, tile)
-    local up = getTile(tiles, x, y - 2, tile)
-    local down = getTile(tiles, x, y + 2, tile)
+    local left = tiles:get(x - 2, y, tile)
+    local right = tiles:get(x + 2, y, tile)
+    local up = tiles:get(x, y - 2, tile)
+    local down = tiles:get(x, y + 2, tile)
 
     -- Special case for tiles with ignores, should treat ignored tiles as "air"
     if ignores and ignores.hasIgnores then
@@ -93,14 +89,18 @@ local function getPaddingOrCenterQuad(x, y, tile, tiles, tileMeta, airTile, empt
     local ignores = tileMeta.ignores
 
     if checkPadding(tiles, x, y, tile, ignores, airTile, emptyTile, wildcard) then
-        local padding = tileMeta.padding
+        if tileMeta.hasPadding then
+            return tileMeta.padding, defaultSprite
+        end
 
-        return padding and #padding > 0 and padding or defaultQuad, defaultSprite
+        return defaultQuad, defaultSprite
 
     else
-        local center = tileMeta.center
+        if tileMeta.hasCenter then
+            return tileMeta.center, defaultSprite
+        end
 
-        return center and #center > 0 and center or defaultQuad, defaultSprite
+        return defaultQuad, defaultSprite
     end
 end
 
@@ -286,6 +286,7 @@ local function readTilesetInfo(tileset, id, element)
             end
 
             tileset.padding = utils.unique(tileset.padding, tileStringHashFunction)
+            tileset.hasPadding = tileset.padding and #tileset.padding > 0
 
         elseif mask == "center" then
             local newCenters = convertTileString(tiles)
@@ -295,6 +296,7 @@ local function readTilesetInfo(tileset, id, element)
             end
 
             tileset.center = utils.unique(tileset.center, tileStringHashFunction)
+            tileset.hasCenter = tileset.center and #tileset.center > 0
 
         else
             local maskMatrix = convertMaskString(mask, tileset.scanWidth, tileset.scanHeight)
