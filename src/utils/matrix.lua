@@ -1,5 +1,6 @@
 -- Fast Matrix implementation in Lua
 -- Most set/gets are inlined for performance reasons
+local tableNew = require("table.new")
 
 local matrix = {}
 
@@ -16,11 +17,19 @@ function matrixMt.__index:getInbounds(x, y)
 end
 
 function matrixMt.__index:get0(x, y, default)
-    return x >= 0 and x < self._width and y >= 0 and y < self._height and self[x + y * self._width + 1] or default
+    if x >= 0 and x < self._width and y >= 0 and y < self._height then
+        return self[x + y * self._width + 1] or default
+    end
+
+    return default
 end
 
 function matrixMt.__index:get(x, y, default)
-    return x >= 1 and x <= self._width and y >= 1 and y <= self._height and self[(x - 1) + (y - 1) * self._width + 1] or default
+    if x >= 1 and x <= self._width and y >= 1 and y <= self._height then
+        return self[(x - 1) + (y - 1) * self._width + 1] or default
+    end
+
+    return default
 end
 
 
@@ -221,9 +230,7 @@ end
 
 
 function matrix.filled(default, width, height)
-    local m = {
-        _type = "matrix"
-    }
+    local m = tableNew(width * height, 3)
 
     if default ~= nil then
         for i = 1, width * height do
@@ -231,6 +238,7 @@ function matrix.filled(default, width, height)
         end
     end
 
+    m._type = "matrix"
     m._width = width
     m._height = height
 
