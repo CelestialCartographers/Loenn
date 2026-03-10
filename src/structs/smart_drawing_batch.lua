@@ -308,7 +308,7 @@ matrixDrawingBatchMt.__index = {}
 
 function matrixDrawingBatchMt.__index:set(x, y, meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
     if meta then
-        local previousValue = self._matrix:get(x, y)
+        local previousValue = self._idMatrix:get(x, y)
 
         if previousValue then
             self:remove(x, y, meta)
@@ -316,7 +316,6 @@ function matrixDrawingBatchMt.__index:set(x, y, meta, quad, drawX, drawY, r, sx,
 
         local id = self._batch:add(meta, quad, drawX, drawY, r, sx, sy, jx, jy, ox, oy)
 
-        self._matrix:set(x, y, true)
         self._idMatrix:set(x, y, id)
 
     else
@@ -325,7 +324,7 @@ function matrixDrawingBatchMt.__index:set(x, y, meta, quad, drawX, drawY, r, sx,
 end
 
 function matrixDrawingBatchMt.__index:get(x, y, default)
-    return self._matrix:get(x, y, default)
+    return self._idMatrix:get(x, y, default)
 end
 
 function matrixDrawingBatchMt.__index:remove(x, y, meta)
@@ -336,7 +335,6 @@ function matrixDrawingBatchMt.__index:remove(x, y, meta)
         batch:remove(id, meta)
 
         self._idMatrix:set(x, y, false)
-        self._matrix:set(x, y, false)
     end
 end
 
