@@ -38,11 +38,11 @@ local function checkMask(adjacent, mask)
 end
 
 function autotiler.checkTile(value, target, ignore, air, wildcard)
-    if ignore then
-        return not (target == air or ignore[target])
+    if target == air then
+        return false
     end
 
-    return target ~= air
+    return not (ignore and ignore[target])
 end
 
 local function checkMaskFromTiles(mask, checks)
