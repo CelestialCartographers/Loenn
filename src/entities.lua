@@ -444,7 +444,7 @@ function entities.getNodeRectangles(room, entity, viewport, handlerOverride)
                     nodeRectangle = entities.getDrawableRectangle(nodeDrawable)
                 end
 
-                table.insert(rectangles, utils.deepcopy(nodeRectangle))
+                table.insert(rectangles, nodeRectangle)
             end
         end
     end
