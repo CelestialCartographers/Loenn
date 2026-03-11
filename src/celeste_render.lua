@@ -446,7 +446,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
     for x = 1, width do
         for y = 1, height do
             local tile = tilesMatrix:getInbounds(x, y)
-            local sceneryTile = sceneryMatrix and sceneryMatrix:getInbounds(x, y, -1)
+            local sceneryTile = sceneryMatrix and sceneryMatrix:getInbounds(x, y, -1) or -1
 
             if sceneryTile > -1 then
                 local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
