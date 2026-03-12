@@ -320,10 +320,10 @@ end
 
 -- Get node drawable with pcall, return drawables from the erroring entity handler if not successful
 function entities.getNodeDrawable(name, handler, room, entity, node, nodeIndex, viewport)
-    local success, drawables = pcall(entities.getNodeDrawableUnsafe, name, handler, room, entity, node, nodeIndex, viewport)
+    local success, drawables, depth, usedMainEntityDrawable = pcall(entities.getNodeDrawableUnsafe, name, handler, room, entity, node, nodeIndex, viewport)
 
     if success then
-        return drawables
+        return drawables, depth, usedMainEntityDrawable
 
     else
         logEntityDefinitionError("rendering node", drawables, room, entity)
@@ -444,7 +444,7 @@ function entities.getNodeRectangles(room, entity, viewport, handlerOverride)
                     nodeRectangle = entities.getDrawableRectangle(nodeDrawable)
                 end
 
-                table.insert(rectangles, utils.deepcopy(nodeRectangle))
+                table.insert(rectangles, nodeRectangle)
             end
         end
     end
