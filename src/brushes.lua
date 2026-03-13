@@ -132,7 +132,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local roomCache = celesteRender.getRoomCache(room.name, layer)
     local batch = roomCache and roomCache.result
 
-    local sceneryMatrix = scenery and scenery.matrix or matrix.filled(-1, width, height)
+    local sceneryMatrix = scenery and scenery.matrix
     local sceneryMeta = celesteRender.getSceneryMeta()
 
     if not batch then
@@ -195,9 +195,8 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         local x, y = needsUpdate[updateIndex], needsUpdate[updateIndex + 1]
 
         if tilesMatrix:inbounds(x, y) then
-            local rng = random:getInbounds(x, y)
             local tile = tilesMatrix:getInbounds(x, y)
-            local sceneryTile = sceneryMatrix:getInbounds(x, y) or -1
+            local sceneryTile = sceneryMatrix:getInbounds(x, y, -1) or -1
 
             if sceneryTile > -1 then
                 local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
@@ -212,14 +211,15 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
             else
                 -- TODO - Update overlay sprites
                 local tileMeta = meta[tile]
+                local texture = tileMeta.path
 
                 if tileMeta and tileMeta.path then
                     local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
                     if quadCount > 0 then
+                        local rng = random:getInbounds(x, y)
                         local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
-                        local texture = meta[tile].path or emptyTile
 
                         local spriteMeta = atlases.gameplay[texture]
 
