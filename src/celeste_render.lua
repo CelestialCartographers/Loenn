@@ -399,7 +399,7 @@ local function getTilesBatchFromMode(width, height, mode)
         return smartDrawingBatch.createGridCanvasBatch(false, width, height, 8, 8)
 
     elseif mode == "matrixDrawingBatch" then
-        return smartDrawingBatch.createMatrixBatch(false, width, height, 8, 8)
+        return smartDrawingBatch.createMatrixBatch(width, height, 8, 8)
 
     elseif mode == "table" then
         return {}

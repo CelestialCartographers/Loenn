@@ -359,7 +359,7 @@ function matrixDrawingBatchMt.__index:release()
 end
 
 -- Only works with textures
-function smartDrawingBatch.createMatrixBatch(default, width, height, cellWidth, cellHeight)
+function smartDrawingBatch.createMatrixBatch(width, height, cellWidth, cellHeight)
     local res = {
         _type = "matrixDrawingBatch",
     }
@@ -369,8 +369,6 @@ function smartDrawingBatch.createMatrixBatch(default, width, height, cellWidth, 
 
     res._cellWidth = cellWidth
     res._cellHeight = cellHeight
-
-    res._matrix = matrix.filled(default, width, height)
 
     -- Track where the cells are drawn
     res._idMatrix = matrix.filled(nil, width, height)
