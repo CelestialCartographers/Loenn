@@ -47,11 +47,13 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
 end
 
 local function addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
-    if not addedUpdate:get(x, y) then
+    if not addedUpdate or not addedUpdate:get(x, y) then
         table.insert(needsUpdate, x)
         table.insert(needsUpdate, y)
 
-        addedUpdate:set(x, y, true)
+        if addedUpdate then
+            addedUpdate:set(x, y, true)
+        end
     end
 end
 
@@ -107,7 +109,6 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local tilesMatrix = tiles.matrix
 
     -- Getting upvalues
-    local gameplayAtlas = atlases.gameplay
     local cache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
@@ -124,8 +125,18 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local defaultQuad = {{0, 0}}
     local defaultSprite = ""
 
-    local width, height = tilesMatrix:size()
-    local addedUpdate = matrix.filled(nil, width, height)
+    local materialType = utils.typeof(material)
+
+    -- No need to create matrix for single tile brushing
+    local trackAddedUpdates = materialType == "matrix"
+    local addedUpdate
+
+    if trackAddedUpdates then
+        local width, height = tilesMatrix:size()
+
+        addedUpdate = matrix.filled(nil, width, height)
+    end
+
     local needsUpdate = {}
 
     local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, layer)
@@ -138,8 +149,6 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     if not batch then
         return false
     end
-
-    local materialType = utils.typeof(material)
 
     if materialType == "matrix" then
         local materialWidth, materialHeight = material:size()
