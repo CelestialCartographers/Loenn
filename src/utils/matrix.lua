@@ -63,6 +63,10 @@ function matrixMt.__index:inbounds0(x, y)
 end
 
 
+function matrixMt.__index:index(x, y)
+    return (x - 1) + (y - 1) * self._width + 1
+end
+
 function matrixMt.__index:size()
     return self._width, self._height
 end
