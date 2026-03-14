@@ -316,25 +316,30 @@ function utils.unbackslashify(text)
 end
 
 function utils.parseHexColor(color)
-    color := match("^#?([0-9a-fA-F]+)$")
-
-    if color then
-        if #color == 6 then
-            local number = tonumber(color, 16)
-            local r, g, b = math.floor(number / 256^2) % 256, math.floor(number / 256) % 256, math.floor(number) % 256
-
-            return true, r / 255, g / 255, b / 255
-
-        elseif #color == 8 then
-            local number = tonumber(color, 16)
-            local r, g, b = math.floor(number / 256^3) % 256, math.floor(number / 256^2) % 256, math.floor(number / 256) % 256
-            local a = math.floor(number) % 256
-
-            return true, r / 255, g / 255, b / 255, a / 255
-        end
+    if utils.startsWith(color, "#") then
+        color = string.sub(color, 2)
     end
 
-    return false, 0, 0, 0
+    if #color ~= 6 and #color ~= 8 then
+        return false, 0, 0, 0
+    end
+
+    local number = tonumber(color, 16)
+
+    if not number then
+        return false, 0, 0, 0
+    end
+
+    local r, g, b = math.floor(number / 256^2) % 256, math.floor(number / 256) % 256, number % 256
+
+    if #color == 6 then
+        return true, r / 255, g / 255, b / 255
+
+    elseif #color == 8 then
+        local a = math.floor(number) % 256
+
+        return true, r / 255, g / 255, b / 255, a / 255
+    end
 end
 
 function utils.rgbToHex(r, g, b)
