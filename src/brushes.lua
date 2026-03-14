@@ -47,11 +47,13 @@ function brushHelper.placeTileRaw(room, x, y, material, layer)
 end
 
 local function addNeighborIfMissing(x, y, needsUpdate, addedUpdate)
-    if not addedUpdate:get(x, y) then
+    if not addedUpdate or not addedUpdate:get(x, y) then
         table.insert(needsUpdate, x)
         table.insert(needsUpdate, y)
 
-        addedUpdate:set(x, y, true)
+        if addedUpdate then
+            addedUpdate:set(x, y, true)
+        end
     end
 end
 
@@ -107,7 +109,6 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local tilesMatrix = tiles.matrix
 
     -- Getting upvalues
-    local gameplayAtlas = atlases.gameplay
     local cache = celesteRender.tilesSpriteMetaCache
     local autotiler = autotiler
     local meta = fg and celesteRender.tilesMetaFg or celesteRender.tilesMetaBg
@@ -124,22 +125,30 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
     local defaultQuad = {{0, 0}}
     local defaultSprite = ""
 
-    local width, height = tilesMatrix:size()
-    local addedUpdate = matrix.filled(nil, width, height)
+    local materialType = utils.typeof(material)
+
+    -- No need to create matrix for single tile brushing
+    local trackAddedUpdates = materialType == "matrix"
+    local addedUpdate
+
+    if trackAddedUpdates then
+        local width, height = tilesMatrix:size()
+
+        addedUpdate = matrix.filled(nil, width, height)
+    end
+
     local needsUpdate = {}
 
     local random = randomMatrix or celesteRender.getRoomRandomMatrix(room, layer)
     local roomCache = celesteRender.getRoomCache(room.name, layer)
     local batch = roomCache and roomCache.result
 
-    local sceneryMatrix = scenery and scenery.matrix or matrix.filled(-1, width, height)
+    local sceneryMatrix = scenery and scenery.matrix
     local sceneryMeta = celesteRender.getSceneryMeta()
 
     if not batch then
         return false
     end
-
-    local materialType = utils.typeof(material)
 
     if materialType == "matrix" then
         local materialWidth, materialHeight = material:size()
@@ -195,9 +204,8 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
         local x, y = needsUpdate[updateIndex], needsUpdate[updateIndex + 1]
 
         if tilesMatrix:inbounds(x, y) then
-            local rng = random:getInbounds(x, y)
             local tile = tilesMatrix:getInbounds(x, y)
-            local sceneryTile = sceneryMatrix:getInbounds(x, y) or -1
+            local sceneryTile = sceneryMatrix:getInbounds(x, y, -1) or -1
 
             if sceneryTile > -1 then
                 local quad = celesteRender.getOrCacheScenerySpriteQuad(sceneryTile)
@@ -212,14 +220,15 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
             else
                 -- TODO - Update overlay sprites
                 local tileMeta = meta[tile]
+                local texture = tileMeta.path
 
                 if tileMeta and tileMeta.path then
                     local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
                     if quadCount > 0 then
+                        local rng = random:getInbounds(x, y)
                         local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
-                        local texture = meta[tile].path or emptyTile
 
                         local spriteMeta = atlases.gameplay[texture]
 

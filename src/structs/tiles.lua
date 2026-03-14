@@ -1,4 +1,5 @@
-local matrix = require("utils.matrix")
+local tableNew = require("table.new")
+local matrixLib = require("utils.matrix")
 local utils = require("utils")
 
 local tilesStruct = {}
@@ -7,7 +8,7 @@ function tilesStruct.matrixToTileString(matrix, separator, empty)
     separator = separator or ""
     empty = empty or "0"
 
-    local width, height = matrix:size
+    local width, height = matrix:size()
 
     local lines = {}
 
@@ -27,21 +28,19 @@ end
 local function getRelevantCols(matrix, empty)
     empty = empty or "0"
 
-    local width, height = matrix:size
-    local relevantCols = {}
+    local width, height = matrix:size()
+    local relevantCols = tableNew(height, 0)
 
     for y = 1, height do
-        for x = width, 1, -1 do
-            if matrix:getInbounds(x, y) ~= empty then
-                relevantCols[y] = x
+        local matrixRowStart = matrix:index(0, y)
+        local x = width
 
-                break
-            end
+        -- Look for first non empty tile from right to left
+        while x > 0 and matrix[matrixRowStart + x] == empty do
+            x = x - 1
         end
 
-        if #relevantCols ~= y then
-            relevantCols[y] = 0
-        end
+        relevantCols[y] = x
     end
 
     return relevantCols
@@ -61,19 +60,15 @@ function tilesStruct.matrixToTileStringMinimized(matrix, separator, empty)
     separator = separator or ""
     empty = empty or "0"
 
-    local width, height = matrix:size
     local relevantCols = getRelevantCols(matrix, empty)
     local relevantRowsCount = getRelevantRowCount(relevantCols)
     local lines = {}
 
     for y = 1, relevantRowsCount do
-        local row = {}
+        local start = matrix:index(1, y)
+        local stop = matrix:index(relevantCols[y], y)
 
-        for x = 1, relevantCols[y] do
-            row[x] = matrix:getInbounds(x, y)
-        end
-
-        lines[y] = table.concat(row, separator)
+        lines[y] = table.concat(matrix, "", start, stop)
     end
 
     return table.concat(lines, "\n")
@@ -89,11 +84,11 @@ function tilesStruct.tileStringToMatrix(tiles, separator, empty)
     local cols = 0
     local rows = #lines
 
-    for i, line in ipairs(lines) do
+    for _, line in ipairs(lines) do
         cols = math.max(cols, #line)
     end
 
-    local res = matrix.filled(empty, cols, rows)
+    local res = matrixLib.filled(empty, cols, rows)
     local parseNumber = type(empty) == "number"
 
     for y, line in ipairs(lines) do
@@ -128,7 +123,7 @@ function tilesStruct.resizeMatrix(tiles, width, height, default, offsetX, offset
 
     if not sameSize or hasOffset then
         local simpleResize = not hasOffset and tilesWidth <= width and tilesHeight <= height
-        local newTilesMatrix = matrix.filled(default, width, height)
+        local newTilesMatrix = matrixLib.filled(default, width, height)
 
         if simpleResize then
             for x = 1, tilesWidth do
