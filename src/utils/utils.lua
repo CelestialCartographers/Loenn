@@ -7,6 +7,14 @@ local bit = require("bit")
 local ffi = require("ffi")
 local utf8 = require("utf8")
 
+local xnaColorsLookup = {}
+local xnaColorsNameLookup = {}
+
+for colorName, color in pairs(xnaColors) do
+    xnaColorsLookup[string.lower(colorName)] = color
+    xnaColorsNameLookup[string.lower(colorName)] = colorName
+end
+
 local rectangles = require("structs.rectangle")
 
 local utils = {}
@@ -421,11 +429,10 @@ end
 -- Case insensitive XNA color getter
 function utils.getXNAColor(name)
     local nameLower = name:lower()
+    local color = xnaColorsLookup[nameLower]
 
-    for colorName, color in pairs(xnaColors) do
-        if colorName:lower() == nameLower then
-            return color, colorName
-        end
+    if color then
+        return color, xnaColorsNameLookup[nameLower]
     end
 
     return false, false
