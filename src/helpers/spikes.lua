@@ -493,8 +493,17 @@ function spikeHelper.createEntityHandler(name, direction, ...)
 
     function handler.selection(room, entity)
         local sprites = spriteFunction(entity, direction, originalTriggerSpike)
+        local spriteCount = #sprites
 
-        return entities.getDrawableRectangle(sprites)
+        -- Reduce amount of rectangle cover checking
+        -- If we have multiple splrites they should all fit between first and last one
+
+        if spriteCount == 1 then
+            return sprites[1]:getRectangle()
+
+        elseif spriteCount > 1 then
+            return entities.getDrawableRectangle({sprites[1], sprites[spriteCount]})
+        end
     end
 
     if handlerDirectionNames then
