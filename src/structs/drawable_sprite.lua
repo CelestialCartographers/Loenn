@@ -101,14 +101,16 @@ function drawableSpriteMt.__index:getRectangleRaw()
     local x = self.x
     local y = self.y
 
-    local width = self.meta.width
-    local height = self.meta.height
+    local meta = self.meta
 
-    local realWidth = self.meta.realWidth
-    local realHeight = self.meta.realHeight
+    local width = meta.width
+    local height = meta.height
 
-    local offsetX = self.offsetX or self.meta.offsetX
-    local offsetY = self.offsetY or self.meta.offsetY
+    local realWidth = meta.realWidth
+    local realHeight = meta.realHeight
+
+    local offsetX = self.offsetX or meta.offsetX
+    local offsetY = self.offsetY or meta.offsetY
 
     local renderOffsetX = self.renderOffsetX or 0
     local renderOffsetY = self.renderOffsetY or 0
@@ -175,8 +177,10 @@ function drawableSpriteMt.__index:drawRectangle(mode, color)
 end
 
 function drawableSpriteMt.__index:draw(alpha)
-    local offsetX = self.offsetX or math.floor((self.justificationX or 0.0) * self.meta.realWidth + self.meta.offsetX) + self.renderOffsetX
-    local offsetY = self.offsetY or math.floor((self.justificationY or 0.0) * self.meta.realHeight + self.meta.offsetY) + self.renderOffsetY
+    local meta = self.meta
+
+    local offsetX = self.offsetX or math.floor((self.justificationX or 0.0) * meta.realWidth + self.meta.offsetX) + self.renderOffsetX
+    local offsetY = self.offsetY or math.floor((self.justificationY or 0.0) * meta.realHeight + self.meta.offsetY) + self.renderOffsetY
 
     local layer = self.meta.layer
 
@@ -192,19 +196,19 @@ function drawableSpriteMt.__index:draw(alpha)
             end
 
             if layer then
-                love.graphics.drawLayer(self.meta.image, layer, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+                love.graphics.drawLayer(meta.image, layer, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
 
             else
-                love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+                love.graphics.draw(meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
             end
         end)
 
     else
         if layer then
-            love.graphics.drawLayer(self.meta.image, layer, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+            love.graphics.drawLayer(meta.image, layer, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
 
         else
-            love.graphics.draw(self.meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
+            love.graphics.draw(meta.image, self.quad, self.x, self.y, self.rotation, self.scaleX, self.scaleY, offsetX, offsetY)
         end
     end
 end
