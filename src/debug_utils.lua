@@ -197,7 +197,9 @@ function debugUtils.getCallPath(startLevel)
 
         level += 1
 
-        table.insert(parts, string.format("%s L%s", info.source, info.currentline))
+        local source = modHandler.cleanDebugSource(info.source)
+
+        table.insert(parts, string.format("%s L%s", source, info.currentline))
     end
 
     return table.concat(parts, " <- ")

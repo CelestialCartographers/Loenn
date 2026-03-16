@@ -331,7 +331,7 @@ function modHandler.unrequireKnownPluginRequires()
     end
 end
 
-local function cleanDebugSource(source)
+function modHandler.cleanDebugSource(source)
     -- Remove @ from mod content requires, added to fix luajit profiler
     if utils.startsWith(source, "@" .. modHandler.specificModContentSymbol) then
         return string.sub(source, 2)
@@ -353,7 +353,7 @@ function modHandler.requireFromPlugin(lib, modName)
 
     else
         local info = debug.getinfo(2)
-        local source = cleanDebugSource(info.source)
+        local source = mods.cleanDebugSource(info.source)
         local parts = string.split(source, "/")()
 
         libPrefix = table.concat(parts, ".", 1, 2)
@@ -387,7 +387,7 @@ function modHandler.filenameFromPlugin(filename, modName)
 
     else
         local info = debug.getinfo(2)
-        local source = cleanDebugSource(info.source)
+        local source = mods.cleanDebugSource(info.source)
         local parts = string.split(source, "/")()
 
         filenamePrefix = table.concat(parts, "/", 1, 2)
@@ -438,7 +438,7 @@ function modHandler.getCurrentModName(maxDepth)
             return
         end
 
-        local source = cleanDebugSource(info.source)
+        local source = mods.cleanDebugSource(info.source)
 
         if utils.startsWith(source, modHandler.specificModContentSymbol) then
             local parts = string.split(source, "/")()
