@@ -375,7 +375,7 @@ function modHandler.requireFromPlugin(lib, modName)
 end
 
 -- Defaults to current mod directory
-function modHandler.readFromPlugin(filename, modName)
+function modHandler.filenameFromPlugin(filename, modName)
     local filenamePrefix
 
     if modName then
@@ -394,7 +394,16 @@ function modHandler.readFromPlugin(filename, modName)
     end
 
     if filename and filenamePrefix then
-        local content = utils.readAll(filenamePrefix .. "/" .. filename)
+        return filenamePrefix .. "/" .. filename
+    end
+end
+
+-- Defaults to current mod directory
+function modHandler.readFromPlugin(filename, modName)
+    local filenameFromPlugin = modHandler.filenameFromPlugin(filename, modName)
+
+    if filenameFromPlugin then
+        local content = utils.readAll(filenameFromPlugin)
 
         return content
     end
