@@ -58,7 +58,11 @@ function themes.loadThemes(filenames)
         local filenameNoPath = utils.filename(filename, "/")
 
         if filenameNoPath == "theme.lua" then
-            loadTheme(filename)
+            local success = pcall(loadTheme, filename)
+
+            if not success then
+                logging.warning(string.format("Failed to load theme from '%s'", filename))
+            end
         end
     end
 end
