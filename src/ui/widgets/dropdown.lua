@@ -19,13 +19,15 @@ uiElements.add("magicDropdown", {
     }
 })
 
-local function closeDropdown(list)
+local function closeDropdown(list, focusParent)
     list.dropdownMenuVisible = false
     list.container:removeSelf()
 
-    ui.runLate(function()
-        widgetUtils.focusElement(list.options.spawnParent)
-    end)
+    if focusParent ~= false then
+        ui.runLate(function()
+            widgetUtils.focusElement(list.options.spawnParent)
+        end)
+    end
 end
 
 local function dataToElement(list, data, element)
@@ -68,7 +70,7 @@ local function listUpdate(orig, self, dt)
         end
 
         if not focused then
-            closeDropdown(self)
+            closeDropdown(self, false)
         end
     end
 end
@@ -111,7 +113,7 @@ function dropdowns.fromList(callback, stringOptions, options)
                 self:revealDropdown(false)
 
             else
-                self:closeDropdown()
+                self:closeDropdown(false)
             end
         end
     end)
@@ -159,8 +161,8 @@ function dropdowns.fromList(callback, stringOptions, options)
         return not dropdownListVisible or revealedWithEmptyList
     end
 
-    function button.closeDropdown(self)
-        closeDropdown(self.list)
+    function button.closeDropdown(self, focusParent)
+        closeDropdown(self.list, focusParent)
     end
 
     function button.revealDropdown(self, fromSearchFilter)
