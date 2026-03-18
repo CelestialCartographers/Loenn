@@ -85,6 +85,13 @@ local function listOnKeyRelease(orig, self, key, ...)
     return orig(self, key, ...)
 end
 
+-- Prevent key events from leaking onto the editor
+local function listOnKeyPressed(orig, self, key, ...)
+    orig(self, key, ...)
+
+    return true
+end
+
 function dropdowns.fromList(callback, stringOptions, options)
     options = options or {}
     options.dataToElement = options.dataToElement or dataToElement
@@ -138,6 +145,7 @@ function dropdowns.fromList(callback, stringOptions, options)
     list:hook({
         update = listUpdate,
         onKeyRelease = listOnKeyRelease,
+        onKeyPress = listOnKeyPressed,
     })
 
     list.options = options
