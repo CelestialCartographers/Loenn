@@ -647,7 +647,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
 
     mouseMoved(px, py)
 
-    if not placementDragCompleted and love.mouse.isDown(actionButton) then
+    if not placementDragCompleted and actionButton and love.mouse.isDown(actionButton) then
         if px and py and placementDragStartX and placementDragStartY then
             local width, height = px - placementDragStartX, py - placementDragStartY
 
