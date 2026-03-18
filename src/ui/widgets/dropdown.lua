@@ -14,6 +14,7 @@ local dropdowns = {}
 -- For styling
 uiElements.add("magicDropdown", {
     style = {
+        margin = 4,
         padding = 4,
         spacing = 0,
     }
@@ -139,6 +140,7 @@ function dropdowns.fromList(callback, stringOptions, options)
     listColumn.style.padding = 0
     listColumn.style.spacing = 0
 
+    listPanel.style.margin = dropdownStyle.margin
     listPanel.style.padding = dropdownStyle.padding
     listPanel.style.spacing = dropdownStyle.spacing
 
@@ -179,7 +181,7 @@ function dropdowns.fromList(callback, stringOptions, options)
 
         if self:shouldReveal() then
             local spawnX = spawnParent.screenX
-            local spawnY = spawnParent.screenY + spawnParent.height
+            local spawnY = spawnParent.screenY + spawnParent.height + dropdownStyle.margin
 
             if spawnParent.parent then
                 spawnY += spawnParent.parent.style.spacing
@@ -196,6 +198,7 @@ function dropdowns.fromList(callback, stringOptions, options)
             list.container.realY = -4096
 
             list:layout()
+            list.container:layout()
 
             -- Let layouting finish
             ui.runLate(function()
@@ -203,14 +206,14 @@ function dropdowns.fromList(callback, stringOptions, options)
                     -- List height didn't seem to make sense after two layout calls, this is good enough
                     local listHeight = lists.getMagicListHeight(list)
                     local listBottom = spawnY + listHeight
-                    local rootBottom = spawnRoot.realY + spawnRoot.height
+                    local rootBottom = spawnRoot.realY + spawnRoot.height - dropdownStyle.margin
 
                     list.container.height = math.min(listHeight, spawnRoot.height)
 
                     if listBottom > rootBottom then
                         if fromSearchFilter then
                             list.height = rootBottom - spawnY
-                            list.container.height = rootBottom - spawnY
+                            list.container.height = rootBottom - spawnY - 2 * dropdownStyle.padding
 
                         else
                             local offsetY = listBottom - rootBottom
@@ -233,7 +236,9 @@ function dropdowns.fromList(callback, stringOptions, options)
                         list.shownOnce = true
                     end
 
-                    widgetUtils.focusElement(list)
+                    if not fromSearchFilter then
+                        widgetUtils.focusElement(list)
+                    end
                 end)
             end)
 
@@ -254,6 +259,15 @@ function dropdowns.fromList(callback, stringOptions, options)
     end
 
     function button.filter(self, text, preventCallback)
+        local spawnRoot = options.spawnRoot or ui.root
+        local spawnParent = options.spawnParent or self
+
+        local spawnY = spawnParent.screenY + spawnParent.height + dropdownStyle.margin
+        local rootBottom = spawnRoot.realY + spawnRoot.height - dropdownStyle.margin
+
+        list.height = rootBottom - spawnY
+        list.container.height = rootBottom - spawnY - 2 * dropdownStyle.padding
+
         list:filter(text, preventCallback)
     end
 
