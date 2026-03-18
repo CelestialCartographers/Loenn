@@ -583,7 +583,8 @@ end
 function listWidgets.updateItems(list, items, target, fromFilter, preventCallback, callbackRequiresChange, forceSort)
     local options = list.options
     local filterItems = options.filterItems or defaultFilterItems
-    local previousSelection = list.selected and list.selected.data
+    local selected = list:getSelectedData()
+    local previousSelection = selected and selected.data
     local newSelection
 
     local processedItems = items
