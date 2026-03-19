@@ -101,6 +101,12 @@ function fieldDropdown.addDropdown(field, dropdown, searchable)
         listWidgets.addSearchFieldHooks(dropdown.list, field, hookOptions)
     end
 
+    -- Do not allow tab cycling while dropdown menu is visible
+    -- Causes issues with default select key
+    field._tabCycleEnabled = function()
+        return not dropdown.list.dropdownMenuVisible
+    end
+
     return field
 end
 

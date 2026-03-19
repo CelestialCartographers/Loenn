@@ -308,7 +308,9 @@ function widgetUtils.addTabCycleHook(element, nextElement, previousElement)
 
     element:hook({
         onKeyPress = function(orig, self, key, ...)
-            if key == "tab" then
+            local tabCycleEnabled = utils.callIfFunction(self._tabCycleEnabled)
+
+            if tabCycleEnabled ~= false and key == "tab" then
                 local reverse = love.keyboard.isDown("lshift", "rshift")
 
                 if reverse then
@@ -321,7 +323,7 @@ function widgetUtils.addTabCycleHook(element, nextElement, previousElement)
                 return true
             end
 
-            orig(self, key, ...)
+            return orig(self, key, ...)
         end
     })
 
