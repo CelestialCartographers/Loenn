@@ -107,7 +107,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
 
         lastMouseX, lastMouseY = tx, ty
 
-        if love.mouse.isDown(actionButton) then
+        if actionButton and love.mouse.isDown(actionButton) then
             dragX, dragY = tx, ty
         end
     end

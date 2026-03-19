@@ -330,13 +330,13 @@ function utils.parseHexColor(color)
         return false, 0, 0, 0
     end
 
-    local r, g, b = math.floor(number / 256^2) % 256, math.floor(number / 256) % 256, number % 256
-
     if #color == 6 then
+        local r, g, b = math.floor(number / 256^2) % 256, math.floor(number / 256) % 256, number % 256
+
         return true, r / 255, g / 255, b / 255
 
     elseif #color == 8 then
-        local a = math.floor(number) % 256
+        local r, g, b, a = math.floor(number / 256^3) % 256, math.floor(number / 256^2) % 256, math.floor(number / 256) % 256, number % 256
 
         return true, r / 255, g / 255, b / 255, a / 255
     end

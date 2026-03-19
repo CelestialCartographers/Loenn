@@ -1387,7 +1387,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local cursorX, cursorY = toolUtils.getCursorPositionInRoom(x, y)
 
     if cursorX and cursorY then
-        if love.mouse.isDown(actionButton) then
+        if actionButton and love.mouse.isDown(actionButton) then
             -- Try in this order: resize, move, select
             if resizeDirection then
                 mouseMovedResize(cursorX, cursorY)

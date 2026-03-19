@@ -53,7 +53,7 @@ end
 function tool.mousemoved(x, y, dx, dy, istouch)
     local actionButton = configs.editor.toolActionButton
 
-    if love.mouse.isDown(actionButton) then
+    if actionButton and love.mouse.isDown(actionButton) then
         brushToolUtils.startTileSnapshot(tool)
         brushToolUtils.handleActionClick(tool, x, y)
     end

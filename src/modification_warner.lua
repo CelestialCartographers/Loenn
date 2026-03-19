@@ -29,7 +29,7 @@ function modificationWarner.addModificationWarner(targetTable)
     end
 
     local info = debug.getinfo(2)
-    local source = info.source
+    local source = mods.cleanDebugSource(info.source)
 
     targetTable._warnerFilename = source
 

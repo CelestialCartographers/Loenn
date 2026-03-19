@@ -263,7 +263,7 @@ function tool.mousemoved(x, y, dx, dy, istouch)
     local axisBound = keyboardHelper.modifierHeld(configs.editor.movementAxisBoundModifier)
 
     -- Check if button is held, tool handler might consume mouse up to change room
-    if love.mouse.isDown(actionButton) then
+    if actionButton and love.mouse.isDown(actionButton) then
         if selectionDrag then
             local mapX, mapY = viewportHandler.getMapCoordinates(x, y)
             local width, height = mapX - dragStartX, mapY - dragStartY
