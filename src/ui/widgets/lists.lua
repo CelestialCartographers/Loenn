@@ -820,28 +820,42 @@ local function searchFieldKeyRelease(list, hookOptions)
         local exitClearKey = configs.ui.searching.searchExitAndClearKey
         local selectKey = configs.ui.searching.searchSelectKey
         local handled = false
+        local focusMainEditor = false
 
         if key == exitClearKey then
             self:setText("")
             self.index = 0
 
-            widgetUtils.focusMainEditor()
+            if hookOptions.afterExitClearKey then
+                hookOptions.afterExitClearKey()
+            end
 
+            focusMainEditor = true
             handled = true
 
         elseif key == exitKey then
-            widgetUtils.focusMainEditor()
-
+            focusMainEditor = true
             handled = true
+
+            if hookOptions.afterExitKey then
+                hookOptions.afterExitKey()
+            end
 
         elseif key == selectKey then
             listWidgets.setSelection(list, list.selectedIndex)
-            widgetUtils.focusMainEditor()
 
             handled = true
 
+            if hookOptions.afterSelectKey then
+                hookOptions.afterSelectKey()
+            end
+
         else
             handled = orig(self, key, ...)
+        end
+
+        if focusMainEditor and hookOptions.focusMainEditor ~= false then
+           widgetUtils.focusMainEditor()
         end
 
         return handled

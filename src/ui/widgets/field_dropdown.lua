@@ -86,6 +86,13 @@ function fieldDropdown.addDropdown(field, dropdown, searchable)
 
         local hookOptions = {
             preventCallback = true,
+            focusMainEditor = false,
+            afterExitKey = function()
+                dropdown:closeDropdown()
+            end,
+            afterSelectKey = function()
+                dropdown:closeDropdown()
+            end,
             skipHooksPredicate = function()
                 return dropdown.list.dropdownMenuVisible
             end
