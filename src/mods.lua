@@ -353,7 +353,7 @@ function modHandler.requireFromPlugin(lib, modName)
 
     else
         local info = debug.getinfo(2)
-        local source = mods.cleanDebugSource(info.source)
+        local source = modHandler.cleanDebugSource(info.source)
         local parts = string.split(source, "/")()
 
         libPrefix = table.concat(parts, ".", 1, 2)
@@ -387,7 +387,7 @@ function modHandler.filenameFromPlugin(filename, modName)
 
     else
         local info = debug.getinfo(2)
-        local source = mods.cleanDebugSource(info.source)
+        local source = modHandler.cleanDebugSource(info.source)
         local parts = string.split(source, "/")()
 
         filenamePrefix = table.concat(parts, "/", 1, 2)
@@ -438,7 +438,7 @@ function modHandler.getCurrentModName(maxDepth)
             return
         end
 
-        local source = mods.cleanDebugSource(info.source)
+        local source = modHandler.cleanDebugSource(info.source)
 
         if utils.startsWith(source, modHandler.specificModContentSymbol) then
             local parts = string.split(source, "/")()
