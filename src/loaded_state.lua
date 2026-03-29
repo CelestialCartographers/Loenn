@@ -86,6 +86,12 @@ local function updateSideState(side, roomName, filename, eventName)
 
     sceneHandler.changeScene("Editor")
     sceneHandler.sendEvent(eventName, filename)
+
+    local missingDependencies = modHandler.checkForMissingMods(filename)
+
+    if #missingDependencies > 0 then
+        sceneHandler.sendEvent("editorMapMissingDependencies", missingDependencies)
+    end
 end
 
 function state.getLayerName(layer)

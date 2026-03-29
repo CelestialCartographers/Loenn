@@ -10,6 +10,7 @@ local modHandler = {}
 
 local everestBuildNumberMatch = "EverestBuild(%d*)"
 
+modHandler.everestModName = "Everest"
 modHandler.internalModContent = "@Internal@"
 modHandler.commonModContent = "@ModsCommon@"
 modHandler.everestYamlFilenames = {
@@ -792,5 +793,39 @@ function modHandler.formatAssociatedMods(language, modNames)
         return string.format(modHandler.modNamesFormat, joinedNames)
     end
 end
+
+function modHandler.isEverest(modName)
+    return modName == modHandler.everestModName
+end
+
+function modHandler.checkForMissingMods(filename)
+    local modPath = modHandler.getFilenameModPath(filename)
+
+    if not modPath then
+        return {}
+    end
+
+    local modMetadata = modHandler.getModMetadataFromPath(modPath)
+
+    if not modMetadata or not modMetadata[1] then
+        return {}
+    end
+
+    local metadata = modMetadata[1]
+    local missing = {}
+
+    for _, dependency in ipairs(metadata.Dependencies or {}) do
+        local modName = dependency.Name
+        local isEverest = modHandler.isEverest(modName)
+        local loaded = modHandler.hasLoadedMod(dependency.Name)
+
+        if not isEverest and not loaded then
+            table.insert(missing, dependency.Name)
+        end
+    end
+
+    return missing
+end
+
 
 return modHandler
