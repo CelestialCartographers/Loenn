@@ -31,7 +31,9 @@ local defaultTabForms = {
                     "spacer",
                     "general.persistWindowFullscreen",
                     "general.persistWindowPosition",
-                    "general.persistWindowSize"
+                    "general.persistWindowSize",
+                    "spacer",
+                    "general.useEverestBlacklist"
                 }
             },
             {
