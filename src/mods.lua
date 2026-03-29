@@ -610,7 +610,10 @@ function modHandler.readEverestBlacklist(filename)
 
     for _, line in ipairs(lines) do
         if not utils.startsWith(line, "#") and line ~= "" then
+            local lineUnderscores = line:gsub("%.", "_")
+
             ignored[line] = true
+            ignored[lineUnderscores] = true
         end
     end
 
