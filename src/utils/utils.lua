@@ -247,8 +247,12 @@ function utils.trim(s)
     return string.match(s, "^%s*(.*%S)") or ""
 end
 
-function utils.startsWith(s, start)
-    return s:sub(1, #start) == start
+function utils.startsWith(s, prefix)
+    return s:sub(1, #prefix) == prefix
+end
+
+function utils.endsWith(s, suffix)
+    return s:sub(-#suffix) == suffix
 end
 
 function utils.findCharacter(string, character)
