@@ -10,6 +10,7 @@ local modHandler = {}
 
 local everestBuildNumberMatch = "EverestBuild(%d*)"
 
+modHandler.everestModName = "Everest"
 modHandler.internalModContent = "@Internal@"
 modHandler.commonModContent = "@ModsCommon@"
 modHandler.everestYamlFilenames = {
@@ -610,7 +611,10 @@ function modHandler.readEverestBlacklist(filename)
 
     for _, line in ipairs(lines) do
         if not utils.startsWith(line, "#") and line ~= "" then
+            local lineUnderscores = line:gsub("%.", "_")
+
             ignored[line] = true
+            ignored[lineUnderscores] = true
         end
     end
 
@@ -620,7 +624,13 @@ end
 function modHandler.mountMods(directory, force)
     directory = directory or utils.joinpath(fileLocations.getCelesteDir(), "Mods")
 
-    local ignored = modHandler.readEverestBlacklist(utils.joinpath(directory, "blacklist.txt"))
+    local ignored = {}
+
+    if configs.general.useEverestBlacklist then
+        logging.info("Reading Everest blacklist")
+
+        ignored = modHandler.readEverestBlacklist(utils.joinpath(directory, "blacklist.txt"))
+    end
 
     if utils.isDirectory(directory) then
         for filename, dir in utils.listDir(directory) do
@@ -783,5 +793,39 @@ function modHandler.formatAssociatedMods(language, modNames)
         return string.format(modHandler.modNamesFormat, joinedNames)
     end
 end
+
+function modHandler.isEverest(modName)
+    return modName == modHandler.everestModName
+end
+
+function modHandler.checkForMissingMods(filename)
+    local modPath = modHandler.getFilenameModPath(filename)
+
+    if not modPath then
+        return {}
+    end
+
+    local modMetadata = modHandler.getModMetadataFromPath(modPath)
+
+    if not modMetadata or not modMetadata[1] then
+        return {}
+    end
+
+    local metadata = modMetadata[1]
+    local missing = {}
+
+    for _, dependency in ipairs(metadata.Dependencies or {}) do
+        local modName = dependency.Name
+        local isEverest = modHandler.isEverest(modName)
+        local loaded = modHandler.hasLoadedMod(dependency.Name)
+
+        if not isEverest and not loaded then
+            table.insert(missing, dependency.Name)
+        end
+    end
+
+    return missing
+end
+
 
 return modHandler
