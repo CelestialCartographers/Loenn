@@ -123,6 +123,14 @@ function notificationHandlers:editorHistoryRedoEmpty()
     )
 end
 
+function notificationHandlers:editorMapMissingDependencies(missing)
+    local language = languageRegistry.getLanguage()
+    local missingString = table.concat(missing, ", ")
+    local message = string.format(tostring(language.ui.notifications.editorMapMissingDependencies), missingString)
+
+    notifications.notify(message, -1)
+end
+
 -- TODO - Move over to modal when those are implemented
 function notificationHandlers:editorQuitWithChanges(quitArg)
     local language = languageRegistry.getLanguage()

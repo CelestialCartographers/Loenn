@@ -17,6 +17,7 @@ ui.notifications.editorMapVerificationFailed=Failed to save map: %s
 ui.notifications.editorMapLoaded=Loaded map: %s
 ui.notifications.editorMapLoadFailed=Failed to load map: %s
 ui.notifications.editorMapNew=Created new map
+ui.notifications.editorMapMissingDependencies=Missing dependencies: %s
 ui.notifications.editorHistoryUndoEmpty=Unable to undo, end of history
 ui.notifications.editorHistoryRedoEmpty=Unable to redo, end of history
 ui.notifications.editorQuitWithChanges=You have unsaved pending changes.\nAre you sure you want to quit?
