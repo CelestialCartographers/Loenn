@@ -620,7 +620,13 @@ end
 function modHandler.mountMods(directory, force)
     directory = directory or utils.joinpath(fileLocations.getCelesteDir(), "Mods")
 
-    local ignored = modHandler.readEverestBlacklist(utils.joinpath(directory, "blacklist.txt"))
+    local ignored = {}
+
+    if configs.general.useEverestBlacklist then
+        logging.info("Reading Everest blacklist")
+
+        ignored = modHandler.readEverestBlacklist(utils.joinpath(directory, "blacklist.txt"))
+    end
 
     if utils.isDirectory(directory) then
         for filename, dir in utils.listDir(directory) do
