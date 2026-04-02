@@ -178,6 +178,7 @@ entities.player.attributes.description.isDefaultSpawn=Whether this should be the
 
 # Wire
 entities.wire.placements.name.wire=Wire
+entities.wire.attributes.name.fixWindBehavior=Fix Wind Behaviour
 entities.wire.attributes.description.above=Determines whether the wire is placed in the foreground or background.
 entities.wire.attributes.description.color=Determines the colour of the wire.
 entities.wire.attributes.description.fixWindBehavior=Fixes wires moving too quickly in wind.\nDisable to restore Vanilla behaviour.
