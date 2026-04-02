@@ -35,7 +35,9 @@ keyboard.nameToModifierFunction = {
 -- Some names cause confusions/issues for hotkeys
 local keyToNameLookup = {
     ["+"] = "plus",
-    ["-"] = "minus"
+    ["-"] = "minus",
+    ["kp+"] = "kpplus",
+    ["kp-"] = "kpminus",
 }
 
 function keyboard.modifierHeld(modifier)
