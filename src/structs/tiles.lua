@@ -68,7 +68,7 @@ function tilesStruct.matrixToTileStringMinimized(matrix, separator, empty)
         local start = matrix:index(1, y)
         local stop = matrix:index(relevantCols[y], y)
 
-        lines[y] = table.concat(matrix, "", start, stop)
+        lines[y] = table.concat(matrix, separator, start, stop)
     end
 
     return table.concat(lines, "\n")
