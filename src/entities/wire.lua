@@ -61,7 +61,8 @@ wire.placements = {
     name = "wire",
     data = {
         above = false,
-        color = "595866"
+        color = "595866",
+        fixWindBehavior = true
     }
 }
 

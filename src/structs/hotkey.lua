@@ -6,6 +6,8 @@ local defaultScopes = {defaultScope}
 local specialKeyAliases = {
     plus = "+",
     minus = "-",
+    kpplus = "kp+",
+    kpminus = "kp-",
 }
 
 local modifierKeyFunctions = keyboardHelper.nameToModifierFunction
