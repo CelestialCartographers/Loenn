@@ -1,9 +1,9 @@
-local tableNew = require("table.new")
+local dataUtils = require("utils.data")
 
 local rectangles = {}
 
 function rectangles.create(x, y, width, height)
-    local rectangle = tableNew(0, 5)
+    local rectangle = dataUtils.newTable(0, 5)
 
     rectangle._type = "rectangle"
 

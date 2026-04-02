@@ -1,4 +1,3 @@
-local tableNew = require("table.new")
 local matrixLib = require("utils.matrix")
 local utils = require("utils")
 
@@ -28,7 +27,7 @@ local function getRelevantCols(matrix, empty)
     empty = empty or "0"
 
     local width, height = matrix:size()
-    local relevantCols = tableNew(height, 0)
+    local relevantCols = utils.newTable(height, 0)
 
     for y = 1, height do
         local matrixRowStart = matrix:index(0, y)
