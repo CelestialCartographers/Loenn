@@ -248,6 +248,7 @@ local defaultTabForms = {
             "debug.enableDebugOptions",
             "debug.displayConsole",
             "spacer",
+            "debug.logModLoading",
             "debug.logPluginLoading",
             "debug.logImageLoading",
             "editor.warnOnMissingEntityHandler",
