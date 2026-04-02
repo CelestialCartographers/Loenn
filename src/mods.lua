@@ -567,6 +567,7 @@ function modHandler.mountMod(path, force)
     local directory, filename = utils.dirname(path), utils.filename(path)
     local modFolderName = filename:gsub("%.", "_")
     local loaded = not not modHandler.loadedMods[modFolderName]
+    local gotLoaded = false
 
     if not loaded or force then
         if modHandler.mountable(path) then
@@ -586,13 +587,13 @@ function modHandler.mountMod(path, force)
                 metadata = modMetadata,
             }
 
-            loaded = true
+            gotLoaded = true
         end
     end
 
     local endTime = love.timer.getTime()
 
-    if loaded and configs.debug.logModLoading then
+    if gotLoaded and configs.debug.logModLoading then
         local message = string.format("Loaded '%s' in %.2fms", modFolderName, (endTime - startTime) * 1000)
 
         logging.info(message)
