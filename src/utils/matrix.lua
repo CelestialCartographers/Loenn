@@ -1,6 +1,6 @@
 -- Fast Matrix implementation in Lua
 -- Most set/gets are inlined for performance reasons
-local tableNew = require("table.new")
+local dataUtils = require("utils.data")
 
 local matrix = {}
 
@@ -234,7 +234,7 @@ end
 
 
 function matrix.filled(default, width, height)
-    local m = tableNew(width * height, 3)
+    local m = dataUtils.newTable(width * height, 3)
 
     if default ~= nil then
         for i = 1, width * height do

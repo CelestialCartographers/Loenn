@@ -1,6 +1,7 @@
 local serialize = require("utils.serialize")
 local filesystem = require("utils.filesystem")
 local osUtils = require("utils.os")
+local dataUtils = require("utils.data")
 local requireUtils = require("utils.require")
 local xnaColors = require("consts.xna_colors")
 local bit = require("bit")
@@ -896,6 +897,11 @@ end
 
 -- Add all of filesystem helper into utils
 for k, v <- filesystem do
+    utils[k] = v
+end
+
+-- Add all of data helper into utils
+for k, v <- dataUtils do
     utils[k] = v
 end
 

@@ -1,4 +1,3 @@
-local tableNew = require("table.new")
 local matrixLib = require("utils.matrix")
 local utils = require("utils")
 
@@ -15,11 +14,10 @@ function tilesStruct.matrixToTileString(matrix, separator, empty)
     for y = 1, height do
         local row = {}
 
-        for x = 1, width do
-            table.insert(row, matrix:getInbounds(x, y))
-        end
+        local start = matrix:index(1, y)
+        local stop = matrix:index(width, y)
 
-        table.insert(lines, table.concat(row, separator))
+        table.insert(lines, table.concat(row, separator, start, stop))
     end
 
     return table.concat(lines, "\n")
@@ -29,7 +27,7 @@ local function getRelevantCols(matrix, empty)
     empty = empty or "0"
 
     local width, height = matrix:size()
-    local relevantCols = tableNew(height, 0)
+    local relevantCols = utils.newTable(height, 0)
 
     for y = 1, height do
         local matrixRowStart = matrix:index(0, y)
@@ -68,7 +66,7 @@ function tilesStruct.matrixToTileStringMinimized(matrix, separator, empty)
         local start = matrix:index(1, y)
         local stop = matrix:index(relevantCols[y], y)
 
-        lines[y] = table.concat(matrix, "", start, stop)
+        lines[y] = table.concat(matrix, separator, start, stop)
     end
 
     return table.concat(lines, "\n")
