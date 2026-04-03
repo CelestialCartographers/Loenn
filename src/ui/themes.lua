@@ -58,10 +58,10 @@ function themes.loadThemes(filenames)
         local filenameNoPath = utils.filename(filename, "/")
 
         if filenameNoPath == "theme.lua" then
-            local success = pcall(loadTheme, filename)
+            local success, error = pcall(loadTheme, filename)
 
             if not success then
-                logging.warning(string.format("Failed to load theme from '%s'", filename))
+                logging.warning(string.format("Failed to load theme from '%s':\n%s", filename, error))
             end
         end
     end
@@ -84,9 +84,17 @@ function themes.useTheme(name)
         themes.currentTheme = themes.themes[name]
         themes.currentThemeName = name
 
-        themer.apply(themes.themes[name])
+        local success, error = pcall(themer.apply, themes.currentTheme)
 
-        return true
+        if not success then
+            logging.warning(string.format("Failed to apply theme '%s':\n%s", name, error))
+
+            if name ~= themes.defaultThemeName then
+                themes.useTheme(themes.defaultThemeName)
+            end
+        end
+
+        return success
     end
 
     return false
