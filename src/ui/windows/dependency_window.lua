@@ -365,9 +365,9 @@ local function addEverestDependency(metadata)
     for _, dependency in ipairs(dependencies) do
         if dependency.Name == everestModName and not dependency.Version then
             dependency.Version = everestVersion
-        end
 
-        return true, dependencies
+            return true, dependencies
+        end
     end
 
     -- Add Everest as dependency if missing
