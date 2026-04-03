@@ -68,4 +68,5 @@ return {
     -- Save sanitizers
     sortRoomsOnSave = true,
     checkDependenciesOnSave = true,
+    checkDependenciesRemindMeLaterDelay = 60 * 60 * 24,
 }

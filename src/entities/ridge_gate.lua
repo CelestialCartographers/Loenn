@@ -4,13 +4,16 @@ ridgeGate.name = "ridgeGate"
 ridgeGate.depth = 0
 ridgeGate.nodeLineRenderType = "line"
 ridgeGate.nodeLimits = {0, 1}
+ridgeGate.canResize = {false, false}
 ridgeGate.justification = {0.0, 0.0}
 ridgeGate.placements = {
     name = "ridge_gate",
     data = {
         texture = "objects/ridgeGate",
         strawberries = "",
-        keys = ""
+        keys = "",
+        width = 32,
+        height = 32
     }
 }
 

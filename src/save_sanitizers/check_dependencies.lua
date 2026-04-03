@@ -1,17 +1,52 @@
 local sceneHandler = require("scene_handler")
 local dependencyFinder = require("dependencies")
-local utils = require("utils")
 local configs = require("configs")
+local persistence = require("persistence")
 local mods = require("mods")
 
 local sanitizer = {}
 
--- Disable for specific filenames, should not be persisted
-sanitizer.disableEventFor = {}
+local function preparePersistence()
+    if not persistence.dependencySaveSanitizer then
+        persistence.dependencySaveSanitizer = {}
+    end
+
+    if not persistence.dependencySaveSanitizer.remindMeLater then
+        persistence.dependencySaveSanitizer.remindMeLater = {}
+    end
+
+    -- Clean up any expired checks
+    for filename, _ in pairs(persistence.dependencySaveSanitizer.remindMeLater) do
+        if sanitizer.shouldSendEvent(filename, false) then
+            persistence.dependencySaveSanitizer.remindMeLater[filename] = nil
+        end
+    end
+end
+
+function sanitizer.shouldSendEvent(filename, prepare)
+    if prepare ~= false then
+        preparePersistence()
+    end
+
+    local laterTime = persistence.dependencySaveSanitizer.remindMeLater[filename] or 0
+    local checkTime = laterTime + configs.updater.remindMeLaterDelay
+
+    if os.time() < checkTime then
+        return false
+    end
+
+    return true
+end
+
+function sanitizer.disableEventFor(filename)
+    preparePersistence()
+
+    persistence.dependencySaveSanitizer.remindMeLater[filename] = os.time()
+end
 
 function sanitizer.beforeSave(filename, state)
     if configs.editor.checkDependenciesOnSave then
-        if sanitizer.disableEventFor[filename] then
+        if not sanitizer.shouldSendEvent(filename) then
             return
         end
 

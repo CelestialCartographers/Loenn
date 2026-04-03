@@ -11,6 +11,7 @@ local modHandler = {}
 local everestBuildNumberMatch = "EverestBuild(%d*)"
 
 modHandler.everestModName = "Everest"
+modHandler.everestCoreModName = "EverestCore"
 modHandler.internalModContent = "@Internal@"
 modHandler.commonModContent = "@ModsCommon@"
 modHandler.everestYamlFilenames = {
@@ -796,7 +797,7 @@ function modHandler.formatAssociatedMods(language, modNames)
 end
 
 function modHandler.isEverest(modName)
-    return modName == modHandler.everestModName
+    return modName == modHandler.everestModName or modName == modHandler.everestCoreModName
 end
 
 function modHandler.checkForMissingMods(filename)
