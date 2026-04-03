@@ -38,7 +38,7 @@ function notificationHandlers:saveSanitizerDependenciesMissing(missingMods, used
                         local dependencySaveSanitizer = require("save_sanitizers/check_dependencies")
 
                         if loadedState.filename then
-                            dependencySaveSanitizer.disableEventFor[loadedState.filename] = true
+                            dependencySaveSanitizer.disableEventFor(loadedState.filename)
                         end
 
                         popup:close()
