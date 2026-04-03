@@ -220,9 +220,9 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
             else
                 -- TODO - Update overlay sprites
                 local tileMeta = meta[tile]
-                local texture = tileMeta.path
+                local texture = tileMeta and tileMeta.path
 
-                if tileMeta and tileMeta.path then
+                if texture then
                     local quads, sprites = autotiler.getQuads(x, y, tilesMatrix, tileMeta, airTile, emptyTile, wildcard, defaultQuad, defaultSprite, checkTile, lshift, bxor, band)
                     local quadCount = #quads
 
