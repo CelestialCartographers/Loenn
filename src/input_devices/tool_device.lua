@@ -11,17 +11,21 @@ local subLayers = require("sub_layers")
 local hotkeyStruct = require("structs.hotkey")
 local hotkeyHandler = require("hotkey_handler")
 
+local function getToolEventHandler(event)
+    if state.map ~= nil then
+        local currentTool = toolHandler.currentTool
+
+        if currentTool and currentTool[event] then
+            return currentTool[event]
+        end
+    end
+
+    return function(...) end
+end
+
 local toolProxyMt = {
     __index = function(self, event)
-        if state.map ~= nil then
-            local currentTool = toolHandler.currentTool
-
-            if currentTool and currentTool[event] then
-                return currentTool[event]
-            end
-        end
-
-        return function() end
+        return getToolEventHandler(event)
     end
 }
 
@@ -120,7 +124,13 @@ function device.keypressed(...)
 
     toolHandler.addHotkeyScopes(scopes)
 
-    return hotkeyStruct.callbackFirstActive(registeredHotkeys, scopes, ...)
+    local handled = hotkeyStruct.callbackFirstActive(registeredHotkeys, scopes, ...)
+
+    if not handled then
+        return getToolEventHandler("keypressed")(...)
+    end
+
+    return handled
 end
 
 return device
