@@ -1,10 +1,10 @@
 local hotkeyStruct = require("structs.hotkey")
 local standardHotkeys = require("standard_hotkeys")
 local utils = require("utils")
-local tools = require("tools")
 
-local registeredHotkeys = {}
 local hotkeyHandler = {}
+
+hotkeyHandler.registeredHotkeys = {}
 
 function hotkeyHandler.removeHotkey(scope, activator)
     if utils.typeof(scope) == "hotkey" then
@@ -12,9 +12,9 @@ function hotkeyHandler.removeHotkey(scope, activator)
         scope = scope.scope
     end
 
-    for i, target in ipairs(registeredHotkeys) do
+    for i, target in ipairs(hotkeyHandler.registeredHotkeys) do
         if target.scope == scope and target._rawActivator == activator then
-            table.remove(registeredHotkeys, i)
+            table.remove(hotkeyHandler.registeredHotkeys, i)
 
             return target
         end
@@ -33,7 +33,7 @@ function hotkeyHandler.addHotkey(scope, activator, callback, options)
 
     hotkey = hotkeyStruct.createHotkey(scope, activator, callback, options)
 
-    table.insert(registeredHotkeys, hotkey)
+    table.insert(hotkeyHandler.registeredHotkeys, hotkey)
 
     return hotkey
 end
@@ -43,7 +43,7 @@ function hotkeyHandler.addStandardHotkeys()
 end
 
 function hotkeyHandler.reloadHotkeys()
-    table.clear(registeredHotkeys)
+    table.clear(hotkeyHandler.registeredHotkeys)
 
     standardHotkeys.addStandardHotkeys(hotkeyHandler)
 end
@@ -54,14 +54,13 @@ function hotkeyHandler.createHotkeyDevice()
         _enabled = true
     }
 
-    device.hotkeys = registeredHotkeys
+    device.hotkeys = hotkeyHandler.registeredHotkeys
 
-    function device.keypressed(key, scancode, isrepeat)
+    -- Only handle global hotkeys here, let other devices do scoped ones
+    function device.keypressed(...)
         local scopes = {"global"}
 
-        tools.addHotkeyScopes(scopes)
-
-        return hotkeyStruct.callbackFirstActive(registeredHotkeys, scopes)
+        return hotkeyStruct.callbackFirstActive(hotkeyHandler.registeredHotkeys, scopes, ...)
     end
 
     return device
