@@ -8,6 +8,8 @@ local persistence = require("persistence")
 local configs = require("configs")
 local keyboardHelper = require("utils.keyboard")
 local subLayers = require("sub_layers")
+local hotkeyStruct = require("structs.hotkey")
+local hotkeyHandler = require("hotkey_handler")
 
 local toolProxyMt = {
     __index = function(self, event)
@@ -110,6 +112,15 @@ end
 
 function device.editorToolMaterialChanged(tool, layer, material)
     toolUtils.setPersistenceMaterial(tool, layer, material)
+end
+
+function device.keypressed(...)
+    local scopes = {}
+    local registeredHotkeys = hotkeyHandler.registeredHotkeys
+
+    toolHandler.addHotkeyScopes(scopes)
+
+    return hotkeyStruct.callbackFirstActive(registeredHotkeys, scopes, ...)
 end
 
 return device
