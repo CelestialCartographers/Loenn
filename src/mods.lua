@@ -344,25 +344,9 @@ end
 
 -- Defaults to current mod directory
 function modHandler.requireFromPlugin(lib, modName)
-    local libPrefix
+    local requireName = modHandler.filenameFromPlugin(lib, modName, ".")
 
-    if modName then
-        local modInfo, pluginInfo = modHandler.findLoadedMod(modName)
-
-        if modInfo then
-            libPrefix = pluginInfo._mountPointLoenn
-        end
-
-    else
-        local info = debug.getinfo(2)
-        local source = modHandler.cleanDebugSource(info.source)
-        local parts = string.split(source, "/")()
-
-        libPrefix = table.concat(parts, ".", 1, 2)
-    end
-
-    if lib and libPrefix then
-        local requireName = libPrefix .. "." .. lib
+    if requireName then
         local success, result = utils.tryrequire(requireName)
 
         if success then
@@ -377,7 +361,10 @@ function modHandler.requireFromPlugin(lib, modName)
 end
 
 -- Defaults to current mod directory
-function modHandler.filenameFromPlugin(filename, modName)
+function modHandler.filenameFromPlugin(filename, modName, resultSeparator, maxDepth)
+    resultSeparator = resultSeparator or "/"
+    maxDepth = maxDepth or 10
+
     local filenamePrefix
 
     if modName then
@@ -388,15 +375,26 @@ function modHandler.filenameFromPlugin(filename, modName)
         end
 
     else
-        local info = debug.getinfo(2)
-        local source = modHandler.cleanDebugSource(info.source)
-        local parts = string.split(source, "/")()
+        local currentFilename = debug.getinfo(1).source
+        local parts = {}
 
-        filenamePrefix = table.concat(parts, "/", 1, 2)
+        -- Find first usage outside of current file
+        for i = 2, maxDepth do
+            local info = debug.getinfo(i)
+
+            if info.source ~= currentFilename then
+                local source = modHandler.cleanDebugSource(info.source)
+
+                parts = string.split(source, "/")()
+                filenamePrefix = table.concat(parts, resultSeparator, 1, 2)
+
+                break
+            end
+        end
     end
 
     if filename and filenamePrefix then
-        return filenamePrefix .. "/" .. filename
+        return filenamePrefix .. resultSeparator .. filename
     end
 end
 
