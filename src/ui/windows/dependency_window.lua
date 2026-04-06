@@ -29,8 +29,6 @@ local dependencyWindow = {}
 
 local dependencyWindowGroup = uiElements.group({})
 
-local everestModName = "Everest"
-
 local function localizeModName(modName, language)
     language = language or languageRegistry.getLanguage()
 
@@ -199,8 +197,8 @@ local function getModSection(modName, localizedModName, reasons, groupName, inte
         modContent = uiElements.label(localizedModName)
     end
 
-    local localizedEverestName = localizeModName(everestModName)
-    local isEverest = modName == everestModName or modName == localizedEverestName
+    local localizedEverestName = localizeModName(mods.everestModName)
+    local isEverest = modName == mods.everestModName or modName == localizedEverestName
 
     local actionButton = uiElements.button(buttonText, buttonCallback)
     local column = uiElements.column({
@@ -276,11 +274,11 @@ function dependencyWindow.getWindowContent(modPath, side, interactionData)
     end
 
     -- Add Everest as target if missing
-    local localizedEverestName = localizeModName(everestModName)
-    local hasEverest = dependedOnModsLookup[everestModName] or dependedOnModsLookup[localizedEverestName]
+    local localizedEverestName = localizeModName(mods.everestModName)
+    local hasEverest = dependedOnModsLookup[mods.everestModName] or dependedOnModsLookup[localizedEverestName]
 
-    if not hasEverest and not missingMods[everestModName] then
-        missingMods[everestModName] = false
+    if not hasEverest and not missingMods[mods.everestModName] then
+        missingMods[mods.everestModName] = false
     end
 
     -- Anything depended on but with no known usage
@@ -361,22 +359,45 @@ local function addEverestDependency(metadata)
         return false
     end
 
-    -- Update version if it is missing
-    for _, dependency in ipairs(dependencies) do
-        if dependency.Name == everestModName and not dependency.Version then
-            dependency.Version = everestVersion
+    local everestDependency
+    local everestCoreDependency
 
-            return true, dependencies
+    -- Look for Everest or EverestCore
+    -- Update version if missing or add Everest if both are missing
+
+    for _, dependency in ipairs(dependencies) do
+        if dependency.Name == mods.everestModName then
+            everestDependency = dependency
+        end
+
+        if dependency.Name == mods.everestCoreName then
+            everestCoreDependency = dependency
         end
     end
 
-    -- Add Everest as dependency if missing
-    table.insert(dependencies, {
-        Name = everestModName,
-        Version = everestVersion
-    })
+    if everestDependency and not everestDependency.Version then
+        everestDependency.Version = everestVersion
 
-    return true, dependencies
+        return true, dependencies
+    end
+
+    if everestCoreDependency and not everestCoreDependency.Version then
+        everestCoreDependency.Version = everestVersion
+
+        return true, dependencies
+    end
+
+    if not everestDependency and not everestCoreDependency then
+        -- Add Everest as dependency if missing
+        table.insert(dependencies, {
+            Name = mods.everestModName,
+            Version = everestVersion
+        })
+
+        return true, dependencies
+    end
+
+    return false, dependencies
 end
 
 local function createStartingEverestYaml(side, metadata)
