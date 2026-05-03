@@ -227,23 +227,30 @@ function drawableSpriteMt.__index:getRelativeQuad(x, y, width, height, hideOverf
             imageMeta.quadCache = {}
         end
 
+        if not imageMeta.quadOffsetCache then
+            imageMeta.quadOffsetCache = {}
+        end
+
         -- Get value with false as default, then change it to the quad
         -- Otherwise we are just creating the quad every single request
         local quadCache = imageMeta.quadCache
+        local offsetCache = imageMeta.quadOffsetCache
         local key = string.format("%s-%s-%s-%s", x, y, width, height)
         local value = quadCache[key]
 
         if not value then
             local quad, offsetX, offsetY = drawing.getRelativeQuad(imageMeta, x, y, width, height, hideOverflow, realSize)
 
-            quadCache._offsetX = offsetX
-            quadCache._offsetY = offsetY
             quadCache[key] = quad
+            offsetCache[key] = {
+                x = offsetX,
+                y = offsetY
+            }
 
             return quad, offsetX, offsetY
         end
 
-        return value, quadCache._offsetX, quadCache._offsetY
+        return value, offsetCache[key].x, offsetCache[key].y
     end
 end
 
