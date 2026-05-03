@@ -471,7 +471,7 @@ function celesteRender.getTilesBatch(room, tiles, meta, scenery, fg, randomMatri
 
                     if quadCount > 0 then
                         local rng = random:getInbounds(x, y)
-                        local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
+                        local randQuad = quads[1 + math.floor(rng * quadCount)]
 
                         local spriteMeta = gameplayAtlas[texture]
 

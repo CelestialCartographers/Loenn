@@ -228,7 +228,7 @@ function brushHelper.updateRender(room, x, y, material, layer, randomMatrix)
 
                     if quadCount > 0 then
                         local rng = random:getInbounds(x, y)
-                        local randQuad = quads[1 + math.floor(rng * (quadCount - 1))]
+                        local randQuad = quads[1 + math.floor(rng * quadCount)]
 
                         local spriteMeta = atlases.gameplay[texture]
 
