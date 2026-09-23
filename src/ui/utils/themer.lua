@@ -1,16 +1,24 @@
 local ui, uiUtils, uiElements = require("ui").quick()
+local utils = require("utils")
 
 local configs = require("configs")
 
 local themer = {}
 
+local affectedByScale = {
+    spacing = true,
+    padding = true,
+    margin = true,
+    contentPadding = true,
+    radius = true,
+    thickness = true,
+}
+
 function themer.dump()
     local theme = {}
 
     for id, el in pairs(uiElements) do
-        id = id:match("__(.+)")
-
-        if id then
+        if utils.startsWith(id, "__") then
             local style = el.__default
             style = style and style.style
 
@@ -33,17 +41,21 @@ function themer.dump()
     return theme
 end
 
-function themer.apply(theme)
+function themer.apply(theme, scale)
     if not theme then
         return
     end
 
+    scale = configs.ui.theme.uiScale or 1
+
     themer.applyElementStyles(theme)
-    themer.applyFontInfo(theme)
+    themer.applyFontInfo(theme, scale)
+    themer.applyStyleScale(scale)
 end
 
-function themer.applyFontInfo(theme)
-    local labelFontSizeFallback = configs.ui.theme.defaultFontSize or 12
+function themer.applyFontInfo(theme, scale)
+    local defaultFontSize = configs.ui.theme.defaultFontSize or 12
+    local labelFontSizeFallback = math.floor(defaultFontSize * scale)
     local labelFontSize = theme.labelFontSize or labelFontSizeFallback
     local labelFilename = theme.labelFilename
     local labelFont = theme.labelFont
@@ -89,6 +101,35 @@ function themer.applyElementStyles(theme)
 
     if ui.root then
         ui.globalReflowID = ui.globalReflowID + 1
+    end
+end
+
+-- Naively apply the scale to all default styles according to affectedByScale
+function themer.applyStyleScale(scale)
+    -- Nothing to do
+    if not scale or scale == 1 then
+        return
+    end
+
+    for id, element in pairs(uiElements) do
+        if utils.startsWith(id, "__") then
+            local style = element and element.__default and element.__default.style
+
+            if style then
+                for key, value in pairs(style) do
+                    if affectedByScale[key] then
+                        if type(value) == "number" then
+                            style[key] = math.floor(value * scale)
+
+                        elseif type(value) == "table" then
+                            for i, v in ipairs(value) do
+                                style[key][i] = math.floor(v * scale)
+                            end
+                        end
+                    end
+                end
+            end
+        end
     end
 end
 

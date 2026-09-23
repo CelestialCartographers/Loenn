@@ -1,4 +1,5 @@
 return {
     themeName = "dark",
-    defaultFontSize = false
+    defaultFontSize = false,
+    uiScale = 1,
 }
