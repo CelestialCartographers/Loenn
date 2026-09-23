@@ -1002,12 +1002,13 @@ local function getListCommon(magicList, callback, items, options)
 
     local initialSearch = options.initialSearch or ""
     local filteredItems = filterItems(items, initialSearch, options)
+    local uiScale = configs.ui.theme.uiScale or 1
 
     local list
     local listData = {
         unfilteredItems = items,
         filterItems = filterItems,
-        minWidth = options.minimumWidth or 128,
+        minWidth = (options.minimumWidth or 128) * uiScale,
         draggable = options.draggable or false,
         draggableTag = options.draggableTag or false,
         listItemDragged = options.listItemDragged,
