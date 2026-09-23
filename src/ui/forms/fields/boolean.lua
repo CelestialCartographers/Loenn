@@ -1,6 +1,7 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
+local formFieldUtils = require("ui.utils.form_fields")
 
 local booleanField = {}
 
@@ -36,11 +37,13 @@ end
 function booleanField.getElement(name, value, options)
     local formField = {}
 
-    local minWidth = options.minWidth or options.width or 160
-    local maxWidth = options.maxWidth or options.width or 160
+    local minWidth, maxWidth = formFieldUtils.getMinMaxWidth(options)
 
-    local checkbox = uiElements.checkbox(options.displayName or name, value, fieldChanged(formField))
-    local element = checkbox
+    local checkbox = uiElements.checkbox(options.displayName or name, value, fieldChanged(formField)):with({
+        minWidth = minWidth,
+        maxWidth = maxWidth
+    })
+
 
     if options.tooltipText then
         checkbox.interactive = 1

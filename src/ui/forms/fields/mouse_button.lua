@@ -1,6 +1,7 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
+local formFieldUtils = require("ui.utils.form_fields")
 
 local languageRegistry = require("language_registry")
 local inputCapturingDevice = require("input_devices.input_capture_device")
@@ -63,8 +64,7 @@ function mouseField.getElement(name, value, options)
         inputCapturingDevice.captureMouseButton(captureMouseButton(formField, self))
     end)
 
-    local minWidth = options.minWidth or options.width or 160
-    local maxWidth = options.maxWidth or options.width or 160
+    local minWidth, maxWidth = formFieldUtils.getMinMaxWidth(options)
 
     buttonElement:with({
         minWidth = minWidth,

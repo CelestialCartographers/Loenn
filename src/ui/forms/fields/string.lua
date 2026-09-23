@@ -1,6 +1,7 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
+local formFieldUtils = require("ui.utils.form_fields")
 
 local fieldDropdown = require("ui.widgets.field_dropdown")
 local dropdowns = require("ui.widgets.dropdown")
@@ -215,8 +216,7 @@ function stringField.getElement(name, value, options)
         return v
     end
 
-    local minWidth = options.minWidth or options.width or 160
-    local maxWidth = options.maxWidth or options.width or 160
+    local minWidth, maxWidth = formFieldUtils.getMinMaxWidth(options)
 
     local dropdownOptions = options.options
     local editable = options.editable

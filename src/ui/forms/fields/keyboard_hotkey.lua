@@ -1,6 +1,7 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
+local formFieldUtils = require("ui.utils.form_fields")
 
 local utils = require("utils")
 local languageRegistry = require("language_registry")
@@ -55,8 +56,7 @@ function shortcutField.getElement(name, value, options)
         inputCapturingDevice.captureKeyboardHotkey(captureKeyboard(formField, self))
     end)
 
-    local minWidth = options.minWidth or options.width or 160
-    local maxWidth = options.maxWidth or options.width or 160
+    local minWidth, maxWidth = formFieldUtils.getMinMaxWidth(options)
 
     buttonElement:with({
         minWidth = minWidth,

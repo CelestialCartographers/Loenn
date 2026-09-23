@@ -1,6 +1,7 @@
 local ui = require("ui")
 local uiElements = require("ui.elements")
 local uiUtils = require("ui.utils")
+local formFieldUtils = require("ui.utils.form_fields")
 
 local contextMenu = require("ui.context_menu")
 local utils = require("utils")
@@ -164,8 +165,7 @@ function colorField.getElement(name, value, options)
 
     value = fixNumberColor(value)
 
-    local minWidth = options.minWidth or options.width or 160
-    local maxWidth = options.maxWidth or options.width or 160
+    local minWidth, maxWidth = formFieldUtils.getMinMaxWidth(options)
     local allowXNAColors = options.allowXNAColors
     local allowEmpty = options.allowEmpty
 
