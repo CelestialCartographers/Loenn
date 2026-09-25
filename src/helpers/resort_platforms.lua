@@ -40,7 +40,7 @@ function resortPlatforms.addPlatformSprites(sprites, entity, position, texture, 
     leftSprite:useRelativeQuad(0, 0, 8, 8)
     leftSprite:setJustification(0, 0)
 
-    rightSprite:useRelativeQuad(25, 0, 8, 8)
+    rightSprite:useRelativeQuad(24, 0, 8, 8)
     rightSprite:addPosition(width - 8, 0)
     rightSprite:setJustification(0, 0)
 
