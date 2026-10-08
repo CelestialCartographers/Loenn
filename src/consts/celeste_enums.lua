@@ -410,6 +410,32 @@ celesteEnums.core_modes = {
     "Hot"
 }
 
+celesteEnums.alt_music = {
+    music_prologue_intro_vignette = "event:/game/00_prologue/intro_vignette",
+    music_city_theo = "event:/music/lvl1/theo",
+    music_oldsite_dreamblock_sting_pt1 = "event:/music/lvl2/dreamblock_sting_pt1",
+    music_oldsite_dreamblock_sting_pt2 = "event:/music/lvl2/dreamblock_sting_pt2",
+    music_temple_mirrorcutscene = "event:/music/lvl5/mirror_cutscene",
+    music_reflection_secretroom = "event:/music/lvl6/secret_room",
+    music_farewell_intermission_powerpoint = "event:/new_content/music/lvl10/intermission_powerpoint",
+    music_farewell_end_cinematic_intro = "event:/new_content/music/lvl10/cinematic/end_intro",
+    music_farewell_firstbirdcrash_cinematic = "event:/new_content/music/lvl10/cinematic/bird_crash_first",
+    music_farewell_secondbirdcrash_cinematic = "event:/new_content/music/lvl10/cinematic/bird_crash_second",
+    music_farewell_golden_room = "event:/new_content/music/lvl10/golden_room",
+    music_credits = "event:/music/menu/credits",
+    music_pico8_title = "event:/classic/pico8_mus_00",
+    music_pico8_area1 = "event:/classic/pico8_mus_01",
+    music_pico8_area2 = "event:/classic/pico8_mus_02",
+    music_pico8_area3 = "event:/classic/pico8_mus_03",
+    music_pico8_wind = "event:/classic/sfx61",
+    music_pico8_end = "event:/classic/sfx62",
+    music_pico8_boot = "event:/classic/pico8_boot",
+    music_levelselect = "event:/music/menu/level_select",
+    music_complete_area = "event:/music/menu/complete_area",
+    music_complete_summit = "event:/music/menu/complete_summit",
+    music_complete_bside = "event:/music/menu/complete_bside"
+}
+
 -- "Display Name" => "Expected Value"
 celesteEnums.wipe_names = {
     Angled = "Celeste.AngledWipe", --Prologue
