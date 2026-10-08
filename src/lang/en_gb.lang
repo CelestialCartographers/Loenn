@@ -1115,6 +1115,17 @@ triggers.everest/musicLayerTrigger.placements.name.music_layer=Music Layer
 triggers.everest/musicLayerTrigger.attributes.description.layers=Comma-separated list of layers that the trigger should change.
 triggers.everest/musicLayerTrigger.attributes.description.enable=Whether the trigger should enable or disable the specified layers.
 
+# Teleport (Everest)
+triggers.everest/teleport.placements.name.teleport_trigger=Teleport
+triggers.everest/teleport.attributes.name.nextLevel=Target Room
+triggers.everest/teleport.attributes.description.nextLevel=The room to teleport to.
+triggers.everest/teleport.attributes.description.introType=The intro type to use after teleport.
+triggers.everest/teleport.attributes.description.nearestSpawnX=X coordinate to teleport to. The closest spawn point will be used.
+triggers.everest/teleport.attributes.description.nearestSpawnY=Y coordinate to teleport to. The closest spawn point will be used.
+triggers.everest/teleport.attributes.description.useDefaultSpawn=Whether to use the default spawn point of the room rather than the one closest to the coordinates.
+triggers.everest/teleport.attributes.description.onlyOnce=Whether the trigger should only teleport once.
+triggers.everest/teleport.attributes.description.flag=Flag required for the trigger to teleport. Leave empty to always teleport.
+
 # Smooth Camera Offset (Everest)
 triggers.everest/smoothCameraOffsetTrigger.placements.name.smooth_camera=Smooth Camera Offset
 triggers.everest/smoothCameraOffsetTrigger.attributes.description.offsetXFrom=First X position of the camera offset.
