@@ -169,7 +169,7 @@ entities.jumpThru.placements.name.reflection=Jump Through (Reflection)
 entities.jumpThru.placements.name.core=Jump Through (Core)
 entities.jumpThru.placements.name.moon=Jump Through (Moon)
 entities.jumpThru.attributes.description.texture=Changes the appearance of the platform.
-entities.jumpThru.attributes.description.surfaceIndex=Footstep sound when walking on the platform.\nLeave at Default for game to decide automatically based on texture.
+entities.jumpThru.attributes.description.surfaceIndex=Footstep sound when walking on the platform.\nLeave at Default for the game to decide automatically based on texture.
 
 # Player
 entities.player.placements.name.player=Player (Spawn Point)
@@ -335,6 +335,9 @@ entities.negaBlock.placements.name.nega_block=Nega Block
 
 # Invisible Barrier
 entities.invisibleBarrier.placements.name.invisible_barrier=Invisible Barrier
+entities.invisibleBarrier.attributes.description.allowClimbing=Whether the barrier can be climbed.
+entities.invisibleBarrier.attributes.description.surfaceIndex=Footstep sound when walking on the platform.
+entities.invisibleBarrier.attributes.description.allowStaticMovers=Whether static movers attach to the barrier.
 
 # Strawberry Blockfield
 entities.blockField.placements.name.block_field=Strawberry Blockfield
@@ -357,6 +360,7 @@ entities.seekerStatue.attributes.description.hatch=Determines whether the statue
 # Seeker Barrier
 entities.seekerBarrier.placements.name.seeker_barrier=Seeker Barrier
 entities.seekerBarrier.placements.name.jellyfish_barrier=Jellyfish Barrier
+entities.seekerBarrier.attributes.description.allowStaticMovers=Whether static movers attach to the barrier.
 
 # Player Seeker
 entities.playerSeeker.placements.name.player_seeker=Player Seeker
