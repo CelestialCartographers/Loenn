@@ -1,5 +1,4 @@
 local lfs = require("lib.lfs_ffi")
-local nfd = require("nfd")
 local physfs = require("lib.physfs")
 local requireUtils = require("utils.require")
 local threadHandler = require("utils.threads")
@@ -8,6 +7,10 @@ local osUtils = require("utils.os")
 local hasRequest, request = requireUtils.tryrequire("lib.luajit-request.luajit-request")
 
 local filesystem = {}
+
+local function getNfd()
+    return require("nfd")
+end
 
 function filesystem.supportWindowsInThreads()
     return osUtils.getOS() ~= "OS X"
@@ -355,13 +358,13 @@ function filesystem.saveDialog(path, filter, callback)
             return threadHandler.createStartWithCallback(code, callback, path, filter)
 
         else
-            callback(nfd.save(filter, nil, path))
+            callback(getNfd().save(filter, nil, path))
 
             return false, false
         end
 
     else
-        return nfd.save(filter, nil, path)
+        return getNfd().save(filter, nil, path)
     end
 end
 
@@ -386,7 +389,7 @@ function filesystem.openDialog(path, filter, callback)
             return threadHandler.createStartWithCallback(code, callback, path, filter)
 
         else
-            local result = nfd.open(filter, path)
+            local result = getNfd().open(filter, path)
 
             if result then
                 callback(result)
@@ -396,7 +399,7 @@ function filesystem.openDialog(path, filter, callback)
         end
 
     else
-        return nfd.open(filter, path)
+        return getNfd().open(filter, path)
     end
 end
 
@@ -421,7 +424,7 @@ function filesystem.openFolderDialog(path, callback)
             return threadHandler.createStartWithCallback(code, callback, path)
 
         else
-            local result = nfd.openFolder(path)
+            local result = getNfd().openFolder(path)
 
             if result then
                 callback(result)
@@ -431,7 +434,7 @@ function filesystem.openFolderDialog(path, callback)
         end
 
     else
-        return nfd.openFolder(path)
+        return getNfd().openFolder(path)
     end
 end
 
