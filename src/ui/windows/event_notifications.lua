@@ -51,6 +51,30 @@ function notificationHandlers:saveSanitizerDependenciesMissing(missingMods, used
     )
 end
 
+function notificationHandlers:saveSanitizerVanillaMapWarning()
+    local language = languageRegistry.getLanguage()
+
+    notifications.notify(
+        function(popup)
+            return uiElements.column({
+                uiElements.label(tostring(language.ui.notifications.saveSanitizerVanillaMapWarning)),
+                uiElements.row({
+                    uiElements.button(tostring(language.ui.button.yes), function()
+                        loadedState.saveCurrentMap(function()
+                            popup:close()
+                        end, false)
+                    end),
+                    uiElements.button(tostring(language.ui.button.no), function()
+                        popup:close()
+                    end),
+                })
+            })
+        end,
+        -1,
+        {clearSameTag = true, tag = "saveSanitizerVanillaMap"}
+    )
+end
+
 function notificationHandlers:editorMapSaved(filename)
     local language = languageRegistry.getLanguage()
     local fromBackup = filename ~= loadedState.filename

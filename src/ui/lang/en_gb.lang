@@ -37,6 +37,8 @@ ui.notifications.updaterDontRemindMeAgain=Don't ask me again
 ui.notifications.saveSanitizerDependenciesMissing=Detected missing dependencies.\nDo you want to open the dependency window?
 ui.notifications.saveSanitizerDependenciesRemindMeLater=Remind me later
 
+ui.notifications.saveSanitizerVanillaMapWarning=Are you sure you want to save over a vanilla map?\nIn most cases, you do not want to do this.
+
 ui.notifications.mapImageSaveFailed=Failed to save map image
 
 
