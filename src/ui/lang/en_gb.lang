@@ -115,9 +115,11 @@ ui.settings_window.tab.debug=Debug
 
 # Settings - Editor - Interface
 settings.ui.theme.attribute.themeName=Theme
+settings.ui.theme.attribute.uiScale=UI Scale
 settings.ui.lists.attribute.shrinkToFit=Adapt List Width to Content
 
 settings.ui.theme.description.themeName=Visual theme used by Lönn. Additional themes can be added through plugins.
+settings.ui.theme.description.uiScale=Scale of user interface elements.\nRequires restart for some elements.
 settings.ui.lists.description.shrinkToFit=Make the lists on the sides exactly as wide as needed to display the content.\nIf disabled, lists will adapt to always fit the largest content.\nRequires restart.
 
 # Settings - Editor - Search

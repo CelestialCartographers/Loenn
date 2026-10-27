@@ -63,6 +63,7 @@ local defaultTabForms = {
                 title = "ui.settings_window.group.editor.interface",
                 fieldOrder = {
                     "ui.theme.themeName",
+                    "ui.theme.uiScale",
                     "spacer",
                     "ui.lists.shrinkToFit",
                 }
@@ -262,6 +263,16 @@ local themeOptions = {}
 for themeName, theme in pairs(themes.themes) do
     table.insert(themeOptions, themeName)
 end
+
+local uiScaleOptions = {
+    {"50%", 0.5},
+    {"75%", 0.75},
+    {"100%", 1.0},
+    {"125%", 1.25},
+    {"150%", 1.5},
+    {"175%", 1.75},
+    {"200%", 2.0},
+}
 
 local defaultFieldInformation = {
     ["spacer"] = {
@@ -560,6 +571,11 @@ local defaultFieldInformation = {
         editable = false,
         options = themeOptions
     },
+    ["ui.theme.uiScale"] = {
+        fieldType = "number",
+        editable = false,
+        options = uiScaleOptions
+    },
     ["ui.hotkeys.bypassDangerousActionWarningModifier"] = {
         fieldType = "keyboard_modifier"
     },
@@ -586,7 +602,7 @@ local function applyNewSettings(newSettings, oldSettings)
         return utils.getPath(newSettings, parts) ~= utils.getPath(oldSettings, parts)
     end
 
-    if settingChanged("ui.theme.themeName") then
+    if settingChanged("ui.theme.themeName") or settingChanged("ui.theme.uiScale") then
         themes.useTheme(newSettings.ui.theme.themeName)
     end
 
