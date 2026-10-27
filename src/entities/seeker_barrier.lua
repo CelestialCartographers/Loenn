@@ -8,7 +8,8 @@ seekerBarrier.placements = {
     alternativeName = "jellyfish_barrier",
     data = {
         width = 8,
-        height = 8
+        height = 8,
+        allowStaticMovers = true
     }
 }
 

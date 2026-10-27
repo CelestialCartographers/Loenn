@@ -69,4 +69,5 @@ return {
     sortRoomsOnSave = true,
     checkDependenciesOnSave = true,
     checkDependenciesRemindMeLaterDelay = 60 * 60 * 24,
+    warnOnVanillaMaps = true,
 }

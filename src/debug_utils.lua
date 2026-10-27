@@ -179,6 +179,7 @@ function debugUtils.restartLuaInstance()
 end
 
 function debugUtils.debug()
+    print("Entering Lua debug. Type `cont` to resume program.")
     debug.debug()
 end
 

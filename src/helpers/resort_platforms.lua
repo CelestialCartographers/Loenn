@@ -23,10 +23,10 @@ function resortPlatforms.addPlatformSprites(sprites, entity, position, texture, 
     texture = texture or string.format(textureLocation, entity.texture or "default")
     width = width or entity.width or 16
 
-    for i = 8, width - 1, 8 do
+    for i = 8, width - 9, 8 do
         local sprite = drawableSprite.fromTexture(texture, position)
 
-        sprite:addPosition(i - 8, 0)
+        sprite:addPosition(i, 0)
         sprite:useRelativeQuad(8, 0, 8, 8)
         sprite:setJustification(0, 0)
 
@@ -40,7 +40,7 @@ function resortPlatforms.addPlatformSprites(sprites, entity, position, texture, 
     leftSprite:useRelativeQuad(0, 0, 8, 8)
     leftSprite:setJustification(0, 0)
 
-    rightSprite:useRelativeQuad(25, 0, 8, 8)
+    rightSprite:useRelativeQuad(24, 0, 8, 8)
     rightSprite:addPosition(width - 8, 0)
     rightSprite:setJustification(0, 0)
 

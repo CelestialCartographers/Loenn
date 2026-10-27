@@ -288,6 +288,8 @@ function state.saveFile(filename, afterSaveCallback, beforeSaveCallback, addExtI
             if not callbackResult then
                 sceneHandler.sendEvent("editorMapSaveInterrupted", filename)
 
+                state.currentSaves[filename] = false
+
                 return false
             end
         end
