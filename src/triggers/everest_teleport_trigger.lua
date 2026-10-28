@@ -2,7 +2,7 @@ local enums = require("consts.celeste_enums")
 
 local everestTeleport = {}
 
-everestTeleport.name = "everest/teleport"
+everestTeleport.name = "everest/teleportTrigger"
 everestTeleport.category = "general"
 everestTeleport.associatedMods = {"Everest"}
 everestTeleport.fieldInformation = {

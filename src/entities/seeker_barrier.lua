@@ -9,7 +9,7 @@ seekerBarrier.placements = {
     data = {
         width = 8,
         height = 8,
-        allowStaticMovers = true
+        allowStaticMovers = false
     }
 }
 
