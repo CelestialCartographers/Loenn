@@ -18,7 +18,7 @@ invisibleBarrier.placements = {
         height = 8,
         allowClimbing = false,
         surfaceIndex = 33,
-        allowStaticMovers = true,
+        allowStaticMovers = false,
     }
 }
 
