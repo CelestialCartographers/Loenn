@@ -39,9 +39,10 @@ table.sort(songs)
 table.sort(ambientSounds)
 
 local defaultFieldOrder = {
-    "name", "color",
+    "name", "spacer",
     "x", "y",
     "width", "height",
+    "color", "customColor",
     "cameraOffsetX", "cameraOffsetY",
     "windPattern", "underwater", "space",
     "disableDownTransition", "checkpoint", "dark", "whisper",
@@ -51,6 +52,10 @@ local defaultFieldOrder = {
 }
 
 local defaultFieldInformation = {
+    ["spacer"] = {
+        fieldType = "spacer"
+    },
+
     x = {
         fieldType = "integer"
     },
@@ -77,6 +82,10 @@ local defaultFieldInformation = {
         fieldType = "integer",
         options = colorOptions,
         editable = false
+    },
+    customColor = {
+        fieldType = "color",
+        allowEmpty = true
     },
 
     musicProgress = {
