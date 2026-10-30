@@ -1,5 +1,5 @@
 local enums = require("consts.celeste_enums")
-local songs = table.keys(enums.songs)
+local songs = table.keys(enums.alt_songs)
 
 table.sort(songs)
 
