@@ -364,6 +364,7 @@ celesteEnums.swap_block_themes = {
 }
 
 celesteEnums.intro_types = {
+    "Transition",
     "Respawn",
     "WalkInRight",
     "WalkInLeft",
