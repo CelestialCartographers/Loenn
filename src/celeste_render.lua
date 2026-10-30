@@ -257,10 +257,21 @@ function celesteRender.getRoomBackgroundColor(room, selected, state)
     end
 
     local roomColor = room.color or 0
+    local roomCustomColor = room.customColor or ""
     local color = colors.roomBackgroundDefault
 
     if roomColor >= 0 and roomColor < #colors.roomBackgroundColors then
         color = colors.roomBackgroundColors[roomColor + 1]
+    end
+
+    -- Custom color by Everest
+    -- Use default background color instead
+    if roomCustomColor then
+        local success = utils.parseHexColor(roomCustomColor)
+
+        if success then
+            color = colors.roomBackgroundDefault
+        end
     end
 
     local r, g, b = color[1], color[2], color[3]
@@ -275,10 +286,20 @@ function celesteRender.getRoomBorderColor(room, selected, state)
     end
 
     local roomColor = room.color or 0
+    local roomCustomColor = room.customColor or ""
     local color = colors.roomBorderDefault
 
     if roomColor >= 0 and roomColor < #colors.roomBorderColors then
         color = colors.roomBorderColors[roomColor + 1]
+    end
+
+    -- Custom color by Everest
+    if roomCustomColor then
+        local success, r, g, b = utils.parseHexColor(roomCustomColor)
+
+        if success then
+            color = {r, g, b}
+        end
     end
 
     return color
