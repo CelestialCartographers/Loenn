@@ -60,6 +60,7 @@ function roomStruct.decode(data)
     room.windPattern = data.windPattern or "None"
 
     room.color = data.c or 0
+    room.customColor = data.color or ""
 
     room.cameraOffsetX = data.cameraOffsetX or 0
     room.cameraOffsetY = data.cameraOffsetY or 0
@@ -224,6 +225,10 @@ function roomStruct.encode(room)
     res.windPattern = room.windPattern
 
     res.c = room.color
+
+    if room.customColor ~= "" then
+        res.color = room.customColor
+    end
 
     res.cameraOffsetX = room.cameraOffsetX
     res.cameraOffsetY = room.cameraOffsetY
