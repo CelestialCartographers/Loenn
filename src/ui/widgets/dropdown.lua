@@ -63,7 +63,7 @@ local function listUpdate(orig, self, dt)
         local focused = ui.focusing == self.options.spawnParent
 
         while target and not focused do
-            if target == self or target == self.column then
+            if target == self or target == self.container then
                 focused = true
             end
 
