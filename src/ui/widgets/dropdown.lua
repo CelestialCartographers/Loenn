@@ -126,9 +126,9 @@ function dropdowns.fromList(callback, stringOptions, options)
         end
     end)
 
-    local wrappedCallback = function(list, target)
+    local wrappedCallback = function(list, target, item)
         callback(list, target)
-        button:setText(target)
+        button:setText(item.text)
     end
 
     local listColumn, list = lists.getMagicList(wrappedCallback, listItems, options)
