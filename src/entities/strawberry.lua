@@ -2,7 +2,7 @@ local strawberry = {}
 
 strawberry.name = "strawberry"
 strawberry.depth = -100
-strawberry.nodeLineRenderType = "fan"
+strawberry.nodeLineRenderType = "line"
 strawberry.nodeLimits = {0, -1}
 strawberry.fieldInformation = {
     order = {
