@@ -27,8 +27,13 @@ end
 
 function argumentParserMt.__index:_argumentFinished()
     local flagOptions = self.arguments[self._currentFlag]
-    local names = type(flagOptions.name) == "table" and flagOptions.name or {flagOptions.name}
     local valuesToStore = self._flagValues
+    local storeMultiple = flagOptions.storeMultiple
+    local names = type(flagOptions.name) == "table" and flagOptions.name or {flagOptions.name}
+
+    if flagOptions.destination then
+        table.insert(names, flagOptions.destination)
+    end
 
     -- Manual decision on how to store the data
     if flagOptions.action then
@@ -42,12 +47,17 @@ function argumentParserMt.__index:_argumentFinished()
         end
     end
 
-    if flagOptions.destination then
-        self._result[flagOptions.destination] = valuesToStore
-    end
-
     for _, name in ipairs(names) do
-        self._result[name] = valuesToStore
+        if storeMultiple then
+            if not self._result[name] then
+                self._result[name] = {}
+            end
+
+            table.insert(self._result[name], valuesToStore)
+
+        else
+            self._result[name] = valuesToStore
+        end
     end
 
     self._currentFlag = 0
