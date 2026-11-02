@@ -21,6 +21,12 @@ tool.name = "bucket"
 tool.group = "brush"
 tool.image = nil
 
+tool.mode = "region"
+tool.modes = {
+    "region",
+    "room"
+}
+
 tool.layer = "tilesFg"
 tool.validLayers = {
     "tilesFg",
@@ -39,17 +45,13 @@ local points = {}
 local pointsConnectedLines
 local currentFloodMatrix
 
-local function floodFill(matrix, x, y)
+local function floodFill(matrix, x, y, targetedTiles, processed)
     local result = {}
     local roomWidth, roomHeight = matrix:size()
 
-    local tlx, tly, brx, bry = math.huge, math.huge, 0, 0
-    local processed
-    local targetedTiles
-
     if x >= 1 and x <= roomWidth and y >= 1 and y <= roomHeight then
-        processed = matrixLib.filled(false, roomWidth, roomHeight)
-        targetedTiles = matrixLib.filled(false, roomWidth, roomHeight)
+        processed = processed or matrixLib.filled(false, roomWidth, roomHeight)
+        targetedTiles = targetedTiles or matrixLib.filled(false, roomWidth, roomHeight)
 
         local material = matrix:get(x, y)
         local needsProcessing = {{x, y}}
@@ -70,18 +72,13 @@ local function floodFill(matrix, x, y)
                     table.insert(needsProcessing, {targetX, targetY + 1})
                     table.insert(needsProcessing, {targetX, targetY - 1})
 
-                    tlx = math.min(targetX, tlx)
-                    tly = math.min(targetX, tlx)
-                    brx = math.max(targetX, brx)
-                    bry = math.max(targetY, brx)
-
                     targetedTiles:set(targetX, targetY, true)
                 end
             end
         end
     end
 
-    return result, targetedTiles, tlx, tly, brx, bry
+    return result, targetedTiles, processed
 end
 
 local function updatePoints(x, y)
@@ -96,8 +93,35 @@ local function updatePoints(x, y)
         local tiles = room[tool.layer]
         local tilesMatrix = tiles.matrix
 
-        points, currentFloodMatrix = floodFill(tilesMatrix, x, y)
-        pointsConnectedLines = brushToolUtils.connectEdgesFromPoints(points)
+        if tool.mode == "region" then
+            points, currentFloodMatrix = floodFill(tilesMatrix, x, y)
+            pointsConnectedLines = {brushToolUtils.connectEdgesFromPoints(points)}
+
+        elseif tool.mode == "room" then
+            -- Naive approach to mark all points and connection regions
+            -- Attempt flood fill at all points where we haven't already gone over with a flood fill
+            local targetMaterial = tilesMatrix:get(x, y)
+            local width, height = tilesMatrix:size()
+            local processed = matrixLib.filled(false, width, height)
+
+            currentFloodMatrix = matrixLib.filled(false, width, height)
+            points = {}
+            pointsConnectedLines = {}
+
+            for roomX = 1, width do
+                for roomY = 1, height do
+                    if targetMaterial == tilesMatrix:get(roomX, roomY) and not processed:get(roomX, roomY) then
+                        local newPoints = floodFill(tilesMatrix, roomX, roomY, currentFloodMatrix, processed)
+
+                        table.insert(pointsConnectedLines, brushToolUtils.connectEdgesFromPoints(newPoints))
+
+                        for _, point in ipairs(newPoints) do
+                            table.insert(points, point)
+                        end
+                    end
+                end
+            end
+        end
     end
 end
 
@@ -113,7 +137,7 @@ local function handleActionClick(x, y, force)
         local roomWidth, roomHeight = tilesMatrix:size()
         local matrix = matrixLib.filled(" ", roomWidth, roomHeight)
 
-        if #points > 0 then
+        if points and #points > 0 then
             for _, point in ipairs(points) do
                 matrix:set(point[1], point[2], tool.material)
             end
@@ -201,7 +225,9 @@ function tool.draw()
             drawing.callKeepOriginalColor(function()
                 love.graphics.setColor(colors.brushColor)
 
-                brushToolUtils.drawConnectedLines(pointsConnectedLines, -8, -8)
+                for _, previewConnectedLines in ipairs(pointsConnectedLines or {}) do
+                    brushToolUtils.drawConnectedLines(previewConnectedLines, -8, -8)
+                end
             end)
         end)
     end
