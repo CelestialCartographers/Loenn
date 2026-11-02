@@ -5,6 +5,7 @@ local config = require("utils.config")
 local configs = require("configs")
 local filesystem = require("utils.filesystem")
 local logging = require("logging")
+local launchArguments = require("launch_arguments")
 
 local modHandler = {}
 
@@ -625,6 +626,8 @@ function modHandler.mountMods(directory, force)
     directory = directory or utils.joinpath(fileLocations.getCelesteDir(), "Mods")
 
     local ignored = {}
+    local noMods = launchArguments.parsed.noMods
+    local alwaysLoad = table.flip(launchArguments.parsed.loadMods or {})
 
     if configs.general.useEverestBlacklist then
         logging.info("Reading Everest blacklist")
@@ -635,9 +638,11 @@ function modHandler.mountMods(directory, force)
     if utils.isDirectory(directory) then
         for filename, dir in utils.listDir(directory) do
             if filename ~= "." and filename ~= ".." then
-                if ignored[filename] then
+                local modIgnored = not alwaysLoad[filename] and (ignored[filename] or noMods)
+
+                if modIgnored then
                     if configs.debug.logModLoading then
-                        local message = string.format("Skipped '%s' due to Everest blacklist", filename)
+                        local message = string.format("Skipped '%s' due to Everest blacklist or launch arguments", filename)
 
                         logging.info(message)
                     end

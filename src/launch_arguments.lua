@@ -26,6 +26,17 @@ function launchArguments.updateArguments(raw)
         destination = "storageDirectory"
     })
 
+    -- Mod loading
+    parser:addFlag({
+        name = "--no-mods",
+        destination = "noMods"
+    })
+    parser:addArgument({
+        name = "--load-mod",
+        destination = "loadMods",
+        storeMultiple = true,
+    })
+
     launchArguments.arguments = arguments
     launchArguments.rawArguments = raw
     launchArguments.parsed = parser:parse(arguments)
