@@ -35,6 +35,11 @@ function launchArguments.updateArguments(raw)
         name = "--load-mod",
         destination = "loadMods",
         storeMultiple = true,
+        action = function(value)
+            local parts = $(value):split(",")()
+
+            return unpack(parts)
+        end
     })
 
     launchArguments.arguments = arguments

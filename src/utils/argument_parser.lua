@@ -37,7 +37,7 @@ function argumentParserMt.__index:_argumentFinished()
 
     -- Manual decision on how to store the data
     if flagOptions.action then
-        valuesToStore = flagOptions.action(unpack(valuesToStore))
+        valuesToStore = {flagOptions.action(unpack(valuesToStore))}
 
     else
         -- TODO - Type conversion
@@ -53,7 +53,14 @@ function argumentParserMt.__index:_argumentFinished()
                 self._result[name] = {}
             end
 
-            table.insert(self._result[name], valuesToStore)
+            if flagOptions.action then
+                for _, v in ipairs(valuesToStore) do
+                    table.insert(self._result[name], v)
+                end
+
+            else
+                table.insert(self._result[name], valuesToStore)
+            end
 
         else
             self._result[name] = valuesToStore
