@@ -14,16 +14,21 @@ languageRegistry.fallbackLanguageName = nil
 
 function languageRegistry.setLanguage(name)
     languageRegistry.currentLanguageName = name
-    languageRegistry.language = languageRegistry.languages[name] or {}
+    languageRegistry.language = languageRegistry.languages[name]
 end
 
 function languageRegistry.getLanguage()
+    -- If language is completely missing
+    if not languageRegistry.language then
+        return languageRegistry.fallbackLanguage
+    end
+
     return languageRegistry.language
 end
 
 function languageRegistry.setFallbackLanguage(name)
     languageRegistry.fallbackLanguageName = name
-    languageRegistry.fallbackLanguage = languageRegistry.languages[name] or {}
+    languageRegistry.fallbackLanguage = languageRegistry.languages[name]
 
     language.setFallback(languageRegistry.fallbackLanguage)
 end

@@ -55,9 +55,12 @@ local function checkDialog(path)
 end
 
 function startupScene:firstEnter()
+    local defaultConfig = require("default_config")
+
     -- Load language file for all other scenes
     languageRegistry.loadInternalFiles()
     languageRegistry.setLanguage(configs.general.language)
+    languageRegistry.setFallbackLanguage(defaultConfig.general.language)
 
     -- Skip this scene if Celeste directory is already configured
     if not startup.requiresInit() then
