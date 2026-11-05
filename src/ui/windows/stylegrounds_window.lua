@@ -265,7 +265,7 @@ local function prepareFormData(interactionData)
 
     -- Add any missing default values
     local handler = getHandler(style)
-    local defaultData = handler.defaultData(style) or {}
+    local defaultData = handler and handler.defaultData(style) or {}
 
     for k, v in pairs(defaultData) do
         if formData[k] == nil then
@@ -454,7 +454,7 @@ end
 -- For when the list is completely empty
 local function getDefaultListTarget()
     return {
-        style = createParallax(),
+        style = {},
         foreground = true,
         defaultTarget = true
     }
