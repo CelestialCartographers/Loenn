@@ -59,6 +59,7 @@ end
 
 function lang.parse(str, languageData)
     local res = languageData or {}
+    local res_mt = languageData and getmetatable(languageData) or lang_mt
 
     for _, line <- str:gsub("\r\n", "\n"):split("\n", nil, false) do
         if #line:match("^%s*(.*)%s*$") > 0 and not line:find(commentPrefix) then
@@ -67,7 +68,7 @@ function lang.parse(str, languageData)
             if #key > 0 and #value > 0 then
                 local target = res
                 for _, part <- key:split(separator, nil, false) do
-                    target[part] = rawget(target, part) or setmetatable({_exists = true, _path = getPath(rawget(target, "_path"), part)}, lang_mt)
+                    target[part] = rawget(target, part) or setmetatable({_exists = true, _path = getPath(rawget(target, "_path"), part)}, res_mt)
                     target = target[part]
                 end
 
@@ -76,7 +77,7 @@ function lang.parse(str, languageData)
         end
     end
 
-    return languageData and res or setmetatable(res, lang_mt)
+    return languageData and res or setmetatable(res, res_mt)
 end
 
 function lang.loadFile(filename, languageData, internal)
