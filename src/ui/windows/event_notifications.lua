@@ -60,7 +60,8 @@ function notificationHandlers:saveSanitizerVanillaMapWarning()
                 uiElements.label(tostring(language.ui.notifications.saveSanitizerVanillaMapWarning)),
                 uiElements.row({
                     uiElements.button(tostring(language.ui.button.yes), function()
-                        loadedState.saveCurrentMap(function()
+                        loadedState.saveCurrentMap(function(...)
+                            loadedState.defaultAfterSaveCallback(...)
                             popup:close()
                         end, false)
                     end),
