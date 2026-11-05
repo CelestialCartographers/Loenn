@@ -40,6 +40,11 @@ tools.name.line=Line
 
 tools.name.bucket=Bucket
 
+tools.bucket.modes.name.region=Region
+tools.bucket.modes.description.continuous=Change connected tiles in the room.
+tools.bucket.modes.name.room=Whole Room
+tools.bucket.modes.description.global=Change every similiar tile in the room.
+
 tools.name.rectangle=Rectangle
 
 tools.rectangle.modes.name.fill=Fill

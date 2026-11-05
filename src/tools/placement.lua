@@ -318,9 +318,10 @@ local function updatePlacementNodes(layer)
 
     local item = placementTemplate.item
     local placementType = getCurrentPlacementType()
-    local minimumNodes, maximumNodes = placementUtils.nodeLimits(room, layer, item)
+    local nodeCount = item.nodes and #item.nodes or 0
+    local nodeInitialCount = placementUtils.nodeInitialCount(room, layer, item)
 
-    if minimumNodes > 0 then
+    if nodeInitialCount > 0 or nodeCount > 0 then
         -- Set up empty nodes table if needed
         -- Make the nodes table the correct type, makes it less tedious in plugins
         if item.nodes then
@@ -335,7 +336,7 @@ local function updatePlacementNodes(layer)
         item.nodes._type = nodeStruct.nodesType
 
         -- Add nodes until placement has minimum amount of nodes
-        while #item.nodes < minimumNodes do
+        while #item.nodes < nodeInitialCount do
             local widthOffset = item.width or 0
             local nodeOffset = (#item.nodes + 1) * 16
 

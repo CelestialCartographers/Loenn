@@ -203,6 +203,16 @@ function placementUtils.warnAboveSize(room, layer, target)
     return placementUtils.maximumSize(room, layer, target)
 end
 
+function placementUtils.nodeInitialCount(room, layer, target)
+    local handler = layerHandlers.getHandler(layer)
+
+    if handler and handler.nodeInitialCount then
+        return handler.nodeInitialCount(room, layer, target)
+    end
+
+    return 0
+end
+
 function placementUtils.nodeLimits(room, layer, target)
     local handler = layerHandlers.getHandler(layer)
 

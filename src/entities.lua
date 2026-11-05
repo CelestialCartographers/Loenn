@@ -1244,6 +1244,13 @@ function entities.warnAboveSize(room, layer, entity)
     return entities.getHandlerValue(entity, room, "warnAbove", fallbackWidth, fallbackHeight)
 end
 
+-- Use nodeInitialCount if it exists, otherwise fallack to minimum node size
+function entities.nodeInitialCount(room, layer, entitie)
+    local minimum = entities.nodeLimits(room, layer, entitie)
+
+    return entities.getHandlerValue(entitie, room, "nodeInitialCount", minimum)
+end
+
 function entities.nodeLimits(room, layer, entity)
     return entities.getHandlerValue(entity, room, "nodeLimits", 0, 0)
 end
