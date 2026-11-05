@@ -739,6 +739,13 @@ function triggers.warnAboveSize(room, layer, trigger)
     return math.huge, math.huge
 end
 
+-- Use nodeInitialCount if it exists, otherwise fallack to minimum node size
+function triggers.nodeInitialCount(room, layer, trigger)
+    local minimum = triggers.nodeLimits(room, layer, trigger)
+
+    return triggers.getHandlerValue(trigger, room, "nodeInitialCount", minimum)
+end
+
 function triggers.nodeLimits(room, layer, trigger)
     return triggers.getHandlerValue(trigger, room, "nodeLimits", 0, 0)
 end
