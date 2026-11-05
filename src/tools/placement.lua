@@ -318,9 +318,10 @@ local function updatePlacementNodes(layer)
 
     local item = placementTemplate.item
     local placementType = getCurrentPlacementType()
-    local minimumNodes, maximumNodes = placementUtils.nodeLimits(room, layer, item)
+    local nodeCount = item.nodes and #item.nodes or 0
+    local minimumNodes = placementUtils.nodeLimits(room, layer, item)
 
-    if minimumNodes > 0 then
+    if minimumNodes > 0 or nodeCount > 0 then
         -- Set up empty nodes table if needed
         -- Make the nodes table the correct type, makes it less tedious in plugins
         if item.nodes then
