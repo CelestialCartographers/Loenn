@@ -1245,10 +1245,10 @@ function entities.warnAboveSize(room, layer, entity)
 end
 
 -- Use nodeInitialCount if it exists, otherwise fallack to minimum node size
-function entities.nodeInitialCount(room, layer, entitie)
-    local minimum = entities.nodeLimits(room, layer, entitie)
+function entities.nodeInitialCount(room, layer, entity)
+    local minimum = entities.nodeLimits(room, layer, entity)
 
-    return entities.getHandlerValue(entitie, room, "nodeInitialCount", minimum)
+    return entities.getHandlerValue(entity, room, "nodeInitialCount", minimum)
 end
 
 function entities.nodeLimits(room, layer, entity)
