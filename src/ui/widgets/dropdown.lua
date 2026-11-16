@@ -206,9 +206,10 @@ function dropdowns.fromList(callback, stringOptions, options)
                     -- List height didn't seem to make sense after two layout calls, this is good enough
                     local listHeight = lists.getMagicListHeight(list)
                     local listBottom = spawnY + listHeight
-                    local rootBottom = spawnRoot.realY + spawnRoot.height - dropdownStyle.margin
+                    local rootBottom = spawnRoot.screenY + spawnRoot.height - dropdownStyle.margin
 
-                    list.container.height = math.min(listHeight, spawnRoot.height)
+                    list.height = math.min(listHeight, spawnRoot.height)
+                    list.container.height = math.min(listHeight, spawnRoot.height) - 2 * dropdownStyle.padding
 
                     if listBottom > rootBottom then
                         if fromSearchFilter then
@@ -263,7 +264,7 @@ function dropdowns.fromList(callback, stringOptions, options)
         local spawnParent = options.spawnParent or self
 
         local spawnY = spawnParent.screenY + spawnParent.height + dropdownStyle.margin
-        local rootBottom = spawnRoot.realY + spawnRoot.height - dropdownStyle.margin
+        local rootBottom = spawnRoot.screenY + spawnRoot.height - dropdownStyle.margin
 
         list.height = rootBottom - spawnY
         list.container.height = rootBottom - spawnY - 2 * dropdownStyle.padding
