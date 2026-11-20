@@ -695,7 +695,21 @@ else
     end
 
     local dirent_def
-    if OS == 'OSX' or OS == 'BSD' then
+    if OS == 'OSX' and ffi.arch == 'arm64' then
+        -- macOS arm64 only exposes the modern 64-bit inode dirent ABI.
+        -- Using the legacy layout reads d_name at the wrong offset and
+        -- produces empty or corrupt filenames while enumerating folders.
+        dirent_def = [[
+            struct dirent {
+                uint64_t d_ino;
+                uint64_t d_seekoff;
+                uint16_t d_reclen;
+                uint16_t d_namlen;
+                uint8_t  d_type;
+                char d_name[1024];
+            };
+        ]]
+    elseif OS == 'OSX' or OS == 'BSD' then
         dirent_def = [[
             /* _DARWIN_FEATURE_64_BIT_INODE is NOT defined here? */
             struct dirent {
